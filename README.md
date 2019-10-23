@@ -1,2 +1,4 @@
-# functions
-MLRun template functions and examples
+# Function Templates and Examples
+
+This repo stores ML and data processing related functions and examples
+

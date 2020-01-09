@@ -35,7 +35,8 @@ def open_archive(context: MLClientCtx,
     specified (defaults to 'content').
 
     :param context:      function context
-    :param target_dir:   destination for file artifact
+    :param target_path:  destination for file artifact
+    :param key:          key of item in artifact store
     :param archive_url:  source archive url
     """
     # Define locations

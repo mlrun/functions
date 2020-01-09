@@ -63,6 +63,7 @@ def arc_to_parquet(
     name: str = "",
     chunksize: int = 10_000,
     log_data: bool = True,
+    add_uid: bool = False,
     key: str = 'raw_data'
 ) -> None:
     """Open a file/object archive and save as a parquet file.
@@ -77,15 +78,21 @@ def arc_to_parquet(
     :param chunksize:   (0) row size retrieved per iteration
     :param log_data:    (True) if True, log the data so that it is available
                         at the next step
+    :param add_uid:     (False) add the metadata uid to the target_path so that 
+                        runs can be identified
     :param key:         key in artifact store (when log_data=True)
     """
-    os.makedirs(target_path, exist_ok=True)
-
     if not name.endswith(".parquet"):
         name += ".parquet"
-
-    dest_path = os.path.join(target_path, name)
-
+    
+    if not add_uid:
+        uid = ''
+    else:
+        uid = context.uid
+        
+    dest_path = os.path.join(target_path, uid, name)
+    os.makedirs(os.path.join(target_path, uid), exist_ok=True)
+    
     if not os.path.isfile(dest_path):
         context.logger.info("destination file does not exist, downloading")
         pqwriter = None
@@ -102,8 +109,8 @@ def arc_to_parquet(
 
         context.logger.info(f"saved table to {dest_path}")
     else:
-        context.logger.info("destination file exists")
+        context.logger.info("destination file already exists")
 
     if log_data:
-        context.logger.info("logging data to context")
+        context.logger.info(f"assign data to {key} in artifact store")
         context.log_artifact(key, target_path=dest_path)

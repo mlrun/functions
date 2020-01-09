@@ -22,3 +22,4 @@ spec:
     - pip install -q pyarrow
     - pip install -q numpy
     - pip install -q pandas
+    - pip install -q s3fs

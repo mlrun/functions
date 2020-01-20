@@ -1,12 +1,12 @@
 ## arc_to_parquet
 
-Retrieve a remote archive and save locally as a parquet file, [source](file_utils.py)
+Retrieve a remote archive and save locally as a parquet file, [source](arc_to_parquet.py)
 
 Usage example:
 
 ```python
 # load function from Github
-xfn = mlrun.import_function('https://raw.githubusercontent.com/yjb-ds/functions/arc2parq/arc2parq/arc_to_parquet.yaml')
+xfn = mlrun.import_function('https://raw.githubusercontent.com/mlrun/functions/master/fileutils/arc_to_parquet/arc_to_parquet.yaml')
 
 # configure function: mount on Iguazio data fabric, set as interactive (return stdout)
 xfn.apply(mlrun.mount_v3io())

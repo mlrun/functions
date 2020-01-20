@@ -8,7 +8,7 @@ Usage example:
 
 ```python
 # load function from Github
-xfn = mlrun.import_function('https://raw.githubusercontent.com/yjb-ds/functions/master/fileutils/open_archive.yaml')
+xfn = mlrun.import_function('https://raw.githubusercontent.com/mlrun/functions/master/fileutils/open_archive/function.yaml')
 
 # configute it: mount on iguazio fabric, set as interactive (return stdout)
 xfn.apply(mlrun.mount_v3io())

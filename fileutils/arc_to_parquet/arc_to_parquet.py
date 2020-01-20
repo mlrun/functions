@@ -65,5 +65,9 @@ def arc_to_parquet(
         context.logger.info("destination file already exists")
 
     if log_data:
-        context.logger.info(f"assign data to {key} in artifact store")
         context.log_artifact(key, target_path=dest_path)
+        if header:
+            header = [x.replace(' ', '_') for x in header]
+            filepath = path.join(target_path, 'header.json')
+            json.dump(header, open(filepath, 'w'))
+            context.log_artifact('header', target_path=filepath)

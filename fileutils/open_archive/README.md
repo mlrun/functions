@@ -2,23 +2,23 @@
 
 ## open_archive
 
-Example function which can open a remote zip archive into a local target folder, [see source](file_utils.py).
+Open a remote zip archive into a local target folder, [ource](file_utils.py).
 
 Usage example:
 
 ```python
 # load function from Github
-xfn = mlrun.import_function('https://raw.githubusercontent.com/mlrun/functions/master/fileutils/function.yaml')
+xfn = mlrun.import_function('https://raw.githubusercontent.com/mlrun/functions/master/fileutils/open_archive/function.yaml')
 
 # configute it: mount on iguazio fabric, set as interactive (return stdout)
 xfn.apply(mlrun.mount_v3io())
 xfn.interactive = True
 
 # create and run the task
-images_path = '/User/mlrun/examples/images'
+images_path = '/User/mlrun/functions/images'
 open_archive_task = mlrun.NewTask('download', handler='open_archive', 
-               params={'target_dir': images_path},
-               inputs={'archive_url': 'http://iguazio-sample-data.s3.amazonaws.com/catsndogs.zip'})
+                                  params={'target_dir': images_path},
+                                  inputs={'archive_url': 'http://iguazio-sample-data.s3.amazonaws.com/catsndogs.zip'})
 
 # run
 run = xfn.run(open_archive_task)

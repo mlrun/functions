@@ -28,10 +28,10 @@ def create_binary_classification(
     features_hdr: Optional[List[str]] = None,
     weight: float = 0.50,
     random_state=1,
-    filename: Any = None,
+    filename: Optional[str] = None,
     target_path: str = "",
     key: str = "",
-#     **sk_params,
+    **sk_params,
 ):
     """Create a binary classification sample dataset and save.
     If no filename is given it will default to:
@@ -46,6 +46,7 @@ def create_binary_classification(
     :param filename:      optional name for stored data file
     :param target_path:   destimation for file
     :param key:           key of data in artifact store
+    :param sk_params:     keyword arguments for scikit-learn's 'make_classification'
     Returns filename of created data (includes path).
     """
     # check directories exist and create filename if None:
@@ -60,7 +61,7 @@ def create_binary_classification(
         weights=[weight],  # False
         n_classes=2,
         random_state=random_state,
-#         **sk_params,
+        **sk_params,
     )
 
     # make dataframes, add column names, concatenate (X, y)

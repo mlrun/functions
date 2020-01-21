@@ -11,10 +11,10 @@ from typing import IO, AnyStr, Union, List, Optional
 def arc_to_parquet(
     context: MLClientCtx,
     archive_url: Union[str, Path, IO[AnyStr]],
-    header: Optional[List[str]] = None,
+    header: Union[int, List[str], None] = 0,
     target_path: str = "",
     name: str = "",
-    chunksize: int = 10_000,
+    chunksize: int = 10_240,
     log_data: bool = True,
     add_uid: bool = False,
     key: str = "raw_data",
@@ -45,7 +45,7 @@ def arc_to_parquet(
 
     dest_path = os.path.join(target_path, uid, name)
     os.makedirs(os.path.join(target_path, uid), exist_ok=True)
-
+    
     if not os.path.isfile(dest_path):
         context.logger.info("destination file does not exist, downloading")
         pqwriter = None
@@ -54,6 +54,8 @@ def arc_to_parquet(
         ):
             table = pa.Table.from_pandas(df)
             if i == 0:
+                header = list(df)
+                header = [x.replace(' ', '_') for x in header]
                 pqwriter = pq.ParquetWriter(dest_path, table.schema)
             pqwriter.write_table(table)
 
@@ -66,8 +68,8 @@ def arc_to_parquet(
 
     if log_data:
         context.log_artifact(key, target_path=dest_path)
-        if header:
-            header = [x.replace(' ', '_') for x in header]
-            filepath = path.join(target_path, 'header.json')
-            json.dump(header, open(filepath, 'w'))
-            context.log_artifact('header', target_path=filepath)
+        # log header
+        filepath = path.join(target_path, 'header.json')
+        json.dump(header, open(filepath, 'w'))
+        context.log_artifact('header', target_path=filepath)
+            

@@ -1,4 +1,4 @@
-n_samp# Copyright 2019 Iguazio
+# Copyright 2019 Iguazio
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,16 +22,15 @@ from mlrun.execution import MLClientCtx
 
 
 def create_binary_classification(
-    context: MLClientCtx = None,
-    n_samples: int = 100_000,
-    m_features: int = 20,
-    features_hdr: Optional[List[str]] = None,
-    weight: float = 0.50,
-    random_state=1,
-    filename: Optional[str] = None,
-    target_path: str = "",
-    key: str = "",
-    **sk_params,
+    context : MLClientCtx = None,
+    n_samples : int = 100_000,
+    m_features : int = 20,
+    features_hdr : Optional[List[str]] = None,
+    weight : float = 0.50,
+    random_state : int =1,
+    filename : Optional[str] = None,
+    target_path : str = "",
+    key : str = ""
 ):
     """Create a binary classification sample dataset and save.
     If no filename is given it will default to:
@@ -46,7 +45,6 @@ def create_binary_classification(
     :param filename:      optional name for stored data file
     :param target_path:   destimation for file
     :param key:           key of data in artifact store
-    :param sk_params:     keyword arguments for scikit-learn's 'make_classification'
     Returns filename of created data (includes path).
     """
     # check directories exist and create filename if None:
@@ -54,15 +52,15 @@ def create_binary_classification(
     if not filename:
         name = f"simdata-{n_samples:0.0e}X{m_features}.parquet".replace("+", "")
         filename = os.path.join(target_path, name)
-
+    else:
+        filename = os.path.join(target_path, filename)
+    
     features, labels = make_classification(
         n_samples=n_samples,
         n_features=m_features,
         weights=[weight],  # False
         n_classes=2,
-        random_state=random_state,
-        **sk_params,
-    )
+        random_state=random_state)
 
     # make dataframes, add column names, concatenate (X, y)
     X = pd.DataFrame(features)

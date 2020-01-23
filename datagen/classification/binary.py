@@ -36,6 +36,7 @@ def create_binary_classification(
     If no filename is given it will default to:
     'simdata-{n_samples}X{m_features}.parquet'.
     All of the scikit-learn parameters can be set using **sk_params
+    
     :param context:       function context
     :param n_samples:     number of rows/samples
     :param m_features:    number of cols/features

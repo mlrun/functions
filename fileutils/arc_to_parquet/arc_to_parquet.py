@@ -46,8 +46,8 @@ def arc_to_parquet(
     :param chunksize:   (0) row size retrieved per iteration
     :param key:         key in artifact store (when log_data=True)
     """
-    if not name.endswith(".parquet"):
-        name += ".parquet"
+    if not name.endswith(".pqt"):
+        name += ".pqt"
 
     dest_path = os.path.join(target_path, name)
     os.makedirs(os.path.join(target_path), exist_ok=True)

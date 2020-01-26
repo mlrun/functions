@@ -52,10 +52,7 @@ def test_model(
     :param key:             key for model artifact
     """
     # load model and data
-    if isinstance(model, DataItem):
-        clf = load(open(str(model), 'rb'))
-    else:
-        clf = load(open(model, 'rb'))
+    clf = load(open(str(model), 'rb'))
 
     if isinstance(xtest, DataItem):
         xtest = pd.read_parquet(str(xtest))

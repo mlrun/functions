@@ -5,10 +5,16 @@ import pyarrow.parquet as pq
 import pyarrow as pa
 from cloudpickle import dump
 
+import pyarrow.parquet as pq
+import pyarrow as pa
+
 from sklearn.model_selection import train_test_split
 from typing import Optional, Union
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
+
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 def train_valid_test_splitter(
     context: Optional[MLClientCtx] = None,
@@ -40,19 +46,18 @@ def train_valid_test_splitter(
     :param key:             key for model artifact
     :param random_state:    (1) sklearn rng seed
     """
-    if isinstance(src_file, DataItem):
-        src_file = str(src_file)
-    srcfilepath = os.path.join(target_path, src_file)
+    srcfilepath = os.path.join(target_path, str(src_file))
 
     if (sample == -1) or (sample >= 1):
         # get all rows, or contiguous sample starting at row 1.
-        raw = pd.read_parquet(srcfilepath, engine='pyarrow')
+        raw = pq.read_table(srcfilepath).to_pandas()
         labels = raw.pop(label_column)
         raw = raw.iloc[:sample, :]
         labels = labels.iloc[:sample]
     else:
         # grab a random sample
-        raw = pd.read_parquet(srcfilepath, engine='pyarrow').sample(sample*-1)
+        #raw = pd.read_parquet(srcfilepath, engine='pyarrow').sample(sample*-1)
+        raw = pq.read_table(srcfilepath).to_pandas().sample(sample*-1)
         labels = raw.pop(label_column)
     
     # double split tp generate 3 data sets: train, validation and test

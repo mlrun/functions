@@ -81,17 +81,22 @@ def train(
     # create classifier class from string and instantiate
     splits = SKClassifier.split(".")
     clfclass = getattr(importlib.import_module(".".join(splits[:-1])), splits[-1])
-    clf = clfclass(random_state=random_state, verbose=int(verbose == True))
+    model = clfclass(random_state=random_state, verbose=int(verbose == True))
 
-    clf.fit(xtrain, 
-            ytrain,
-            eval_set=[(xvalid, yvalid), (xtrain, ytrain)],
-            eval_names=['valid', 'train'],
-            callbacks=callbacks,
-            verbose=verbose)
+    model.fit(xtrain, 
+              ytrain,
+              eval_set=[(xvalid, yvalid), (xtrain, ytrain)],
+              eval_names=['valid', 'train'],
+              callbacks=callbacks,
+              verbose=verbose)
      
     context.log_result("train_accuracy", float(clf.score(xtrain, ytrain)))
-
+    
+    # plot train and validation history, save and log
+    loss = np.asarray(model.evals_result_['train']['binary_logloss'], dtype=np.float)
+    val_loss = np.asarray(model.evals_result_['valid']['binary_logloss'], dtype=np.float)
+    plot_validation(loss, val_loss)
+    
     # save model
     filepath = os.path.join(target_path, name)
     dump(clf, open(filepath, 'wb'))
@@ -102,3 +107,32 @@ def train(
         filepath = os.path.join(target_path, fname)
         dump(xtest, open(filepath, 'wb'))
         context.log_artifact(t+'test', target_path=filepath)
+        
+        
+def plot_validation(train_metric, valid_metric):
+    """Plot train and validation loss curves
+
+    These curves represent the training round losses from the training
+    and validation sets.
+    
+    :param train_metric:    train metric
+    :param valid_metric:    validation metric
+    """
+    # generate plot
+    plt.plot(train_metric)
+    plt.plot(valid_metric)
+    plt.title("training validation results")
+    plt.xlabel("epoch")
+    plt.ylabel("")
+    plt.legend(["train", "valid"])
+    fig = plt.gcf()
+
+    # save figure and log artifact
+    plotpath = path.join(target_path, "history.png")
+    plt.savefig(plotpath)
+    context.log_artifact(PlotArtifact('training-validation-plot', body=fig, target_path=plotpath))
+
+    # plot cleanup
+    plt.cla()
+    plt.clf()
+    plt.close()        

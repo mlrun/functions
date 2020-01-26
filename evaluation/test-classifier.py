@@ -19,6 +19,8 @@ from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.artifacts import TableArtifact, PlotArtifact
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 def test_model(
     context: Optional[MLClientCtx],

@@ -45,6 +45,8 @@ def arc_to_parquet(
     log_data: bool = True,
     add_uid: bool = False,
     key: str = "raw_data",
+    dataset: bool = False,
+    partition_cols = []
 ) -> None:
     """Open a file/object archive and save as a parquet file.
     
@@ -57,6 +59,9 @@ def arc_to_parquet(
     :param name:        name file to be saved locally, also
     :param chunksize:   (0) row size retrieved per iteration
     :param key:         key in artifact store (when log_data=True)
+    :param dataset:     (False) if True then target_path is folder for
+                        partitioned files
+    :param part_cols:   ([]) list of partitioning columns
     """
     if not name.endswith(".pqt"):
         name += ".pqt"
@@ -70,8 +75,11 @@ def arc_to_parquet(
             table = pa.Table.from_pandas(df)
             if i == 0:
                 pqwriter = pq.ParquetWriter(dest_path, table.schema)
-            pqwriter.write_table(table)
-
+            if dataset:
+                pq.write_to_dataset(table, root_path=target_path, partition_cols=partition_cols)
+            else:
+                pqwriter.write_table(table)
+            
         if pqwriter:
             pqwriter.close()
 
@@ -80,6 +88,7 @@ def arc_to_parquet(
         context.logger.info("destination file already exists")
 
     context.log_artifact(key, target_path=dest_path)
+    
     # log header
     filepath = os.path.join(target_path, 'header.pkl')
     dump(header, open(filepath, 'wb'))

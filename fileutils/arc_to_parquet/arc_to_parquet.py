@@ -26,6 +26,7 @@ else:
 import os
 import json
 from pathlib import Path
+import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 import pyarrow as pa
@@ -42,13 +43,18 @@ def arc_to_parquet(
     target_path: str = "",
     name: str = "",
     chunksize: int = 10_000,
+    dtype=None,
+    encoding: str = 'latin-1',
     log_data: bool = True,
     add_uid: bool = False,
     key: str = "raw_data",
     dataset: bool = False,
-    partition_cols = []
+    partition_cols = [],
+    inc_cols: Optional[List[str]] = None
 ) -> None:
     """Open a file/object archive and save as a parquet file.
+    
+    Partitioning requires precise specification of column types.
     
     :param context:     function context
     :param archive_url: any valid string path consistent with the path variable
@@ -58,6 +64,8 @@ def arc_to_parquet(
     :param target_path: destination folder of table
     :param name:        name file to be saved locally, also
     :param chunksize:   (0) row size retrieved per iteration
+    :param inc_cols:    include only these columns
+    :param dtype        destination data type of specified columns
     :param key:         key in artifact store (when log_data=True)
     :param dataset:     (False) if True then target_path is folder for
                         partitioned files
@@ -65,13 +73,18 @@ def arc_to_parquet(
     """
     if not name.endswith(".pqt"):
         name += ".pqt"
-
+    
     dest_path = os.path.join(target_path, name)
     os.makedirs(os.path.join(target_path), exist_ok=True)
     if not os.path.isfile(dest_path):
         context.logger.info("destination file does not exist, downloading")
         pqwriter = None
-        for i, df in enumerate(pd.read_csv(archive_url, chunksize=chunksize, names=header)):
+        for i, df in enumerate(pd.read_csv(archive_url, 
+                                           chunksize=chunksize, 
+                                           names=header, 
+                                           encoding=encoding, 
+                                           usecols=inc_cols, 
+                                           dtype=dtype)):
             table = pa.Table.from_pandas(df)
             if i == 0:
                 pqwriter = pq.ParquetWriter(dest_path, table.schema)

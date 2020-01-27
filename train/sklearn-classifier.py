@@ -124,3 +124,41 @@ def plot_validation(
     plt.cla()
     plt.clf()
     plt.close()        
+
+
+    
+def keras_classifier_generator(
+    metrics: list = [],
+    input_size: int = 20,
+    dropout: float = 0.5,
+    output_bias: float = None,
+    learning_rate: float = 1e-3
+):
+    """Generate a super simple classifier
+
+    :param metrics:      select metrics to be evaluated
+    :param output_bias:  layer initializer
+    :param input_size:   number of features, size of input
+    :param dropout:      dropout frequency
+    :param learning_rate:
+
+    returns a compiled keras model used as input to the KerasClassifer wrapper
+    """
+    if output_bias is not None:
+        output_bias = Constant(output_bias)
+
+    model = Sequential(
+        [
+            Dense(16, activation="relu", input_shape=(input_size,)),
+            Dropout(dropout),
+            Dense(1, activation="sigmoid", bias_initializer=output_bias),
+        ]
+    )
+
+    model.compile(
+        optimizer=Adam(lr=learning_rate),
+        loss=BinaryCrossentropy(),
+        metrics=metrics
+    )
+
+    return model    

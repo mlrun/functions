@@ -2,4 +2,5 @@ models/
 .ipynb_checkpoints
 *.gz
 *.csv
+*.pyc
 *.swp

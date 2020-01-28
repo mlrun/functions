@@ -40,17 +40,15 @@ def arc_to_parquet(
     context: MLClientCtx,
     archive_url: Union[str, Path, IO[AnyStr]],
     header: Optional[List[str]] = None,
+    inc_cols: Optional[List[str]] = None,
     target_path: str = "",
     name: str = "",
     chunksize: int = 10_000,
     dtype=None,
     encoding: str = 'latin-1',
-    log_data: bool = True,
-    add_uid: bool = False,
-    key: str = "raw_data",
-    dataset: bool = False,
+    key: str = 'data',
+    dataset: str = 'dataset',
     partition_cols = [],
-    inc_cols: Optional[List[str]] = None
 ) -> None:
     """Open a file/object archive and save as a parquet file.
     
@@ -61,21 +59,28 @@ def arc_to_parquet(
                         of pandas.read_csv, including strings as file paths, as urls, 
                         pathlib.Path objects, etc...
     :param header:      column names
+    :param inc_cols:    include only these columns
     :param target_path: destination folder of table
     :param name:        name file to be saved locally, also
     :param chunksize:   (0) row size retrieved per iteration
-    :param inc_cols:    include only these columns
     :param dtype        destination data type of specified columns
+    :param encoding     ('latin-8') file encoding
     :param key:         key in artifact store (when log_data=True)
-    :param dataset:     (False) if True then target_path is folder for
-                        partitioned files
+    :param dataset:     (None) if not None then 'target_path/dataset'
+                        is folder for partitioned files
     :param part_cols:   ([]) list of partitioning columns
+    
     """
     if not name.endswith(".pqt"):
         name += ".pqt"
     
-    dest_path = os.path.join(target_path, name)
-    os.makedirs(os.path.join(target_path), exist_ok=True)
+    if dataset:
+        os.makedirs(os.path.join(target_path, dataset), exist_ok=True)
+        dest_path = os.path.join(target_path, dataset)
+    else:
+        os.makedirs(os.path.join(target_path), exist_ok=True)
+        dest_path = os.path.join(target_path, name)
+        
     if not os.path.isfile(dest_path):
         context.logger.info("destination file does not exist, downloading")
         pqwriter = None
@@ -87,10 +92,13 @@ def arc_to_parquet(
                                            dtype=dtype)):
             table = pa.Table.from_pandas(df)
             if i == 0:
-                pqwriter = pq.ParquetWriter(dest_path, table.schema)
+                # write the header to target_path...
+                pqwriter = pq.ParquetWriter(os.path.join(target_path,'header-only.pqt'), table.schema)
             if dataset:
-                pq.write_to_dataset(table, root_path=target_path, partition_cols=partition_cols)
+                 # ...and files to subfolder dataset
+                pq.write_to_dataset(table, root_path=dest_path, partition_cols=partition_cols)
             else:
+                # ...and file to a parquet file
                 pqwriter.write_table(table)
             
         if pqwriter:
@@ -99,10 +107,5 @@ def arc_to_parquet(
         context.logger.info(f"saved table to {dest_path}")
     else:
         context.logger.info("destination file already exists")
-
-    context.log_artifact(key, target_path=dest_path)
     
-    # log header
-    filepath = os.path.join(target_path, 'header.pkl')
-    dump(header, open(filepath, 'wb'))
-    context.log_artifact('header', target_path=filepath)
+    # context.log_artifact(key, target_path=dest_path)

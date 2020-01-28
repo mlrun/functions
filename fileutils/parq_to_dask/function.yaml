@@ -1,0 +1,23 @@
+kind: dask
+metadata:
+  name: function
+  hash: 722d874e8d00ff106a34b876c9700fc4f0bc2994
+  project: default
+spec:
+  command: /User/repos/functions/fileutils/parq_to_dask/function.py
+  args: []
+  image: ''
+  volumes: []
+  volume_mounts: []
+  env: []
+  build:
+    base_image: yjbds/mlrun-ds:latest
+    commands: []
+  description: ''
+  replicas: 4
+  image_pull_policy: Always
+  remote: true
+  service_type: NodePort
+  nthreads: 1
+  min_replicas: 0
+  max_replicas: 4

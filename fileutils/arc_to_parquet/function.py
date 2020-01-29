@@ -47,7 +47,7 @@ def arc_to_parquet(
     dtype=None,
     encoding: str = 'latin-1',
     key: str = 'data',
-    dataset: str = 'dataset',
+    dataset: Optional[str] = None,
     partition_cols = [],
 ) -> None:
     """Open a file/object archive and save as a parquet file.
@@ -74,7 +74,7 @@ def arc_to_parquet(
     if not name.endswith(".pqt"):
         name += ".pqt"
     
-    if dataset:
+    if dataset is not None:
         os.makedirs(os.path.join(target_path, dataset), exist_ok=True)
         dest_path = os.path.join(target_path, dataset)
     else:
@@ -86,19 +86,25 @@ def arc_to_parquet(
         pqwriter = None
         for i, df in enumerate(pd.read_csv(archive_url, 
                                            chunksize=chunksize, 
-                                           names=header, 
+                                           names=header,
                                            encoding=encoding, 
                                            usecols=inc_cols, 
                                            dtype=dtype)):
             table = pa.Table.from_pandas(df)
             if i == 0:
-                # write the header to target_path...
-                pqwriter = pq.ParquetWriter(os.path.join(target_path,'header-only.pqt'), table.schema)
+                filepath = os.path.join(target_path,'header-only.pqt')
+                if dataset:
+                    # just write header here
+                    pq.ParquetWriter(filepath, table.schema)
+                    context.log_artifact('header', target_path=filepath)
+                else:
+                    # start writing file
+                    context.log_artifact('header', target_path=filepath)
+                    pqwriter = pq.ParquetWriter(dest_path, table.schema)
+                
             if dataset:
-                 # ...and files to subfolder dataset
                 pq.write_to_dataset(table, root_path=dest_path, partition_cols=partition_cols)
             else:
-                # ...and file to a parquet file
                 pqwriter.write_table(table)
             
         if pqwriter:
@@ -108,4 +114,4 @@ def arc_to_parquet(
     else:
         context.logger.info("destination file already exists")
     
-    # context.log_artifact(key, target_path=dest_path)
+    context.log_artifact(key, target_path=dest_path)

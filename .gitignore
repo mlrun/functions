@@ -4,3 +4,4 @@ models/
 *.csv
 *.pyc
 *.swp
+dask-worker-space

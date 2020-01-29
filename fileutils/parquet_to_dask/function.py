@@ -11,18 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import ssl
-
-try:
-    _create_unverified_https_context = ssl._create_unverified_context
-except AttributeError:
-    # Legacy Python that doesn't verify HTTPS certificates by default
-    pass
-else:
-    # Handle target environment that doesn't support HTTPS verification
-    ssl._create_default_https_context = _create_unverified_https_context
-
 import os
 import json
 from pathlib import Path
@@ -44,19 +32,29 @@ def parquet_to_dask(
     inc_cols: Optional[List[str]] = None,
     index_cols: Optional[List[str]] = None,
     shards: int = 4,
-    persist: bool = True
+    threads_per: int = 4,
+    persist: bool = True,
+    dask_key: str = 'my_dask_dataframe'
 ) -> None:
-    """Load parquet file or dataset into dask cluster
+    """Load parquet dataset into dask cluster
     
-    
+    If no cluster is found loads a new one and persist the data to it
     """
     # Setup Dask
     if hasattr(context, 'dask_client'):
         dask_client = context.dask_client  
     else:
-        dask_client = Client(LocalCluster(n_workers=shards))
+        context.dask_client = Client(LocalCluster(n_workers=shards,
+                                                  threads_per_worker=threads_per))
+        context.logger.info(context.dask_client)
+
+    assert context.dask_client
     
     df = dd.read_parquet(parquet_url)
 
-    if persist:
-        df = df.persist()
+    if persist and context:
+        df = context.dask_client.persist(df)
+        context.dask_client.datasets[dask_key] = df
+        print(df.head())
+        # or can use:
+        # context.dask_client.publish_dataset(my_dataset=df)

@@ -1,0 +1,16 @@
+kind: job
+metadata:
+  name: arc_to_parquet
+  hash: 30906948185d1e5c2b3a20482a1e97dbb1505f8a
+  project: default
+spec:
+  command: /User/repos/functions/fileutils/arc_to_parquet/arc_to_parquet.py
+  args: []
+  image: ''
+  volumes: []
+  volume_mounts: []
+  env: []
+  description: retrieve archive table and save as partitioned parquet dataset
+  build:
+    base_image: yjbds/mlrun_dev-files:latest
+    commands: []

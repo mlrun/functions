@@ -1,21 +1,20 @@
 kind: dask
 metadata:
-  name: function
-  hash: 722d874e8d00ff106a34b876c9700fc4f0bc2994
+  name: describe
+  hash: 931bd0bbc1dde34284e6c604d0b08d5e9666b7a7
   project: default
 spec:
-  command: /User/repos/functions/fileutils/parq_to_dask/function.py
+  command: /User/repos/functions/tests/describe.py
   args: []
   image: ''
   volumes: []
   volume_mounts: []
   env: []
   build:
-    base_image: yjbds/mlrun-ds:latest
+    base_image: yjbds/mlrun_dev-dask-ds:latest
     commands: []
   description: ''
   replicas: 4
-  image_pull_policy: Always
   remote: true
   service_type: NodePort
   nthreads: 1

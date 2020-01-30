@@ -1,0 +1,15 @@
+kind: job
+metadata:
+  name: describe
+  project: default
+spec:
+  command: https://raw.githubusercontent.com/yjb-ds/functions/lgbm-serving/tests/describe.py
+  args: []
+  image: ''
+  volumes: []
+  volume_mounts: []
+  env: []
+  description: ''
+  build:
+    base_image: yjbds/mlrun-daskboost:dev
+    commands: []

@@ -2,3 +2,6 @@ models/
 .ipynb_checkpoints
 *.gz
 *.csv
+*.pyc
+*.swp
+dask-worker-space

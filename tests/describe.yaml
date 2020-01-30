@@ -1,7 +1,7 @@
-kind: dask
+kind: job
 metadata:
   name: describe
-  hash: 931bd0bbc1dde34284e6c604d0b08d5e9666b7a7
+  hash: 3f3a5547127800b6351fc4bb15198bd7022e7e99
   project: default
 spec:
   command: /User/repos/functions/tests/describe.py
@@ -10,13 +10,7 @@ spec:
   volumes: []
   volume_mounts: []
   env: []
-  build:
-    base_image: yjbds/mlrun_dev-dask-ds:latest
-    commands: []
   description: ''
-  replicas: 4
-  remote: true
-  service_type: NodePort
-  nthreads: 1
-  min_replicas: 0
-  max_replicas: 4
+  build:
+    base_image: yjbds/mlrun-daskboost:dev
+    commands: []

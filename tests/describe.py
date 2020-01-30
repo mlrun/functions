@@ -28,6 +28,7 @@ from typing import IO, AnyStr, Union, List, Optional
 
 def table_summary(
     context: MLClientCtx,
+    dask_client: Union[DataItem, str],
     dask_key: str = 'my_dask_dataframe',
     target_path: str = '',
     name: str = 'table_summary.csv',
@@ -35,11 +36,12 @@ def table_summary(
 ) -> None:
     """Summarize a table
     """
-    if hasattr(context, 'dask_client'):
-        dscr = context.dask_client.datasets[dask_key].describe() 
-        filepath = os.path.join(target_path, name)
-        dscr.to_csv(filepath)
-        context.log_artifact(key, target_path=filepath)
-    else:
-        context.logger.info('no dask_client found')
+    print(str(dask_client))
+    
+    context.dask_client = Client(scheduler_file='/User/mlrun/models/scheduler.json')
+    dscr = context.dask_client.datasets[dask_key].describe() 
+    filepath = os.path.join(target_path, name)
+    dscr.to_csv(filepath)
+    print(dscr)
+    context.log_artifact(key, target_path=filepath)
     

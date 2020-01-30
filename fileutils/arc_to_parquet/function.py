@@ -96,10 +96,10 @@ def arc_to_parquet(
                 if dataset:
                     # just write header here
                     pq.ParquetWriter(filepath, table.schema)
-                    context.log_artifact('header', target_path=filepath)
+                    #context.log_artifact('header', target_path=filepath)
                 else:
                     # start writing file
-                    context.log_artifact('header', target_path=filepath)
+                    #context.log_artifact('header', target_path=filepath)
                     pqwriter = pq.ParquetWriter(dest_path, table.schema)
                 
             if dataset:

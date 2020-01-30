@@ -1,16 +1,16 @@
 kind: job
 metadata:
-  name: arc_to_parquet
-  hash: 30906948185d1e5c2b3a20482a1e97dbb1505f8a
+  name: function
+  hash: 0a17345fa693f3b0fd5671a8f94e09f97676ded2
   project: default
 spec:
-  command: /User/repos/functions/fileutils/arc_to_parquet/arc_to_parquet.py
+  command: /User/repos/functions/fileutils/arc_to_parquet/function.py
   args: []
   image: ''
   volumes: []
   volume_mounts: []
   env: []
-  description: retrieve archive table and save as partitioned parquet dataset
+  description: retrieve archive table and save as parquet file
   build:
     base_image: yjbds/mlrun_dev-files:latest
     commands: []

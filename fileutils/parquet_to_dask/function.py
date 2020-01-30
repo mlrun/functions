@@ -34,27 +34,33 @@ def parquet_to_dask(
     shards: int = 4,
     threads_per: int = 4,
     persist: bool = True,
-    dask_key: str = 'my_dask_dataframe'
+    dask_key: str = 'my_dask_dataframe',
+    target_path: str = ''
 ) -> None:
     """Load parquet dataset into dask cluster
     
     If no cluster is found loads a new one and persist the data to it
     """
-    # Setup Dask
     if hasattr(context, 'dask_client'):
-        dask_client = context.dask_client  
+        context.logger.info('found cluster...')
+        dask_client = context.dask_client
     else:
-        context.dask_client = Client(LocalCluster(n_workers=shards,
-                                                  threads_per_worker=threads_per))
-        context.logger.info(context.dask_client)
-
-    assert context.dask_client
+        context.logger.info('starting new cluster...')
+        cluster = LocalCluster(n_workers=shards, threads_per_worker=threads_per)
+        dask_client = Client(cluster)
     
+    context.logger.info(dask_client)
+ 
     df = dd.read_parquet(parquet_url)
 
     if persist and context:
-        df = context.dask_client.persist(df)
-        context.dask_client.datasets[dask_key] = df
+        df = dask_client.persist(df)
+        dask_client.publish_dataset(dask_key=df)
+        context.dask_client = dask_client
+        
+        # share the scheduler
+        filepath = os.path.join(target_path, 'scheduler.json')
+        dask_client.write_scheduler_file(filepath)
+        context.log_artifact('scheduler', target_path=filepath)
+        
         print(df.head())
-        # or can use:
-        # context.dask_client.publish_dataset(my_dataset=df)

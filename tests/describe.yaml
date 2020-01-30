@@ -1,10 +1,9 @@
 kind: job
 metadata:
   name: describe
-  hash: 3f3a5547127800b6351fc4bb15198bd7022e7e99
   project: default
 spec:
-  command: /User/repos/functions/tests/describe.py
+  command: https://raw.githubusercontent.com/yjb-ds/functions/lgbm-serving/tests/describe.py
   args: []
   image: ''
   volumes: []

@@ -36,6 +36,14 @@ def table_summary(
     key: str = 'table_summary'
 ) -> None:
     """Summarize a table
+    
+    :param context:         the function context
+    :param dask_client:     path to the dask client scheduler json file, as
+                            string or artifact
+    :param dask_key:        key of dataframe in dask client 'datasets' attribute
+    :param target_path:     destimation folder for table summary file
+    :param name:            name of table summary file (with extension like .csv)
+    :param key:             key of table summary in artifact store
     """
     context.dask_client = Client(scheduler_file=str(dask_client))
     df = context.dask_client.get_dataset('dask_key')

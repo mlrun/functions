@@ -41,7 +41,18 @@ def parquet_to_dask(
 ) -> None:
     """Load parquet dataset into dask cluster
     
-    If no cluster is found loads a new one and persist the data to it
+    If no cluster is found loads a new one and persist the data to it. It
+    shouold not be necessary to create a new cluster when the function
+    is run as a 'dask' job.
+    
+    :param context:         the function context
+    :param parquet_url:     url of the parquet file or partitioned dataset as either
+                            artifact DataItem, string, or path object (see pandas read_csv)
+    :param inc_cols:        include only these columns (very fast)
+    :param index_cols:      list of index column names (can be a long-running process)
+    :param shards:          number of workers to launch
+    :param threads_per:     number of threads per worker
+    :param processes:       
     """
     if hasattr(context, 'dask_client'):
         context.logger.info('found cluster...')

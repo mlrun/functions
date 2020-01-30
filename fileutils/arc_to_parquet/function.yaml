@@ -4,7 +4,7 @@ metadata:
   hash: 0a17345fa693f3b0fd5671a8f94e09f97676ded2
   project: default
 spec:
-  command: /User/repos/functions/fileutils/arc_to_parquet/function.py
+  command: https://raw.githubusercontent.com/yjb-ds/functions/lgbm-serving/fileutils/parquet_to_dask/function.py
   args: []
   image: ''
   volumes: []
@@ -12,5 +12,5 @@ spec:
   env: []
   description: retrieve archive table and save as parquet file
   build:
-    base_image: yjbds/mlrun-base:dev
+    base_image: yjbds/mlrun-daskboost:dev
     commands: []

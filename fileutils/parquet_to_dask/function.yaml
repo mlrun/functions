@@ -1,7 +1,7 @@
-kind: job
+kind: dask
 metadata:
   name: function
-  hash: ba58f928478016117de9cefbce93054cad9ee263
+  hash: 4ed6e4dfc23b35ca9a7a6029b1f08b9a1d786885
   project: default
 spec:
   command: /User/repos/functions/fileutils/parquet_to_dask/function.py
@@ -10,8 +10,13 @@ spec:
   volumes: []
   volume_mounts: []
   env: []
-  description: ''
-  replicas: 4
   build:
     base_image: yjbds/mlrun-daskboost:dev
     commands: []
+  description: ''
+  replicas: 4
+  remote: true
+  service_type: NodePort
+  nthreads: 1
+  min_replicas: 0
+  max_replicas: 4

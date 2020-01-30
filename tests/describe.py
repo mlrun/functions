@@ -19,10 +19,11 @@ import pandas as pd
 
 import dask
 import dask.dataframe as dd
-from dask.distributed import Client, LocalCluster
+from dask.distributed import Client
 
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
+from mlrun.artifacts import ChartArtifact, TableArtifact, PlotArtifact
 
 from typing import IO, AnyStr, Union, List, Optional
 
@@ -36,12 +37,11 @@ def table_summary(
 ) -> None:
     """Summarize a table
     """
-    print(str(dask_client))
+    context.dask_client = Client(scheduler_file=str(dask_client))
+    df = context.dask_client.get_dataset('dask_key')
+    dscr = df.describe() 
     
-    context.dask_client = Client(scheduler_file='/User/mlrun/models/scheduler.json')
-    dscr = context.dask_client.datasets[dask_key].describe() 
     filepath = os.path.join(target_path, name)
-    dscr.to_csv(filepath)
-    print(dscr)
+    dd.to_csv(dscr, filepath, single_file=True, index=False)
     context.log_artifact(key, target_path=filepath)
     

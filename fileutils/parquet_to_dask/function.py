@@ -33,6 +33,8 @@ def parquet_to_dask(
     index_cols: Optional[List[str]] = None,
     shards: int = 4,
     threads_per: int = 4,
+    processes: bool = False,
+    memory_limit: str = '2GB',
     persist: bool = True,
     dask_key: str = 'my_dask_dataframe',
     target_path: str = ''
@@ -46,7 +48,10 @@ def parquet_to_dask(
         dask_client = context.dask_client
     else:
         context.logger.info('starting new cluster...')
-        cluster = LocalCluster(n_workers=shards, threads_per_worker=threads_per)
+        cluster = LocalCluster(n_workers=shards,
+                               threads_per_worker=threads_per,
+                               processes=processes,
+                               memory_limit=memory_limit)
         dask_client = Client(cluster)
     
     context.logger.info(dask_client)

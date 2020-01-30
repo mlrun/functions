@@ -12,5 +12,5 @@ spec:
   env: []
   description: retrieve archive table and save as parquet file
   build:
-    base_image: yjbds/mlrun_dev-files:latest
+    base_image: yjbds/mlrun-base:dev
     commands: []

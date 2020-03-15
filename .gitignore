@@ -1,8 +1,13 @@
+models/
 .ipynb_checkpoints
+*.pyc
+*.swp
+dask-worker-space
 artifacts/
 images/
 wip/
-.vscode
+.vscode/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

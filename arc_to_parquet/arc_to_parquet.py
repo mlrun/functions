@@ -18,14 +18,13 @@ try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
     # Legacy Python that doesn"t verify HTTPS certificates by default
-    pass
+        pass
 else:
     # Handle target environment that doesn"t support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
 
 import os
 import json
-from pathlib import Path
 import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
@@ -38,7 +37,7 @@ from typing import IO, AnyStr, Union, List, Optional
 
 def arc_to_parquet(
     context: MLClientCtx,
-    archive_url: Union[str, Path, IO[AnyStr]],
+    archive_url: Union[str, DataItem],
     header: Optional[List[str]] = None,
     inc_cols: Optional[List[str]] = None,
     chunksize: int = 10_000,
@@ -46,17 +45,17 @@ def arc_to_parquet(
     encoding: str = "latin-1",
     key: str = "data",
     dataset: Optional[str] = None,
-    partition_cols = [],
+    part_cols = [],
 ) -> None:
     """Open a file/object archive and save as a parquet file.
-    
+
     Partitioning requires precise specification of column types.
-    
+
     :param context:      function context
     :param archive_url:  any valid string path consistent with the path variable
                          of pandas.read_csv, including strings as file paths, as urls, 
                          pathlib.Path objects, etc...
-    :param header_names: column names
+    :param header:       column names
     :param inc_cols:     include only these columns
     :param chunksize:    (0) row size retrieved per iteration
     :param dtype         destination data type of specified columns
@@ -65,18 +64,18 @@ def arc_to_parquet(
     :param dataset:      (None) if not None then "target_path/dataset"
                          is folder for partitioned files
     :param part_cols:    ([]) list of partitioning columns
-    
+
     """
     base_path = context.artifact_path
     os.makedirs(base_path, exist_ok=True)
-    
+
     if dataset is not None:
         dest_path = os.path.join(base_path, dataset)
         exists = os.path.isdir(dest_path)
     else:
         dest_path = os.path.join(base_path, key+".pqt")
         exists = os.path.isfile(dest_path)
-     
+
     # todo: more logic for header
     if not exists:
         context.logger.info("destination file does not exist, downloading")
@@ -107,5 +106,4 @@ def arc_to_parquet(
         context.logger.info(f"saved table to {dest_path}")
     else:
         context.logger.info("destination file already exists")
-    
     context.log_artifact(key, local_path=key+".pqt")

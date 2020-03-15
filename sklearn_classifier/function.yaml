@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: sklearn-classifier
   tag: ''
-  hash: b1bc6738f3aba1d6da74cfa0fcb435d0ad5d835b
+  hash: 91ba021d8f8112032cf01bd161d2f206a067d11a
   project: ''
   categories: []
 spec:

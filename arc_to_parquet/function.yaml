@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: arc-to-parquet
   tag: ''
-  hash: 9a306cb68181c0a8b69ae93f50955629db6a212a
+  hash: 2f3f48351b04b0613bdbac7894cff7f19853e1b8
   project: ''
   categories: []
 spec:

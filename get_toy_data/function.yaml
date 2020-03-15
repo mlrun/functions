@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: get-toy-data
   tag: ''
-  hash: 6126acf03b7a9fdcff8056ea8a02f221ec3b994d
+  hash: e42df32677603738c6e0ec59df58629bd97733b5
   project: ''
   categories: []
 spec:

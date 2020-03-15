@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: test-classifier
   tag: ''
-  hash: 931d8f1fce63fdf0e9d145fd70544cc797656f57
+  hash: b6b45b1b3141c0ca4a39b2a31d8889adf952ed7e
   project: ''
   categories: []
 spec:

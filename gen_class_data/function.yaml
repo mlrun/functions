@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: create-classification-data
   tag: ''
-  hash: b59e3518e0aec4142a298aa97feaedaf235c5ea2
+  hash: 236307af18dab450fa5cb51ccf1a7a141ff6c4b1
   project: ''
   categories: []
 spec:

@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: describe-dask
   tag: ''
-  hash: 1f0016d8d56fab8c4cef9fa3ef6701353e9f249e
+  hash: 76724f243a07936a2ee6df0636ee09a14ffe888a
   project: ''
   categories: []
 spec:

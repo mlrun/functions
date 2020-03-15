@@ -2,7 +2,7 @@ kind: dask
 metadata:
   name: parquet-to-dask
   tag: ''
-  hash: 4df1f9fefb077380413e4170399f7a57aa08a56c
+  hash: a42df8bc81c0f5192bbe3d76546157a78f392ff3
   project: ''
   categories: []
 spec:

@@ -37,20 +37,3 @@ def get_model_config(
     os.makedirs(os.path.join(context.artifact_path, 'models'), exist_ok=True)
     context.log_artifact('class_params', body=json.dumps(config['CLASS_PARAMS']), local_path='models/class_params.json') #, labels={'framework': 'xgboost'})
     context.log_artifact('fit_params', body=json.dumps(config['FIT_PARAMS']), local_path='models/fit_params.json') #, labels={'framework': 'xgboost'})
-    
-
-def gen_model_config_by_attr(attr: str = 'pedict_proba'):
-    """Generate a model config and save as json
-    Filters model by attribute `attr`, for example, only classes
-    with a `predict_proba` method
-    Returns a list of (str, FullArgSpec, FullArgSpec) Tuples, where the first 
-    FullArgSpec object contains all model class parameters plus defaults, and 
-    the second contains all the fit params plus defaults
-    :param attrib:   the attribute filter
-    """
-    estimators = all_estimators()
-    clfs = []
-    for name, class_ in estimators:
-        if hasattr(class_, 'predict_proba'):
-            clfs.append((name, getfullargspec(class_), getfullargspec(class_.fit)))
-... etc    

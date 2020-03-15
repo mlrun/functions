@@ -32,8 +32,10 @@ import pyarrow as pa
 from cloudpickle import dump, load
 
 from mlrun.execution import MLClientCtx
-from typing import IO, AnyStr, Union, List, Optional
+from mlrun.datastore import DataItem
+from mlrun.artifacts import PlotArtifact, TableArtifact
 
+from typing import IO, AnyStr, Union, List, Optional
 
 def arc_to_parquet(
     context: MLClientCtx,

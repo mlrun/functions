@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"random_state": null, "decision_function_shape": "ovr", "max_iter": -1, "verbose": false, "class_weight": null, "cache_size": 200, "tol": 0.001, "probability": false, "shrinking": true, "coef0": 0.0, "gamma": "auto_deprecated", "degree": 3, "kernel": "rbf", "C": 1.0}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}

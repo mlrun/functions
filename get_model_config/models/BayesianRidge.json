@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"verbose": false, "copy_X": true, "normalize": false, "fit_intercept": true, "compute_score": false, "lambda_2": 1e-06, "lambda_1": 1e-06, "alpha_2": 1e-06, "alpha_1": 1e-06, "tol": 0.001, "n_iter": 300}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}

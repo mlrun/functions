@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"n_jobs": null, "metric_params": null, "outlier_label": null, "metric": "minkowski", "p": 2, "leaf_size": 30, "algorithm": "auto", "weights": "uniform", "radius": 1.0}, "FIT_PARAMS": {"y": null, "X": null}}

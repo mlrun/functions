@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"return_train_score": false, "error_score": "raise-deprecating", "pre_dispatch": "2*n_jobs", "verbose": 0, "cv": "warn", "refit": true, "iid": "warn", "n_jobs": null, "scoring": null, "param_grid": null, "estimator": null}, "FIT_PARAMS": {"groups": null, "y": null, "X": null}}

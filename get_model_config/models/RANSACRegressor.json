@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"random_state": null, "loss": "absolute_loss", "stop_probability": 0.99, "stop_score": Infinity, "stop_n_inliers": Infinity, "max_skips": Infinity, "max_trials": 100, "is_model_valid": null, "is_data_valid": null, "residual_threshold": null, "min_samples": null, "base_estimator": null}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}

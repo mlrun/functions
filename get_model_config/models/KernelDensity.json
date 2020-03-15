@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"metric_params": null, "leaf_size": 40, "breadth_first": true, "rtol": 0, "atol": 0, "metric": "euclidean", "kernel": "gaussian", "algorithm": "auto", "bandwidth": 1.0}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}

@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"max_iter": 1000, "random_state": null, "verbose": 0, "class_weight": null, "intercept_scaling": 1, "fit_intercept": true, "multi_class": "ovr", "C": 1.0, "tol": 0.0001, "dual": true, "loss": "squared_hinge", "penalty": "l2"}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}

@@ -1,0 +1,26 @@
+{
+    "CLASS_PARAMS" : {
+        "classifier"         : "lightgbm.sklearn.LGBMClassifier",    
+        "boosting_type"      : "gbdt",
+        "num_leaves"         : 300,
+        "max_depth"          : 50,
+        "learning_rate"      : 0.1,
+        "n_estimators"       : 300,
+        "objective"          : "binary",
+        "scale_pos_weight"   : 1,    
+        "min_split_gain"     : 0.0,
+        "min_child_samples"  : 20,
+        "subsample"          : 1,
+        "colsample_bytree"   : 1,
+        "reg_alpha"          : 0,
+        "reg_lambda"         : 1,
+        "n_jobs"             : 16,
+        "silent"             : true,
+        "importance_type"    : "split",
+        "random_state"       : 1},
+    
+    "FIT_PARAMS" : {
+        "early_stopping_rounds" : 10,
+        "verbose"               : false,
+        "callbacks"             : "lightgbm.callback.record_evaluation"}
+}

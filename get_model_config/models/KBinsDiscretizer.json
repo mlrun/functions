@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"strategy": "quantile", "encode": "onehot", "n_bins": 5}, "FIT_PARAMS": {"y": null, "X": null}}

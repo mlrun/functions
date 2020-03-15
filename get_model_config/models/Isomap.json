@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"n_jobs": null, "neighbors_algorithm": "auto", "path_method": "auto", "max_iter": null, "tol": 0, "eigen_solver": "auto", "n_components": 2, "n_neighbors": 5}, "FIT_PARAMS": {"y": null, "X": null}}

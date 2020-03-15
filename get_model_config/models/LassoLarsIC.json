@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"positive": false, "copy_X": true, "eps": 2.220446049250313e-16, "max_iter": 500, "precompute": "auto", "normalize": true, "verbose": false, "fit_intercept": true, "criterion": "aic"}, "FIT_PARAMS": {"copy_X": null, "y": null, "X": null}}

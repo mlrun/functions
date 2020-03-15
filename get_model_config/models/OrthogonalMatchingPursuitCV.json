@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"verbose": false, "n_jobs": null, "cv": "warn", "max_iter": null, "normalize": true, "fit_intercept": true, "copy": true}, "FIT_PARAMS": {"y": null, "X": null}}

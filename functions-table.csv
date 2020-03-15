@@ -1,0 +1,11 @@
+name,folder,filename,handler,image,image_tag,kind
+arc_to_parquet,arc_to_parquet,arc_to_parquet.py,arc_to_parquet,mlrun/ml-base,0.4.5,job
+get_toy_data,get_toy_data,get_toy_data.py,get_toy_data,mlrun/ml-models,0.4.5,job
+get_model_config,get_model_config,get_model_config.py,get_model_config,mlrun/ml-base,0.4.5,job
+describe,describe,describe.py,describe,mlrun/ml-models,0.4.5,job
+test_classifier,test_classifier,test_classifier.py,test_classifier,mlrun/ml-models,0.4.5,job
+sklearn_classifier,sklearn_classifier,sklearn_classifier.py,train_model,mlrun/ml-models,0.4.5,job
+create_classification_data,gen_class_data,gen_class_data.py,create_classification_data,mlrun/ml-models,0.4.5,job
+open_archive,open_archive,open_archive.ipynb,open_archive,mlrun/ml-models,0.4.5,job
+parquet_to_dask,parquet_to_dask,parquet_to_dask.py,parquet_to_dask,mlrun/ml-dask,0.4.5,dask
+describe_dask,describe_dask,describe_dask.py,describe_dask,mlrun/ml-dask,0.4.5,job

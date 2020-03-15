@@ -39,7 +39,6 @@ def arc_to_parquet(
     context: MLClientCtx,
     archive_url: Union[str, DataItem],
     header: Optional[List[str]] = None,
-    inc_cols: Optional[List[str]] = None,
     chunksize: int = 10_000,
     dtype=None,
     encoding: str = "latin-1",
@@ -56,7 +55,6 @@ def arc_to_parquet(
                          of pandas.read_csv, including strings as file paths, as urls, 
                          pathlib.Path objects, etc...
     :param header:       column names
-    :param inc_cols:     include only these columns
     :param chunksize:    (0) row size retrieved per iteration
     :param dtype         destination data type of specified columns
     :param encoding      ("latin-8") file encoding
@@ -82,10 +80,8 @@ def arc_to_parquet(
         pqwriter = None
         for i, df in enumerate(pd.read_csv(archive_url, 
                                            chunksize=chunksize, 
-                                           #header=None,
                                            names=header,
                                            encoding=encoding, 
-                                           #usecols=inc_cols, 
                                            dtype=dtype)):
             table = pa.Table.from_pandas(df)
             if i == 0:

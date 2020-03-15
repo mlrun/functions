@@ -1,4 +1,4 @@
-name,location,filename,handler,image,image_tag,kind
+name,folder,filename,handler,image,image_tag,kind
 arc_to_parquet,arc_to_parquet,arc_to_parquet.py,arc_to_parquet,mlrun/ml-base,0.4.5,job
 get_toy_data,get_toy_data,get_toy_data.py,get_toy_data,mlrun/ml-models,0.4.5,job
 get_model_config,get_model_config,get_model_config.py,get_model_config,mlrun/ml-base,0.4.5,job

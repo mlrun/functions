@@ -65,7 +65,7 @@ def create_classification_data(
     features, labels = make_classification(
         n_samples=n_samples,
         n_features=m_features,
-        weights=[weight],  # False
+        weights=weight,
         n_classes=k_classes,
         random_state=random_state, 
         **sk_params)

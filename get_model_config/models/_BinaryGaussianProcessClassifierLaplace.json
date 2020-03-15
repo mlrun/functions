@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"random_state": null, "copy_X_train": true, "warm_start": false, "max_iter_predict": 100, "n_restarts_optimizer": 0, "optimizer": "fmin_l_bfgs_b", "kernel": null}, "FIT_PARAMS": {"y": null, "X": null}}

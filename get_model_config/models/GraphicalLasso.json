@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"assume_centered": false, "verbose": false, "max_iter": 100, "enet_tol": 0.0001, "tol": 0.0001, "mode": "cd", "alpha": 0.01}, "FIT_PARAMS": {"y": null, "X": null}}

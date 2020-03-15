@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"random_state": null, "max_iter": -1, "verbose": false, "cache_size": 200, "shrinking": true, "nu": 0.5, "tol": 0.001, "coef0": 0.0, "gamma": "auto_deprecated", "degree": 3, "kernel": "rbf"}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}

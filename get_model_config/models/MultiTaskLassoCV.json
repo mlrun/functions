@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"selection": "cyclic", "random_state": null, "n_jobs": null, "verbose": false, "cv": "warn", "copy_X": true, "tol": 0.0001, "max_iter": 1000, "normalize": false, "fit_intercept": true, "alphas": null, "n_alphas": 100, "eps": 0.001}, "FIT_PARAMS": {"y": null, "X": null}}

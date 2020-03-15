@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"n_jobs": null, "tol": 0.001, "max_iter": 30, "alpha": 0.2, "n_neighbors": 7, "gamma": 20, "kernel": "rbf"}, "FIT_PARAMS": {"y": null, "X": null}}

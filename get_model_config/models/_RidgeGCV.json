@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"store_cv_values": false, "gcv_mode": null, "copy_X": true, "scoring": null, "normalize": false, "fit_intercept": true, "alphas": [0.1, 1.0, 10.0]}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}

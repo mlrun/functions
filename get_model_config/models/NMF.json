@@ -1,0 +1,1 @@
+{"CLASS_PARAMS": {"shuffle": false, "verbose": 0, "l1_ratio": 0.0, "alpha": 0.0, "random_state": null, "max_iter": 200, "tol": 0.0001, "beta_loss": "frobenius", "solver": "cd", "init": null, "n_components": null}, "FIT_PARAMS": {"y": null, "X": null}}

@@ -47,6 +47,7 @@ def arc_to_parquet(
     key: str = "data",
     dataset: Optional[str] = None,
     part_cols = [],
+    file_ext: str = 'pqt'
 ) -> None:
     """Open a file/object archive and save as a parquet file.
 
@@ -63,6 +64,7 @@ def arc_to_parquet(
     :param key:          key in artifact store (when log_data=True)
     :param dataset:      (None) if not None then "target_path/dataset"
                          is folder for partitioned files
+    :param file_ext:     (pqt) parquet file extension
     :param part_cols:    ([]) list of partitioning columns
 
     """
@@ -73,7 +75,7 @@ def arc_to_parquet(
         dest_path = os.path.join(base_path, dataset)
         exists = os.path.isdir(dest_path)
     else:
-        dest_path = os.path.join(base_path, key+".pqt")
+        dest_path = os.path.join(base_path, key+f".{file_ext}")
         exists = os.path.isfile(dest_path)
 
     # todo: more logic for header

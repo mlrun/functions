@@ -32,6 +32,7 @@ def create_classification_data(
     random_state: int = 1,
     filename: Optional[str] = None,
     key: str = 'classifier-data', 
+    file_ext: str = 'pqt',
     sk_params = {}
 ):
     """Create a binary classification sample dataset and save.
@@ -50,6 +51,7 @@ def create_classification_data(
     :param random_state:  rng seed (see https://scikit-learn.org/stable/glossary.html#term-random-state)
     :param filename:      optional name for saving simulated data file
     :param key:           key of data in artifact store
+    :param file_ext:      (pqt) extension for parquet file
     :param sk_params:     additional `sklearn.datasets.make_classification`
     
     outputs filename of created data (includes path) in the artifact store.
@@ -57,7 +59,7 @@ def create_classification_data(
     # check directories exist and create filename if None:
     os.makedirs(context.artifact_path, exist_ok=True)
     if not filename:
-        name = f"simdata-{n_samples:0.0e}X{m_features}.parquet".replace("+", "")
+        name = f"simdata-{n_samples:0.0e}X{m_features}.{file_ext}".replace("+", "")
         filename = os.path.join(context.artifact_path, name)
     else:
         filename = os.path.join(context.artifact_path, filename)

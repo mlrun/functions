@@ -25,7 +25,7 @@ def create_classification_data(
     context: MLClientCtx,
     n_samples: int,
     m_features: int,
-    c_classes: int, 
+    k_classes: int,
     header: Optional[List[str]],
     label_column: Optional[str] = 'labels',
     weight: float = 0.5,
@@ -43,8 +43,9 @@ def create_classification_data(
     :param context:       function context
     :param n_samples:     number of rows/samples
     :param m_features:    number of cols/features
+    :param k_classes:     number of classes
     :param header:        header for features array
-    :oaram label_column:  column name of ground-truth series
+    :param label_column:  column name of ground-truth series
     :param weight:        fraction of sample negative value (ground-truth=0)
     :param random_state:  rng seed (see https://scikit-learn.org/stable/glossary.html#term-random-state)
     :param filename:      optional name for saving simulated data file
@@ -65,8 +66,9 @@ def create_classification_data(
         n_samples=n_samples,
         n_features=m_features,
         weights=[weight],  # False
-        n_classes=c_classes,
-        random_state=random_state, **sk_params)
+        n_classes=k_classes,
+        random_state=random_state, 
+        **sk_params)
 
     # make dataframes, add column names, concatenate (X, y)
     X = pd.DataFrame(features)

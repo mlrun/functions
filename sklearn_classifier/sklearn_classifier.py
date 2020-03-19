@@ -226,6 +226,8 @@ def train_model(
     """
     base_path = context.artifact_path
     os.makedirs(base_path, exist_ok=True)
+    os.makedirs(os.path.join(base_path, plots_dir), exist_ok=True)
+    os.makedirs(os.path.join(base_path, models_dir), exist_ok=True)
     
     # extract file name from DataItem
     srcfilepath = str(data_key)
@@ -281,12 +283,12 @@ def train_model(
     # update the parameters            
     # add data to fit params
     fit_params_updates.update({'X': xtrain,'y': ytrain})
-    model_config = update_model_config(model_config, class_params_update, fit_params_updates)
+    model_config = update_model_config(model_config, class_params_updates, fit_params_updates)
 
     # create class and fit
     ClassifierClass = _create_class(model_config["META"]["class"])
-    model = ClassifierClass(**class_params)
-    model.fit(**fit_params)
+    model = ClassifierClass(**model_config["CLASS"])
+    model.fit(**model_config["FIT"])
 
     # save model
     filepath = os.path.join(base_path, f"{models_dir}/{model_key}.pkl")

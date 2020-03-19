@@ -59,7 +59,6 @@ def get_toy_data(
     # check to see if we haven't already downloaded the file
     if not os.path.isfile(filepath):
         artifact_path = context.artifact_path
-        os.makedirs(artifact_path, exist_ok=True)
 
         # reach into module and import the appropriate load_xxx function
         pkg_module = 'sklearn.datasets'

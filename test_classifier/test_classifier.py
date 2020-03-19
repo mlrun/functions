@@ -57,8 +57,6 @@ def test_classifier(
     :param score_method:     for multiclass classification
     :param key:             key for results artifact
     """
-    os.makedirs(os.path.join(context.artifact_path, "plots"), exist_ok=True)
-
     xtest = pd.read_csv(str(test_set))
     ytest = xtest.pop(label_column)
 

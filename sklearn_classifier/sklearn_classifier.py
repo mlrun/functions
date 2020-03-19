@@ -224,6 +224,9 @@ def train_model(
     :param fit_updates:       update scikit-learn fit parameters, input as
                               a dict.
     """
+    base_path = context.artifact_path
+    os.makedirs(base_path, exist_ok=True)
+    
     # extract file name from DataItem
     srcfilepath = str(data_key)
     
@@ -248,7 +251,7 @@ def train_model(
     yb = label_binarize(labels, classes=list(range(raw.shape[1])))
     # double split to generate 3 data sets: train, validation and test
     # with xtest,ytest set aside
-    x, xtest, y, ytest = train_test_split(np.concatenate([raw, yb], axis=0), labels, test_size=test_size, random_state=rng)
+    x, xtest, y, ytest = train_test_split(np.concatenate([raw, yb], axis=1), labels, test_size=test_size, random_state=rng)
     xtrain, xvalid, ytrain, yvalid = train_test_split(x, y, train_size=train_val_split, random_state=rng)
     # extract the hot_encoded labels
     ytrainb = xtrain[:, -yb.shape[1]:].copy()
@@ -262,8 +265,7 @@ def train_model(
     # set-aside test_set
     test_set = pd.concat(
         [pd.DataFrame(data=xtest, columns=context.header),
-         pd.DataFrame(data=ytest, columns=[label_column]),
-         pd.DataFrame(data=ytestb, columns=[label_column])],
+         pd.DataFrame(data=ytest, columns=[label_column])],
         axis=1,)
     filepath = os.path.join(base_path, test_set_key + ".pqt")
     test_set.to_parquet(filepath, index=False)

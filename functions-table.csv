@@ -9,4 +9,4 @@ create_classification_data,gen_class_data,gen_class_data.py,create_classificatio
 open_archive,open_archive,open_archive.ipynb,open_archive,mlrun/ml-models,0.4.5,job,fileutils,datagen
 parquet_to_dask,parquet_to_dask,parquet_to_dask.py,parquet_to_dask,mlrun/ml-dask,0.4.5,dask,fileutils,datagen
 describe_dask,describe_dask,describe_dask.py,describe_dask,mlrun/ml-dask,0.4.5,job,models,datagen
-model_server,serving,model_server.ipynb,
+model_server,serving,model_server.ipynb,model_server,mlrun/mlrun,0.4.5,job,serving,models

@@ -7,6 +7,8 @@ import itertools
 
 import sklearn
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -243,10 +245,10 @@ def train_model(
     
     # TODO: all of this should be part of a spitter component that does cv too, dealt with in another step
     # make a hot encode copy of labels before the split
-    yb = label_binarize(y, classes=list(range(raw.shape[1])))
+    yb = label_binarize(labels, classes=list(range(raw.shape[1])))
     # double split to generate 3 data sets: train, validation and test
     # with xtest,ytest set aside
-    x, xtest, y, ytest = train_test_split(np.concatenate([raw, yb], labels, test_size=test_size, random_state=rng)
+    x, xtest, y, ytest = train_test_split(np.concatenate([raw, yb], axis=0), labels, test_size=test_size, random_state=rng)
     xtrain, xvalid, ytrain, yvalid = train_test_split(x, y, train_size=train_val_split, random_state=rng)
     # extract the hot_encoded labels
     ytrainb = xtrain[:, -yb.shape[1]:].copy()
@@ -261,7 +263,7 @@ def train_model(
     test_set = pd.concat(
         [pd.DataFrame(data=xtest, columns=context.header),
          pd.DataFrame(data=ytest, columns=[label_column]),
-         pd.DataFrame(data=ytestb columns=[label_column])],
+         pd.DataFrame(data=ytestb, columns=[label_column])],
         axis=1,)
     filepath = os.path.join(base_path, test_set_key + ".pqt")
     test_set.to_parquet(filepath, index=False)

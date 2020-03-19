@@ -69,6 +69,7 @@ def arc_to_parquet(
 
     """
     base_path = context.artifact_path
+    os.makedirs(base_path, exist_ok=True)
 
     if dataset is not None:
         dest_path = os.path.join(base_path, dataset)

@@ -110,4 +110,4 @@ def get_model_configs(
     else:
         # log artifact this? wip, not this week
         return model_configs
-    
+  

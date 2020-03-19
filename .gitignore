@@ -1,3 +1,4 @@
+models/
 .ipynb_checkpoints
 *.pyc
 *.swp

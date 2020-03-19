@@ -22,35 +22,92 @@ from mlrun.execution import MLClientCtx
 from typing import IO, AnyStr, Union, List, Optional
 
 
-def get_model_config(
-    context: MLClientCtx,
-    config_url: Union[str, Path, IO[AnyStr]],
-) -> None:
-    """Retrieve a model config.
+def get_model_configs(
+    my_models: Union[str, List[str]],
+    class_key = "CLASS",
+    fit_key = "FIT",
+    meta_key = "META",
+) -> Union[dict, List[dict]]:
+    """build sklearn model configuration parameters
     
-    A model config consists of a dict with 2 keys:  class_params and
-    fit_params and these map to the model's scikit learn API.
+    Take (full) class name of an scikit-learn model 
+    and retrieve its `class` and `fit` parameters and
+    their default values.
+    
+    Also returns some useful metadata values for the class
     """
-    import json
-    config = json.load(open(str(config_url), "r"))
-    
-    os.makedirs(os.path.join(context.artifact_path, 'models'), exist_ok=True)
-    context.log_artifact('class_params', body=json.dumps(config['CLASS_PARAMS']), local_path='models/class_params.json') #, labels={'framework': 'xgboost'})
-    context.log_artifact('fit_params', body=json.dumps(config['FIT_PARAMS']), local_path='models/fit_params.json') #, labels={'framework': 'xgboost'})
-    
-
-def gen_model_config_by_attr(attr: str = 'pedict_proba'):
-    """Generate a model config and save as json
-    Filters model by attribute `attr`, for example, only classes
-    with a `predict_proba` method
-    Returns a list of (str, FullArgSpec, FullArgSpec) Tuples, where the first 
-    FullArgSpec object contains all model class parameters plus defaults, and 
-    the second contains all the fit params plus defaults
-    :param attrib:   the attribute filter
-    """
+    # get a list of all sklearn estimators
     estimators = all_estimators()
-    clfs = []
-    for name, class_ in estimators:
-        if hasattr(class_, 'predict_proba'):
-            clfs.append((name, getfullargspec(class_), getfullargspec(class_.fit)))
-... etc    
+    def _get_estimator(pkg_class):
+        """find a specific class in a list of sklearn estimators"""
+        my_class = pkg_class.split('.')[-1]
+        return list(filter(lambda x: x[0] == my_class, estimators))[0]
+
+    # find estimators corresponding to my_models list
+    my_estimators = []
+    my_models = [my_models] if isinstance(my_models, str) else my_models
+    for model in my_models:
+        estimator_name, estimator_class = _get_estimator(model)
+        my_estimators.append((estimator_name, estimator_class))
+
+    # get class and fit specs
+    estimator_specs = []
+    for an_estimator in my_estimators:
+        estimator_specs.append((an_estimator[0], # model only name
+                                getfullargspec(an_estimator[1]), # class params
+                                getfullargspec(an_estimator[1].fit), # fit params
+                                an_estimator[1])) # package.module.model
+
+    model_configs = []
+
+    for estimator in estimator_specs:
+        model_json = {class_key: {}, fit_key: {}}
+        fit_params = {}
+
+        for i, key in enumerate(model_json.keys()):
+            f = estimator[i+1]
+            args_paired = []
+            defs_paired = []
+
+            # reverse the args since there are fewer defaults than args
+            args = f.args
+            args.reverse()
+            n_args = len(args)
+
+            defs = f.defaults
+            if defs is None:
+                defs = [defs]
+            defs = list(defs)
+            defs.reverse()
+            n_defs = len(defs)
+
+            n_smallest = min(n_args, n_defs)
+            n_largest = max(n_args, n_defs)
+
+            # build 2 lists that can be concatenated
+            for ix in range(n_smallest):
+                if args[ix] is not "self":
+                    args_paired.append(args[ix])
+                    defs_paired.append(defs[ix])
+
+            for ix in range(n_smallest, n_largest):
+                if ix is not 0 and args[ix] is not "self":
+                    args_paired.append(args[ix])
+                    defs_paired.append(None)
+               # concatenate lists into appropriate structure
+            model_json[key] = dict(zip(reversed(args_paired), reversed(defs_paired)))
+
+        model_json[meta_key] = {}
+        model_json[meta_key]['sklearn_version'] = skversion
+        model_json[meta_key]['class'] = '.'.join([estimator[3].__module__, estimator[0]])
+        model_configs.append(model_json)
+    if len(model_configs) == 1:
+        try:
+            context.log_artifact('model_config', body=json.dumps(config['CLASS']), local_path='models/class_params.json')
+        except Exception as e:
+            
+        return model_configs[0]
+    else:
+        # log artifact this? wip, not this week
+        return model_configs
+    

@@ -18,14 +18,13 @@ try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
     # Legacy Python that doesn"t verify HTTPS certificates by default
-    pass
+        pass
 else:
     # Handle target environment that doesn"t support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
 
 import os
 import json
-from pathlib import Path
 import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
@@ -33,60 +32,60 @@ import pyarrow as pa
 from cloudpickle import dump, load
 
 from mlrun.execution import MLClientCtx
-from typing import IO, AnyStr, Union, List, Optional
+from mlrun.datastore import DataItem
+from mlrun.artifacts import PlotArtifact, TableArtifact
 
+from typing import IO, AnyStr, Union, List, Optional
 
 def arc_to_parquet(
     context: MLClientCtx,
-    archive_url: Union[str, Path, IO[AnyStr]],
+    archive_url: Union[str, DataItem],
     header: Optional[List[str]] = None,
-    inc_cols: Optional[List[str]] = None,
     chunksize: int = 10_000,
     dtype=None,
     encoding: str = "latin-1",
     key: str = "data",
     dataset: Optional[str] = None,
-    partition_cols = [],
+    part_cols = [],
+    file_ext: str = 'pqt'
 ) -> None:
     """Open a file/object archive and save as a parquet file.
-    
+
     Partitioning requires precise specification of column types.
-    
+
     :param context:      function context
     :param archive_url:  any valid string path consistent with the path variable
                          of pandas.read_csv, including strings as file paths, as urls, 
                          pathlib.Path objects, etc...
-    :param header_names: column names
-    :param inc_cols:     include only these columns
+    :param header:       column names
     :param chunksize:    (0) row size retrieved per iteration
     :param dtype         destination data type of specified columns
     :param encoding      ("latin-8") file encoding
     :param key:          key in artifact store (when log_data=True)
     :param dataset:      (None) if not None then "target_path/dataset"
                          is folder for partitioned files
+    :param file_ext:     (pqt) parquet file extension
     :param part_cols:    ([]) list of partitioning columns
-    
+
     """
     base_path = context.artifact_path
     os.makedirs(base_path, exist_ok=True)
-    
+
     if dataset is not None:
         dest_path = os.path.join(base_path, dataset)
         exists = os.path.isdir(dest_path)
     else:
-        dest_path = os.path.join(base_path, key+".pqt")
+        dest_path = os.path.join(base_path, key+f".{file_ext}")
         exists = os.path.isfile(dest_path)
-     
+
     # todo: more logic for header
     if not exists:
         context.logger.info("destination file does not exist, downloading")
         pqwriter = None
         for i, df in enumerate(pd.read_csv(archive_url, 
                                            chunksize=chunksize, 
-                                           #header=None,
                                            names=header,
                                            encoding=encoding, 
-                                           #usecols=inc_cols, 
                                            dtype=dtype)):
             table = pa.Table.from_pandas(df)
             if i == 0:
@@ -107,5 +106,4 @@ def arc_to_parquet(
         context.logger.info(f"saved table to {dest_path}")
     else:
         context.logger.info("destination file already exists")
-    
     context.log_artifact(key, local_path=key+".pqt")

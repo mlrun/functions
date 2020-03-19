@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"constant": null, "random_state": null, "strategy": "stratified"}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}
+{"CLASS": {"strategy": "stratified", "random_state": null, "constant": null}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.dummy.DummyClassifier"}}

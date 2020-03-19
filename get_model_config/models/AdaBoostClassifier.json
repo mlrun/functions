@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"random_state": null, "algorithm": "SAMME.R", "learning_rate": 1.0, "n_estimators": 50, "base_estimator": null}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}
+{"CLASS": {"base_estimator": null, "n_estimators": 50, "learning_rate": 1.0, "algorithm": "SAMME.R", "random_state": null}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.ensemble.weight_boosting.AdaBoostClassifier"}}

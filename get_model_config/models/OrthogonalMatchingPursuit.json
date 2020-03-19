@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"precompute": "auto", "normalize": true, "fit_intercept": true, "tol": null, "n_nonzero_coefs": null}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"n_nonzero_coefs": null, "tol": null, "fit_intercept": true, "normalize": true, "precompute": "auto"}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.linear_model.omp.OrthogonalMatchingPursuit"}}

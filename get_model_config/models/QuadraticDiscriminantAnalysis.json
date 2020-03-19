@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"tol": 0.0001, "store_covariance": false, "reg_param": 0.0, "priors": null}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"priors": null, "reg_param": 0.0, "store_covariance": false, "tol": 0.0001}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.discriminant_analysis.QuadraticDiscriminantAnalysis"}}

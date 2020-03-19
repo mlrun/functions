@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"expected_fit_params": null, "foo_param": 0, "check_X": null, "check_y": null}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"check_y": null, "check_X": null, "foo_param": 0, "expected_fit_params": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.utils.mocking.CheckingClassifier"}}

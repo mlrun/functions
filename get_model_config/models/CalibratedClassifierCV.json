@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"cv": "warn", "method": "sigmoid", "base_estimator": null}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}
+{"CLASS": {"base_estimator": null, "method": "sigmoid", "cv": "warn"}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.calibration.CalibratedClassifierCV"}}

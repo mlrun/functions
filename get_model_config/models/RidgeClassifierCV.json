@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"store_cv_values": false, "class_weight": null, "cv": null, "scoring": null, "normalize": false, "fit_intercept": true, "alphas": [0.1, 1.0, 10.0]}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}
+{"CLASS": {"alphas": [0.1, 1.0, 10.0], "fit_intercept": true, "normalize": false, "scoring": null, "cv": null, "class_weight": null, "store_cv_values": false}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.linear_model.ridge.RidgeClassifierCV"}}

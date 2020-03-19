@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"block_size": 1000, "assume_centered": false, "store_precision": true}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"store_precision": true, "assume_centered": false, "block_size": 1000}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.covariance.shrunk_covariance_.LedoitWolf"}}

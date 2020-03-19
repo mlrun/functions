@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"distance_threshold": null, "pooling_func": "deprecated", "linkage": "ward", "compute_full_tree": "auto", "connectivity": null, "memory": null, "affinity": "euclidean", "n_clusters": 2}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"n_clusters": 2, "affinity": "euclidean", "memory": null, "connectivity": null, "compute_full_tree": "auto", "linkage": "ward", "pooling_func": "deprecated", "distance_threshold": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.cluster.hierarchical.AgglomerativeClustering"}}

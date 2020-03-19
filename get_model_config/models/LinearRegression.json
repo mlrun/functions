@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"n_jobs": null, "copy_X": true, "normalize": false, "fit_intercept": true}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}
+{"CLASS": {"fit_intercept": true, "normalize": false, "copy_X": true, "n_jobs": null}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.linear_model.base.LinearRegression"}}

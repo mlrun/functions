@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"flatten_transform": true, "n_jobs": null, "weights": null, "voting": "hard", "estimators": null}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}
+{"CLASS": {"estimators": null, "voting": "hard", "weights": null, "n_jobs": null, "flatten_transform": true}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.ensemble.voting.VotingClassifier"}}

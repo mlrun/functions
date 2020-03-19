@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"order": "C", "include_bias": true, "interaction_only": false, "degree": 2}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"degree": 2, "interaction_only": false, "include_bias": true, "order": "C"}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.preprocessing.data.PolynomialFeatures"}}

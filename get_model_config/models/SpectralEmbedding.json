@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"n_jobs": null, "n_neighbors": null, "eigen_solver": null, "random_state": null, "gamma": null, "affinity": "nearest_neighbors", "n_components": 2}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"n_components": 2, "affinity": "nearest_neighbors", "gamma": null, "random_state": null, "eigen_solver": null, "n_neighbors": null, "n_jobs": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.manifold.spectral_embedding_.SpectralEmbedding"}}

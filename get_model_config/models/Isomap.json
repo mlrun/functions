@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"n_jobs": null, "neighbors_algorithm": "auto", "path_method": "auto", "max_iter": null, "tol": 0, "eigen_solver": "auto", "n_components": 2, "n_neighbors": 5}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"n_neighbors": 5, "n_components": 2, "eigen_solver": "auto", "tol": 0, "max_iter": null, "path_method": "auto", "neighbors_algorithm": "auto", "n_jobs": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.manifold.isomap.Isomap"}}

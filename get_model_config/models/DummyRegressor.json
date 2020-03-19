@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"quantile": null, "constant": null, "strategy": "mean"}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}
+{"CLASS": {"strategy": "mean", "constant": null, "quantile": null}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.dummy.DummyRegressor"}}

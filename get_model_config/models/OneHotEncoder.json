@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"handle_unknown": "error", "dtype": 
+{"CLASS": {"n_values": null, "categorical_features": null, "categories": null, "drop": null, "sparse": true, "dtype": 

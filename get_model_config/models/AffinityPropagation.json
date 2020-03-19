@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"verbose": false, "affinity": "euclidean", "preference": null, "copy": true, "convergence_iter": 15, "max_iter": 200, "damping": 0.5}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"damping": 0.5, "max_iter": 200, "convergence_iter": 15, "copy": true, "preference": null, "affinity": "euclidean", "verbose": false}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.cluster.affinity_propagation_.AffinityPropagation"}}

@@ -1,6 +1,5 @@
 {
     "CLASS_PARAMS" : {
-        "classifier"         : "lightgbm.sklearn.LGBMClassifier",    
         "boosting_type"      : "gbdt",
         "num_leaves"         : 300,
         "max_depth"          : 50,
@@ -20,7 +19,9 @@
         "random_state"       : 1},
     
     "FIT_PARAMS" : {
-        "early_stopping_rounds" : 10,
         "verbose"               : false,
-        "callbacks"             : "lightgbm.callback.record_evaluation"}
+        "callbacks"             : "lightgbm.callback.record_evaluation"},
+    "META" : {
+        "class"         : "lightgbm.sklearn.LGBMClassifier",    
+    }
 }

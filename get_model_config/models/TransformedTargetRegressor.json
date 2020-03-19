@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"check_inverse": true, "inverse_func": null, "func": null, "transformer": null, "regressor": null}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}
+{"CLASS": {"regressor": null, "transformer": null, "func": null, "inverse_func": null, "check_inverse": true}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.compose._target.TransformedTargetRegressor"}}

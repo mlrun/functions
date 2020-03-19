@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"random_state": null, "solver": "auto", "class_weight": null, "tol": 0.001, "max_iter": null, "copy_X": true, "normalize": false, "fit_intercept": true, "alpha": 1.0}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}
+{"CLASS": {"alpha": 1.0, "fit_intercept": true, "normalize": false, "copy_X": true, "max_iter": null, "tol": 0.001, "class_weight": null, "solver": "auto", "random_state": null}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.linear_model.ridge.RidgeClassifier"}}

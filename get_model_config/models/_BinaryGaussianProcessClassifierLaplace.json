@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"random_state": null, "copy_X_train": true, "warm_start": false, "max_iter_predict": 100, "n_restarts_optimizer": 0, "optimizer": "fmin_l_bfgs_b", "kernel": null}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"kernel": null, "optimizer": "fmin_l_bfgs_b", "n_restarts_optimizer": 0, "max_iter_predict": 100, "warm_start": false, "copy_X_train": true, "random_state": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.gaussian_process.gpc._BinaryGaussianProcessClassifierLaplace"}}

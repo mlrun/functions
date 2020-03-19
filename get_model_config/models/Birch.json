@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"copy": true, "compute_labels": true, "n_clusters": 3, "branching_factor": 50, "threshold": 0.5}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"threshold": 0.5, "branching_factor": 50, "n_clusters": 3, "compute_labels": true, "copy": true}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.cluster.birch.Birch"}}

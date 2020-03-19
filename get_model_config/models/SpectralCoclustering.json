@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"random_state": null, "n_jobs": null, "n_init": 10, "init": "k-means++", "mini_batch": false, "n_svd_vecs": null, "svd_method": "randomized", "n_clusters": 3}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"n_clusters": 3, "svd_method": "randomized", "n_svd_vecs": null, "mini_batch": false, "init": "k-means++", "n_init": 10, "n_jobs": null, "random_state": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.cluster.bicluster.SpectralCoclustering"}}

@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"random_state": null, "eps": 0.1, "n_components": "auto"}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"n_components": "auto", "eps": 0.1, "random_state": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.random_projection.GaussianRandomProjection"}}

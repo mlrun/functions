@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"verbose": 0, "step": 1, "n_features_to_select": null, "estimator": null}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"estimator": null, "n_features_to_select": null, "step": 1, "verbose": 0}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.feature_selection.rfe.RFE"}}

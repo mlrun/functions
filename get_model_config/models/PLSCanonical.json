@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"copy": true, "tol": 1e-06, "max_iter": 500, "algorithm": "nipals", "scale": true, "n_components": 2}, "FIT_PARAMS": {"Y": null, "X": null}}
+{"CLASS": {"n_components": 2, "scale": true, "algorithm": "nipals", "max_iter": 500, "tol": 1e-06, "copy": true}, "FIT": {"X": null, "Y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.cross_decomposition.pls_.PLSCanonical"}}

@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"var_smoothing": 1e-09, "priors": null}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}
+{"CLASS": {"priors": null, "var_smoothing": 1e-09}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.naive_bayes.GaussianNB"}}

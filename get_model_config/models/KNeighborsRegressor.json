@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"n_jobs": null, "metric_params": null, "metric": "minkowski", "p": 2, "leaf_size": 30, "algorithm": "auto", "weights": "uniform", "n_neighbors": 5}, "FIT_PARAMS": {"y": null, "X": null}}
+{"CLASS": {"n_neighbors": 5, "weights": "uniform", "algorithm": "auto", "leaf_size": 30, "p": 2, "metric": "minkowski", "metric_params": null, "n_jobs": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.neighbors.regression.KNeighborsRegressor"}}

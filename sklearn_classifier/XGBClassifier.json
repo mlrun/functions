@@ -1,6 +1,5 @@
 {
-    "CLASS_PARAMS" : {
-        "classifier"         : "xgboost.sklearn.XGBClassifier",
+    "CLASS" : {
         "max_depth"          : 50,
         "learning_rate"      : 0.1,
         "verbosity"          : 1,
@@ -19,8 +18,10 @@
         "scale_pos_weight"   : 1,
         "random_state"       : 1},
     
-    "FIT_PARAMS" : {
-        "early_stopping_rounds" : 10,
+    "FIT" : {
         "verbose"               : false,
-        "callbacks"             :  "xgboost.callback.record_evaluation"}
+        "callbacks"             :  "xgboost.callback.record_evaluation"},
+    "META" :{
+        "class" : "xgboost.sklearn.XGBClassifier"
+    }
 }

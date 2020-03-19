@@ -1,1 +1,1 @@
-{"CLASS_PARAMS": {"metric_params": null, "leaf_size": 40, "breadth_first": true, "rtol": 0, "atol": 0, "metric": "euclidean", "kernel": "gaussian", "algorithm": "auto", "bandwidth": 1.0}, "FIT_PARAMS": {"sample_weight": null, "y": null, "X": null}}
+{"CLASS": {"bandwidth": 1.0, "algorithm": "auto", "kernel": "gaussian", "metric": "euclidean", "atol": 0, "rtol": 0, "breadth_first": true, "leaf_size": 40, "metric_params": null}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.neighbors.kde.KernelDensity"}}

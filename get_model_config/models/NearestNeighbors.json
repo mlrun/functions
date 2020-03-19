@@ -1,0 +1,1 @@
+{"CLASS": {"n_neighbors": 5, "radius": 1.0, "algorithm": "auto", "leaf_size": 30, "metric": "minkowski", "p": 2, "metric_params": null, "n_jobs": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.neighbors.unsupervised.NearestNeighbors"}}

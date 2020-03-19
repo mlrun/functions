@@ -1,0 +1,1 @@
+{"CLASS": {"store_precision": true, "assume_centered": false}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.covariance.shrunk_covariance_.OAS"}}

@@ -1,0 +1,1 @@
+{"CLASS": {"alpha": 1.0, "fit_prior": true, "class_prior": null, "norm": false}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.naive_bayes.ComplementNB"}}

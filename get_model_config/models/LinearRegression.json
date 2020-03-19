@@ -1,0 +1,1 @@
+{"CLASS": {"fit_intercept": true, "normalize": false, "copy_X": true, "n_jobs": null}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.linear_model.base.LinearRegression"}}

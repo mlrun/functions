@@ -1,0 +1,1 @@
+{"CLASS": {"n_iter": 300, "tol": 0.001, "alpha_1": 1e-06, "alpha_2": 1e-06, "lambda_1": 1e-06, "lambda_2": 1e-06, "compute_score": false, "fit_intercept": true, "normalize": false, "copy_X": true, "verbose": false}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.linear_model.bayes.BayesianRidge"}}

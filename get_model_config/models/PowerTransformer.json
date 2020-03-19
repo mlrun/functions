@@ -1,0 +1,1 @@
+{"CLASS": {"method": "yeo-johnson", "standardize": true, "copy": true}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.preprocessing.data.PowerTransformer"}}

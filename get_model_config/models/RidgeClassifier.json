@@ -1,0 +1,1 @@
+{"CLASS": {"alpha": 1.0, "fit_intercept": true, "normalize": false, "copy_X": true, "max_iter": null, "tol": 0.001, "class_weight": null, "solver": "auto", "random_state": null}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.linear_model.ridge.RidgeClassifier"}}

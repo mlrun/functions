@@ -1,0 +1,1 @@
+{"CLASS": {"transformer_list": null, "n_jobs": null, "transformer_weights": null, "verbose": false}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.pipeline.FeatureUnion"}}

@@ -1,0 +1,1 @@
+{"CLASS": {"n_components": null, "init": "auto", "warm_start": false, "max_iter": 50, "tol": 1e-05, "callback": null, "verbose": 0, "random_state": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.neighbors.nca.NeighborhoodComponentsAnalysis"}}

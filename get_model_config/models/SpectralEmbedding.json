@@ -1,0 +1,1 @@
+{"CLASS": {"n_components": 2, "affinity": "nearest_neighbors", "gamma": null, "random_state": null, "eigen_solver": null, "n_neighbors": null, "n_jobs": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.manifold.spectral_embedding_.SpectralEmbedding"}}

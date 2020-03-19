@@ -1,0 +1,1 @@
+{"CLASS": {"alpha": 1, "kernel": "linear", "gamma": null, "degree": 3, "coef0": 1, "kernel_params": null}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.kernel_ridge.KernelRidge"}}

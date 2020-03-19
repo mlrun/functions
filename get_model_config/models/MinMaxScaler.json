@@ -1,0 +1,1 @@
+{"CLASS": {"feature_range": [0, 1], "copy": true}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.preprocessing.data.MinMaxScaler"}}

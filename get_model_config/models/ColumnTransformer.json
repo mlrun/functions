@@ -1,0 +1,1 @@
+{"CLASS": {"transformers": null, "remainder": "drop", "sparse_threshold": 0.3, "n_jobs": null, "transformer_weights": null, "verbose": false}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.compose._column_transformer.ColumnTransformer"}}

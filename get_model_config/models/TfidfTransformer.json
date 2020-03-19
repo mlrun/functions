@@ -1,0 +1,1 @@
+{"CLASS": {"norm": "l2", "use_idf": true, "smooth_idf": true, "sublinear_tf": false}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.feature_extraction.text.TfidfTransformer"}}

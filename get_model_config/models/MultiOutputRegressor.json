@@ -1,0 +1,1 @@
+{"CLASS": {"estimator": null, "n_jobs": null}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.multioutput.MultiOutputRegressor"}}

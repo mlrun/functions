@@ -1,0 +1,1 @@
+{"CLASS": {"fit_intercept": true, "verbose": false, "max_iter": 500, "normalize": true, "precompute": "auto", "cv": "warn", "max_n_alphas": 1000, "n_jobs": null, "eps": 2.220446049250313e-16, "copy_X": true, "positive": false}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.linear_model.least_angle.LarsCV"}}

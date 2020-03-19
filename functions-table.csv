@@ -1,0 +1,12 @@
+name,folder,filename,handler,image,image_tag,kind,categoryA,categoryB
+arc_to_parquet,arc_to_parquet,arc_to_parquet.py,arc_to_parquet,mlrun/ml-base,0.4.5,job,fileutils,compression
+load_dataset,load_dataset,load_dataset.py,load_dataset,mlrun/ml-models,0.4.5,job,datagen,fileutils
+get_model_config,get_model_config,get_model_config.py,get_model_config,mlrun/ml-base,0.4.5,job,models,config
+describe,describe,describe.ipynb,describe,mlrun/ml-models,0.4.5,job,models,graphics
+test_classifier,test_classifier,test_classifier.py,test_classifier,mlrun/ml-models,0.4.5,job,models,test
+sklearn_classifier,sklearn_classifier,sklearn_classifier.py,train_model,mlrun/ml-models,0.4.5,job,models,classifier
+create_classification_data,gen_class_data,gen_class_data.py,create_classification_data,mlrun/ml-models,0.4.5,job,datagen,fileutils
+open_archive,open_archive,open_archive.ipynb,open_archive,mlrun/ml-models,0.4.5,job,fileutils,datagen
+parquet_to_dask,parquet_to_dask,parquet_to_dask.py,parquet_to_dask,mlrun/ml-dask,0.4.5,dask,fileutils,datagen
+describe_dask,describe_dask,describe_dask.py,describe_dask,mlrun/ml-dask,0.4.5,job,models,datagen
+model_server,serving,model_server.ipynb,

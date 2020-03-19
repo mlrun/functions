@@ -1,0 +1,1 @@
+{"CLASS": {"n_bins": 5, "encode": "onehot", "strategy": "quantile"}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.preprocessing._discretization.KBinsDiscretizer"}}

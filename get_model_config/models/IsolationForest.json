@@ -1,0 +1,1 @@
+{"CLASS": {"n_estimators": 100, "max_samples": "auto", "contamination": "legacy", "max_features": 1.0, "bootstrap": false, "n_jobs": null, "behaviour": "old", "random_state": null, "verbose": 0, "warm_start": false}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.ensemble.iforest.IsolationForest"}}

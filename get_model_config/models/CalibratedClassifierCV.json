@@ -1,0 +1,1 @@
+{"CLASS": {"base_estimator": null, "method": "sigmoid", "cv": "warn"}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.calibration.CalibratedClassifierCV"}}

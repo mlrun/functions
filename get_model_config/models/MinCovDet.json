@@ -1,0 +1,1 @@
+{"CLASS": {"store_precision": true, "assume_centered": false, "support_fraction": null, "random_state": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.covariance.robust_covariance.MinCovDet"}}

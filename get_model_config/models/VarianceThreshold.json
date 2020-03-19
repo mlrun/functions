@@ -1,0 +1,1 @@
+{"CLASS": {"threshold": 0.0}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.feature_selection.variance_threshold.VarianceThreshold"}}

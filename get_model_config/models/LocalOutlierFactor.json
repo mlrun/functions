@@ -1,0 +1,1 @@
+{"CLASS": {"n_neighbors": 20, "algorithm": "auto", "leaf_size": 30, "metric": "minkowski", "p": 2, "metric_params": null, "contamination": "legacy", "novelty": false, "n_jobs": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.neighbors.lof.LocalOutlierFactor"}}

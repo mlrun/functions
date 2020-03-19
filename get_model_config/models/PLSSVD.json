@@ -1,0 +1,1 @@
+{"CLASS": {"n_components": 2, "scale": true, "copy": true}, "FIT": {"X": null, "Y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.cross_decomposition.pls_.PLSSVD"}}

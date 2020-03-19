@@ -1,0 +1,1 @@
+{"CLASS": {"func": null, "inverse_func": null, "validate": null, "accept_sparse": false, "pass_y": "deprecated", "check_inverse": true, "kw_args": null, "inv_kw_args": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.preprocessing._function_transformer.FunctionTransformer"}}

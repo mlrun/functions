@@ -163,6 +163,8 @@ def update_model_config(
     fit_key: str = "FIT"
 ):
     """Update model config json
+    
+    Not used until we refactor as per the TODO
         
     This function is essential since there are modifications in class
     and fit params that must be made (callbacks are a good example, without
@@ -282,18 +284,24 @@ def train_model(
         fit_params_updates = json.loads(fit_params_updates.get())
     # update the parameters            
     # add data to fit params
-    fit_params_updates.update({'X': xtrain,'y': ytrain})
-    model_config = update_model_config(model_config, class_params_updates, fit_params_updates)
-
+    fit_params_updates.update({'X': xtrain,'y': ytrain.values})
+    
+    model_config["CLASS"].update(class_params_updates)
+    model_config["FIT"].update(fit_params_updates)
+    
     # create class and fit
     ClassifierClass = _create_class(model_config["META"]["class"])
     model = ClassifierClass(**model_config["CLASS"])
+    print(model_config["FIT"])
     model.fit(**model_config["FIT"])
 
     # save model
     filepath = os.path.join(base_path, f"{models_dir}/{model_key}.pkl")
-    dump(model, open(filepath, "wb"))
-    context.log_artifact(model_key, local_path=models_dir)
+    try:
+        dump(model, open(filepath, "wb"))
+        context.log_artifact(model_key, local_path=models_dir)
+    except Exception as e:
+        print('SERIALIZE MODEL ERROR:', str(e))
 
     # compute validation metrics
     ypred = model.predict(xvalid)

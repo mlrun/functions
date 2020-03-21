@@ -6,6 +6,7 @@ from cloudpickle import dump, load
 import itertools
 
 import sklearn
+from sklearn import metrics
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -292,7 +293,6 @@ def train_model(
     # create class and fit
     ClassifierClass = _create_class(model_config["META"]["class"])
     model = ClassifierClass(**model_config["CLASS"])
-    print(model_config["FIT"])
     model.fit(**model_config["FIT"])
 
     # save model
@@ -306,14 +306,15 @@ def train_model(
     # compute validation metrics
     ypred = model.predict(xvalid)
     y_score = model.predict_proba(xvalid)
-
-    average_precision = average_precision_score(yvalidb,
-                                                y_score,
-                                                average=score_method)
+    print(y_score.shape)
+    print(yvalidb.shape)
+    average_precision = metrics.average_precision_score(yvalidb[:,:-1],
+                                                        y_score,
+                                                        average=score_method)
 
     context.log_result(f"accuracy", float(model.score(xvalid, yvalid)))
-    context.log_result(f"rocauc", roc_auc_score(yvalidb, y_score))
-    context.log_result(f"f1_score", f1_score(yvalid, ypred,
+    context.log_result(f"rocauc", metrics.roc_auc_score(yvalidb, y_score))
+    context.log_result(f"f1_score", metrics.f1_score(yvalid, ypred,
                                              average=score_method))
     context.log_result(f"avg_precscore", average_precision)
 
@@ -351,7 +352,7 @@ def plot_roc(
     :param legend_loc:   ("best") location of plot legend
     """
     # don't bother if this doesn't work
-    assert y_probs.shape == y_labels.shape
+    assert y_probs.shape == y_labels[:,:-1].shape
     
     # clear matplotlib current figure
     _gcf_clear(plt)
@@ -371,7 +372,7 @@ def plot_roc(
     plt.legend(loc=legend_loc)
     
     # single ROC or mutliple
-    for i in range(y_labels.shape[1]):
+    for i in range(y_labels[:,:-1].shape[1]):
         fpr[i], tpr[i], _ = metrics.roc_curve(y_labels[:, i], y_probs[:, i], pos_label=1)
         roc_auc[i] = metrics.auc(fpr[i], tpr[i])
         plt.plot(fpr[i], tpr[i], label=f"class {i}")

@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: describe
   tag: ''
-  hash: 99cf75fabd5f8437962accf9d58591abb35d4056
+  hash: 1d52d6cc17eaaf75307b1dcf06dbe5010badce7f
   project: ''
   labels:
     author: yjb
@@ -19,6 +19,6 @@ spec:
   description: ''
   image_pull_policy: Always
   build:
-    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTAzLTIxIDAwOjM4Cgo=
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTAzLTIxIDE2OjA1Cgo=
     commands: []
-    code_origin: https://github.com/mlrun/functions.git#e34951cf8ba8c6161f717f861134daa03106d87b:describe/describe.ipynb
+    code_origin: https://github.com/mlrun/functions.git#9291c61efbbc381e4929a04619346ed82d6d7da2:describe/describe.ipynb

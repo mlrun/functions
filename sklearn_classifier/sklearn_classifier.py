@@ -88,7 +88,7 @@ def get_model_configs(
     estimators = all_estimators()
     def _get_estimator(pkg_class):
         """find a specific class in a list of sklearn estimators"""
-        my_class = pkg_class.split('.')[-1]
+        my_class = pkg_class.split(".")[-1]
         return list(filter(lambda x: x[0] == my_class, estimators))[0]
 
     # find estimators corresponding to my_models list
@@ -146,8 +146,8 @@ def get_model_configs(
             model_json[key] = dict(zip(reversed(args_paired), reversed(defs_paired)))
 
         model_json[meta_key] = {}
-        model_json[meta_key]['sklearn_version'] = skversion
-        model_json[meta_key]['class'] = '.'.join([estimator[3].__module__, estimator[0]])
+        model_json[meta_key]["sklearn_version"] = skversion
+        model_json[meta_key]["class"] = ".".join([estimator[3].__module__, estimator[0]])
         model_configs.append(model_json)
     if len(model_configs) == 1:
         # do we want to log this modified model as an artifact?
@@ -205,13 +205,14 @@ def train_model(
     """train a classifier.
 
     :param context:           the function context
-    :param model_pkg_class:   the model to train, e.g, 'sklearn.neural_networks.MLPClassifier'
+    :param model_pkg_class:   the model to train, e.g, "sklearn.neural_networks.MLPClassifier", 
+                              or json model config
     :param data_key:          ("raw") name of raw data file
     :param sample:            Selects the first n rows, or select a sample
                               starting from the first. If negative <-1, select
                               a random sample
     :param label_column:      ground-truth (y) labels
-    :param model_key:         ('model') name of model in artifact store,
+    :param model_key:         ("model") name of model in artifact store,
                               points to a directory
     :param test_size:         (0.05) test set size
     :param train_val_split:   (0.75) Once the test set has been removed the
@@ -235,7 +236,7 @@ def train_model(
     # extract file name from DataItem
     srcfilepath = str(data_key)
     
-    # TODO: this should be part of data's metadata dealt with in another step get a data set, sample, etc...
+    # TODO: this should be part of data"s metadata dealt with in another step get a data set, sample, etc...
     # get all data or a sample
     if (sample == -1) or (sample >= 1):
         # get all rows, or contiguous sample starting at row 1.
@@ -248,7 +249,7 @@ def train_model(
         raw = pq.read_table(srcfilepath).to_pandas().dropna().sample(sample * -1)
         labels = raw.pop(label_column)
 
-    # TODO: this should be part of data's metadata dealt with in another step
+    # TODO: this should be part of data"s metadata dealt with in another step
     context.header = raw.columns.values
     
     # TODO: all of this should be part of a spitter component that does cv too, dealt with in another step
@@ -276,8 +277,12 @@ def train_model(
     test_set.to_parquet(filepath, index=False)
     context.log_artifact(test_set_key, local_path=test_set_key + ".pqt")
 
-    # load the model config
-    model_config = get_model_configs(model_pkg_class)
+    if model_pkg_class.endswith(".json"):
+        model_config = json.load(open(model_pkg_class, "r"))
+    else:
+        # load the model config
+        model_config = get_model_configs(model_pkg_class)
+
     # get update params if any
     if isinstance(class_params_updates, DataItem):
         class_params_updates = json.loads(class_params_updates.get())
@@ -285,7 +290,7 @@ def train_model(
         fit_params_updates = json.loads(fit_params_updates.get())
     # update the parameters            
     # add data to fit params
-    fit_params_updates.update({'X': xtrain,'y': ytrain.values})
+    fit_params_updates.update({"X": xtrain,"y": ytrain.values})
     
     model_config["CLASS"].update(class_params_updates)
     model_config["FIT"].update(fit_params_updates)
@@ -301,7 +306,7 @@ def train_model(
         dump(model, open(filepath, "wb"))
         context.log_artifact(model_key, local_path=models_dir)
     except Exception as e:
-        print('SERIALIZE MODEL ERROR:', str(e))
+        print("SERIALIZE MODEL ERROR:", str(e))
 
     # compute validation metrics
     ypred = model.predict(xvalid)
@@ -351,7 +356,7 @@ def plot_roc(
     :param title:        ("roc curve") title of plot
     :param legend_loc:   ("best") location of plot legend
     """
-    # don't bother if this doesn't work
+    # don"t bother if this doesn"t work
     assert y_probs.shape == y_labels[:,:-1].shape
     
     # clear matplotlib current figure

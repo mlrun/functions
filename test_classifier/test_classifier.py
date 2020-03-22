@@ -63,8 +63,6 @@ def test_classifier(
     def _eval_model(model):
         # enclose all except model
         ytestb = label_binarize(ytest, classes=list(range(xtest.shape[1])))
-        print(ytest)
-        print(ytestb)
         clf = load(open(os.path.join(str(models_dir), model), "rb"))
         if callable(getattr(clf, "predict_proba")):
             y_score = clf.predict_proba(xtest.values)
@@ -77,7 +75,6 @@ def test_classifier(
             y_score = None
         plot_confusion_matrix(context, ytest, ypred, key="confusion", fmt="png")
         if hasattr(clf, "feature_importances_"):
-            print(clf)
             plot_importance(context, clf, key=f"featimp")
         average_precision = metrics.average_precision_score(ytestb[:,:-1], y_score, average=score_method)
         context.log_result(f"accuracy", float(clf.score(xtest.values, ytest.values)))

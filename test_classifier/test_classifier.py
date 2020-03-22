@@ -79,7 +79,7 @@ def test_classifier(
         if hasattr(clf, "feature_importances_"):
             print(clf)
             plot_importance(context, clf, key=f"featimp")
-        average_precision = metrics.average_precision_score(ytestb, y_score, average=score_method)
+        average_precision = metrics.average_precision_score(ytestb[:,:-1], y_score, average=score_method)
         context.log_result(f"accuracy", float(clf.score(xtest.values, ytest.values)))
         context.log_result(f"rocauc", metrics.roc_auc_score(ytestb, y_score))
         context.log_result(f"f1_score", metrics.f1_score(ytest.values, ypred, average=score_method))

@@ -32,13 +32,13 @@ def get_toy_data(
     
     The following datasets are available ('name' : desription):
     
-        'boston'   : boston house-prices dataset (regression)
-        'iris'     : iris dataset (classification)
-        'diabetes' : diabetes dataset (regression)
-        'digits'   : digits dataset (classification)
-        'linnerud' : linnerud dataset (multivariate regression)
-        'wine'     : wine dataset (classification)
-        'cancer'   : breast cancer wisconsin dataset (classification)
+        'boston'          : boston house-prices dataset (regression)
+        'iris'            : iris dataset (classification)
+        'diabetes'        : diabetes dataset (regression)
+        'digits'          : digits dataset (classification)
+        'linnerud'        : linnerud dataset (multivariate regression)
+        'wine'            : wine dataset (classification)
+        'breast_cancer'   : breast cancer wisconsin dataset (classification)
     
     The scikit-learn functions return a data bunch including the following items:
     - data              the features matrix
@@ -69,10 +69,15 @@ def get_toy_data(
         
         data = load_data_fn(**params)
         feature_names = data['feature_names']
-        
+
         # save
         xy = np.concatenate([data['data'], data['target'].reshape(-1, 1)], axis=1)
-        feature_names.append('labels')
+        if hasattr(feature_names, 'append'):
+            # its a list
+            feature_names.append('labels')
+        else:
+            # its an array
+            feature_names = np.append(feature_names, 'labels')
         df = pd.DataFrame(data=xy, columns=feature_names)
         df.to_parquet(filepath, engine='pyarrow', index=False)
         

@@ -21,7 +21,7 @@
     
     "FIT" : {
         "verbose"               : false,
-        "callbacks"             :  "xgboost.callback.record_evaluation"},
+    },
     "META" : {
             "class": "xgboost.sklearn.XGBClassifier",
             "version" : "1.0.2"

@@ -1,5 +1,5 @@
 {
-    "CLASS_PARAMS" : {
+    "CLASS" : {
         "boosting_type"      : "gbdt",
         "num_leaves"         : 300,
         "max_depth"          : 50,
@@ -17,11 +17,11 @@
         "silent"             : true,
         "importance_type"    : "split",
         "random_state"       : 1},
-    
-    "FIT_PARAMS" : {
-        "verbose"               : false,
-        "callbacks"             : "lightgbm.callback.record_evaluation"},
+    "FIT" : {
+        "verbose"               : false
+    },
     "META" : {
-        "class"         : "lightgbm.sklearn.LGBMClassifier",    
+        "class" : "lightgbm.sklearn.LGBMClassifier",
+        "version" : "2.3.1"
     }
 }

@@ -270,7 +270,7 @@ def train_model(
     # set-aside test_set
     test_set = pd.concat(
         [pd.DataFrame(data=xtest, columns=context.header),
-         pd.DataFrame(data=ytest, columns=[label_column])],
+         pd.DataFrame(data=ytest.values, columns=[label_column])],
         axis=1,)
     filepath = os.path.join(base_path, test_set_key + ".pqt")
     test_set.to_parquet(filepath, index=False)
@@ -306,8 +306,8 @@ def train_model(
     # compute validation metrics
     ypred = model.predict(xvalid)
     y_score = model.predict_proba(xvalid)
-    print(y_score.shape)
-    print(yvalidb.shape)
+    context.logger.info(f"y_score.shape {y_score.shape}")
+    context.logger.info(f"yvalidb.shape {yvalidb.shape}")
     average_precision = metrics.average_precision_score(yvalidb[:,:-1],
                                                         y_score,
                                                         average=score_method)

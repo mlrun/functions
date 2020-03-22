@@ -35,7 +35,8 @@ def test_classifier(
     test_set: DataItem,
     label_column: str,
     score_method: str = 'micro',
-    key: str = ""
+    key: str = "",
+    plots_dir: str = "plots"
 ) -> None:
     """Test one or more classifier models against held-out dataset
     
@@ -48,12 +49,15 @@ def test_classifier(
     :param models_dir:      artifact models representing a folder or a folder
     :param test_set:        test features and labels
     :param label_column:    column name for ground truth labels
-    :param score_method:     for multiclass classification
-    :param key:             key for results artifact
+    :param score_method:    for multiclass classification
+    :param key:             key for results artifact (maybe just a dir of artifacts for test like plots_dir)
+    :param plots_dir:       dir for test plots
     """
-    xtest = pd.read_csv(str(test_set))
+    os.makedirs(os.path.join(context.artifact_path, plots_dir), exist_ok=True)
+    
+    xtest = pd.read_parquet(str(test_set))
     ytest = xtest.pop(label_column)
-
+    
     context.header = list(xtest.columns.values)
     
     def _eval_model(model):
@@ -63,22 +67,18 @@ def test_classifier(
         if callable(getattr(clf, "predict_proba")):
             y_score = clf.predict_proba(xtest.values)
             ypred = clf.predict(xtest.values)
-            plot_roc(context, ytestb, y_score, key=f"roc")
+            plot_roc(context, ytestb, y_score, key=f"roc", plots_dir=plots_dir)
         else:
             ypred = clf.predict(xtest.values) # refactor
             y_score = None
-        plot_confusion_matrix(context, 
-                                ytest, 
-                                ypred, 
-                                classes=context.header[:-1],
-                                key=f"confusion")
+        plot_confusion_matrix(context, ytest, ypred, key="confusion", fmt="png")
         if hasattr(clf, "feature_importances_"):
             print(clf)
             plot_importance(context, clf, key=f"featimp")
-        average_precision = average_precision_score(ytestb, y_score, average=score_method)
+        average_precision = metrics.average_precision_score(ytestb, y_score, average=score_method)
         context.log_result(f"accuracy", float(clf.score(xtest.values, ytest.values)))
-        context.log_result(f"rocauc", roc_auc_score(ytestb, y_score))
-        context.log_result(f"f1_score", f1_score(ytest.values, ypred, average=score_method))
+        context.log_result(f"rocauc", metrics.roc_auc_score(ytestb, y_score))
+        context.log_result(f"f1_score", metrics.f1_score(ytest.values, ypred, average=score_method))
         context.log_result(f"avg_precscore", average_precision)
 
     
@@ -100,8 +100,8 @@ def plot_roc(
     key="roc",
     plots_dir: str = "plots",
     fmt="png",
-    x_label: str = "false positive rate",
-    y_label: str =  "true positive rate",
+    fpr_label: str = "false positive rate",
+    tpr_label: str =  "true positive rate",
     title: str = "roc curve",
     legend_loc: str = "best"
 ):
@@ -116,13 +116,13 @@ def plot_roc(
     :param key:          ("roc") key of plot in artifact store
     :param plots_dir:    ("plots") destination folder relative path to artifact path
     :param fmt:          ("png") plot format
-    :param x_label:      ("false positive rate") x-axis labels
-    :param y_label:      ("true positive rate") y-axis labels
+    :param fpr_label:    ("false positive rate") x-axis labels
+    :param tpr_label:    ("true positive rate") y-axis labels
     :param title:        ("roc curve") title of plot
     :param legend_loc:   ("best") location of plot legend
     """
     # don't bother if this doesn't work
-    assert y_probs.shape == y_labels[:,:-1].shape
+    assert y_probs.shape == y_labels.shape
     
     # clear matplotlib current figure
     _gcf_clear(plt)
@@ -136,8 +136,8 @@ def plot_roc(
     plt.plot([0, 1], [0, 1], "k--")
     
     # labelling
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
+    plt.xlabel(fpr_label)
+    plt.ylabel(tpr_label)
     plt.title(title)
     plt.legend(loc=legend_loc)
     

@@ -6,15 +6,9 @@ from cloudpickle import load
 import numpy as np
 import pandas as pd
 
+import sklearn
+from sklearn import metrics
 from sklearn.preprocessing import label_binarize
-
-from sklearn.metrics import (roc_auc_score, 
-                             auc,
-                             f1_score, 
-                             average_precision_score, 
-                             roc_curve, 
-                             confusion_matrix)
-
 from sklearn.utils.multiclass import unique_labels
 
 import matplotlib.pyplot as plt
@@ -41,7 +35,8 @@ def test_classifier(
     test_set: DataItem,
     label_column: str,
     score_method: str = 'micro',
-    key: str = ""
+    key: str = "",
+    plots_dir: str = "plots"
 ) -> None:
     """Test one or more classifier models against held-out dataset
     
@@ -54,37 +49,40 @@ def test_classifier(
     :param models_dir:      artifact models representing a folder or a folder
     :param test_set:        test features and labels
     :param label_column:    column name for ground truth labels
-    :param score_method:     for multiclass classification
-    :param key:             key for results artifact
+    :param score_method:    for multiclass classification
+    :param key:             key for results artifact (maybe just a dir of artifacts for test like plots_dir)
+    :param plots_dir:       dir for test plots
     """
-    xtest = pd.read_csv(str(test_set))
+    os.makedirs(os.path.join(context.artifact_path, plots_dir), exist_ok=True)
+    
+    xtest = pd.read_parquet(str(test_set))
     ytest = xtest.pop(label_column)
-
+    
     context.header = list(xtest.columns.values)
     
     def _eval_model(model):
         # enclose all except model
-        ytestb = label_binarize(ytest, classes=[0, 1, 2])
+        ytestb = label_binarize(ytest, classes=list(range(xtest.shape[1])))
+        print(ytest)
+        print(ytestb)
         clf = load(open(os.path.join(str(models_dir), model), "rb"))
         if callable(getattr(clf, "predict_proba")):
             y_score = clf.predict_proba(xtest.values)
             ypred = clf.predict(xtest.values)
-            plot_roc(context, ytestb, y_score, key=f"roc")
+            context.logger.info(f"y_score.shape {y_score.shape}")
+            context.logger.info(f"ytestb.shape {ytestb.shape}")
+            plot_roc(context, ytestb, y_score, key=f"roc", plots_dir=plots_dir)
         else:
             ypred = clf.predict(xtest.values) # refactor
             y_score = None
-        plot_confusion_matrix(context, 
-                                ytest, 
-                                ypred, 
-                                classes=context.header[:-1],
-                                key=f"confusion")
+        plot_confusion_matrix(context, ytest, ypred, key="confusion", fmt="png")
         if hasattr(clf, "feature_importances_"):
             print(clf)
             plot_importance(context, clf, key=f"featimp")
-        average_precision = average_precision_score(ytestb, y_score, average=score_method)
+        average_precision = metrics.average_precision_score(ytestb, y_score, average=score_method)
         context.log_result(f"accuracy", float(clf.score(xtest.values, ytest.values)))
-        context.log_result(f"rocauc", roc_auc_score(ytestb, y_score))
-        context.log_result(f"f1_score", f1_score(ytest.values, ypred, average=score_method))
+        context.log_result(f"rocauc", metrics.roc_auc_score(ytestb, y_score))
+        context.log_result(f"f1_score", metrics.f1_score(ytest.values, ypred, average=score_method))
         context.log_result(f"avg_precscore", average_precision)
 
     
@@ -100,64 +98,102 @@ def test_classifier(
     context.log_artifact('DEPLOY', body=b'true', local_path='DEPLOY')
     
 def plot_roc(
-    context: MLClientCtx, 
+    context,
     y_labels,
     y_probs,
     key="roc",
-    fmt="png"
+    plots_dir: str = "plots",
+    fmt="png",
+    fpr_label: str = "false positive rate",
+    tpr_label: str =  "true positive rate",
+    title: str = "roc curve",
+    legend_loc: str = "best"
 ):
-    """Plot an ROC curve from test data saved in an artifact store.
+    """plot roc curves
     
-    :param context:         function context
-    :param y_labels:        test data labels
-    :param y_probs:         test data 
+    TODO:  add averaging method (as string) that was used to create probs, 
+    display in legend
+    
+    :param context:      the function context
+    :param y_labels:     ground truth labels, hot encoded for multiclass  
+    :param y_probs:      model prediction probabilities
+    :param key:          ("roc") key of plot in artifact store
+    :param plots_dir:    ("plots") destination folder relative path to artifact path
+    :param fmt:          ("png") plot format
+    :param fpr_label:    ("false positive rate") x-axis labels
+    :param tpr_label:    ("true positive rate") y-axis labels
+    :param title:        ("roc curve") title of plot
+    :param legend_loc:   ("best") location of plot legend
     """
+    y_labels = y_labels[:, :-1] # last column redundant (labelbinarizer issue?)
+    assert y_probs.shape == y_labels.shape
+    
+    # clear matplotlib current figure
     _gcf_clear(plt)
     
+    # data accummulators by class
     fpr = dict()
     tpr = dict()
     roc_auc = dict()
+    
+    # draw 45 degree line
     plt.plot([0, 1], [0, 1], "k--")
-    plt.xlabel("false positive rate")
-    plt.ylabel("true positive rate")
-    plt.title("roc curve")
-    plt.legend(loc="best")
-    for i in range(y_labels.shape[1]):
-        fpr[i], tpr[i], _ = roc_curve(y_labels[:, i], y_probs[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
+    
+    # labelling
+    plt.xlabel(fpr_label)
+    plt.ylabel(tpr_label)
+    plt.title(title)
+    plt.legend(loc=legend_loc)
+    
+    # single ROC or mutliple
+    for i in range(y_labels[:,:-1].shape[1]):
+        fpr[i], tpr[i], _ = metrics.roc_curve(y_labels[:, i], y_probs[:, i], pos_label=1)
+        roc_auc[i] = metrics.auc(fpr[i], tpr[i])
         plt.plot(fpr[i], tpr[i], label=f"class {i}")
 
-    fig = plt.gcf()
-    os.makedirs(os.path.join(context.artifact_path, "plots"), exist_ok=True)
-    fig.savefig(os.path.join(context.artifact_path, f"plots/{key}.{fmt}"))
-    context.log_artifact(PlotArtifact(key,  body=fig), local_path=f"plots/{key}.{fmt}")
+    fname = f"{plots_dir}/{key}.{fmt}"
+    plt.savefig(os.path.join(context.artifact_path, fname))
+    context.log_artifact(PlotArtifact(key, body=plt.gcf()), local_path=fname)
+    
 
 def plot_confusion_matrix(
-    context: MLClientCtx, 
-    labels, 
+    context: MLClientCtx,
+    labels,
     predictions,
-    classes,
-    key: str ="confusion",
-    fmt: str = "png"
+    key: str = "confusion_matrix",
+    plots_dir: str = "plots",
+    colormap: str = "Blues",
+    fmt: str = "png",
+    sample_weight=None
 ):
     """Create a confusion matrix.
     Plot and save a confusion matrix using test data from a
-    pipeline step.
+    modelline step.
+    
+    See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html
+    
+    TODO: fix label alignment
+    TODO: consider using another packaged version
+    TODO: refactor to take params dict for plot options
+
     :param context:         function context
-    :param labels:          test data labels
-    :param predictions:     test data predictions
+    :param labels:          validation data ground-truth labels
+    :param predictions:     validation data predictions
+    :param key:             str
+    :param plots_dir:       relative path of plots in artifact store
+    :param colormap:        colourmap for confusion matrix
+    :param fmt:             plot format
+    :param sample_weight:   sample weights
     """
     _gcf_clear(plt)
-
-    cm = _plot_confusion_matrix(labels, predictions, classes=classes, 
-                                title=key, normalize=True)
+    
+    cm = metrics.confusion_matrix(labels, predictions, sample_weight=None)
+    sns.heatmap(cm, annot=True, cmap=colormap, square=True)
 
     fig = plt.gcf()
-    os.makedirs(os.path.join(context.artifact_path, "plots"), exist_ok=True)
-    fig.savefig(os.path.join(context.artifact_path, f"plots/{key}.{fmt}"))
-    context.log_artifact(PlotArtifact(key,  body=fig), local_path=f"plots/{key}.{fmt}")
-
-    _gcf_clear(plt)
+    fname = f"{plots_dir}/{key}.{fmt}"
+    fig.savefig(os.path.join(context.artifact_path, fname))
+    context.log_artifact(PlotArtifact(key, body=fig), local_path=fname)
 
 def plot_importance(
     context,

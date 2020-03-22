@@ -6,6 +6,7 @@ from cloudpickle import dump, load
 import itertools
 
 import sklearn
+from sklearn import metrics
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -163,6 +164,8 @@ def update_model_config(
     fit_key: str = "FIT"
 ):
     """Update model config json
+    
+    Not used until we refactor as per the TODO
         
     This function is essential since there are modifications in class
     and fit params that must be made (callbacks are a good example, without
@@ -226,6 +229,8 @@ def train_model(
     """
     base_path = context.artifact_path
     os.makedirs(base_path, exist_ok=True)
+    os.makedirs(os.path.join(base_path, plots_dir), exist_ok=True)
+    os.makedirs(os.path.join(base_path, models_dir), exist_ok=True)
     
     # extract file name from DataItem
     srcfilepath = str(data_key)
@@ -265,7 +270,7 @@ def train_model(
     # set-aside test_set
     test_set = pd.concat(
         [pd.DataFrame(data=xtest, columns=context.header),
-         pd.DataFrame(data=ytest, columns=[label_column])],
+         pd.DataFrame(data=ytest.values, columns=[label_column])],
         axis=1,)
     filepath = os.path.join(base_path, test_set_key + ".pqt")
     test_set.to_parquet(filepath, index=False)
@@ -280,30 +285,36 @@ def train_model(
         fit_params_updates = json.loads(fit_params_updates.get())
     # update the parameters            
     # add data to fit params
-    fit_params_updates.update({'X': xtrain,'y': ytrain})
-    model_config = update_model_config(model_config, class_params_update, fit_params_updates)
-
+    fit_params_updates.update({'X': xtrain,'y': ytrain.values})
+    
+    model_config["CLASS"].update(class_params_updates)
+    model_config["FIT"].update(fit_params_updates)
+    
     # create class and fit
     ClassifierClass = _create_class(model_config["META"]["class"])
-    model = ClassifierClass(**class_params)
-    model.fit(**fit_params)
+    model = ClassifierClass(**model_config["CLASS"])
+    model.fit(**model_config["FIT"])
 
     # save model
     filepath = os.path.join(base_path, f"{models_dir}/{model_key}.pkl")
-    dump(model, open(filepath, "wb"))
-    context.log_artifact(model_key, local_path=models_dir)
+    try:
+        dump(model, open(filepath, "wb"))
+        context.log_artifact(model_key, local_path=models_dir)
+    except Exception as e:
+        print('SERIALIZE MODEL ERROR:', str(e))
 
     # compute validation metrics
     ypred = model.predict(xvalid)
     y_score = model.predict_proba(xvalid)
-
-    average_precision = average_precision_score(yvalidb,
-                                                y_score,
-                                                average=score_method)
+    context.logger.info(f"y_score.shape {y_score.shape}")
+    context.logger.info(f"yvalidb.shape {yvalidb.shape}")
+    average_precision = metrics.average_precision_score(yvalidb[:,:-1],
+                                                        y_score,
+                                                        average=score_method)
 
     context.log_result(f"accuracy", float(model.score(xvalid, yvalid)))
-    context.log_result(f"rocauc", roc_auc_score(yvalidb, y_score))
-    context.log_result(f"f1_score", f1_score(yvalid, ypred,
+    context.log_result(f"rocauc", metrics.roc_auc_score(yvalidb, y_score))
+    context.log_result(f"f1_score", metrics.f1_score(yvalid, ypred,
                                              average=score_method))
     context.log_result(f"avg_precscore", average_precision)
 
@@ -341,7 +352,7 @@ def plot_roc(
     :param legend_loc:   ("best") location of plot legend
     """
     # don't bother if this doesn't work
-    assert y_probs.shape == y_labels.shape
+    assert y_probs.shape == y_labels[:,:-1].shape
     
     # clear matplotlib current figure
     _gcf_clear(plt)
@@ -361,7 +372,7 @@ def plot_roc(
     plt.legend(loc=legend_loc)
     
     # single ROC or mutliple
-    for i in range(y_labels.shape[1]):
+    for i in range(y_labels[:,:-1].shape[1]):
         fpr[i], tpr[i], _ = metrics.roc_curve(y_labels[:, i], y_probs[:, i], pos_label=1)
         roc_auc[i] = metrics.auc(fpr[i], tpr[i])
         plt.plot(fpr[i], tpr[i], label=f"class {i}")

@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: test-classifier
   tag: ''
-  hash: c99ff189e028153521ab0135209dbd75818e9767
+  hash: 638511370f81a098574038e07810a0b433104775
   project: ''
   labels:
     author: yjb
@@ -13,7 +13,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/ml-models:0.4.5
+  image: mlrun/ml-models:latest
   env: []
   default_handler: test_classifier
   description: ''

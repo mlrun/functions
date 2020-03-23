@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: load-dataset
   tag: ''
-  hash: 3174125bedca40ae5e9f90f68e96744298df449a
+  hash: b0ef296ad93c614d0886fab03c94a9ea694fc03a
   project: ''
   labels:
     author: yjb
@@ -13,7 +13,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/ml-models:0.4.5
+  image: mlrun/ml-models:latest
   env: []
   default_handler: get_toy_data
   description: ''

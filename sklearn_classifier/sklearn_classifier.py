@@ -254,7 +254,7 @@ def train_model(
     
     # TODO: all of this should be part of a spitter component that does cv too, dealt with in another step
     # make a hot encode copy of labels before the split
-    yb = label_binarize(labels, classes=list(range(raw.shape[1])))
+    yb = label_binarize(labels, classes=labels.unique())
     # double split to generate 3 data sets: train, validation and test
     # with xtest,ytest set aside
     x, xtest, y, ytest = train_test_split(np.concatenate([raw, yb], axis=1), labels, test_size=test_size, random_state=rng)
@@ -313,15 +313,23 @@ def train_model(
     y_score = model.predict_proba(xvalid)
     context.logger.info(f"y_score.shape {y_score.shape}")
     context.logger.info(f"yvalidb.shape {yvalidb.shape}")
-    average_precision = metrics.average_precision_score(yvalidb[:,:-1],
-                                                        y_score,
-                                                        average=score_method)
-
+    if yvalidb.shape[1] > 1:
+        # label encoding was applied:
+        average_precision = metrics.average_precision_score(yvalidb[:,:-1],
+                                                            y_score,
+                                                            average=score_method)
+        context.log_result(f"rocauc", metrics.roc_auc_score(yvalidb, y_score))
+    else:
+        average_precision = metrics.average_precision_score(yvalidb,
+                                                            y_score[:, 1],
+                                                            average=score_method)
+        context.log_result(f"rocauc", metrics.roc_auc_score(yvalidb, y_score[:, 1]))
+        
+    context.log_result(f"avg_precscore", average_precision)
     context.log_result(f"accuracy", float(model.score(xvalid, yvalid)))
-    context.log_result(f"rocauc", metrics.roc_auc_score(yvalidb, y_score))
     context.log_result(f"f1_score", metrics.f1_score(yvalid, ypred,
                                              average=score_method))
-    context.log_result(f"avg_precscore", average_precision)
+    
 
     # validation plots
     
@@ -356,16 +364,8 @@ def plot_roc(
     :param title:        ("roc curve") title of plot
     :param legend_loc:   ("best") location of plot legend
     """
-    # don"t bother if this doesn"t work
-    assert y_probs.shape == y_labels[:,:-1].shape
-    
     # clear matplotlib current figure
     _gcf_clear(plt)
-    
-    # data accummulators by class
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
     
     # draw 45 degree line
     plt.plot([0, 1], [0, 1], "k--")
@@ -377,11 +377,19 @@ def plot_roc(
     plt.legend(loc=legend_loc)
     
     # single ROC or mutliple
-    for i in range(y_labels[:,:-1].shape[1]):
-        fpr[i], tpr[i], _ = metrics.roc_curve(y_labels[:, i], y_probs[:, i], pos_label=1)
-        roc_auc[i] = metrics.auc(fpr[i], tpr[i])
-        plt.plot(fpr[i], tpr[i], label=f"class {i}")
-
+    if y_labels.shape[1] > 1:
+        # data accummulators by class
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        for i in range(y_labels[:,:-1].shape[1]):
+            fpr[i], tpr[i], _ = metrics.roc_curve(y_labels[:, i], y_probs[:, i], pos_label=1)
+            roc_auc[i] = metrics.auc(fpr[i], tpr[i])
+            plt.plot(fpr[i], tpr[i], label=f"class {i}")
+    else:
+        fpr, tpr, _ = metrics.roc_curve(y_labels, y_probs[:, 1], pos_label=1)
+        plt.plot(fpr, tpr, label=f"positive class")
+        
     fname = f"{plots_dir}/{key}.{fmt}"
     plt.savefig(os.path.join(context.artifact_path, fname))
     context.log_artifact(PlotArtifact(key, body=plt.gcf()), local_path=fname)

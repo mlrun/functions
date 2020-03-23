@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: describe-dask
   tag: ''
-  hash: d91dba08940c1ba715e047ad205d9d53b15200d3
+  hash: d9c2554367f3c236242885e3cd6c3758724727b0
   project: ''
   labels:
     author: yjb
@@ -13,7 +13,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/ml-dask:0.4.5
+  image: mlrun/ml-dask:latest
   env: []
   default_handler: describe_dask
   description: ''

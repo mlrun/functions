@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: get-model-config
   tag: ''
-  hash: 93dc35bed463b1812f789495d62983727646d3f1
+  hash: c350175cbe6d11e47b35b0daa8a584440192bd47
   project: ''
   labels:
     author: yjb
@@ -13,7 +13,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/ml-base:0.4.5
+  image: mlrun/ml-base:latest
   env: []
   default_handler: get_model_config
   description: ''

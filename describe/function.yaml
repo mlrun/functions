@@ -17,13 +17,6 @@ spec:
   env: []
   default_handler: summarize
   entry_points:
-    _gcf_clear:
-      name: _gcf_clear
-      doc: ''
-      parameters:
-      - name: plt
-      outputs: []
-      lineno: 20
     summarize:
       name: summarize
       doc: Summarize a table

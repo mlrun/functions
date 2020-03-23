@@ -56,6 +56,7 @@ def create_classification_data(
     
     outputs filename of created data (includes path) in the artifact store.
     """
+    os.makedirs(context.artifact_path, exist_ok=True)
     if not filename:
         name = f"simdata-{n_samples:0.0e}X{m_features}.{file_ext}".replace("+", "")
         filename = os.path.join(context.artifact_path, name)

@@ -1,1 +1,0 @@
-{"CLASS": {"n_clusters": 8, "eigen_solver": null, "random_state": null, "n_init": 10, "gamma": 1.0, "affinity": "rbf", "n_neighbors": 10, "eigen_tol": 0.0, "assign_labels": "kmeans", "degree": 3, "coef0": 1, "kernel_params": null, "n_jobs": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.cluster.spectral.SpectralClustering"}}

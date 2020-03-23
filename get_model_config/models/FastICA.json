@@ -1,1 +1,0 @@
-{"CLASS": {"n_components": null, "algorithm": "parallel", "whiten": true, "fun": "logcosh", "fun_args": null, "max_iter": 200, "tol": 0.0001, "w_init": null, "random_state": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.decomposition.fastica_.FastICA"}}

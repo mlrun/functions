@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: test-classifier
   tag: ''
-  hash: 5395f891d486ec09b283b208b9efcd450f8fe915
+  hash: d25d9acfe6e10bbf4a3b9cb62330d9a691dc4f21
   project: ''
   labels:
     author: yjb
@@ -16,6 +16,178 @@ spec:
   image: mlrun/ml-models:0.4.6
   env: []
   default_handler: test_classifier
+  entry_points:
+    _gcf_clear:
+      name: _gcf_clear
+      doc: ''
+      parameters:
+      - name: plt
+      outputs: []
+      lineno: 27
+    test_classifier:
+      name: test_classifier
+      doc: "Test one or more classifier models against held-out dataset\n\nUsing held-out\
+        \ test features, evaluates the peformance of the estimated model\n\nCan be\
+        \ part of a kubeflow pipeline as a test step that is run post EDA and \ntraining/validation\
+        \ cycles"
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+      - name: models_dir
+        type: Union[DataItem, str]
+        doc: artifact models representing a folder or a folder
+      - name: test_set
+        type: DataItem
+        doc: test features and labels
+      - name: label_column
+        type: str
+        doc: column name for ground truth labels
+      - name: score_method
+        type: str
+        doc: for multiclass classification
+        default: micro
+      - name: key
+        type: str
+        doc: key for results artifact (maybe just a dir of artifacts for test like
+          plots_dir)
+      - name: plots_dir
+        type: str
+        doc: dir for test plots
+        default: plots
+      outputs: []
+      lineno: 32
+    _eval_model:
+      name: _eval_model
+      doc: ''
+      parameters:
+      - name: model
+      outputs: []
+      lineno: 63
+    plot_roc:
+      name: plot_roc
+      doc: "plot roc curves\n\nTODO:  add averaging method (as string) that was used\
+        \ to create probs, \ndisplay in legend"
+      parameters:
+      - name: context
+        doc: the function context
+      - name: y_labels
+        doc: 'ground truth labels, hot encoded for multiclass  '
+      - name: y_probs
+        doc: model prediction probabilities
+      - name: key
+        doc: ("roc") key of plot in artifact store
+        default: roc
+      - name: plots_dir
+        type: str
+        doc: ("plots") destination folder relative path to artifact path
+        default: plots
+      - name: fmt
+        doc: ("png") plot format
+        default: png
+      - name: fpr_label
+        type: str
+        doc: ("false positive rate") x-axis labels
+        default: false positive rate
+      - name: tpr_label
+        type: str
+        doc: ("true positive rate") y-axis labels
+        default: true positive rate
+      - name: title
+        type: str
+        doc: ("roc curve") title of plot
+        default: roc curve
+      - name: legend_loc
+        type: str
+        doc: ("best") location of plot legend
+        default: best
+      outputs: []
+      lineno: 97
+    plot_confusion_matrix:
+      name: plot_confusion_matrix
+      doc: 'Create a confusion matrix.
+
+        Plot and save a confusion matrix using test data from a
+
+        modelline step.
+
+
+        See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html
+
+
+        TODO: fix label alignment
+
+        TODO: consider using another packaged version
+
+        TODO: refactor to take params dict for plot options'
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: function context
+      - name: labels
+        doc: validation data ground-truth labels
+      - name: predictions
+        doc: validation data predictions
+      - name: key
+        type: str
+        doc: str
+        default: confusion_matrix
+      - name: plots_dir
+        type: str
+        doc: relative path of plots in artifact store
+        default: plots
+      - name: colormap
+        type: str
+        doc: colourmap for confusion matrix
+        default: Blues
+      - name: fmt
+        type: str
+        doc: plot format
+        default: png
+      - name: sample_weight
+        doc: sample weights
+      outputs: []
+      lineno: 156
+    plot_importance:
+      name: plot_importance
+      doc: Display estimated feature importances.
+      parameters:
+      - name: context
+        doc: function context
+      - name: model
+        doc: fitted lightgbm model
+      - name: key
+        type: str
+        default: feature-importances
+      - name: fmt
+        default: png
+      outputs: []
+      lineno: 195
+    _plot_confusion_matrix:
+      name: _plot_confusion_matrix
+      doc: 'This can be deprecated once intel python upgrades scikit-learn to >0.22
+
+
+        This function prints and plots the confusion matrix.
+
+        Normalization can be applied by setting `normalize=True`.
+
+
+        https://scikit-learn.org/0.21/auto_examples/model_selection/plot_confusion_matrix.html#sphx-glr-auto-examples-model-selection-plot-confusion-matrix-py'
+      parameters:
+      - name: y_true
+      - name: y_pred
+      - name: classes
+        default:
+        - neg
+        - pos
+      - name: normalize
+        default: true
+      - name: title
+      - name: cmap
+        default: <_ast.Attribute object at 0x7f48ceb94510>
+      outputs: []
+      lineno: 229
   description: ''
   image_pull_policy: Always
   build:

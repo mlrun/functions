@@ -1,1 +1,0 @@
-{"CLASS": {"n_components": 256, "learning_rate": 0.1, "batch_size": 10, "n_iter": 10, "verbose": 0, "random_state": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.neural_network.rbm.BernoulliRBM"}}

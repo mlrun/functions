@@ -1,1 +1,0 @@
-{"CLASS": {"alpha": 1.0, "fit_intercept": true, "normalize": false, "precompute": false, "copy_X": true, "max_iter": 1000, "tol": 0.0001, "warm_start": false, "positive": false, "random_state": null, "selection": "cyclic"}, "FIT": {"X": null, "y": null, "check_input": true}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.linear_model.coordinate_descent.Lasso"}}

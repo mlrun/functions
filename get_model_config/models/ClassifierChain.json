@@ -1,1 +1,0 @@
-{"CLASS": {"base_estimator": null, "order": null, "cv": null, "random_state": null}, "FIT": {"X": null, "Y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.multioutput.ClassifierChain"}}

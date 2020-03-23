@@ -1,1 +1,0 @@
-{"CLASS": {"n_neighbors": 5, "n_components": 2, "eigen_solver": "auto", "tol": 0, "max_iter": null, "path_method": "auto", "neighbors_algorithm": "auto", "n_jobs": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.manifold.isomap.Isomap"}}

@@ -1,1 +1,0 @@
-{"CLASS": {"estimator": null, "param_grid": null, "scoring": null, "n_jobs": null, "iid": "warn", "refit": true, "cv": "warn", "verbose": 0, "pre_dispatch": "2*n_jobs", "error_score": "raise-deprecating", "return_train_score": false}, "FIT": {"X": null, "y": null, "groups": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.model_selection._search.GridSearchCV"}}

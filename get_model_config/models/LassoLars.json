@@ -1,1 +1,0 @@
-{"CLASS": {"alpha": 1.0, "fit_intercept": true, "verbose": false, "normalize": true, "precompute": "auto", "max_iter": 500, "eps": 2.220446049250313e-16, "copy_X": true, "fit_path": true, "positive": false}, "FIT": {"X": null, "y": null, "Xy": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.linear_model.least_angle.LassoLars"}}

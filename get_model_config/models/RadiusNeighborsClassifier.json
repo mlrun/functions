@@ -1,1 +1,0 @@
-{"CLASS": {"radius": 1.0, "weights": "uniform", "algorithm": "auto", "leaf_size": 30, "p": 2, "metric": "minkowski", "outlier_label": null, "metric_params": null, "n_jobs": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.neighbors.classification.RadiusNeighborsClassifier"}}

@@ -1,1 +1,0 @@
-{"CLASS": {"metric": "euclidean", "shrink_threshold": null}, "FIT": {"X": null, "y": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.neighbors.nearest_centroid.NearestCentroid"}}

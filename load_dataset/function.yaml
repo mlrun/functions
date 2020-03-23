@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: load-dataset
   tag: ''
-  hash: 47b609730412e25396d17044e27e7b91a2106381
+  hash: 95deddda60b8337e138fdf268f2103fe6ca46aea
   project: ''
   labels:
     author: yjb
@@ -16,6 +16,38 @@ spec:
   image: mlrun/ml-models:0.4.6
   env: []
   default_handler: get_toy_data
+  entry_points:
+    get_toy_data:
+      name: get_toy_data
+      doc: "Loads a scikit-learn toy dataset for classification or regression\n\n\
+        The following datasets are available ('name' : desription):\n\n    'boston'\
+        \          : boston house-prices dataset (regression)\n    'iris'        \
+        \    : iris dataset (classification)\n    'diabetes'        : diabetes dataset\
+        \ (regression)\n    'digits'          : digits dataset (classification)\n\
+        \    'linnerud'        : linnerud dataset (multivariate regression)\n    'wine'\
+        \            : wine dataset (classification)\n    'breast_cancer'   : breast\
+        \ cancer wisconsin dataset (classification)\n\nThe scikit-learn functions\
+        \ return a data bunch including the following items:\n- data             \
+        \ the features matrix\n- target            the ground truth labels\n- DESCR\
+        \             a description of the dataset\n- feature_names     header for\
+        \ data\n\nThe features (and their names) are stored with the target labels\
+        \ in a DataFrame.\n\nFor further details see https://scikit-learn.org/stable/datasets/index.html#toy-datasets"
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: function execution context
+      - name: dataset
+        type: str
+        doc: 'name of the dataset to load '
+      - name: params
+        type: dict
+        doc: params of the sklearn load_data method
+      - name: format
+        type: str
+        doc: save format
+        default: parquet
+      outputs: []
+      lineno: 26
   description: ''
   image_pull_policy: Always
   build:

@@ -1,1 +1,0 @@
-{"CLASS": {"epsilon": 0.0, "tol": 0.0001, "C": 1.0, "loss": "epsilon_insensitive", "fit_intercept": true, "intercept_scaling": 1.0, "dual": true, "verbose": 0, "random_state": null, "max_iter": 1000}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.svm.classes.LinearSVR"}}

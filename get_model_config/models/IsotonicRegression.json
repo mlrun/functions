@@ -1,1 +1,0 @@
-{"CLASS": {"y_min": null, "y_max": null, "increasing": true, "out_of_bounds": "nan"}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.isotonic.IsotonicRegression"}}

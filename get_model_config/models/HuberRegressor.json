@@ -1,1 +1,0 @@
-{"CLASS": {"epsilon": 1.35, "max_iter": 100, "alpha": 0.0001, "warm_start": false, "fit_intercept": true, "tol": 1e-05}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.linear_model.huber.HuberRegressor"}}

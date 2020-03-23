@@ -1,1 +1,0 @@
-{"CLASS": {"penalty": "l2", "loss": "squared_hinge", "dual": true, "tol": 0.0001, "C": 1.0, "multi_class": "ovr", "fit_intercept": true, "intercept_scaling": 1, "class_weight": null, "verbose": 0, "random_state": null, "max_iter": 1000}, "FIT": {"X": null, "y": null, "sample_weight": null}, "META": {"sklearn_version": "0.21.3", "classifier": "sklearn.svm.classes.LinearSVC"}}

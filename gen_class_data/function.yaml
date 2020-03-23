@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: create-classification-data
   tag: ''
-  hash: 82f12c2c7cc0b8f6463eb3fe6be2b3d44d98d88e
+  hash: b04125029dbdfdc8adfd7a2f815f840e588a4973
   project: ''
   labels:
     author: yjb
@@ -16,62 +16,6 @@ spec:
   image: mlrun/ml-models:0.4.6
   env: []
   default_handler: create_classification_data
-  entry_points:
-    create_classification_data:
-      name: create_classification_data
-      doc: 'Create a binary classification sample dataset and save.
-
-        If no filename is given it will default to:
-
-        ''simdata-{n_samples}X{m_features}.parquet''.
-
-
-        Additional scikit-learn parameters can be set using **sk_params, please see
-        https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html
-        for more details.'
-      parameters:
-      - name: context
-        type: MLClientCtx
-        doc: function context
-      - name: n_samples
-        type: int
-        doc: number of rows/samples
-      - name: m_features
-        type: int
-        doc: number of cols/features
-      - name: k_classes
-        type: int
-        doc: number of classes
-      - name: header
-        type: Optional[List[str]]
-        doc: header for features array
-      - name: label_column
-        type: Optional[str]
-        doc: column name of ground-truth series
-        default: labels
-      - name: weight
-        type: float
-        doc: fraction of sample negative value (ground-truth=0)
-        default: 0.5
-      - name: random_state
-        type: int
-        doc: rng seed (see https://scikit-learn.org/stable/glossary.html#term-random-state)
-        default: 1
-      - name: filename
-        type: Optional[str]
-        doc: optional name for saving simulated data file
-      - name: key
-        type: str
-        doc: key of data in artifact store
-        default: classifier-data
-      - name: file_ext
-        type: str
-        doc: (pqt) extension for parquet file
-        default: pqt
-      - name: sk_params
-        doc: additional `sklearn.datasets.make_classification`
-      outputs: []
-      lineno: 24
   description: ''
   image_pull_policy: Always
   build:

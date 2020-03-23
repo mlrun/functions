@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: describe-dask
   tag: ''
-  hash: 396dc875849aac21117a8505665fbdea5a80981a
+  hash: 46ed0f6f66d8b9a07f003ec314a7dfb333978b6e
   project: ''
   labels:
     author: yjb
@@ -16,34 +16,6 @@ spec:
   image: mlrun/ml-dask:0.4.6
   env: []
   default_handler: describe_dask
-  entry_points:
-    table_summary:
-      name: table_summary
-      doc: Summarize a table
-      parameters:
-      - name: context
-        type: MLClientCtx
-        doc: the function context
-      - name: dask_client
-        type: Union[DataItem, str]
-        doc: path to the dask client scheduler json file, as string or artifact
-      - name: dask_key
-        type: str
-        doc: key of dataframe in dask client 'datasets' attribute
-        default: my_dask_dataframe
-      - name: target_path
-        type: str
-        doc: destimation folder for table summary file
-      - name: name
-        type: str
-        doc: name of table summary file (with extension like .csv)
-        default: table_summary.csv
-      - name: key
-        type: str
-        doc: key of table summary in artifact store
-        default: table_summary
-      outputs: []
-      lineno: 30
   description: ''
   image_pull_policy: Always
   build:

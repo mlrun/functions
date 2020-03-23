@@ -26,7 +26,8 @@ from typing import IO, AnyStr, Union, List, Optional
 def get_toy_data(
     context: MLClientCtx,
     dataset: str,
-    params: dict = {}
+    params: dict = {},
+    format: str = "parquet"
 ) -> None:
     """Loads a scikit-learn toy dataset for classification or regression
     
@@ -53,8 +54,11 @@ def get_toy_data(
     :param context:    function execution context
     :param dataset:    name of the dataset to load 
     :param params:     params of the sklearn load_data method
+    :param format:     save format
     """
-    filepath = os.path.join(context.artifact_path, dataset) + '.pqt'
+    os.makedirs(context.artifact_path, exist_ok=True)
+    
+    filepath = os.path.join(context.artifact_path, dataset) + '.parquet'
     
     # check to see if we haven't already downloaded the file
     if not os.path.isfile(filepath):

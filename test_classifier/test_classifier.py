@@ -122,32 +122,32 @@ def plot_roc(
     :param title:        ("roc curve") title of plot
     :param legend_loc:   ("best") location of plot legend
     """
-    y_labels = y_labels[:, :-1] # last column redundant (labelbinarizer issue?)
-    assert y_probs.shape == y_labels.shape
-    
-    # clear matplotlib current figure
+       # clear matplotlib current figure
     _gcf_clear(plt)
-    
-    # data accummulators by class
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
     
     # draw 45 degree line
     plt.plot([0, 1], [0, 1], "k--")
     
     # labelling
-    plt.xlabel(fpr_label)
-    plt.ylabel(tpr_label)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
     plt.title(title)
     plt.legend(loc=legend_loc)
     
     # single ROC or mutliple
-    for i in range(y_labels[:,:-1].shape[1]):
-        fpr[i], tpr[i], _ = metrics.roc_curve(y_labels[:, i], y_probs[:, i], pos_label=1)
-        roc_auc[i] = metrics.auc(fpr[i], tpr[i])
-        plt.plot(fpr[i], tpr[i], label=f"class {i}")
-
+    if y_labels.shape[1] > 1:
+        # data accummulators by class
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        for i in range(y_labels[:,:-1].shape[1]):
+            fpr[i], tpr[i], _ = metrics.roc_curve(y_labels[:, i], y_probs[:, i], pos_label=1)
+            roc_auc[i] = metrics.auc(fpr[i], tpr[i])
+            plt.plot(fpr[i], tpr[i], label=f"class {i}")
+    else:
+        fpr, tpr, _ = metrics.roc_curve(y_labels, y_probs[:, 1], pos_label=1)
+        plt.plot(fpr, tpr, label=f"positive class")
+        
     fname = f"{plots_dir}/{key}.{fmt}"
     plt.savefig(os.path.join(context.artifact_path, fname))
     context.log_artifact(PlotArtifact(key, body=plt.gcf()), local_path=fname)

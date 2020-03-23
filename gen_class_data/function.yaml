@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: create-classification-data
   tag: ''
-  hash: 510f90496ac902457c098a317a2c82c0f5fdead1
+  hash: b44c0688e3e3990176069f8f1c945be9ab5f9bad
   project: ''
   labels:
     author: yjb
@@ -13,7 +13,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/ml-models:latest
+  image: mlrun/ml-models:0.4.6
   env: []
   default_handler: create_classification_data
   description: ''

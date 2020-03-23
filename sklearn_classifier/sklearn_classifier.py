@@ -254,12 +254,15 @@ def train_model(
     
     # TODO: all of this should be part of a spitter component that does cv too, dealt with in another step
     # make a hot encode copy of labels before the split
-    yb = label_binarize(labels, classes=labels.unique())
+    yb = label_binarize(labels, classes=labels.unique()) # if binary 0/1 labels, will return labels as is
+    
     # double split to generate 3 data sets: train, validation and test
     # with xtest,ytest set aside
+    # here we hide the binary encoded labels inside the X matrix so that when splitting we preserve order in both the encoded
+    # and non-encoded labels:
     x, xtest, y, ytest = train_test_split(np.concatenate([raw, yb], axis=1), labels, test_size=test_size, random_state=rng)
     xtrain, xvalid, ytrain, yvalid = train_test_split(x, y, train_size=train_val_split, random_state=rng)
-    # extract the hot_encoded labels
+    # now extract the hot_encoded labels
     ytrainb = xtrain[:, -yb.shape[1]:].copy()
     xtrain = xtrain[:, :-yb.shape[1]].copy()
     # extract the hot_encoded labels
@@ -268,14 +271,15 @@ def train_model(
     # extract the hot_encoded labels
     ytestb = xtest[:, -yb.shape[1]:].copy()
     xtest = xtest[:, :-yb.shape[1]].copy()                                      
+    
     # set-aside test_set
     test_set = pd.concat(
         [pd.DataFrame(data=xtest, columns=context.header),
          pd.DataFrame(data=ytest.values, columns=[label_column])],
         axis=1,)
-    filepath = os.path.join(base_path, test_set_key + ".pqt")
+    filepath = os.path.join(base_path, test_set_key + ".parquet")
     test_set.to_parquet(filepath, index=False)
-    context.log_artifact(test_set_key, local_path=test_set_key + ".pqt")
+    context.log_artifact(test_set_key, local_path=test_set_key + ".parquet")
 
     if model_pkg_class.endswith(".json"):
         model_config = json.load(open(model_pkg_class, "r"))
@@ -315,7 +319,7 @@ def train_model(
     context.logger.info(f"yvalidb.shape {yvalidb.shape}")
     if yvalidb.shape[1] > 1:
         # label encoding was applied:
-        average_precision = metrics.average_precision_score(yvalidb[:,:-1],
+        average_precision = metrics.average_precision_score(yvalidb,
                                                             y_score,
                                                             average=score_method)
         context.log_result(f"rocauc", metrics.roc_auc_score(yvalidb, y_score))
@@ -329,9 +333,8 @@ def train_model(
     context.log_result(f"accuracy", float(model.score(xvalid, yvalid)))
     context.log_result(f"f1_score", metrics.f1_score(yvalid, ypred,
                                              average=score_method))
-    
 
-    # validation plots
+    # TODO: missing validation plots, callbacks need to reintroduced
     
     plot_roc(context, yvalidb, y_score)
     plot_confusion_matrix(context, yvalid, ypred, key="confusion", fmt="png")

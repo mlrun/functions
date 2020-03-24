@@ -346,8 +346,8 @@ def plot_roc(
     key="roc",
     plots_dir: str = "plots",
     fmt="png",
-    x_label: str = "false positive rate",
-    y_label: str =  "true positive rate",
+    fpr_label: str = "false positive rate",
+    tpr_label: str =  "true positive rate",
     title: str = "roc curve",
     legend_loc: str = "best"
 ):
@@ -374,8 +374,8 @@ def plot_roc(
     plt.plot([0, 1], [0, 1], "k--")
     
     # labelling
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
+    plt.xlabel(fpr_label)
+    plt.ylabel(tpr_label)
     plt.title(title)
     plt.legend(loc=legend_loc)
     

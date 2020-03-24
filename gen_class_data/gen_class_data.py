@@ -21,7 +21,7 @@ from sklearn.datasets import make_classification
 from mlrun.execution import MLClientCtx
 
 
-def create_classification_data(
+def gen_class_data(
     context: MLClientCtx,
     n_samples: int,
     m_features: int,
@@ -32,7 +32,7 @@ def create_classification_data(
     random_state: int = 1,
     filename: Optional[str] = None,
     key: str = 'classifier-data', 
-    file_ext: str = 'pqt',
+    file_ext: str = 'parquet',
     sk_params = {}
 ):
     """Create a binary classification sample dataset and save.
@@ -56,12 +56,8 @@ def create_classification_data(
     
     outputs filename of created data (includes path) in the artifact store.
     """
-    os.makedirs(context.artifact_path, exist_ok=True)
     if not filename:
         name = f"simdata-{n_samples:0.0e}X{m_features}.{file_ext}".replace("+", "")
-        filename = os.path.join(context.artifact_path, name)
-    else:
-        filename = os.path.join(context.artifact_path, filename)
     
     features, labels = make_classification(
         n_samples=n_samples,
@@ -80,6 +76,5 @@ def create_classification_data(
 
     y = pd.DataFrame(labels, columns=[label_column])
     data = pd.concat([X, y], axis=1)
-
-    pq.write_table(pa.Table.from_pandas(data), filename)
-    context.log_artifact(key, local_path=name)
+    
+    context.log_dataset(key, df=data, format=format, index=False)

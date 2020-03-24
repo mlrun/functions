@@ -129,8 +129,8 @@ def plot_roc(
     plt.plot([0, 1], [0, 1], "k--")
     
     # labelling
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
+    plt.xlabel(fpr_label)
+    plt.ylabel(tpr_label)
     plt.title(title)
     plt.legend(loc=legend_loc)
     

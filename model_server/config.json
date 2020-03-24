@@ -1,0 +1,1 @@
+{"name": "model_server", "filename": "/User/functions/model_server/model_server.ipynb", "image": "mlrun/mlrun:0.4.6", "kind": "job", "with_doc": false, "default_handler": "model_server", "pull_policy": "Always", "categoryA": "serving", "categoryB": "models", "author": "yjb", "stage": "development", "export_as": "function.yaml"}

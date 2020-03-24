@@ -1,1 +1,0 @@
-{"name": "open_archive", "filename": "/User/functions/open_archive/open_archive.ipynb", "image": "mlrun/ml-models:0.4.6", "kind": "job", "with_doc": false, "default_handler": "open_archive", "pull_policy": "Always", "categoryA": "fileutils", "categoryB": "datagen", "author": "yjb", "stage": "development", "export_as": "function.yaml"}

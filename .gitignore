@@ -3,9 +3,7 @@ models/
 *.pyc
 *.swp
 dask-worker-space
-artifacts/
 images/
-wip/
 .vscode/
 
 # Byte-compiled / optimized / DLL files

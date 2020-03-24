@@ -1,1 +1,0 @@
-{"name": "test_classifier", "filename": "/User/functions/test_classifier/test_classifier.py", "image": "mlrun/ml-models:0.4.6", "kind": "job", "with_doc": false, "default_handler": "test_classifier", "pull_policy": "Always", "categoryA": "models", "categoryB": "test", "author": "yjb", "stage": "development", "export_as": "function.yaml"}

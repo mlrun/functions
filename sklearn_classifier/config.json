@@ -1,1 +1,0 @@
-{"name": "sklearn_classifier", "filename": "/User/functions/sklearn_classifier/sklearn_classifier.py", "image": "mlrun/ml-models:0.4.6", "kind": "job", "with_doc": false, "default_handler": "train_model", "pull_policy": "Always", "categoryA": "models", "categoryB": "classifier", "author": "yjb", "stage": "development", "export_as": "function.yaml"}

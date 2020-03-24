@@ -18,10 +18,8 @@
         "reg_lambda"         : 1,
         "scale_pos_weight"   : 1,
         "random_state"       : 1},
-    
     "FIT" : {
-        "verbose"               : false,
-    },
+        "verbose"               : false},
     "META" : {
             "class": "xgboost.sklearn.XGBClassifier",
             "version" : "1.0.2"

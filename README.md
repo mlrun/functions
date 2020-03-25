@@ -102,16 +102,4 @@ Here is a **partial `conda list`** of the included packages:
     scipy                     1.4.1            py37h0b6359f_0    anaconda 
     seaborn                   0.10.0                     py_0    anaconda 
     sqlite                    3.31.1               h7b6447c_0    anaconda 
-    xgboost                   1.0.2            py37h3340039_0    conda-forge 
-
-# INSTALL THE KERNEL AND GIVE IT A NAME (LIKE STABLE)
-# RESTART AND START RUNNING THE TUTORIAL
-
-### install specific mlrun and functions versions in the new environment
-
-(assume 0.4.6 is the stable version)
-
-    conda activate stable
-    python -m pip install git+https://github.com/mlrun/mlrun.git@development
-    
-    # run a makefile that hasn't been written
+    xgboost                   1.0.2            py37h3340039_0    conda-forge

@@ -61,6 +61,9 @@ to install the environment named **stable**, run the following commands in a ter
     conda create -n stable numpy pandas scipy scikit-learn matplotlib seaborn pytest kfp pyarrow
     conda install -n stable ipykernel
     conda install -n stable -c DistrictDataLabs yellowbrick # to deprecate
+    
+at this point you should exit the terminal and refresh browser, open a new terminal:
+
     conda activate stable
     python -m ipykernel install --user --name=stable
     python -m pip install git+https://github.com/mlrun/mlrun.git@development
@@ -70,7 +73,7 @@ to install the environment named **stable**, run the following commands in a ter
     git clone https://github.com/functions/functions.git@development
     functions/create-conda.sh or makefile/ci 
 
-refresh browser
+
 
 **dont't forget to always select the correct environment for your notebooks**
 

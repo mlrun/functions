@@ -31,11 +31,11 @@ def _create_function(pkg_func: list):
     return function_
 
 def get_model_configs(
-    my_models: Union[str, List[str]],
+    my_models,
     class_key = "CLASS",
     fit_key = "FIT",
     meta_key = "META",
-) -> Union[dict, List[dict]]:
+):
     """build sklearn model configuration parameters
     
     Take (full) class name of an scikit-learn model 

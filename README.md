@@ -48,75 +48,23 @@ The following setup instructions are for developers, and for regular users it is
 
 1. for convenience, define some mlrun config path settings through environment variables
 2. **[set up](#setup)** a minimal conda environment for reproducibility
-3. do the **[suggested steps through functions](#suggetsed)** below
+3. do the **[suggested steps through functions](#suggetsed)** above
 
 ## set up a conda environment
 
-### long way
-
-to install the environment named **stable**, run the following commands in a terminal:
-
-    conda config --add channels conda-forge
-    conda config --add channels anaconda
-    conda create -n stable numpy pandas scipy scikit-learn matplotlib seaborn pytest kfp pyarrow
-    conda install -n stable ipykernel
-    conda install -n stable -c DistrictDataLabs yellowbrick # to deprecate
-    
-at this point you should exit the terminal and refresh browser, open a new terminal:
-
-    conda activate stable
-    python -m ipykernel install --user --name=stable
-    python -m pip install git+https://github.com/mlrun/mlrun.git@development
-    git clone https://github.com/functions/functions.git@development
-    
-    # TODO
-    git clone https://github.com/functions/functions.git@development
-    functions/create-conda.sh or makefile/ci 
-
-
-
 **dont't forget to always select the correct environment for your notebooks**
 
-### short way
+run the script **[conda-setup](conda-setup)**
 
-run the script conda-setup.sh
-
-Here is a **partial `conda list`** of the included packages:
-
-    # packages in environment at /User/.conda/envs/stable: 
-
-    # Name                    Version                   Build  Channel 
-    arrow-cpp                 0.15.1           py37h7cd5009_5    anaconda 
-    blas                      1.0                         mkl    anaconda 
-    intel-openmp              2020.0                      166    anaconda 
-    ipython                   7.13.0                   pypi_0    pypi 
-    joblib                    0.14.1                     py_0    anaconda 
-    lightgbm                  2.3.0            py37he6710b0_0    anaconda 
-    matplotlib                3.1.3                    py37_0    anaconda 
-    mkl                       2019.5                      281    anaconda 
-    numpy                     1.18.1           py37h4f9e942_0    anaconda 
-    pandas                    1.0.2            py37h0573a6f_0    anaconda 
-    pip                       20.0.2                   py37_1    anaconda 
-    pyarrow                   0.15.1           py37h0573a6f_0    anaconda 
-    pytest                    5.4.1                    py37_0    anaconda 
-    python                    3.7.6                h0371630_2    anaconda 
-    pyzmq                     19.0.0                   pypi_0    pypi 
-    scikit-learn              0.22.1           py37hd81dba3_0    anaconda 
-    scipy                     1.4.1            py37h0b6359f_0    anaconda 
-    seaborn                   0.10.0                     py_0    anaconda 
-    sqlite                    3.31.1               h7b6447c_0    anaconda 
-    xgboost                   1.0.2            py37h3340039_0    conda-forge
-    
 ## GPU setup
 
-many function components can take advantage performance gains made available by running in a well-configured GPU environment.  Setting up the platform (client) side requires a custom conda environment like the one built above, with a few additions:
+many function components can take advantage of performance gains made available by running in a well-configured GPU environment.  Setting up the platform (client) side requires a custom conda environment like the one built above, with a few additions:
 
 1. ensure drivers are available (cuda and cudnn, currently at 10.1 and 7)
 2. add gpu compatible packages and drop-in replacements (e.g. tensorflow, pytorch,)
-3. build gpu versions of packages when straightforward (e.g., xgboost)
 3. add nvidia's rapids library (which provide dask updates for gpu)
-4. init conda environment scripts so libcuda found (eg., activate.d/set_vars.sh and 
-deactivate.d/unset_vars.sh)
+4. init conda environment scripts so libcuda can be found in addition to other libraries inside the environment (`/User/.conda/envs/<my-env>/etc/conda/activate.d/env_vars.sh` and 
+`deactivate.d/env_vars.sh`)
 
 all of this is done automatically in the conda-setup script **[conda-setup-gpu](conda-setup-gpu)**
 

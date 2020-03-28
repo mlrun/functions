@@ -2,11 +2,14 @@
 
 set -e
 
-# for some reason it is not 
+# if for some reason we are not in home:
 cd $HOME
+
+# add in this order
 conda config --add channels conda-forge
 conda config --add channels anaconda
 
+# create `cpu` environment with some packages
 conda create --yes -n cpu \
     numpy \
     pandas \
@@ -17,7 +20,9 @@ conda create --yes -n cpu \
     pytest \
     pyarrow \
     tensorflow \
-    dask[complete]
+    dask[complete] \
+    xgboost \
+    lightgbm
     
 conda install --yes -n cpu ipykernel
 conda install --yes -n cpu -c DistrictDataLabs yellowbrick # to deprecate
@@ -28,5 +33,4 @@ python -m ipykernel install --user --name=cpu
 
 python -m pip install git+https://github.com/mlrun/mlrun.git@development
 python -m pip install git+https://github.com/yjb-ds/mlutils.git
-
 git clone --single-branch --branch development https://github.com/mlrun/functions.git function-cpu

@@ -2,11 +2,14 @@
 
 set -e
 
-# for some reason it is not 
+# if for some reason we are not in home:
 cd $HOME
+
+# add in this order
 conda config --add channels conda-forge
 conda config --add channels anaconda
 
+# create `gpu` environment with some packages
 conda create --yes -n gpu \
     numpy \
     pandas \
@@ -18,17 +21,46 @@ conda create --yes -n gpu \
     pyarrow \
     tensorflow \
     cudatoolkit=10.1
-    
+
 conda install --yes -n gpu ipykernel
 conda install --yes -n gpu -c DistrictDataLabs yellowbrick # to deprecate
 conda install --yes -n gpu -c pytorch pytorch torchvision
 conda install --yes -n gpu -c rapidsai -c nvidia -c anaconda -c conda-forge -c defaults rapids
 
+## need to activate environment from here on:
 eval "$(conda shell.bash hook)"
 conda activate gpu
 python -m ipykernel install --user --name=gpu
-
 python -m pip install git+https://github.com/mlrun/mlrun.git@development
 python -m pip install git+https://github.com/yjb-ds/mlutils.git
-
 git clone --single-branch --branch development https://github.com/mlrun/functions.git function-gpu
+
+# in order to find the cuda file `libcuda.so`, `LD_LIBRARY_PATH` needs to be modified to include
+# `/usr/local/cuda-10.0/compat:/User/.conda/envs/gpu/lib` (the first part is essential)
+# note that the cuda library installed on the platform is 10.0, and the conda environment is 10.1...but IJW!
+# also note that this file may be located elsewhere on your system.  Use `find / -name 'libcuda.so.1'` to
+# locate the correct file.  Since this script installs packages depending on cuda 10.1, chose that folder if
+# 10.1 is available.
+
+mkdir -p /User/.conda/envs/gpu/etc/conda/activate.d
+mkdir -p /User/.conda/envs/gpu/etc/conda/deactivate.d
+touch /User/.conda/envs/gpu/etc/conda/activate.d/env_vars.sh
+touch /User/.conda/envs/gpu/etc/conda/deactivate.d/env_vars.sh
+
+echo "#!/bin/sh
+export LD_LIBRARY_PATH=/usr/local/cuda-10.0/compat:/User/.conda/envs/gpu/lib" > /User/.conda/envs/gpu/etc/conda/activate.d/env_vars.sh
+echo "#!/bin/sh
+unset LD_LIBRARY_PATH" > /User/.conda/envs/gpu/etc/conda/deactivate.d/env_vars.sh
+
+# a pre-built pip wheel with xgboost gpu enabled doesn't exist:
+conda install -n cmake
+git clone --recursive https://github.com/dmlc/xgboost
+cd xgboost
+git checkout v1.0.2
+mkdir build
+cd build
+cmake .. -DUSE_CUDA=ON
+make -j`nproc`
+cd ../python-package
+python -m pip install -e .
+

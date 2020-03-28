@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -e
+
+# for some reason it is not 
+cd $HOME
+conda config --add channels conda-forge
+conda config --add channels anaconda
+
+conda create --yes -n gpu \
+    numpy \
+    pandas \
+    scipy \
+    scikit-learn \
+    matplotlib \
+    seaborn \
+    pytest \
+    pyarrow \
+    tensorflow \
+    cudatoolkit=10.1
+    
+conda install --yes -n gpu ipykernel
+conda install --yes -n gpu -c DistrictDataLabs yellowbrick # to deprecate
+conda install --yes -n gpu -c pytorch pytorch torchvision
+conda install --yes -n gpu -c rapidsai -c nvidia -c anaconda -c conda-forge -c defaults rapids
+
+eval "$(conda shell.bash hook)"
+conda activate gpu
+python -m ipykernel install --user --name=gpu
+
+python -m pip install git+https://github.com/mlrun/mlrun.git@development
+python -m pip install git+https://github.com/yjb-ds/mlutils.git
+
+git clone --single-branch --branch development https://github.com/mlrun/functions.git function-gpu

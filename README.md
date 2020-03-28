@@ -106,3 +106,17 @@ Here is a **partial `conda list`** of the included packages:
     seaborn                   0.10.0                     py_0    anaconda 
     sqlite                    3.31.1               h7b6447c_0    anaconda 
     xgboost                   1.0.2            py37h3340039_0    conda-forge
+    
+## GPU setup
+
+many function components can take advantage performance gains made available by running in a well-configured GPU environment.  Setting up the platform (client) side requires a custom conda environment like the one built above, with a few additions:
+
+1. ensure drivers are available (cuda and cudnn, currently at 10.1 and 7)
+2. add gpu compatible packages and drop-in replacements (e.g. tensorflow, pytorch,)
+3. build gpu versions of packages when straightforward (e.g., xgboost)
+3. add nvidia's rapids library (which provide dask updates for gpu)
+4. init conda environment scripts so libcuda found (eg., activate.d/set_vars.sh and 
+deactivate.d/unset_vars.sh)
+
+all of this is done automatically in the conda-setup script **[conda-setup-gpu](conda-setup-gpu)**
+

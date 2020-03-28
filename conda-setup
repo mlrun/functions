@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -e
+
+# for some reason it is not 
+cd $HOME
+conda config --add channels conda-forge
+conda config --add channels anaconda
+
+conda create --yes -n cpu \
+    numpy \
+    pandas \
+    scipy \
+    scikit-learn \
+    matplotlib \
+    seaborn \
+    pytest \
+    pyarrow \
+    tensorflow \
+    dask[complete]
+    
+conda install --yes -n cpu ipykernel
+conda install --yes -n cpu -c DistrictDataLabs yellowbrick # to deprecate
+
+eval "$(conda shell.bash hook)"
+conda activate cpu
+python -m ipykernel install --user --name=cpu
+
+python -m pip install git+https://github.com/mlrun/mlrun.git@development
+python -m pip install git+https://github.com/yjb-ds/mlutils.git
+
+git clone --single-branch --branch development https://github.com/mlrun/functions.git function-cpu

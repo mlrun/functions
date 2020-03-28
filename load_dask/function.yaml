@@ -1,0 +1,56 @@
+kind: job
+metadata:
+  name: load-dask
+  tag: latest
+  hash: 65eb72c7217c04af84e0db3c673b21e7a230116c
+  project: ''
+  labels:
+    author: yjb
+  categories:
+  - fileutils
+  - distributed
+spec:
+  command: ''
+  args: []
+  image: mlrun/ml-dask:0.4.6
+  env: []
+  default_handler: load_dask
+  entry_points:
+    load_dask:
+      name: load_dask
+      doc: 'Load dataset into an existing dask cluster
+
+
+        dask jobs define the dask client parameters at the job level, this method
+        will raise an error if no client is detected.'
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+      - name: src_data
+        type: str
+        doc: url of the data file or partitioned dataset as either artifact DataItem,
+          string, or path object (similar to  pandas read_csv)
+      - name: dask_key
+        type: str
+        doc: destination key of data on dask cluster and artifact store
+        default: daskdf
+      - name: inc_cols
+        type: Optional[List[str]]
+        doc: include only these columns (very fast)
+      - name: index_cols
+        type: Optional[List[str]]
+        doc: list of index column names (can be a long-running process)
+      - name: dask_persist
+        type: bool
+        default: true
+      outputs: []
+      lineno: 17
+  description: load dask cluster with data
+  replicas: 4
+  image_pull_policy: Always
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTAzLTI4IDE1OjEyCgppbXBvcnQgb3MKaW1wb3J0IGpzb24KaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCBwYW5kYXMgYXMgcGQKCmltcG9ydCBkYXNrCmltcG9ydCBkYXNrLmRhdGFmcmFtZSBhcyBkZApmcm9tIGRhc2suZGlzdHJpYnV0ZWQgaW1wb3J0IENsaWVudCwgTG9jYWxDbHVzdGVyCgpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCgpmcm9tIHR5cGluZyBpbXBvcnQgTGlzdCwgT3B0aW9uYWwKCmRlZiBsb2FkX2Rhc2soCiAgICBjb250ZXh0OiBNTENsaWVudEN0eCwKICAgIHNyY19kYXRhOiBzdHIsCiAgICBkYXNrX2tleTogc3RyID0gImRhc2tkZiIsCiAgICBpbmNfY29sczogT3B0aW9uYWxbTGlzdFtzdHJdXSA9IE5vbmUsCiAgICBpbmRleF9jb2xzOiBPcHRpb25hbFtMaXN0W3N0cl1dID0gTm9uZSwKICAgIGRhc2tfcGVyc2lzdDogYm9vbCA9IFRydWUKKSAtPiBOb25lOgogICAgIiIiTG9hZCBkYXRhc2V0IGludG8gYW4gZXhpc3RpbmcgZGFzayBjbHVzdGVyCiAgICAKICAgIGRhc2sgam9icyBkZWZpbmUgdGhlIGRhc2sgY2xpZW50IHBhcmFtZXRlcnMgYXQgdGhlIGpvYiBsZXZlbCwgdGhpcyBtZXRob2Qgd2lsbCByYWlzZSBhbiBlcnJvciBpZiBubyBjbGllbnQgaXMgZGV0ZWN0ZWQuCiAgICAKICAgIDpwYXJhbSBjb250ZXh0OiAgICAgICAgIHRoZSBmdW5jdGlvbiBjb250ZXh0CiAgICA6cGFyYW0gc3JjX2RhdGE6ICAgICAgICB1cmwgb2YgdGhlIGRhdGEgZmlsZSBvciBwYXJ0aXRpb25lZCBkYXRhc2V0IGFzIGVpdGhlcgogICAgICAgICAgICAgICAgICAgICAgICAgICAgYXJ0aWZhY3QgRGF0YUl0ZW0sIHN0cmluZywgb3IgcGF0aCBvYmplY3QgKHNpbWlsYXIgdG8gCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBwYW5kYXMgcmVhZF9jc3YpCiAgICA6cGFyYW0gZGFza19rZXk6ICAgICAgICBkZXN0aW5hdGlvbiBrZXkgb2YgZGF0YSBvbiBkYXNrIGNsdXN0ZXIgYW5kIGFydGlmYWN0IHN0b3JlCiAgICA6cGFyYW0gaW5jX2NvbHM6ICAgICAgICBpbmNsdWRlIG9ubHkgdGhlc2UgY29sdW1ucyAodmVyeSBmYXN0KQogICAgOnBhcmFtIGluZGV4X2NvbHM6ICAgICAgbGlzdCBvZiBpbmRleCBjb2x1bW4gbmFtZXMgKGNhbiBiZSBhIGxvbmctcnVubmluZyBwcm9jZXNzKQogICAgIiIiCiAgICBpZiBoYXNhdHRyKGNvbnRleHQsICJkYXNrX2NsaWVudCIpOgogICAgICAgIGRhc2tfY2xpZW50ID0gY29udGV4dC5kYXNrX2NsaWVudAogICAgICAgIHByaW50KGRhc2tfY2xpZW50KQogICAgZWxzZToKICAgICAgICByYWlzZSBFeGNlcHRpb24oImEgZGFzayBjbGllbnQgd2FzIG5vdCBmb3VuZCBpbiB0aGUgZXhlY3V0aW9uIGNvbnRleHQiKQogICAgCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGRhc2tfY2xpZW50KQoKICAgIHNyY19kYXRhID0gc3RyKHNyY19kYXRhKQogICAgaWYgaXNpbnN0YW5jZShzcmNfZGF0YSwgc3RyaW5nKToKICAgICAgICBpZiBvcy5wYXRoLmlzZGlyKHNyY19kYXRhKSBvciBzcmNfZGF0YS5lbmRzd2l0aCgicHEiKSBvciBzcmNfZGF0YS5lbmRzd2l0aCgicGFycXVldCIpOgogICAgICAgICAgICBkZiA9IGRkLnJlYWRfcGFycXVldChzcmNfZGF0YSkKICAgICAgICBlbGlmIHNyY19kYXRhLmVuZHN3aXRoKCJjc3YiKToKICAgICAgICAgICAgZGYgPSBkZC5yZWFkX2NzdihzcmNfZGF0YSkKCiAgICBpZiBwZXJzaXN0IGFuZCBjb250ZXh0OgogICAgICAgIGRmID0gZGFza19jbGllbnQucGVyc2lzdChkZikKICAgICAgICBkYXNrX2NsaWVudC5wdWJsaXNoX2RhdGFzZXQoZGFza19rZXk9ZGYpCiAgICAgICAgY29udGV4dC5kYXNrX2NsaWVudCA9IGRhc2tfY2xpZW50CiAgICAgICAgCiAgICAgICAgZmlsZXBhdGggPSBvcy5wYXRoLmpvaW4odGFyZ2V0X3BhdGgsICJzY2hlZHVsZXIuanNvbiIpCiAgICAgICAgZGFza19jbGllbnQud3JpdGVfc2NoZWR1bGVyX2ZpbGUoZmlsZXBhdGgpCiAgICAgICAgY29udGV4dC5sb2dfYXJ0aWZhY3QoInNjaGVkdWxlciIsIHRhcmdldF9wYXRoPWZpbGVwYXRoKQogICAgICAgIAogICAgICAgIHByaW50KGRmLmhlYWQoKSkKCg==
+    image: mlrun/ml-dask:0.4.6
+    commands: []
+    code_origin: https://github.com/mlrun/functions.git#fad0c4e4805c720fb4e654a29ad09a9c80a85b2a:load_dask.ipynb

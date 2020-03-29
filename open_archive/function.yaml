@@ -1,24 +1,43 @@
 kind: job
 metadata:
   name: open-archive
-  tag: ''
-  hash: d163f99690fe4a0a734c7ec6dcc6acc08647ef1b
+  tag: latest
+  hash: 937eab18ddf5e091cfaeb98d8906d5b93b98a0d8
   project: ''
   labels:
-    author: yjb
-    stage: development
+    author: yaronh
   categories:
   - fileutils
-  - datagen
+  - retrieve
 spec:
   command: ''
   args: []
-  image: mlrun/ml-models:0.4.6
+  image: mlrun/ml-base
   env: []
   default_handler: open_archive
-  description: ''
+  entry_points:
+    open_archive:
+      name: open_archive
+      doc: 'Open a file/object archive into a target directory
+
+
+        Currently supports zip and tar.gz'
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: function execution context
+      - name: archive_url
+        type: Union[DataItem, str]
+        doc: url of archive file
+      - name: key
+        type: str
+        doc: key of archive contents in artifact store
+        default: images
+      outputs: []
+      lineno: 14
+  description: Open a file/object archive into a target directory
   image_pull_policy: Always
   build:
-    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTAzLTIzIDIwOjE5CgppbXBvcnQgb3MKaW1wb3J0IHppcGZpbGUKaW1wb3J0IHVybGxpYi5yZXF1ZXN0CmltcG9ydCB0YXJmaWxlCmltcG9ydCBqc29uCgpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCgpmcm9tIHR5cGluZyBpbXBvcnQgVW5pb24KCmRlZiBvcGVuX2FyY2hpdmUoCiAgICBjb250ZXh0OiBNTENsaWVudEN0eCwgCiAgICBhcmNoaXZlX3VybDogVW5pb25bRGF0YUl0ZW0sIHN0cl0gPSAnJywKICAgIGtleTogc3RyID0gJ2ltYWdlcycKKToKICAgICIiIk9wZW4gYSBmaWxlL29iamVjdCBhcmNoaXZlIGludG8gYSB0YXJnZXQgZGlyZWN0b3J5CiAgICAKICAgIEN1cnJlbnRseSBzdXBwb3J0cyB6aXAgYW5kIHRhci5negogICAgCiAgICA6cGFyYW0gY29udGV4dDogICAgICBmdW5jdGlvbiBleGVjdXRpb24gY29udGV4dAogICAgOnBhcmFtIGFyY2hpdmVfdXJsOiAgdXJsIG9mIGFyY2hpdmUgZmlsZQogICAgOnBhcmFtIGtleTogICAgICAgICAga2V5IG9mIGFyY2hpdmUgY29udGVudHMgaW4gYXJ0aWZhY3Qgc3RvcmUKICAgICIiIgogICAgdGFyZ2V0X2RpciA9IGNvbnRleHQuYXJ0aWZhY3RfcGF0aAogICAgCiAgICBzcGxpdHMgPSBzdHIoYXJjaGl2ZV91cmwpLnNwbGl0KCcuJykKICAgIGlmICgnLicuam9pbihzcGxpdHNbLTI6XSkgPT0gJ3Rhci5neicpOgogICAgICAgIGNvbnRleHQubG9nZ2VyLmluZm8oJ29wZW5pbmcgdGFyX2d6JykKICAgICAgICBmdHBzdHJlYW0gPSB1cmxsaWIucmVxdWVzdC51cmxvcGVuKGFyY2hpdmVfdXJsKQogICAgICAgIHdpdGggdGFyZmlsZS5vcGVuKGZpbGVvYmo9ZnRwc3RyZWFtLCBtb2RlPSJyfGd6IikgYXMgcmVmOgogICAgICAgICAgICByZWYuZXh0cmFjdGFsbCh0YXJnZXRfZGlyKQogICAgZWxpZiBzcGxpdHNbLTFdID09ICd6aXAnOgogICAgICAgIGNvbnRleHQubG9nZ2VyLmluZm8oJ29wZW5pbmcgemlwJykKICAgICAgICB3aXRoIHppcGZpbGUuWmlwRmlsZShhcmNoaXZlX3VybCwgJ3InKSBhcyByZWY6CiAgICAgICAgICAgIHJlZi5leHRyYWN0YWxsKHRhcmdldF9kaXIpCiAgICAKICAgIGNvbnRleHQubG9nX2FydGlmYWN0KGtleSwgbG9jYWxfcGF0aD10YXJnZXRfZGlyKQoK
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTAzLTI2IDE1OjMxCgppbXBvcnQgb3MKaW1wb3J0IHppcGZpbGUKaW1wb3J0IHVybGxpYi5yZXF1ZXN0CmltcG9ydCB0YXJmaWxlCmltcG9ydCBqc29uCgpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCgpmcm9tIHR5cGluZyBpbXBvcnQgVW5pb24KCmRlZiBvcGVuX2FyY2hpdmUoCiAgICBjb250ZXh0OiBNTENsaWVudEN0eCwgCiAgICBhcmNoaXZlX3VybDogVW5pb25bRGF0YUl0ZW0sIHN0cl0gPSAiIiwKICAgIGtleTogc3RyID0gImltYWdlcyIKKToKICAgICIiIk9wZW4gYSBmaWxlL29iamVjdCBhcmNoaXZlIGludG8gYSB0YXJnZXQgZGlyZWN0b3J5CiAgICAKICAgIEN1cnJlbnRseSBzdXBwb3J0cyB6aXAgYW5kIHRhci5negogICAgCiAgICA6cGFyYW0gY29udGV4dDogICAgICBmdW5jdGlvbiBleGVjdXRpb24gY29udGV4dAogICAgOnBhcmFtIGFyY2hpdmVfdXJsOiAgdXJsIG9mIGFyY2hpdmUgZmlsZQogICAgOnBhcmFtIGtleTogICAgICAgICAga2V5IG9mIGFyY2hpdmUgY29udGVudHMgaW4gYXJ0aWZhY3Qgc3RvcmUKICAgICIiIgogICAgdGFyZ2V0X2RpciA9IGNvbnRleHQuYXJ0aWZhY3RfcGF0aAogICAgCiAgICBzcGxpdHMgPSBzdHIoYXJjaGl2ZV91cmwpLnNwbGl0KCIuIikKICAgIGlmICgiLiIuam9pbihzcGxpdHNbLTI6XSkgPT0gInRhci5neiIpOgogICAgICAgIGNvbnRleHQubG9nZ2VyLmluZm8oIm9wZW5pbmcgdGFyX2d6IikKICAgICAgICBmdHBzdHJlYW0gPSB1cmxsaWIucmVxdWVzdC51cmxvcGVuKGFyY2hpdmVfdXJsKQogICAgICAgIHdpdGggdGFyZmlsZS5vcGVuKGZpbGVvYmo9ZnRwc3RyZWFtLCBtb2RlPSJyfGd6IikgYXMgcmVmOgogICAgICAgICAgICByZWYuZXh0cmFjdGFsbCh0YXJnZXRfZGlyKQogICAgZWxpZiBzcGxpdHNbLTFdID09ICJ6aXAiOgogICAgICAgIGNvbnRleHQubG9nZ2VyLmluZm8oIm9wZW5pbmcgemlwIikKICAgICAgICB3aXRoIHppcGZpbGUuWmlwRmlsZShhcmNoaXZlX3VybCwgInIiKSBhcyByZWY6CiAgICAgICAgICAgIHJlZi5leHRyYWN0YWxsKHRhcmdldF9kaXIpCiAgICAKICAgIGNvbnRleHQubG9nX2FydGlmYWN0KGtleSwgbG9jYWxfcGF0aD10YXJnZXRfZGlyKQoK
     commands: []
-    code_origin: /User/functions/open_archive/function.yaml
+    code_origin: https://github.com/mlrun/functions.git#f2016ab5fe4f5ab972aad55175edab6edce7c19f:open_archive.ipynb

@@ -1,24 +1,58 @@
 kind: job
 metadata:
   name: load-dataset
-  tag: ''
-  hash: 34220ff439158ad0a8feb83bba748fb0834c9534
+  tag: latest
+  hash: 739bbc9bef37cc09939c2c36da9aeb77f3412e6f
   project: ''
   labels:
     author: yjb
-    stage: development
   categories:
   - datagen
-  - fileutils
+  - filesutils
 spec:
   command: ''
   args: []
-  image: mlrun/ml-models:0.4.6
+  image: mlrun/ml-models
   env: []
-  default_handler: get_toy_data
-  description: ''
+  default_handler: load_dataset
+  entry_points:
+    load_dataset:
+      name: load_dataset
+      doc: "Loads a scikit-learn toy dataset for classification or regression\n\n\
+        The following datasets are available ('name' : desription):\n\n    'boston'\
+        \          : boston house-prices dataset (regression)\n    'iris'        \
+        \    : iris dataset (classification)\n    'diabetes'        : diabetes dataset\
+        \ (regression)\n    'digits'          : digits dataset (classification)\n\
+        \    'linnerud'        : linnerud dataset (multivariate regression)\n    'wine'\
+        \            : wine dataset (classification)\n    'breast_cancer'   : breast\
+        \ cancer wisconsin dataset (classification)\n\nThe scikit-learn functions\
+        \ return a data bunch including the following items:\n- data             \
+        \ the features matrix\n- target            the ground truth labels\n- DESCR\
+        \             a description of the dataset\n- feature_names     header for\
+        \ data\n\nThe features (and their names) are stored with the target labels\
+        \ in a DataFrame.\n\nFor further details see https://scikit-learn.org/stable/datasets/index.html#toy-datasets"
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: function execution context
+      - name: dataset
+        type: str
+        doc: name of the dataset to load
+      - name: name
+        type: str
+        doc: artifact name (defaults to dataset)
+      - name: file_ext
+        type: str
+        doc: 'output file_ext: parquet or csv'
+        default: parquet
+      - name: params
+        type: dict
+        doc: params of the sklearn load_data method
+      outputs: []
+      lineno: 9
+  description: load a toy dataset from scikit-learn
   image_pull_policy: Always
   build:
-    functionSourceCode: IyBDb3B5cmlnaHQgMjAxOCBJZ3VhemlvCiMKIyBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIyB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiMgWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CiMKIyAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAojCiMgVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQojIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiMgV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiMgU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAojIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCBwYW5kYXMgYXMgcGQKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CgoKZGVmIGdldF90b3lfZGF0YSgKICAgICAgICBjb250ZXh0OiBNTENsaWVudEN0eCwKICAgICAgICBkYXRhc2V0OiBzdHIsCiAgICAgICAgZm9ybWF0OiBzdHIgPSAncHEnLAogICAgICAgIG5hbWU6IHN0ciA9ICcnLAogICAgICAgIHBhcmFtczogZGljdCA9IHt9CikgLT4gTm9uZToKICAgICIiIkxvYWRzIGEgc2Npa2l0LWxlYXJuIHRveSBkYXRhc2V0IGZvciBjbGFzc2lmaWNhdGlvbiBvciByZWdyZXNzaW9uCgogICAgVGhlIGZvbGxvd2luZyBkYXRhc2V0cyBhcmUgYXZhaWxhYmxlICgnbmFtZScgOiBkZXNyaXB0aW9uKToKCiAgICAgICAgJ2Jvc3RvbicgICAgICAgICAgOiBib3N0b24gaG91c2UtcHJpY2VzIGRhdGFzZXQgKHJlZ3Jlc3Npb24pCiAgICAgICAgJ2lyaXMnICAgICAgICAgICAgOiBpcmlzIGRhdGFzZXQgKGNsYXNzaWZpY2F0aW9uKQogICAgICAgICdkaWFiZXRlcycgICAgICAgIDogZGlhYmV0ZXMgZGF0YXNldCAocmVncmVzc2lvbikKICAgICAgICAnZGlnaXRzJyAgICAgICAgICA6IGRpZ2l0cyBkYXRhc2V0IChjbGFzc2lmaWNhdGlvbikKICAgICAgICAnbGlubmVydWQnICAgICAgICA6IGxpbm5lcnVkIGRhdGFzZXQgKG11bHRpdmFyaWF0ZSByZWdyZXNzaW9uKQogICAgICAgICd3aW5lJyAgICAgICAgICAgIDogd2luZSBkYXRhc2V0IChjbGFzc2lmaWNhdGlvbikKICAgICAgICAnYnJlYXN0X2NhbmNlcicgICA6IGJyZWFzdCBjYW5jZXIgd2lzY29uc2luIGRhdGFzZXQgKGNsYXNzaWZpY2F0aW9uKQoKICAgIFRoZSBzY2lraXQtbGVhcm4gZnVuY3Rpb25zIHJldHVybiBhIGRhdGEgYnVuY2ggaW5jbHVkaW5nIHRoZSBmb2xsb3dpbmcgaXRlbXM6CiAgICAtIGRhdGEgICAgICAgICAgICAgIHRoZSBmZWF0dXJlcyBtYXRyaXgKICAgIC0gdGFyZ2V0ICAgICAgICAgICAgdGhlIGdyb3VuZCB0cnV0aCBsYWJlbHMKICAgIC0gREVTQ1IgICAgICAgICAgICAgYSBkZXNjcmlwdGlvbiBvZiB0aGUgZGF0YXNldAogICAgLSBmZWF0dXJlX25hbWVzICAgICBoZWFkZXIgZm9yIGRhdGEKCiAgICBUaGUgZmVhdHVyZXMgKGFuZCB0aGVpciBuYW1lcykgYXJlIHN0b3JlZCB3aXRoIHRoZSB0YXJnZXQgbGFiZWxzIGluIGEgRGF0YUZyYW1lLgoKICAgIEZvciBmdXJ0aGVyIGRldGFpbHMgc2VlIGh0dHBzOi8vc2Npa2l0LWxlYXJuLm9yZy9zdGFibGUvZGF0YXNldHMvaW5kZXguaHRtbCN0b3ktZGF0YXNldHMKCiAgICA6cGFyYW0gY29udGV4dDogICAgZnVuY3Rpb24gZXhlY3V0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBkYXRhc2V0OiAgICBuYW1lIG9mIHRoZSBkYXRhc2V0IHRvIGxvYWQKICAgIDpwYXJhbSBmb3JtYXQ6ICAgICBvdXRwdXQgZm9ybWF0OiBwcSBvciBjc3YKICAgIDpwYXJhbSBuYW1lOiAgICAgICBhcnRpZmFjdCBuYW1lIChkZWZhdWx0cyB0byBkYXRhc2V0KQogICAgOnBhcmFtIHBhcmFtczogICAgIHBhcmFtcyBvZiB0aGUgc2tsZWFybiBsb2FkX2RhdGEgbWV0aG9kCiAgICAiIiIKCiAgICAjIHJlYWNoIGludG8gbW9kdWxlIGFuZCBpbXBvcnQgdGhlIGFwcHJvcHJpYXRlIGxvYWRfeHh4IGZ1bmN0aW9uCiAgICBwa2dfbW9kdWxlID0gJ3NrbGVhcm4uZGF0YXNldHMnCiAgICBmbmFtZSA9IGYnbG9hZF97ZGF0YXNldH0nCgogICAgcGtnX21vZHVsZSA9IF9faW1wb3J0X18ocGtnX21vZHVsZSwgZnJvbWxpc3Q9W2ZuYW1lXSkKICAgIGxvYWRfZGF0YV9mbiA9IGdldGF0dHIocGtnX21vZHVsZSwgZm5hbWUpCgogICAgZGF0YSA9IGxvYWRfZGF0YV9mbigqKnBhcmFtcykKICAgIGZlYXR1cmVfbmFtZXMgPSBkYXRhWydmZWF0dXJlX25hbWVzJ10KCiAgICAjIGNyZWF0ZSB0aGUgdG95IGRhdGFzZXQKICAgIHh5ID0gbnAuY29uY2F0ZW5hdGUoW2RhdGFbJ2RhdGEnXSwgZGF0YVsndGFyZ2V0J10ucmVzaGFwZSgtMSwgMSldLCBheGlzPTEpCiAgICBpZiBoYXNhdHRyKGZlYXR1cmVfbmFtZXMsICdhcHBlbmQnKToKICAgICAgICAjIGl0cyBhIGxpc3QKICAgICAgICBmZWF0dXJlX25hbWVzLmFwcGVuZCgnbGFiZWxzJykKICAgIGVsc2U6CiAgICAgICAgIyBpdHMgYW4gYXJyYXkKICAgICAgICBmZWF0dXJlX25hbWVzID0gbnAuYXBwZW5kKGZlYXR1cmVfbmFtZXMsICdsYWJlbHMnKQogICAgZGYgPSBwZC5EYXRhRnJhbWUoZGF0YT14eSwgY29sdW1ucz1mZWF0dXJlX25hbWVzKQoKICAgICMgbG9nIGFuZCB1cGxvYWQgdGhlIGRhdGFzZXQKICAgIGNvbnRleHQubG9nX2RhdGFzZXQobmFtZSBvciBkYXRhc2V0LCBkZj1kZiwgZm9ybWF0PWZvcm1hdCwgaW5kZXg9RmFsc2Up
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTAzLTI2IDE1OjMxCgoKaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCBwYW5kYXMgYXMgcGQKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CgoKZGVmIGxvYWRfZGF0YXNldCgKICAgICAgICBjb250ZXh0OiBNTENsaWVudEN0eCwKICAgICAgICBkYXRhc2V0OiBzdHIsCiAgICAgICAgbmFtZTogc3RyID0gJycsCiAgICAgICAgZmlsZV9leHQ6IHN0ciA9ICdwYXJxdWV0JywKICAgICAgICBwYXJhbXM6IGRpY3QgPSB7fQopIC0+IE5vbmU6CiAgICAiIiJMb2FkcyBhIHNjaWtpdC1sZWFybiB0b3kgZGF0YXNldCBmb3IgY2xhc3NpZmljYXRpb24gb3IgcmVncmVzc2lvbgoKICAgIFRoZSBmb2xsb3dpbmcgZGF0YXNldHMgYXJlIGF2YWlsYWJsZSAoJ25hbWUnIDogZGVzcmlwdGlvbik6CgogICAgICAgICdib3N0b24nICAgICAgICAgIDogYm9zdG9uIGhvdXNlLXByaWNlcyBkYXRhc2V0IChyZWdyZXNzaW9uKQogICAgICAgICdpcmlzJyAgICAgICAgICAgIDogaXJpcyBkYXRhc2V0IChjbGFzc2lmaWNhdGlvbikKICAgICAgICAnZGlhYmV0ZXMnICAgICAgICA6IGRpYWJldGVzIGRhdGFzZXQgKHJlZ3Jlc3Npb24pCiAgICAgICAgJ2RpZ2l0cycgICAgICAgICAgOiBkaWdpdHMgZGF0YXNldCAoY2xhc3NpZmljYXRpb24pCiAgICAgICAgJ2xpbm5lcnVkJyAgICAgICAgOiBsaW5uZXJ1ZCBkYXRhc2V0IChtdWx0aXZhcmlhdGUgcmVncmVzc2lvbikKICAgICAgICAnd2luZScgICAgICAgICAgICA6IHdpbmUgZGF0YXNldCAoY2xhc3NpZmljYXRpb24pCiAgICAgICAgJ2JyZWFzdF9jYW5jZXInICAgOiBicmVhc3QgY2FuY2VyIHdpc2NvbnNpbiBkYXRhc2V0IChjbGFzc2lmaWNhdGlvbikKCiAgICBUaGUgc2Npa2l0LWxlYXJuIGZ1bmN0aW9ucyByZXR1cm4gYSBkYXRhIGJ1bmNoIGluY2x1ZGluZyB0aGUgZm9sbG93aW5nIGl0ZW1zOgogICAgLSBkYXRhICAgICAgICAgICAgICB0aGUgZmVhdHVyZXMgbWF0cml4CiAgICAtIHRhcmdldCAgICAgICAgICAgIHRoZSBncm91bmQgdHJ1dGggbGFiZWxzCiAgICAtIERFU0NSICAgICAgICAgICAgIGEgZGVzY3JpcHRpb24gb2YgdGhlIGRhdGFzZXQKICAgIC0gZmVhdHVyZV9uYW1lcyAgICAgaGVhZGVyIGZvciBkYXRhCgogICAgVGhlIGZlYXR1cmVzIChhbmQgdGhlaXIgbmFtZXMpIGFyZSBzdG9yZWQgd2l0aCB0aGUgdGFyZ2V0IGxhYmVscyBpbiBhIERhdGFGcmFtZS4KCiAgICBGb3IgZnVydGhlciBkZXRhaWxzIHNlZSBodHRwczovL3NjaWtpdC1sZWFybi5vcmcvc3RhYmxlL2RhdGFzZXRzL2luZGV4Lmh0bWwjdG95LWRhdGFzZXRzCgogICAgOnBhcmFtIGNvbnRleHQ6ICAgIGZ1bmN0aW9uIGV4ZWN1dGlvbiBjb250ZXh0CiAgICA6cGFyYW0gZGF0YXNldDogICAgbmFtZSBvZiB0aGUgZGF0YXNldCB0byBsb2FkCiAgICA6cGFyYW0gbmFtZTogICAgICAgYXJ0aWZhY3QgbmFtZSAoZGVmYXVsdHMgdG8gZGF0YXNldCkKICAgIDpwYXJhbSBmaWxlX2V4dDogICBvdXRwdXQgZmlsZV9leHQ6IHBhcnF1ZXQgb3IgY3N2CiAgICA6cGFyYW0gcGFyYW1zOiAgICAgcGFyYW1zIG9mIHRoZSBza2xlYXJuIGxvYWRfZGF0YSBtZXRob2QKICAgICIiIgogICAgcGtnX21vZHVsZSA9ICdza2xlYXJuLmRhdGFzZXRzJwogICAgZm5hbWUgPSBmJ2xvYWRfe2RhdGFzZXR9JwoKICAgIHBrZ19tb2R1bGUgPSBfX2ltcG9ydF9fKHBrZ19tb2R1bGUsIGZyb21saXN0PVtmbmFtZV0pCiAgICBsb2FkX2RhdGFfZm4gPSBnZXRhdHRyKHBrZ19tb2R1bGUsIGZuYW1lKQoKICAgIGRhdGEgPSBsb2FkX2RhdGFfZm4oKipwYXJhbXMpCiAgICBmZWF0dXJlX25hbWVzID0gZGF0YVsnZmVhdHVyZV9uYW1lcyddCgogICAgeHkgPSBucC5jb25jYXRlbmF0ZShbZGF0YVsnZGF0YSddLCBkYXRhWyd0YXJnZXQnXS5yZXNoYXBlKC0xLCAxKV0sIGF4aXM9MSkKICAgIGlmIGhhc2F0dHIoZmVhdHVyZV9uYW1lcywgJ2FwcGVuZCcpOgogICAgICAgIGZlYXR1cmVfbmFtZXMuYXBwZW5kKCdsYWJlbHMnKQogICAgZWxzZToKICAgICAgICBmZWF0dXJlX25hbWVzID0gbnAuYXBwZW5kKGZlYXR1cmVfbmFtZXMsICdsYWJlbHMnKQogICAgZGYgPSBwZC5EYXRhRnJhbWUoZGF0YT14eSwgY29sdW1ucz1mZWF0dXJlX25hbWVzKQoKICAgIGNvbnRleHQubG9nX2RhdGFzZXQobmFtZSBvciBkYXRhc2V0LCBkZj1kZiwgZm9ybWF0PWZpbGVfZXh0LCBpbmRleD1GYWxzZSkKCg==
     commands: []
-    code_origin: /User/functions/load_dataset/function.yaml
+    code_origin: https://github.com/mlrun/functions.git#f2016ab5fe4f5ab972aad55175edab6edce7c19f:load_dataset.ipynb

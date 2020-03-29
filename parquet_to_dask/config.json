@@ -1,0 +1,1 @@
+{"name": "parquet_to_dask", "filename": "/User/functions/parquet_to_dask/parquet_to_dask.py", "image": "mlrun/ml-dask:0.4.6", "kind": "dask", "with_doc": false, "default_handler": "parquet_to_dask", "pull_policy": "Always", "categoryA": "fileutils", "categoryB": "datagen", "author": "yjb", "stage": "development", "export_as": "function.yaml"}

@@ -1,0 +1,69 @@
+kind: dask
+metadata:
+  name: load-dask
+  tag: latest
+  hash: d71627f345e088827b1f08471136f0851b6ab1bb
+  project: ''
+  labels:
+    author: yjb
+  categories:
+  - fileutils
+  - distributed
+spec:
+  command: ''
+  image: mlrun/ml-models
+  env: []
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTAzLTMxIDE1OjA5CgppbXBvcnQgb3MKaW1wb3J0IGpzb24KaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCBwYW5kYXMgYXMgcGQKCmltcG9ydCBkYXNrCmltcG9ydCBkYXNrLmRhdGFmcmFtZSBhcyBkZApmcm9tIGRhc2suZGlzdHJpYnV0ZWQgaW1wb3J0IENsaWVudCwgTG9jYWxDbHVzdGVyCgpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCgpmcm9tIHR5cGluZyBpbXBvcnQgTGlzdCwgT3B0aW9uYWwKCmRlZiBsb2FkX2Rhc2soCiAgICBjb250ZXh0OiBNTENsaWVudEN0eCwKICAgIHNyY19kYXRhOiBzdHIsCiAgICBkYXNrX2tleTogc3RyID0gImRhc2tfZGYiLAogICAgaW5jX2NvbHM6IE9wdGlvbmFsW0xpc3Rbc3RyXV0gPSBOb25lLAogICAgaW5kZXhfY29sczogT3B0aW9uYWxbTGlzdFtzdHJdXSA9IE5vbmUsCiAgICBkYXNrX3BlcnNpc3Q6IGJvb2wgPSBUcnVlLAogICAgcmVmcmVzaF9kYXRhOiBib29sID0gVHJ1ZSwKICAgIHNjaGVkdWxlcl9rZXk6IHN0ciA9ICJzY2hlZHVsZXIiCikgLT4gTm9uZToKICAgICIiIkxvYWQgZGF0YXNldCBpbnRvIGFuIGV4aXN0aW5nIGRhc2sgY2x1c3RlcgogICAgCiAgICBkYXNrIGpvYnMgZGVmaW5lIHRoZSBkYXNrIGNsaWVudCBwYXJhbWV0ZXJzIGF0IHRoZSBqb2IgbGV2ZWwsIHRoaXMgbWV0aG9kIHdpbGwgcmFpc2UgYW4gZXJyb3IgaWYgbm8gY2xpZW50IGlzIGRldGVjdGVkLgogICAgCiAgICA6cGFyYW0gY29udGV4dDogICAgICAgICB0aGUgZnVuY3Rpb24gY29udGV4dAogICAgOnBhcmFtIHNyY19kYXRhOiAgICAgICAgdXJsIG9mIHRoZSBkYXRhIGZpbGUgb3IgcGFydGl0aW9uZWQgZGF0YXNldCBhcyBlaXRoZXIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFydGlmYWN0IERhdGFJdGVtLCBzdHJpbmcsIG9yIHBhdGggb2JqZWN0IChzaW1pbGFyIHRvIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgcGFuZGFzIHJlYWRfY3N2KQogICAgOnBhcmFtIGRhc2tfa2V5OiAgICAgICAgZGVzdGluYXRpb24ga2V5IG9mIGRhdGEgb24gZGFzayBjbHVzdGVyIGFuZCBhcnRpZmFjdCBzdG9yZQogICAgOnBhcmFtIGluY19jb2xzOiAgICAgICAgaW5jbHVkZSBvbmx5IHRoZXNlIGNvbHVtbnMgKHZlcnkgZmFzdCkKICAgIDpwYXJhbSBpbmRleF9jb2xzOiAgICAgIGxpc3Qgb2YgaW5kZXggY29sdW1uIG5hbWVzIChjYW4gYmUgYSBsb25nLXJ1bm5pbmcgcHJvY2VzcykKICAgIDpwYXJhbSBkYXNrX3BlcnNpc3Q6ICAgIChUcnVlKSBzaG91bGQgdGhlIGRhdGEgYmUgcGVyc2lzdGVkICh0aHJvdWdoIHRoZSBgY2xpZW50LnBlcnNpc3RgIG9wKQogICAgOnBhcmFtIHJlZnJlc2hfZGF0YTogICAgKEZhbHNlKSBpZiB0aGUgZGFza19rZXkgYWxyZWFkeSBleGlzdHMgaW4gdGhlIGRhc2sgY2x1c3RlciwgdGhpcyB3aWxsIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgcmFpc2UgYW4gRXhjZXB0aW9uLiAgU2V0IHRvIFRydWUgdG8gcmVwbGFjZSB0aGUgZXhpc3RpbmcgY2x1c3RlciBkYXRhLgogICAgOnBhcmFtIHNjaGVkdWxlcl9rZXk6ICAgKHNjaGVkdWxlcikgdGhlIGRhc2sgc2NoZWR1bGVyIGNvbmZpZ3VyYXRpb24sIGpzb24gYWxzbyBsb2dnZWQgYXMgYW4gYXJ0aWZhY3QKICAgICIiIgogICAgaWYgaGFzYXR0cihjb250ZXh0LCAiZGFza19jbGllbnQiKToKICAgICAgICBkYXNrX2NsaWVudCA9IGNvbnRleHQuZGFza19jbGllbnQKICAgICAgICBwcmludChkYXNrX2NsaWVudCkKICAgIGVsc2U6CiAgICAgICAgcmFpc2UgRXhjZXB0aW9uKCJhIGRhc2sgY2xpZW50IHdhcyBub3QgZm91bmQgaW4gdGhlIGV4ZWN1dGlvbiBjb250ZXh0IikKICAgIAogICAgc3JjX2RhdGEgPSBzdHIoc3JjX2RhdGEpCiAgICBpZiBpc2luc3RhbmNlKHNyY19kYXRhLCBzdHIpOgogICAgICAgIGlmIG9zLnBhdGguaXNkaXIoc3JjX2RhdGEpIG9yIHNyY19kYXRhLmVuZHN3aXRoKCJwcSIpIG9yIHNyY19kYXRhLmVuZHN3aXRoKCJwYXJxdWV0Iik6CiAgICAgICAgICAgIGRmID0gZGQucmVhZF9wYXJxdWV0KHNyY19kYXRhKQogICAgICAgIGVsaWYgc3JjX2RhdGEuZW5kc3dpdGgoImNzdiIpOgogICAgICAgICAgICBkZiA9IGRkLnJlYWRfY3N2KHNyY19kYXRhKQoKICAgIGlmIGRhc2tfcGVyc2lzdCBhbmQgY29udGV4dDoKICAgICAgICBkZiA9IGRhc2tfY2xpZW50LnBlcnNpc3QoZGYpCiAgICAgICAgaWYgZGFza19jbGllbnQuZGF0YXNldHMgYW5kIGRhc2tfa2V5IGluIGRhc2tfY2xpZW50LmRhdGFzZXRzOgogICAgICAgICAgICBkYXNrX2NsaWVudC51bnB1Ymxpc2hfZGF0YXNldChkYXNrX2tleSkKICAgICAgICBkYXNrX2NsaWVudC5wdWJsaXNoX2RhdGFzZXQoZGFza19rZXk9ZGYpCiAgICAgICAgY29udGV4dC5kYXNrX2NsaWVudCA9IGRhc2tfY2xpZW50CiAgICAgICAgCiAgICAgICAgZmlsZXBhdGggPSBvcy5wYXRoLmpvaW4oY29udGV4dC5hcnRpZmFjdF9wYXRoLCBzY2hlZHVsZXJfa2V5KyIuanNvbiIpCiAgICAgICAgZGFza19jbGllbnQud3JpdGVfc2NoZWR1bGVyX2ZpbGUoZmlsZXBhdGgpCiAgICAgICAgY29udGV4dC5sb2dfYXJ0aWZhY3Qoc2NoZWR1bGVyX2tleSwgbG9jYWxfcGF0aD1zY2hlZHVsZXJfa2V5KyIuanNvbiIpCgo=
+    commands: []
+    code_origin: https://github.com/yjb-ds/functions.git#02cab6b12a879e6477f290e9deaf03b043bd7c16:load_dask.ipynb
+  entry_points:
+    load_dask:
+      name: load_dask
+      doc: 'Load dataset into an existing dask cluster
+
+
+        dask jobs define the dask client parameters at the job level, this method
+        will raise an error if no client is detected.'
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+      - name: src_data
+        type: str
+        doc: url of the data file or partitioned dataset as either artifact DataItem,
+          string, or path object (similar to  pandas read_csv)
+      - name: dask_key
+        type: str
+        doc: destination key of data on dask cluster and artifact store
+        default: dask_df
+      - name: inc_cols
+        type: Optional[List[str]]
+        doc: include only these columns (very fast)
+      - name: index_cols
+        type: Optional[List[str]]
+        doc: list of index column names (can be a long-running process)
+      - name: dask_persist
+        type: bool
+        doc: (True) should the data be persisted (through the `client.persist` op)
+        default: true
+      - name: refresh_data
+        type: bool
+        doc: (False) if the dask_key already exists in the dask cluster, this will  raise
+          an Exception.  Set to True to replace the existing cluster data.
+        default: true
+      - name: scheduler_key
+        type: str
+        doc: (scheduler) the dask scheduler configuration, json also logged as an
+          artifact
+        default: scheduler
+      outputs: []
+      lineno: 17
+  description: load dask cluster with data
+  replicas: 4
+  remote: true
+  service_type: NodePort
+  nthreads: 1
+  min_replicas: 0
+  max_replicas: 4
+  scheduler_timeout: 60 minutes

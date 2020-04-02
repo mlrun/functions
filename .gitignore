@@ -1,3 +1,4 @@
+content/
 models/
 .ipynb_checkpoints
 *.pyc
@@ -135,3 +136,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+conda-setup-cpu
+conda-setup-gpu

@@ -1,0 +1,101 @@
+aggregate:
+  categories:
+  - preprocessing
+  description: Rolling aggregation over Metrics and Lables according to specifications
+  name: aggregate
+  versions:
+    latest: hub://aggregate
+arc-to-parquet:
+  categories:
+  - fileutils
+  - retrieve
+  description: retrieve remote archive, open and save as parquet
+  name: arc-to-parquet
+  versions:
+    latest: hub://arc_to_parquet
+describe:
+  categories:
+  - models
+  - visualization
+  description: describe and visualizes dataset stats
+  name: describe
+  versions:
+    latest: hub://describe
+describe-dask:
+  categories:
+  - models
+  - visualization
+  description: describe and visualizes dataset stats
+  name: describe-dask
+  versions:
+    latest: hub://describe_dask
+gen-class-data:
+  categories:
+  - datagen
+  - filesutils
+  description: simulate classification data using scikit-learn
+  name: gen-class-data
+  versions:
+    latest: hub://gen_class_data
+load-dask:
+  categories:
+  - fileutils
+  - distributed
+  description: load dask cluster with data
+  name: load-dask
+  versions:
+    latest: hub://load_dask
+load-dataset:
+  categories:
+  - datagen
+  - filesutils
+  description: load a toy dataset from scikit-learn
+  name: load-dataset
+  versions:
+    latest: hub://load_dataset
+model-server-tester:
+  categories:
+  - models
+  - testing
+  description: test model servers
+  name: model-server-tester
+  versions:
+    latest: hub://model_server_tester
+open-archive:
+  categories:
+  - fileutils
+  - retrieve
+  description: Open a file/object archive into a target directory
+  name: open-archive
+  versions:
+    latest: hub://open_archive
+sklearn-classifier:
+  categories:
+  - models
+  - classifier
+  description: train any classifier using scikit-learn's API
+  name: sklearn-classifier
+  versions:
+    latest: hub://sklearn_classifier
+sklearn-server:
+  categories:
+  - serving
+  - models
+  description: generic sklearn model server
+  name: sklearn-server
+  versions:
+    latest: hub://model_server
+test-classifier:
+  categories:
+  - models
+  - testing
+  description: test a classifier using held-out or new data
+  name: test-classifier
+  versions:
+    latest: hub://test_classifier
+tf-images-server:
+  categories: []
+  description: ''
+  name: tf-images-server
+  versions:
+    latest: hub://tf-serving

@@ -11,12 +11,11 @@ for funcdir in dirs:
     if os.path.isfile(specpath):
         fn = import_function(specpath)
 
-        entry = {'name': fn.metadata.name,
-                 'description': fn.spec.description,
+        entry = {'description': fn.spec.description,
                  'categories': fn.metadata.categories,
                  'versions': {'latest': f'hub://{funcdir}'}}
 
-        print(entry)
+        print(fn.metadata.name, entry)
         catalog[fn.metadata.name] = entry
 
 

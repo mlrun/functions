@@ -13,6 +13,7 @@ for funcdir in dirs:
 
         entry = {'description': fn.spec.description,
                  'categories': fn.metadata.categories,
+                 'kind': fn.kind,
                  'versions': {'latest': f'hub://{funcdir}'}}
 
         print(fn.metadata.name, entry)

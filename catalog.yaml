@@ -2,6 +2,7 @@ aggregate:
   categories:
   - preprocessing
   description: Rolling aggregation over Metrics and Lables according to specifications
+  kind: job
   versions:
     latest: hub://aggregate
 arc-to-parquet:
@@ -9,6 +10,7 @@ arc-to-parquet:
   - fileutils
   - retrieve
   description: retrieve remote archive, open and save as parquet
+  kind: job
   versions:
     latest: hub://arc_to_parquet
 describe:
@@ -16,6 +18,7 @@ describe:
   - models
   - visualization
   description: describe and visualizes dataset stats
+  kind: job
   versions:
     latest: hub://describe
 describe-dask:
@@ -23,13 +26,23 @@ describe-dask:
   - models
   - visualization
   description: describe and visualizes dataset stats
+  kind: job
   versions:
     latest: hub://describe_dask
+feature-selection:
+  categories:
+  - preprocessing
+  - feature_selection
+  description: Select features through multiple Statistical and Model filters
+  kind: job
+  versions:
+    latest: hub://feature_selection
 gen-class-data:
   categories:
   - datagen
   - filesutils
   description: simulate classification data using scikit-learn
+  kind: job
   versions:
     latest: hub://gen_class_data
 load-dask:
@@ -37,6 +50,7 @@ load-dask:
   - fileutils
   - distributed
   description: load dask cluster with data
+  kind: dask
   versions:
     latest: hub://load_dask
 load-dataset:
@@ -44,6 +58,7 @@ load-dataset:
   - datagen
   - filesutils
   description: load a toy dataset from scikit-learn
+  kind: job
   versions:
     latest: hub://load_dataset
 model-server-tester:
@@ -51,6 +66,7 @@ model-server-tester:
   - models
   - testing
   description: test model servers
+  kind: job
   versions:
     latest: hub://model_server_tester
 open-archive:
@@ -58,6 +74,7 @@ open-archive:
   - fileutils
   - retrieve
   description: Open a file/object archive into a target directory
+  kind: job
   versions:
     latest: hub://open_archive
 sklearn-classifier:
@@ -65,6 +82,7 @@ sklearn-classifier:
   - models
   - classifier
   description: train any classifier using scikit-learn's API
+  kind: job
   versions:
     latest: hub://sklearn_classifier
 sklearn-server:
@@ -72,6 +90,7 @@ sklearn-server:
   - serving
   - models
   description: generic sklearn model server
+  kind: remote
   versions:
     latest: hub://model_server
 test-classifier:
@@ -79,10 +98,12 @@ test-classifier:
   - models
   - testing
   description: test a classifier using held-out or new data
+  kind: job
   versions:
     latest: hub://test_classifier
 tf-images-server:
   categories: []
   description: ''
+  kind: remote
   versions:
     latest: hub://tf-serving

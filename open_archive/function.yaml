@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: open-archive
   tag: latest
-  hash: b371bd79e9d0f9a79e02f4af7c3192f785189a4a
+  hash: 750f27437399d3ab37be05da6109da8f752b97fa
   project: ''
   labels:
     author: yaronh
@@ -12,35 +12,11 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/ml-base:0.4.7-py37
+  image: mlrun/ml-base
   env: []
   default_handler: open_archive
-  entry_points:
-    open_archive:
-      name: open_archive
-      doc: 'Open a file/object archive into a target directory
-
-
-        Currently supports zip and tar.gz'
-      parameters:
-      - name: context
-        type: MLClientCtx
-        doc: function execution context
-      - name: archive_url
-        type: DataItem
-        doc: url of archive file
-      - name: subdir
-        type: str
-        doc: path within artifact store where extracted files are stored
-        default: content
-      - name: key
-        type: str
-        doc: key of archive contents in artifact store
-        default: content
-      outputs: []
-      lineno: 14
   description: Open a file/object archive into a target directory
   build:
-    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA0LTMwIDAxOjU4CgppbXBvcnQgb3MKaW1wb3J0IHppcGZpbGUKaW1wb3J0IHVybGxpYi5yZXF1ZXN0CmltcG9ydCB0YXJmaWxlCmltcG9ydCBqc29uCgpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCgpmcm9tIHR5cGluZyBpbXBvcnQgVW5pb24KCmRlZiBvcGVuX2FyY2hpdmUoCiAgICBjb250ZXh0OiBNTENsaWVudEN0eCwgCiAgICBhcmNoaXZlX3VybDogRGF0YUl0ZW0gPSAiIiwKICAgIHN1YmRpcjogc3RyID0gImNvbnRlbnQiLAogICAga2V5OiBzdHIgPSAiY29udGVudCIKKToKICAgICIiIk9wZW4gYSBmaWxlL29iamVjdCBhcmNoaXZlIGludG8gYSB0YXJnZXQgZGlyZWN0b3J5CiAgICAKICAgIEN1cnJlbnRseSBzdXBwb3J0cyB6aXAgYW5kIHRhci5negogICAgCiAgICA6cGFyYW0gY29udGV4dDogICAgICBmdW5jdGlvbiBleGVjdXRpb24gY29udGV4dAogICAgOnBhcmFtIGFyY2hpdmVfdXJsOiAgdXJsIG9mIGFyY2hpdmUgZmlsZQogICAgOnBhcmFtIHN1YmRpcjogICAgICAgcGF0aCB3aXRoaW4gYXJ0aWZhY3Qgc3RvcmUgd2hlcmUgZXh0cmFjdGVkIGZpbGVzCiAgICAgICAgICAgICAgICAgICAgICAgICBhcmUgc3RvcmVkCiAgICA6cGFyYW0ga2V5OiAgICAgICAgICBrZXkgb2YgYXJjaGl2ZSBjb250ZW50cyBpbiBhcnRpZmFjdCBzdG9yZQogICAgIiIiCiAgICB0YXJnZXRfZGlyID0gb3MucGF0aC5qb2luKGNvbnRleHQuYXJ0aWZhY3RfcGF0aCwgc3ViZGlyKQogICAgb3MubWFrZWRpcnModGFyZ2V0X2RpciwgZXhpc3Rfb2s9VHJ1ZSkKICAgIAogICAgYXJjaGl2ZV91cmwgPSBzdHIoYXJjaGl2ZV91cmwpCiAgICBpZiBhcmNoaXZlX3VybC5lbmRzd2l0aCgiZ3oiKToKICAgICAgICB3aXRoIHRhcmZpbGUub3BlbihhcmNoaXZlX3VybCwgbW9kZT0icnxneiIpIGFzIHJlZjoKICAgICAgICAgICAgcmVmLmV4dHJhY3RhbGwodGFyZ2V0X2RpcikKICAgIGVsaWYgYXJjaGl2ZV91cmwuZW5kc3dpdGgoInppcCIpOgogICAgICAgIHdpdGggemlwZmlsZS5aaXBGaWxlKGFyY2hpdmVfdXJsLCAiciIpIGFzIHJlZjoKICAgICAgICAgICAgcmVmLmV4dHJhY3RhbGwodGFyZ2V0X2RpcikKICAgIGVsc2U6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcihmJ3Vuc3VwcG9ydGVkIGFyY2hpdmUgdHlwZSBpbiB7YXJjaGl2ZV91cmx9JykKICAgIAogICAgY29udGV4dC5sb2dfYXJ0aWZhY3Qoa2V5LCBsb2NhbF9wYXRoPXN1YmRpcikKCg==
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA0LTMwIDIwOjQxCgppbXBvcnQgb3MKaW1wb3J0IHppcGZpbGUKaW1wb3J0IHVybGxpYi5yZXF1ZXN0CmltcG9ydCB0YXJmaWxlCmltcG9ydCBqc29uCgpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCgpmcm9tIHR5cGluZyBpbXBvcnQgVW5pb24KCmRlZiBvcGVuX2FyY2hpdmUoCiAgICBjb250ZXh0OiBNTENsaWVudEN0eCwgCiAgICBhcmNoaXZlX3VybDogRGF0YUl0ZW0gPSAiIiwKICAgIHN1YmRpcjogc3RyID0gImNvbnRlbnQiLAogICAga2V5OiBzdHIgPSAiY29udGVudCIKKToKICAgICIiIk9wZW4gYSBmaWxlL29iamVjdCBhcmNoaXZlIGludG8gYSB0YXJnZXQgZGlyZWN0b3J5CiAgICAKICAgIEN1cnJlbnRseSBzdXBwb3J0cyB6aXAgYW5kIHRhci5negogICAgCiAgICA6cGFyYW0gY29udGV4dDogICAgICBmdW5jdGlvbiBleGVjdXRpb24gY29udGV4dAogICAgOnBhcmFtIGFyY2hpdmVfdXJsOiAgdXJsIG9mIGFyY2hpdmUgZmlsZQogICAgOnBhcmFtIHN1YmRpcjogICAgICAgcGF0aCB3aXRoaW4gYXJ0aWZhY3Qgc3RvcmUgd2hlcmUgZXh0cmFjdGVkIGZpbGVzCiAgICAgICAgICAgICAgICAgICAgICAgICBhcmUgc3RvcmVkCiAgICA6cGFyYW0ga2V5OiAgICAgICAgICBrZXkgb2YgYXJjaGl2ZSBjb250ZW50cyBpbiBhcnRpZmFjdCBzdG9yZQogICAgIiIiCiAgICB0YXJnZXRfZGlyID0gb3MucGF0aC5qb2luKGNvbnRleHQuYXJ0aWZhY3RfcGF0aCwgc3ViZGlyKQogICAgb3MubWFrZWRpcnModGFyZ2V0X2RpciwgZXhpc3Rfb2s9VHJ1ZSkKICAgIAogICAgYXJjaGl2ZV91cmwgPSBzdHIoYXJjaGl2ZV91cmwpCiAgICBpZiBhcmNoaXZlX3VybC5lbmRzd2l0aCgiZ3oiKToKICAgICAgICB3aXRoIHRhcmZpbGUub3BlbihhcmNoaXZlX3VybCwgbW9kZT0icnxneiIpIGFzIHJlZjoKICAgICAgICAgICAgcmVmLmV4dHJhY3RhbGwodGFyZ2V0X2RpcikKICAgIGVsaWYgYXJjaGl2ZV91cmwuZW5kc3dpdGgoInppcCIpOgogICAgICAgIHdpdGggemlwZmlsZS5aaXBGaWxlKGFyY2hpdmVfdXJsLCAiciIpIGFzIHJlZjoKICAgICAgICAgICAgcmVmLmV4dHJhY3RhbGwodGFyZ2V0X2RpcikKICAgIGVsc2U6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcihmJ3Vuc3VwcG9ydGVkIGFyY2hpdmUgdHlwZSBpbiB7YXJjaGl2ZV91cmx9JykKICAgIAogICAgY29udGV4dC5sb2dfYXJ0aWZhY3Qoa2V5LCBsb2NhbF9wYXRoPXN1YmRpcikKCg==
     commands: []
-    code_origin: https://github.com/yjb-ds/functions.git#d02a24848fda9638b6b0f4a6a48c22c2f668c5f3:open_archive.ipynb
+    code_origin: https://github.com/yjb-ds/functions.git#43c6ce4b807e68feccd1333a2c005a43cd13ef5b:open_archive.ipynb

@@ -1,0 +1,52 @@
+kind: remote
+metadata:
+  name: iris-xgbclassifier
+  tag: latest
+  hash: 910d75be69fd866fc5db1922b8958630b53d4ffe
+  project: default
+  labels:
+    author: yaronh
+  categories:
+  - serving
+  - models
+  - XGBClassifier
+spec:
+  command: ''
+  args: []
+  image: ''
+  description: generic sklearn XGBClassifier model server
+  env:
+  - name: MODEL_CLASS
+    value: ClassifierModel
+  - name: ENABLE_EXPLAINER
+    value: 'False'
+  config:
+    spec.triggers.http:
+      kind: http
+      maxWorkers: 8
+      attributes:
+        ingresses: {}
+      annotations: {}
+  base_spec:
+    apiVersion: nuclio.io/v1
+    kind: nuclio:serving
+    metadata:
+      annotations:
+        nuclio.io/generated_by: function generated at 30-04-2020 by admin from /User/repos/functions/model_server/model_server.ipynb
+      labels: {}
+      name: iris-xgbclassifier
+    spec:
+      build:
+        baseImage: mlrun/ml-models:0.4.7-py37
+        commands:
+        - python -m pip install kfserving
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA0LTMwIDAxOjI1CgppbXBvcnQgb3MKZnJvbSBjbG91ZHBpY2tsZSBpbXBvcnQgbG9hZAppbXBvcnQga2ZzZXJ2aW5nCmltcG9ydCBudW1weSBhcyBucApmcm9tIHR5cGluZyBpbXBvcnQgTGlzdApmcm9tIGRhdGV0aW1lIGltcG9ydCBkYXRldGltZQoKY2xhc3MgQ2xhc3NpZmllck1vZGVsKGtmc2VydmluZy5LRk1vZGVsKToKICAgIGRlZiBfX2luaXRfXyhzZWxmLCBuYW1lOiBzdHIsIG1vZGVsX2Rpcjogc3RyLCBjbGFzc2lmaWVyID0gTm9uZSk6CiAgICAgICAgc3VwZXIoKS5fX2luaXRfXyhuYW1lKQogICAgICAgIHNlbGYubW9kZWxfZGlyID0gbW9kZWxfZGlyCiAgICAgICAgaWYgY2xhc3NpZmllcjoKICAgICAgICAgICAgc2VsZi5jbGFzc2lmaWVyID0gY2xhc3NpZmllcgogICAgICAgICAgICBzZWxmLnJlYWR5ID0gVHJ1ZQoKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgICIiIkxvYWQgbW9kZWwgZnJvbSBLdWJlRmxvdyBzdG9yYWdlLgogICAgICAgICIiIgogICAgICAgIGlmIHNlbGYubW9kZWxfZGlyLmVuZHN3aXRoKCcucGtsJyk6CiAgICAgICAgICAgIG1vZGVsX2ZpbGUgPSBzZWxmLm1vZGVsX2RpcgogICAgICAgIGVsc2U6CiAgICAgICAgICAgIGZvciBmaWxlIGluIG9zLnBhdGgubGlzdGRpcihzZWxmLm1vZGVsX2Rpcik6CiAgICAgICAgICAgICAgICBpZiBmaWxlLmVuZHN3aXRoKCcucGtsJyk6CiAgICAgICAgICAgICAgICAgICAgbW9kZWxfZmlsZSA9IG9zLnB0aC5qb2luKHNlbGYubW9kZWxfZGlyLCBmaWxlKQogICAgICAgICAgICAgICAgICAgIGJyZWFrCiAgICAgICAgc2VsZi5jbGFzc2lmaWVyID0gbG9hZChvcGVuKG1vZGVsX2ZpbGUsICdyYicpKQogICAgICAgIHNlbGYucmVhZHkgPSBUcnVlCgogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keTogZGljdCkgLT4gTGlzdDoKICAgICAgICAiIiJHZW5lcmF0ZSBtb2RlbCBwcmVkaWN0aW9ucyBmcm9tIHNhbXBsZS4KICAgICAgICAKICAgICAgICA6cGFyYW0gYm9keSA6IEEgZGljdCBvZiBvYnNlcnZhdGlvbnMsIGVhY2ggb2Ygd2hpY2ggaXMgYW4gMS1kaW1lbnNpb25hbCBmZWF0dXJlIHZlY3Rvci4KICAgICAgICAgICAgCiAgICAgICAgUmV0dXJucyBtb2RlbCBwcmVkaWN0aW9ucyBhcyBhIGBMaXN0YCwgb25lIGZvciBlYWNoIHJvdyBpbiB0aGUgYGJvZHlgIGlucHV0IGBMaXN0YC4KICAgICAgICAiIiIKICAgICAgICBzdGFydCA9IGRhdGV0aW1lLm5vdygpCiAgICAgICAgdHJ5OgogICAgICAgICAgICBmZWF0cyA9IG5wLmFzYXJyYXkoYm9keVsnaW5zdGFuY2VzJ10pCiAgICAgICAgICAgIHJlc3VsdDogbnAubmRhcnJheSA9IHNlbGYuY2xhc3NpZmllci5wcmVkaWN0KGZlYXRzKQogICAgICAgICAgICByZXNwID0gcmVzdWx0LnRvbGlzdCgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oZiJGYWlsZWQgdG8gcHJlZGljdCB7ZX0iKQogICAgICAgIAoKICAgICAgICByZXR1cm4gcmVzcAoKCmZyb20gbWxydW4ucnVudGltZXMgaW1wb3J0IG51Y2xpb19pbml0X2hvb2sKZGVmIGluaXRfY29udGV4dChjb250ZXh0KToKICAgIG51Y2xpb19pbml0X2hvb2soY29udGV4dCwgZ2xvYmFscygpLCAnc2VydmluZycpCgpkZWYgaGFuZGxlcihjb250ZXh0LCBldmVudCk6CiAgICByZXR1cm4gY29udGV4dC5tbHJ1bl9oYW5kbGVyKGNvbnRleHQsIGV2ZW50KQo=
+        noBaseImagesPull: true
+      env:
+      - name: MODEL_CLASS
+        value: ClassifierModel
+      handler: model_server:handler
+      runtime: python:3.6
+      volumes: []
+  source: ''
+  function_kind: serving

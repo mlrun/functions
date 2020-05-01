@@ -3,106 +3,64 @@
 
 This functions hub is intended to be a centralized location for open source contributions of function components.  These are functions expected to be run as independent mlrun pipeline compnents, and as public contributions, it is expected that contributors follow certain guidelines/protocols (please chip-in).
 
-## suggested steps through functions
+## data
 
-### data
-
-**[arc_to_parquet]()**<br>
+**[arc_to_parquet](arc_to_parquet/arc_to_parquet.ipynb)**<br>
 download remote archive files and save to parquet
 
-**[gen_class_data]()**<br>
+**[gen_class_data](gen_class_data/gen_class_data.ipynb)**<br>
 generate simulated classification data according to detailed specs.  Great for testing algorithms and metrics and whole pipelines.
 
-**[load_datasets]()**<br>
+**[load_datasets](load_datasets/load_datasets.ipynb)**<br>
 download toy datasets from sklearn, tensorflow datasets, and other data external curated datasets.
 
-**[open_archive]()**<br>
+**[open_archive](open_archive/open_archive.ipynb)**<br>
 download a zip or tar archive and extract its contents into a folder (preserving the directory structure)
 
-**[parquet_to_dask]()**<br>
+**[load_dask](load_dask/load_dask.ipynb)**<br>
 define a dask cluster, load your parquet data into it<br>
-access the dask client and dask dashboard throughout your mlrun pipeline<br>
-combine it with other mlrun dask components to build distributed machine and deep learning pipelines
 
-### modeling
+## explore
 
-**[feature engineering]()**
+**[describe](describe/describe.ipynb)**<br>
+estimate a set of descriptive statistics on pipeline data
 
-**[sklearn models]()**
-there are literally undreds of functions available that conform to the **[Scikit Learn]()** API. 
-this component enables training of any sklearn class has that has a fit function, so this includes estimators, tranformers, etc...<br>
-sklearn classes are input as strings<br>
-classes not in the sklearn package muct have an accompanying json file that is easy to create<br>
-xgboost and lightgbm default model configs are included in the samples-configs folder<br>
+**[describe_dask](describe/describe.ipynb)**<br>
+estimate a set of descriptive statistics on pipeline data that has been loaded into a dask cluster
 
-**[xgboost/lightgbm]()**
+## model
 
-**[neural networks]()**
+**[aggregate](aggregate/aggregate.ipynb)**<br>
+rolling aggregations on time seriesA
 
-**[tuning]()**
+**[feature_selection](feature_selection/feature_selection.ipynb)**<br>
+feture selection using the scikit feature-selection module
 
+**[sklearn classifier](sklearn_classifier/sklearn_classifier.ipynb)**<br>
+train any sklearn class has that has a fit function, including estimators, tranformers, etc...
 
-# Setup
+**[xgb_trainer](xgb_trainer/xgb_trainer.ipynb)**<br>
+train any one of 5 xgboost model types (classifier, regressor,...)
 
-The following setup instructions are for developers, and for regular users it is assumed that alot of this will be done by an as of **yet unwritten makefile script** that is part of the install process
+## serve
 
-1. for convenience, define some mlrun config path settings through environment variables
-2. **[set up](#setup)** a minimal conda environment for reproducibility
-3. do the **[suggested steps through functions](#suggetsed)** below
+**[tf1_serving](tf1_serving/tf1_serving.ipynb)**<br>
+deploy a tensorflow 1.x server
 
-## set up a conda environment
+**[tf2_serving](tf2_serving/tf2_serving.ipynb)**<br>
+deploy a tensorflow 2.x server
 
-### long way
+**[xgb_serving](xgb_serving/xgb_serving.ipynb)**<br>
+deploy any xgboost model
 
-to install the environment named **stable**, run the following commands in a terminal:
+**[model_server](model_server/model_server.ipynb)**<br>
+deploy an scikit-learn or almost any pickled model
 
-    conda config --add channels conda-forge
-    conda config --add channels anaconda
-    conda create -n stable numpy pandas scipy scikit-learn matplotlib seaborn pytest kfp pyarrow
-    conda install -n stable ipykernel
-    conda install -n stable -c DistrictDataLabs yellowbrick # to deprecate
-    
-at this point you should exit the terminal and refresh browser, open a new terminal:
+## test
 
-    conda activate stable
-    python -m ipykernel install --user --name=stable
-    python -m pip install git+https://github.com/mlrun/mlrun.git@development
-    git clone https://github.com/functions/functions.git@development
-    
-    # TODO
-    git clone https://github.com/functions/functions.git@development
-    functions/create-conda.sh or makefile/ci 
+**[model_server_tester](model_server_tester/model_server_tester.ipynb)**<br>
+deploy an scikit-learn or almost any pickled model
 
+**[test_classifier](test_classifier/test_classifier.ipynb)**<br>
+test a classifier's model against help-out or new data
 
-
-**dont't forget to always select the correct environment for your notebooks**
-
-### short way
-
-run the script conda-setup.sh
-
-Here is a **partial `conda list`** of the included packages:
-
-    # packages in environment at /User/.conda/envs/stable: 
-
-    # Name                    Version                   Build  Channel 
-    arrow-cpp                 0.15.1           py37h7cd5009_5    anaconda 
-    blas                      1.0                         mkl    anaconda 
-    intel-openmp              2020.0                      166    anaconda 
-    ipython                   7.13.0                   pypi_0    pypi 
-    joblib                    0.14.1                     py_0    anaconda 
-    lightgbm                  2.3.0            py37he6710b0_0    anaconda 
-    matplotlib                3.1.3                    py37_0    anaconda 
-    mkl                       2019.5                      281    anaconda 
-    numpy                     1.18.1           py37h4f9e942_0    anaconda 
-    pandas                    1.0.2            py37h0573a6f_0    anaconda 
-    pip                       20.0.2                   py37_1    anaconda 
-    pyarrow                   0.15.1           py37h0573a6f_0    anaconda 
-    pytest                    5.4.1                    py37_0    anaconda 
-    python                    3.7.6                h0371630_2    anaconda 
-    pyzmq                     19.0.0                   pypi_0    pypi 
-    scikit-learn              0.22.1           py37hd81dba3_0    anaconda 
-    scipy                     1.4.1            py37h0b6359f_0    anaconda 
-    seaborn                   0.10.0                     py_0    anaconda 
-    sqlite                    3.31.1               h7b6447c_0    anaconda 
-    xgboost                   1.0.2            py37h3340039_0    conda-forge

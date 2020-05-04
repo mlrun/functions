@@ -1,22 +1,76 @@
 kind: job
 metadata:
   name: gen-class-data
-  tag: latest
-  hash: 6a4bfdad948649ebc5dc02c2f45ac4463fde4969
+  tag: ''
+  hash: 7813b550f750dd4a1879648d7be08af648c12c7e
   project: ''
   labels:
     author: yjb
+    framework: sklearn
   categories:
-  - datagen
-  - filesutils
+  - simulators
+  - ml
 spec:
   command: ''
   args: []
   image: mlrun/ml-models
   env: []
   default_handler: gen_class_data
+  entry_points:
+    gen_class_data:
+      name: gen_class_data
+      doc: 'Create a binary classification sample dataset and save.
+
+        If no filename is given it will default to:
+
+        "simdata-{n_samples}X{m_features}.parquet".
+
+
+        Additional scikit-learn parameters can be set using **sk_params, please see
+        https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html
+        for more details.'
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: function context
+      - name: n_samples
+        type: int
+        doc: number of rows/samples
+      - name: m_features
+        type: int
+        doc: number of cols/features
+      - name: k_classes
+        type: int
+        doc: number of classes
+      - name: header
+        type: Optional[List[str]]
+        doc: header for features array
+      - name: label_column
+        type: Optional[str]
+        doc: column name of ground-truth series
+        default: labels
+      - name: weight
+        type: float
+        doc: fraction of sample negative value (ground-truth=0)
+        default: 0.5
+      - name: random_state
+        type: int
+        doc: rng seed (see https://scikit-learn.org/stable/glossary.html#term-random-state)
+        default: 1
+      - name: key
+        type: str
+        doc: key of data in artifact store
+        default: classifier-data
+      - name: file_ext
+        type: str
+        doc: (pqt) extension for parquet file
+        default: parquet
+      - name: sk_params
+        doc: additional parameters for `sklearn.datasets.make_classification`
+      outputs: []
+      lineno: 13
   description: simulate classification data using scikit-learn
   build:
-    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA0LTMwIDIwOjQyCgppbXBvcnQgb3MKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgcHlhcnJvdyBhcyBwYQppbXBvcnQgcHlhcnJvdy5wYXJxdWV0IGFzIHBxCmZyb20gdHlwaW5nIGltcG9ydCBPcHRpb25hbCwgTGlzdCwgQW55CmZyb20gc2tsZWFybi5kYXRhc2V0cyBpbXBvcnQgbWFrZV9jbGFzc2lmaWNhdGlvbgoKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CgoKZGVmIGdlbl9jbGFzc19kYXRhKAogICAgY29udGV4dDogTUxDbGllbnRDdHgsCiAgICBuX3NhbXBsZXM6IGludCwKICAgIG1fZmVhdHVyZXM6IGludCwKICAgIGtfY2xhc3NlczogaW50LAogICAgaGVhZGVyOiBPcHRpb25hbFtMaXN0W3N0cl1dLAogICAgbGFiZWxfY29sdW1uOiBPcHRpb25hbFtzdHJdID0gImxhYmVscyIsCiAgICB3ZWlnaHQ6IGZsb2F0ID0gMC41LAogICAgcmFuZG9tX3N0YXRlOiBpbnQgPSAxLAogICAga2V5OiBzdHIgPSAiY2xhc3NpZmllci1kYXRhIiwgCiAgICBmaWxlX2V4dDogc3RyID0gInBhcnF1ZXQiLAogICAgc2tfcGFyYW1zID0ge30KKToKICAgICIiIkNyZWF0ZSBhIGJpbmFyeSBjbGFzc2lmaWNhdGlvbiBzYW1wbGUgZGF0YXNldCBhbmQgc2F2ZS4KICAgIElmIG5vIGZpbGVuYW1lIGlzIGdpdmVuIGl0IHdpbGwgZGVmYXVsdCB0bzoKICAgICJzaW1kYXRhLXtuX3NhbXBsZXN9WHttX2ZlYXR1cmVzfS5wYXJxdWV0Ii4KICAgIAogICAgQWRkaXRpb25hbCBzY2lraXQtbGVhcm4gcGFyYW1ldGVycyBjYW4gYmUgc2V0IHVzaW5nICoqc2tfcGFyYW1zLCBwbGVhc2Ugc2VlIGh0dHBzOi8vc2Npa2l0LWxlYXJuLm9yZy9zdGFibGUvbW9kdWxlcy9nZW5lcmF0ZWQvc2tsZWFybi5kYXRhc2V0cy5tYWtlX2NsYXNzaWZpY2F0aW9uLmh0bWwgZm9yIG1vcmUgZGV0YWlscy4KICAgIAogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgIGZ1bmN0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBuX3NhbXBsZXM6ICAgICBudW1iZXIgb2Ygcm93cy9zYW1wbGVzCiAgICA6cGFyYW0gbV9mZWF0dXJlczogICAgbnVtYmVyIG9mIGNvbHMvZmVhdHVyZXMKICAgIDpwYXJhbSBrX2NsYXNzZXM6ICAgICBudW1iZXIgb2YgY2xhc3NlcwogICAgOnBhcmFtIGhlYWRlcjogICAgICAgIGhlYWRlciBmb3IgZmVhdHVyZXMgYXJyYXkKICAgIDpwYXJhbSBsYWJlbF9jb2x1bW46ICBjb2x1bW4gbmFtZSBvZiBncm91bmQtdHJ1dGggc2VyaWVzCiAgICA6cGFyYW0gd2VpZ2h0OiAgICAgICAgZnJhY3Rpb24gb2Ygc2FtcGxlIG5lZ2F0aXZlIHZhbHVlIChncm91bmQtdHJ1dGg9MCkKICAgIDpwYXJhbSByYW5kb21fc3RhdGU6ICBybmcgc2VlZCAoc2VlIGh0dHBzOi8vc2Npa2l0LWxlYXJuLm9yZy9zdGFibGUvZ2xvc3NhcnkuaHRtbCN0ZXJtLXJhbmRvbS1zdGF0ZSkKICAgIDpwYXJhbSBrZXk6ICAgICAgICAgICBrZXkgb2YgZGF0YSBpbiBhcnRpZmFjdCBzdG9yZQogICAgOnBhcmFtIGZpbGVfZXh0OiAgICAgIChwcXQpIGV4dGVuc2lvbiBmb3IgcGFycXVldCBmaWxlCiAgICA6cGFyYW0gc2tfcGFyYW1zOiAgICAgYWRkaXRpb25hbCBwYXJhbWV0ZXJzIGZvciBgc2tsZWFybi5kYXRhc2V0cy5tYWtlX2NsYXNzaWZpY2F0aW9uYAogICAgIiIiCiAgICBmZWF0dXJlcywgbGFiZWxzID0gbWFrZV9jbGFzc2lmaWNhdGlvbigKICAgICAgICBuX3NhbXBsZXM9bl9zYW1wbGVzLAogICAgICAgIG5fZmVhdHVyZXM9bV9mZWF0dXJlcywKICAgICAgICB3ZWlnaHRzPXdlaWdodCwKICAgICAgICBuX2NsYXNzZXM9a19jbGFzc2VzLAogICAgICAgIHJhbmRvbV9zdGF0ZT1yYW5kb21fc3RhdGUsIAogICAgICAgICoqc2tfcGFyYW1zKQoKICAgIFggPSBwZC5EYXRhRnJhbWUoZmVhdHVyZXMpCiAgICBpZiBub3QgaGVhZGVyOgogICAgICAgIFguY29sdW1ucyA9IFsiZmVhdF8iICsgc3RyKHgpIGZvciB4IGluIHJhbmdlKG1fZmVhdHVyZXMpXQogICAgZWxzZToKICAgICAgICBYLmNvbHVtbnMgPSBoZWFkZXIKCiAgICB5ID0gcGQuRGF0YUZyYW1lKGxhYmVscywgY29sdW1ucz1bbGFiZWxfY29sdW1uXSkKICAgIGRhdGEgPSBwZC5jb25jYXQoW1gsIHldLCBheGlzPTEpCiAgICAKICAgIGNvbnRleHQubG9nX2RhdGFzZXQoa2V5LCBkZj1kYXRhLCBmb3JtYXQ9ZmlsZV9leHQsIGluZGV4PUZhbHNlKQoK
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA1LTAxIDIyOjE4CgppbXBvcnQgb3MKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgcHlhcnJvdyBhcyBwYQppbXBvcnQgcHlhcnJvdy5wYXJxdWV0IGFzIHBxCmZyb20gdHlwaW5nIGltcG9ydCBPcHRpb25hbCwgTGlzdCwgQW55CmZyb20gc2tsZWFybi5kYXRhc2V0cyBpbXBvcnQgbWFrZV9jbGFzc2lmaWNhdGlvbgoKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CgoKZGVmIGdlbl9jbGFzc19kYXRhKAogICAgY29udGV4dDogTUxDbGllbnRDdHgsCiAgICBuX3NhbXBsZXM6IGludCwKICAgIG1fZmVhdHVyZXM6IGludCwKICAgIGtfY2xhc3NlczogaW50LAogICAgaGVhZGVyOiBPcHRpb25hbFtMaXN0W3N0cl1dLAogICAgbGFiZWxfY29sdW1uOiBPcHRpb25hbFtzdHJdID0gImxhYmVscyIsCiAgICB3ZWlnaHQ6IGZsb2F0ID0gMC41LAogICAgcmFuZG9tX3N0YXRlOiBpbnQgPSAxLAogICAga2V5OiBzdHIgPSAiY2xhc3NpZmllci1kYXRhIiwgCiAgICBmaWxlX2V4dDogc3RyID0gInBhcnF1ZXQiLAogICAgc2tfcGFyYW1zID0ge30KKToKICAgICIiIkNyZWF0ZSBhIGJpbmFyeSBjbGFzc2lmaWNhdGlvbiBzYW1wbGUgZGF0YXNldCBhbmQgc2F2ZS4KICAgIElmIG5vIGZpbGVuYW1lIGlzIGdpdmVuIGl0IHdpbGwgZGVmYXVsdCB0bzoKICAgICJzaW1kYXRhLXtuX3NhbXBsZXN9WHttX2ZlYXR1cmVzfS5wYXJxdWV0Ii4KICAgIAogICAgQWRkaXRpb25hbCBzY2lraXQtbGVhcm4gcGFyYW1ldGVycyBjYW4gYmUgc2V0IHVzaW5nICoqc2tfcGFyYW1zLCBwbGVhc2Ugc2VlIGh0dHBzOi8vc2Npa2l0LWxlYXJuLm9yZy9zdGFibGUvbW9kdWxlcy9nZW5lcmF0ZWQvc2tsZWFybi5kYXRhc2V0cy5tYWtlX2NsYXNzaWZpY2F0aW9uLmh0bWwgZm9yIG1vcmUgZGV0YWlscy4KICAgIAogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgIGZ1bmN0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBuX3NhbXBsZXM6ICAgICBudW1iZXIgb2Ygcm93cy9zYW1wbGVzCiAgICA6cGFyYW0gbV9mZWF0dXJlczogICAgbnVtYmVyIG9mIGNvbHMvZmVhdHVyZXMKICAgIDpwYXJhbSBrX2NsYXNzZXM6ICAgICBudW1iZXIgb2YgY2xhc3NlcwogICAgOnBhcmFtIGhlYWRlcjogICAgICAgIGhlYWRlciBmb3IgZmVhdHVyZXMgYXJyYXkKICAgIDpwYXJhbSBsYWJlbF9jb2x1bW46ICBjb2x1bW4gbmFtZSBvZiBncm91bmQtdHJ1dGggc2VyaWVzCiAgICA6cGFyYW0gd2VpZ2h0OiAgICAgICAgZnJhY3Rpb24gb2Ygc2FtcGxlIG5lZ2F0aXZlIHZhbHVlIChncm91bmQtdHJ1dGg9MCkKICAgIDpwYXJhbSByYW5kb21fc3RhdGU6ICBybmcgc2VlZCAoc2VlIGh0dHBzOi8vc2Npa2l0LWxlYXJuLm9yZy9zdGFibGUvZ2xvc3NhcnkuaHRtbCN0ZXJtLXJhbmRvbS1zdGF0ZSkKICAgIDpwYXJhbSBrZXk6ICAgICAgICAgICBrZXkgb2YgZGF0YSBpbiBhcnRpZmFjdCBzdG9yZQogICAgOnBhcmFtIGZpbGVfZXh0OiAgICAgIChwcXQpIGV4dGVuc2lvbiBmb3IgcGFycXVldCBmaWxlCiAgICA6cGFyYW0gc2tfcGFyYW1zOiAgICAgYWRkaXRpb25hbCBwYXJhbWV0ZXJzIGZvciBgc2tsZWFybi5kYXRhc2V0cy5tYWtlX2NsYXNzaWZpY2F0aW9uYAogICAgIiIiCiAgICBmZWF0dXJlcywgbGFiZWxzID0gbWFrZV9jbGFzc2lmaWNhdGlvbigKICAgICAgICBuX3NhbXBsZXM9bl9zYW1wbGVzLAogICAgICAgIG5fZmVhdHVyZXM9bV9mZWF0dXJlcywKICAgICAgICB3ZWlnaHRzPXdlaWdodCwKICAgICAgICBuX2NsYXNzZXM9a19jbGFzc2VzLAogICAgICAgIHJhbmRvbV9zdGF0ZT1yYW5kb21fc3RhdGUsIAogICAgICAgICoqc2tfcGFyYW1zKQoKICAgIFggPSBwZC5EYXRhRnJhbWUoZmVhdHVyZXMpCiAgICBpZiBub3QgaGVhZGVyOgogICAgICAgIFguY29sdW1ucyA9IFsiZmVhdF8iICsgc3RyKHgpIGZvciB4IGluIHJhbmdlKG1fZmVhdHVyZXMpXQogICAgZWxzZToKICAgICAgICBYLmNvbHVtbnMgPSBoZWFkZXIKCiAgICB5ID0gcGQuRGF0YUZyYW1lKGxhYmVscywgY29sdW1ucz1bbGFiZWxfY29sdW1uXSkKICAgIGRhdGEgPSBwZC5jb25jYXQoW1gsIHldLCBheGlzPTEpCiAgICAKICAgIGNvbnRleHQubG9nX2RhdGFzZXQoa2V5LCBkZj1kYXRhLCBmb3JtYXQ9ZmlsZV9leHQsIGluZGV4PUZhbHNlKQoK
     commands: []
-    code_origin: https://github.com/yjb-ds/functions.git#43c6ce4b807e68feccd1333a2c005a43cd13ef5b:gen_class_data.ipynb
+    code_origin: https://github.com/mlrun/functions.git#9ca1e1c57dc6bc9dca79f6fc1c30fc1cbcd6b086:gen_class_data.ipynb

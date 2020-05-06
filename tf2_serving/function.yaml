@@ -1,0 +1,61 @@
+kind: remote
+metadata:
+  name: tensorflow-v2-2layers
+  hash: f4e1ef356bb4a63b6d984697771ef5a56e734377
+  project: default
+  labels:
+    author: yaronh
+  categories:
+  - serving
+  - dl
+spec:
+  command: ''
+  args: []
+  image: ''
+  description: tf2 image classification server
+  min_replicas: 0
+  max_replicas: 4
+  env:
+  - name: SERVING_MODEL_cat_vs_dog_tfv2
+    value: tf2/cats_n_dogs.h5
+  - name: MODEL_CLASS
+    value: TFModel
+  - name: ENABLE_EXPLAINER
+    value: 'False'
+  - name: IMAGE_HEIGHT
+    value: 128
+  - name: IMAGE_WIDTH
+    value: 128
+  - name: classes_map
+    value: /User/artifacts/categories_map.json
+  config:
+    spec.triggers.http:
+      kind: http
+      maxWorkers: 8
+      attributes:
+        ingresses: {}
+      annotations: {}
+  base_spec:
+    apiVersion: nuclio.io/v1
+    kind: nuclio:serving
+    metadata:
+      annotations:
+        nuclio.io/generated_by: function generated at 04-05-2020 by admin from /User/functions/tf2_serving/tf2_serving.ipynb
+      labels: {}
+      name: tensorflow-v2-2layers
+    spec:
+      build:
+        baseImage: mlrun/ml-serving
+        commands:
+        - pip install tensorflow>=2.1
+        - pip install requests pillow
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA1LTA0IDIyOjM0CgoKCmltcG9ydCB3YXJuaW5ncwp3YXJuaW5ncy5zaW1wbGVmaWx0ZXIoYWN0aW9uPSJpZ25vcmUiLCBjYXRlZ29yeT1GdXR1cmVXYXJuaW5nKQoKaW1wb3J0IGpzb24KaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCByZXF1ZXN0cwpmcm9tIHRlbnNvcmZsb3cgaW1wb3J0IGtlcmFzCmZyb20gdGVuc29yZmxvdy5rZXJhcy5tb2RlbHMgaW1wb3J0IGxvYWRfbW9kZWwKZnJvbSB0ZW5zb3JmbG93LmtlcmFzLnByZXByb2Nlc3NpbmcgaW1wb3J0IGltYWdlCmZyb20gdGVuc29yZmxvdy5rZXJhcy5wcmVwcm9jZXNzaW5nLmltYWdlIGltcG9ydCBsb2FkX2ltZwpmcm9tIG9zIGltcG9ydCBlbnZpcm9uLCBwYXRoCmZyb20gUElMIGltcG9ydCBJbWFnZQpmcm9tIGlvIGltcG9ydCBCeXRlc0lPCmZyb20gdXJsbGliLnJlcXVlc3QgaW1wb3J0IHVybG9wZW4KaW1wb3J0IG1scnVuCgpjbGFzcyBURk1vZGVsKG1scnVuLnJ1bnRpbWVzLk1MTW9kZWxTZXJ2ZXIpOgogICAgZGVmIF9faW5pdF9fKHNlbGYsIG5hbWU6IHN0ciwgbW9kZWxfZGlyOiBzdHIpOgogICAgICAgIHN1cGVyKCkuX19pbml0X18obmFtZSwgbW9kZWxfZGlyKQoKICAgICAgICBzZWxmLklNQUdFX1dJRFRIID0gaW50KGVudmlyb24uZ2V0KCdJTUFHRV9XSURUSCcsICcxMjgnKSkKICAgICAgICBzZWxmLklNQUdFX0hFSUdIVCA9IGludChlbnZpcm9uLmdldCgnSU1BR0VfSEVJR0hUJywgJzEyOCcpKQogICAgICAgIAogICAgICAgIHRyeToKICAgICAgICAgICAgd2l0aCBvcGVuKGVudmlyb25bJ2NsYXNzZXNfbWFwJ10sICdyJykgYXMgZjoKICAgICAgICAgICAgICAgIHNlbGYuY2xhc3NlcyA9IGpzb24ubG9hZChmKQogICAgICAgIGV4Y2VwdDoKICAgICAgICAgICAgc2VsZi5jbGFzc2VzID0gTm9uZQogICAgICAgIAogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgbW9kZWxfZmlsZSwgZXh0cmFfZGF0YSA9IHNlbGYuZ2V0X21vZGVsKCcuaDUnKQogICAgICAgIHNlbGYubW9kZWwgPSBsb2FkX21vZGVsKG1vZGVsX2ZpbGUpCiAgICAgICAgCiAgICBkZWYgcHJlcHJvY2VzcyhzZWxmLCBib2R5KToKICAgICAgICB0cnk6CiAgICAgICAgICAgIG91dHB1dCA9IHsnaW5zdGFuY2VzJzogW119CiAgICAgICAgICAgIGluc3RhbmNlcyA9IGJvZHkuZ2V0KCdpbnN0YW5jZXMnLCBbXSkKICAgICAgICAgICAgZm9yIGJ5dGVfaW1hZ2UgaW4gaW5zdGFuY2VzOgogICAgICAgICAgICAgICAgaW1nID0gSW1hZ2Uub3BlbihieXRlX2ltYWdlKQogICAgICAgICAgICAgICAgaW1nID0gaW1nLnJlc2l6ZSgoc2VsZi5JTUFHRV9XSURUSCwgc2VsZi5JTUFHRV9IRUlHSFQpKQoKICAgICAgICAgICAgICAgIHggPSBpbWFnZS5pbWdfdG9fYXJyYXkoaW1nKQogICAgICAgICAgICAgICAgeCA9IG5wLmV4cGFuZF9kaW1zKHgsIGF4aXM9MCkKICAgICAgICAgICAgICAgIG91dHB1dFsnaW5zdGFuY2VzJ10uYXBwZW5kKHgpCiAgICAgICAgICAgIAogICAgICAgICAgICBvdXRwdXRbJ2luc3RhbmNlcyddID0gW25wLnZzdGFjayhvdXRwdXRbJ2luc3RhbmNlcyddKV0KICAgICAgICAgICAgcmV0dXJuIG91dHB1dAogICAgICAgIGV4Y2VwdDoKICAgICAgICAgICAgcmFpc2UgRXhjZXB0aW9uKGYncmVjZWl2ZWQ6IHtib2R5fScpCiAgICAgICAgICAgIAoKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGRhdGEpOgogICAgICAgIGltYWdlcyA9IGRhdGEuZ2V0KCdpbnN0YW5jZXMnLCBbXSkKCiAgICAgICAgcHJlZGljdGVkX3Byb2JhYmlsaXR5ID0gc2VsZi5tb2RlbC5wcmVkaWN0KGltYWdlcykKCiAgICAgICAgcmV0dXJuIHByZWRpY3RlZF9wcm9iYWJpbGl0eQogICAgICAgIAogICAgZGVmIHBvc3Rwcm9jZXNzKHNlbGYsIHByZWRpY3RlZF9wcm9iYWJpbGl0eSk6CiAgICAgICAgaWYgc2VsZi5jbGFzc2VzOgogICAgICAgICAgICBwcmVkaWN0ZWRfY2xhc3NlcyA9IG5wLmFyb3VuZChwcmVkaWN0ZWRfcHJvYmFiaWxpdHksIDEpLnRvbGlzdCgpWzBdCiAgICAgICAgICAgIHByZWRpY3RlZF9wcm9iYWJpbGl0aWVzID0gcHJlZGljdGVkX3Byb2JhYmlsaXR5LnRvbGlzdCgpWzBdCiAgICAgICAgICAgIHJldHVybiB7CiAgICAgICAgICAgICAgICAncHJlZGljdGlvbic6IFtzZWxmLmNsYXNzZXNbc3RyKGludChjbHMpKV0gZm9yIGNscyBpbiBwcmVkaWN0ZWRfY2xhc3Nlc10sIAogICAgICAgICAgICAgICAgZid7c2VsZi5jbGFzc2VzWyIxIl19LXByb2JhYmlsaXR5JzogcHJlZGljdGVkX3Byb2JhYmlsaXRpZXMKICAgICAgICAgICAgfQogICAgICAgIGVsc2U6CiAgICAgICAgICAgIHJldHVybiBwcmVkaWN0ZWRfcHJvYmFiaWxpdHkudG9saXN0KClbMF0KCgpmcm9tIG1scnVuLnJ1bnRpbWVzIGltcG9ydCBudWNsaW9faW5pdF9ob29rCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBudWNsaW9faW5pdF9ob29rKGNvbnRleHQsIGdsb2JhbHMoKSwgJ3NlcnZpbmcnKQoKZGVmIGhhbmRsZXIoY29udGV4dCwgZXZlbnQpOgogICAgcmV0dXJuIGNvbnRleHQubWxydW5faGFuZGxlcihjb250ZXh0LCBldmVudCkK
+        noBaseImagesPull: true
+      env:
+      - name: MODEL_CLASS
+        value: TF2Model
+      handler: tf2_serving:handler
+      runtime: python:3.6
+      volumes: []
+  source: ''
+  function_kind: serving

@@ -1,88 +1,133 @@
 aggregate:
   categories:
-  - preprocessing
+  - data-prep
   description: Rolling aggregation over Metrics and Lables according to specifications
+  kind: job
   versions:
-    latest: hub://aggregate
+    latest: aggregate/function.yaml
 arc-to-parquet:
   categories:
-  - fileutils
-  - retrieve
+  - data-movement
+  - utils
   description: retrieve remote archive, open and save as parquet
+  kind: job
   versions:
-    latest: hub://arc_to_parquet
+    latest: arc_to_parquet/function.yaml
 describe:
   categories:
-  - models
-  - visualization
+  - analysis
   description: describe and visualizes dataset stats
+  kind: job
   versions:
-    latest: hub://describe
+    latest: describe/function.yaml
 describe-dask:
   categories:
-  - models
-  - visualization
+  - analysis
   description: describe and visualizes dataset stats
+  kind: job
   versions:
-    latest: hub://describe_dask
+    latest: describe_dask/function.yaml
+feature-selection:
+  categories:
+  - data-prep
+  - ml
+  description: Select features through multiple Statistical and Model filters
+  kind: job
+  versions:
+    latest: feature_selection/function.yaml
 gen-class-data:
   categories:
-  - datagen
-  - filesutils
+  - simulators
+  - ml
   description: simulate classification data using scikit-learn
+  kind: job
   versions:
-    latest: hub://gen_class_data
+    latest: gen_class_data/function.yaml
+iris-xgb-serving:
+  categories:
+  - serving
+  - ml
+  description: xgboost iris classification server
+  kind: remote
+  versions:
+    latest: xgb_serving/function.yaml
 load-dask:
   categories:
-  - fileutils
-  - distributed
+  - data-movement
+  - utils
   description: load dask cluster with data
+  kind: dask
   versions:
-    latest: hub://load_dask
+    latest: load_dask/function.yaml
 load-dataset:
   categories:
-  - datagen
-  - filesutils
+  - data-source
+  - ml
   description: load a toy dataset from scikit-learn
+  kind: job
   versions:
-    latest: hub://load_dataset
+    latest: load_dataset/function.yaml
 model-server-tester:
   categories:
-  - models
-  - testing
+  - ml
+  - test
   description: test model servers
+  kind: job
   versions:
-    latest: hub://model_server_tester
+    latest: model_server_tester/function.yaml
 open-archive:
   categories:
-  - fileutils
-  - retrieve
+  - data-movement
+  - utils
   description: Open a file/object archive into a target directory
+  kind: job
   versions:
-    latest: hub://open_archive
+    latest: open_archive/function.yaml
 sklearn-classifier:
   categories:
-  - models
-  - classifier
+  - ml
+  - training
   description: train any classifier using scikit-learn's API
+  kind: job
   versions:
-    latest: hub://sklearn_classifier
+    latest: sklearn_classifier/function.yaml
 sklearn-server:
   categories:
   - serving
-  - models
+  - ml
   description: generic sklearn model server
+  kind: remote
   versions:
-    latest: hub://model_server
+    latest: model_server/function.yaml
+tensorflow-v1-2layers:
+  categories:
+  - serving
+  - dl
+  description: tf1 image classification server
+  kind: remote
+  versions:
+    latest: tf1_serving/function.yaml
+tensorflow-v2-2layers:
+  categories:
+  - serving
+  - dl
+  description: tf2 image classification server
+  kind: remote
+  versions:
+    latest: tf2_serving/function.yaml
 test-classifier:
   categories:
-  - models
-  - testing
+  - ml
+  - test
   description: test a classifier using held-out or new data
+  kind: job
   versions:
-    latest: hub://test_classifier
-tf-images-server:
-  categories: []
-  description: ''
+    latest: test_classifier/function.yaml
+xgb-trainer:
+  categories:
+  - training
+  - ml
+  description: train any classifier using scikit-learn's API
+  kind: job
   versions:
-    latest: hub://tf-serving
+    latest: xgb_trainer/function.yaml

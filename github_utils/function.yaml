@@ -1,0 +1,51 @@
+kind: job
+metadata:
+  name: github-utils
+  tag: ''
+  hash: af0ee96960438a5bd916f735a7e1ea0382c9cf6c
+  project: ''
+  labels:
+    author: yaronh
+  categories:
+  - notifications
+  - utils
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  env: []
+  default_handler: run_summary_comment
+  entry_points:
+    pr_comment:
+      name: pr_comment
+      doc: ''
+      parameters:
+      - name: context
+      - name: repo
+        type: str
+      - name: issue
+        type: int
+      - name: message
+        type: str
+      - name: message_file
+        type: DataItem
+      outputs: []
+      lineno: 7
+    run_summary_comment:
+      name: run_summary_comment
+      doc: ''
+      parameters:
+      - name: context
+      - name: project
+      - name: workflow_id
+      - name: repo
+        type: str
+      - name: issue
+        type: int
+      outputs: []
+      lineno: 27
+  description: add comments to github pull requests
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA1LTA5IDIzOjI5CgppbXBvcnQgcmVxdWVzdHMKaW1wb3J0IG9zCmZyb20gbWxydW4gaW1wb3J0IERhdGFJdGVtLCBnZXRfcnVuX2RiCgpkZWYgcHJfY29tbWVudChjb250ZXh0LCByZXBvOiBzdHIsIGlzc3VlIDogaW50LAogICAgICAgICAgICAgICBtZXNzYWdlOiBzdHIgPSAnJywgCiAgICAgICAgICAgICAgIG1lc3NhZ2VfZmlsZTogRGF0YUl0ZW0gPSBOb25lKToKCiAgICB0b2tlbiA9IGNvbnRleHQuZ2V0X3NlY3JldCgnR0lUSFVCX1RPS0VOJykgb3Igb3MuZW52aXJvbi5nZXQoJ0dJVEhVQl9UT0tFTicpCiAgICBpZiBtZXNzYWdlX2ZpbGUgYW5kIG5vdCBtZXNzYWdlOgogICAgICAgIG1lc3NhZ2UgPSBtZXNzYWdlX2ZpbGUuZ2V0KCkKICAgIGVsaWYgbm90IG1lc3NhZ2UgYW5kIG5vdCBtZXNzYWdlX2ZpbGU6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcigncHIgbWVzc2FnZSBvciBtZXNzYWdlIGZpbGUgbXVzdCBiZSBwcm92aWRlZCcpCiAgICAgICAgCiAgICBoZWFkZXJzID0geydBY2NlcHQnOiAnYXBwbGljYXRpb24vdm5kLmdpdGh1Yi52Mytqc29uJywKICAgICAgICAgICAgICAgJ0F1dGhvcml6YXRpb24nOiBmJ3Rva2VuIHt0b2tlbn0nfQogICAgdXJsID0gZidodHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL3tyZXBvfS9pc3N1ZXMve2lzc3VlfS9jb21tZW50cycKCiAgICByZXNwID0gcmVxdWVzdHMucG9zdCh1cmw9dXJsLCBqc29uPXsiYm9keSI6IHN0cihtZXNzYWdlKX0sIGhlYWRlcnM9aGVhZGVycykKICAgIGlmIG5vdCByZXNwLm9rOgogICAgICAgIGVycm1zZyA9IGYnYmFkIHByIGNvbW1lbnQgcmVzcCEhXG57cmVzcC50ZXh0fScKICAgICAgICBjb250ZXh0LmxvZ2dlci5lcnJvcihlcnJtc2cpCiAgICAgICAgcmFpc2UgSU9FcnJvcihlcnJtc2cpCiAgICAKZGVmIHJ1bl9zdW1tYXJ5X2NvbW1lbnQoY29udGV4dCwgcHJvamVjdCwgd29ya2Zsb3dfaWQsIHJlcG86IHN0ciwgaXNzdWUgOiBpbnQpOgogICAgaWYgbm90IHJlcG86CiAgICAgICAgcHJpbnQoJ3JlcG8gbm90IGRlZmluZWQnKQogICAgICAgIHJldHVybgogICAgCiAgICBkYiA9IGdldF9ydW5fZGIoKS5jb25uZWN0KCkKICAgIGh0bWwgPSBkYi5saXN0X3J1bnMocHJvamVjdD1wcm9qZWN0LCBsYWJlbHM9Zid3b3JrZmxvdz17d29ya2Zsb3dfaWR9Jykuc2hvdyhkaXNwbGF5PUZhbHNlKQogICAgcHJfY29tbWVudChjb250ZXh0LCByZXBvLCBpc3N1ZSwgaHRtbCkKICAgIAoK
+    commands: []
+    code_origin: github_utils.ipynb

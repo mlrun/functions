@@ -1,0 +1,43 @@
+kind: job
+metadata:
+  name: slack-notify
+  tag: ''
+  hash: aa798813aa29a98db80b7ecba3516ef074b6c3e2
+  project: ''
+  labels:
+    author: mdl
+  categories:
+  - ops
+spec:
+  command: ''
+  args: []
+  image: python:3.6-jessie
+  env: []
+  default_handler: slack_notify
+  entry_points:
+    slack_notify:
+      name: slack_notify
+      doc: Summarize a table
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+      - name: webhook_url
+        type: str
+        doc: 'Slack incoming webhook URL. Please read: https://api.slack.com/messaging/webhooks'
+        default: URL
+      - name: slack_blocks
+        type: List[str]
+        doc: Message blocks list. NOT IMPLEMENTED YET
+      - name: notification_text
+        type: str
+        doc: Notification text
+        default: Notification
+      outputs: []
+      lineno: 12
+  description: Send Slack notification
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA1LTEzIDE5OjUwCgppbXBvcnQgd2FybmluZ3MKd2FybmluZ3Muc2ltcGxlZmlsdGVyKGFjdGlvbj0naWdub3JlJywgY2F0ZWdvcnk9RnV0dXJlV2FybmluZykKCmltcG9ydCBvcwppbXBvcnQganNvbgppbXBvcnQgcmVxdWVzdHMKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CgpkZWYgc2xhY2tfbm90aWZ5KAogICAgY29udGV4dDogTUxDbGllbnRDdHgsCiAgICB3ZWJob29rX3VybDogc3RyID0gIlVSTCIsCiAgICBzbGFja19ibG9ja3M6ICBMaXN0W3N0cl0gPSBbXSwKICAgIG5vdGlmaWNhdGlvbl90ZXh0OiBzdHIgPSAiTm90aWZpY2F0aW9uIgopIC0+IE5vbmU6CiAgICAiIiJTdW1tYXJpemUgYSB0YWJsZQogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgICAgdGhlIGZ1bmN0aW9uIGNvbnRleHQKICAgIDpwYXJhbSB3ZWJob29rX3VybDogICAgIFNsYWNrIGluY29taW5nIHdlYmhvb2sgVVJMLiBQbGVhc2UgcmVhZDogaHR0cHM6Ly9hcGkuc2xhY2suY29tL21lc3NhZ2luZy93ZWJob29rcwogICAgOnBhcmFtIG5vdGlmaWNhdGlvbl90ZXh0OiAgICAgICAgICAgIE5vdGlmaWNhdGlvbiB0ZXh0CiAgICA6cGFyYW0gc2xhY2tfYmxvY2tzOiAgICAgICAgICBNZXNzYWdlIGJsb2NrcyBsaXN0LiBOT1QgSU1QTEVNRU5URUQgWUVUCiAgICAiIiIKICAgIAogICAgZGF0YSA9IHsKICAgICAgICAndGV4dCc6IG5vdGlmaWNhdGlvbl90ZXh0CiAgICB9CiAgICBwcmludCgiPT09PSIsd2ViaG9va191cmwpCiAgICByZXNwb25zZSA9IHJlcXVlc3RzLnBvc3Qod2ViaG9va191cmwsIGRhdGE9anNvbi5kdW1wcygKICAgICAgICBkYXRhKSwgaGVhZGVycz17J0NvbnRlbnQtVHlwZSc6ICdhcHBsaWNhdGlvbi9qc29uJ30pCgogICAgcHJpbnQoJ1Jlc3BvbnNlOiAnICsgc3RyKHJlc3BvbnNlLnRleHQpKQogICAgcHJpbnQoJ1Jlc3BvbnNlIGNvZGU6ICcgKyBzdHIocmVzcG9uc2Uuc3RhdHVzX2NvZGUpKQoK
+    commands:
+    - pip install requests
+    code_origin: https://github.com/mlrun/functions#a6f58f7f76402efbf01a8454cec8475b873851b6:slack_notify.ipynb

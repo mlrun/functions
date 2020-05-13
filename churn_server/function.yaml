@@ -1,0 +1,54 @@
+kind: remote
+metadata:
+  name: churn-test
+  hash: eb27f21fc4ed154e3a5ef40ec68311fecd071420
+  project: default
+  labels:
+    author: yashab
+    framework: churn
+  categories:
+  - serving
+  - ml
+spec:
+  command: ''
+  args: []
+  image: ''
+  description: churn classification and predictor
+  min_replicas: 0
+  max_replicas: 4
+  env:
+  - name: SERVING_MODEL_churn_server_v1
+    value: /User/artifacts/churn/models
+  - name: MODEL_CLASS
+    value: ChurnModel
+  - name: ENABLE_EXPLAINER
+    value: 'False'
+  config:
+    spec.triggers.http:
+      kind: http
+      maxWorkers: 8
+      attributes:
+        ingresses: {}
+      annotations: {}
+  base_spec:
+    apiVersion: nuclio.io/v1
+    kind: nuclio:serving
+    metadata:
+      annotations:
+        nuclio.io/generated_by: function generated at 13-05-2020 by admin from /User/repos/functions/churn_server/churn_server.ipynb
+      labels: {}
+      name: churn-test
+    spec:
+      build:
+        baseImage: mlrun/ml-models:0.4.8
+        commands: []
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA1LTEzIDIxOjIxCgoKCmltcG9ydCBvcwppbXBvcnQganNvbgppbXBvcnQgbnVtcHkgYXMgbnAKaW1wb3J0IHhnYm9vc3QgYXMgeGdiCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGxvYWQKZnJvbSBsaWZlbGluZXMgaW1wb3J0IENveFBIRml0dGVyLCBLYXBsYW5NZWllckZpdHRlcgppbXBvcnQgeGdib29zdCBhcyB4Z2IKCgppbXBvcnQgbWxydW4KY2xhc3MgQ2h1cm5Nb2RlbChtbHJ1bi5ydW50aW1lcy5NTE1vZGVsU2VydmVyKToKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgICIiIgogICAgICAgIGxvYWQgbXVsdGlwbGUgbW9kZWxzIGluIG5lc3RlZCBmb2xkZXJzLCBjaHVybiBtb2RlbCBvbmx5CiAgICAgICAgIiIiCiAgICAgICAgY2xmX21vZGVsX2ZpbGUsIGV4dHJhX2RhdGEgPSBzZWxmLmdldF9tb2RlbCgiLnBrbCIpCiAgICAgICAgc2VsZi5tb2RlbCA9IGxvYWQob3BlbihzdHIoY2xmX21vZGVsX2ZpbGUpLCAicmIiKSkKICAgICAgICAKICAgICAgICBpZiAiY294IiBpbiBleHRyYV9kYXRhLmtleXMoKToKICAgICAgICAgICAgY294X21vZGVsX2ZpbGUgPSBleHRyYV9kYXRhWyJjb3giXQogICAgICAgICAgICBzZWxmLmNveF9tb2RlbCA9IGxvYWQob3BlbihzdHIoY294X21vZGVsX2ZpbGUpLCAicmIiKSkKICAgICAgICAgICAgaWYgImNveC9rbSIgaW4gZXh0cmFfZGF0YS5rZXlzKCk6CiAgICAgICAgICAgICAgICBrbV9tb2RlbF9maWxlID0gZXh0cmFfZGF0YVsiY294L2ttIl0KICAgICAgICAgICAgICAgIHNlbGYua21fbW9kZWwgPSBsb2FkKG9wZW4oc3RyKGttX21vZGVsX2ZpbGUpLCAicmIiKSkKICAgICAgICByZXR1cm4KCiAgICBkZWYgcHJlZGljdChzZWxmLCBib2R5KToKICAgICAgICB0cnk6CiAgICAgICAgICAgIGZlYXRzID0gbnAuYXNhcnJheShib2R5WyJpbnN0YW5jZXMiXSwgZHR5cGU9bnAuZmxvYXQzMikucmVzaGFwZSgtMSwgMjMpCiAgICAgICAgICAgIHJlc3VsdCA9IHNlbGYubW9kZWwucHJlZGljdChmZWF0cywgdmFsaWRhdGVfZmVhdHVyZXM9RmFsc2UpCiAgICAgICAgICAgIHJldHVybiByZXN1bHQudG9saXN0KCkKICAgICAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgICAgIHJhaXNlIEV4Y2VwdGlvbigiRmFpbGVkIHRvIHByZWRpY3QgJXMiICUgZSkKCgpmcm9tIG1scnVuLnJ1bnRpbWVzIGltcG9ydCBudWNsaW9faW5pdF9ob29rCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBudWNsaW9faW5pdF9ob29rKGNvbnRleHQsIGdsb2JhbHMoKSwgJ3NlcnZpbmcnKQoKZGVmIGhhbmRsZXIoY29udGV4dCwgZXZlbnQpOgogICAgcmV0dXJuIGNvbnRleHQubWxydW5faGFuZGxlcihjb250ZXh0LCBldmVudCkK
+        noBaseImagesPull: true
+      env:
+      - name: MODEL_CLASS
+        value: ChurnModel
+      handler: churn_server:handler
+      runtime: python:3.6
+      volumes: []
+  source: ''
+  function_kind: serving

@@ -1,0 +1,95 @@
+kind: job
+metadata:
+  name: cox-hazards
+  tag: ''
+  hash: 07ee63b562bf21034466563a29403c6f7cd8ae79
+  project: ''
+  labels:
+    author: yjb
+    framework: survival
+  categories:
+  - training
+  - ml
+spec:
+  command: ''
+  args: []
+  image: mlrun/ml-models:0.4.8
+  env: []
+  default_handler: train_model
+  entry_points:
+    train_model:
+      name: train_model
+      doc: "train models to predict the timing of events\n\nAlthough identical in\
+        \ structure to other training functions, this one\nrequires generating a 'Y'\
+        \ that represents the age/duration/tenure of\nthe obervation, designated 'tenure'\
+        \ here, and a binary labels columns that\nrepresents the event of interest,\
+        \ churned/not-churned.\n\nIn addition, there is a strata_cols parameter, representing\
+        \ a list of \nstratification (aka grouping) variables."
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+      - name: dataset
+        type: DataItem
+        doc: ("data") name of raw data file
+      - name: event_column
+        type: str
+        doc: ground-truth (y) labels (considered as events in this model)
+        default: labels
+      - name: time_column
+        type: str
+        doc: age or tenure column
+        default: tenure
+      - name: encode_cols
+        type: dict
+        doc: dictionary of names and prefixes for columns that are to hot be encoded.
+          (diff strata_cols)
+      - name: strata_cols
+        type: list
+        doc: columns used to stratify analysis (aka groups)
+      - name: plot_cov_groups
+        type: bool
+      - name: p_value
+        type: float
+        doc: (0.005) max p value for coeffcients selected
+        default: 0.005
+      - name: enc_drop_first
+        type: bool
+        doc: (True) whether to drop the first column of hot encoded  variables (avoid
+          column exact dependencies)
+        default: true
+      - name: sample
+        type: int
+        doc: Selects the first n rows, or select a sample starting from the first.
+          If negative <-1, select a random sample
+        default: <_ast.USub object at 0x7f07095109b0>
+      - name: test_size
+        type: float
+        doc: (0.25) test set size
+        default: 0.25
+      - name: valid_size
+        type: float
+        doc: (0.75) Once the test set has been removed the training set gets this
+          proportion.
+        default: 0.75
+      - name: random_state
+        type: int
+        doc: (1) sklearn rng seed
+        default: 1
+      - name: models_dest
+        type: str
+        doc: destination subfolder for model artifacts
+      - name: plots_dest
+        type: str
+        doc: destination subfolder for plot artifacts
+      - name: file_ext
+        type: str
+        doc: format for test_set_key hold out data
+        default: csv
+      outputs: []
+      lineno: 89
+  description: train any classifier using scikit-learn's API
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA1LTEzIDIwOjQ1CgppbXBvcnQgd2FybmluZ3MKd2FybmluZ3Muc2ltcGxlZmlsdGVyKGFjdGlvbj0iaWdub3JlIiwgY2F0ZWdvcnk9RnV0dXJlV2FybmluZykKCmZyb20gbWxydW4ubWx1dGlscyBpbXBvcnQgKGdldF9zYW1wbGUsCiAgICAgICAgICAgICAgICAgICAgIGdldF9zcGxpdHMsCiAgICAgICAgICAgICAgICAgICAgIGdlbl9za2xlYXJuX21vZGVsLAogICAgICAgICAgICAgICAgICAgICBjcmVhdGVfY2xhc3MsIAogICAgICAgICAgICAgICAgICAgICBldmFsX2NsYXNzX21vZGVsLAogICAgICAgICAgICAgICAgICAgICBnY2ZfY2xlYXIpCgpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCmZyb20gbWxydW4uYXJ0aWZhY3RzIGltcG9ydCBQbG90QXJ0aWZhY3QsIFRhYmxlQXJ0aWZhY3QKCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzCmltcG9ydCBwYW5kYXMgYXMgcGQKaW1wb3J0IG9zCgpmcm9tIGxpZmVsaW5lcyBpbXBvcnQgQ294UEhGaXR0ZXIsIEthcGxhbk1laWVyRml0dGVyCgpkZWYgX2NveHBoX2xvZ19tb2RlbCgKICAgIGNvbnRleHQsCiAgICBtb2RlbCwgCiAgICBkYXRhc2V0X2tleTogc3RyICA9ICJjb3hoYXphcmQtc3VtbWFyeSIsCiAgICBtb2RlbHNfZGVzdDogc3RyID0gIm1vZGVscyIsCiAgICBwbG90X2Nvdl9ncm91cHM6IGJvb2wgPSBGYWxzZSwKICAgIHBfdmFsdWU6IGZsb2F0ID0gMC4wMDUsCiAgICBwbG90X2tleTogc3RyICA9ICJrbS1jeCIsCiAgICBwbG90c19kZXN0OiBzdHIgPSAicGxvdHMiLAogICAgZmlsZV9leHQ9ImNzdiIsCiAgICBleHRyYV9kYXRhOiBkaWN0ID0ge30KKToKICAgICIiImxvZyBhIGNveHBoIG1vZGVsIChhbmQgc3VibW9kZWwgbG9jYXRpb25zKQogICAgCiAgICA6cGFyYW0gbW9kZWw6ICAgICAgICBlc3RpbWF0ZWQgY294cGggbW9kZWwKICAgIDpwYXJhbSBleHRyYV9kYXRhOiAgIGlmIHRoaXMgbW9kZWwgd2FudHMgdG8gc3RvcmUgdGhlIGxvY2F0aW9ucyBvZiBzdWJtb2RlbHMKICAgICAgICAgICAgICAgICAgICAgICAgIHVzZSB0aGlzCiAgICAiIiIKICAgIGltcG9ydCBtYXRwbG90bGliLnB5cGxvdCBhcyBwbHQKICAgIAogICAgc3VtdGJsID0gbW9kZWwuc3VtbWFyeQogICAgCiAgICBjb250ZXh0LmxvZ19kYXRhc2V0KGRhdGFzZXRfa2V5LCBkZj1zdW10YmwsCiAgICAgICAgICAgICAgICAgICAgICAgIGluZGV4PVRydWUsIGZvcm1hdD1maWxlX2V4dCkKCiAgICBtb2RlbF9iaW4gPSBkdW1wcyhtb2RlbCkKICAgIGNvbnRleHQubG9nX21vZGVsKCJtb2RlbCIsIGJvZHk9bW9kZWxfYmluLCAKICAgICAgICAgICAgICAgICAgICAgIGFydGlmYWN0X3BhdGg9b3MucGF0aC5qb2luKGNvbnRleHQuYXJ0aWZhY3RfcGF0aCwgbW9kZWxzX2Rlc3QpLAogICAgICAgICAgICAgICAgICAgICAgbW9kZWxfZmlsZT0ibW9kZWwucGtsIikKICAgIGlmIHBsb3RfY292X2dyb3VwczoKICAgICAgICBzZWxlY3RfY292YXJzID0gc3VtbWFyeVtzdW1tYXJ5LnA8PXBfdmFsdWVdLmluZGV4LnZhbHVlcwogICAgICAgIGZvciBncm91cCBpbiBzZWxlY3RfY292YXJzOgogICAgICAgICAgICBheHMgPSBtb2RlbC5wbG90X2NvdmFyaWF0ZV9ncm91cHMoZ3JvdXAsIHZhbHVlcz1bMCwgMV0pCiAgICAgICAgICAgIGZvciBpeCwgYXggaW4gZW51bWVyYXRlKGF4cyk6CiAgICAgICAgICAgICAgICBmID0gYXguZ2V0X2ZpZ3VyZSgpCiAgICAgICAgICAgICAgICBjb250ZXh0LmxvZ19hcnRpZmFjdCgKICAgICAgICAgICAgICAgICAgICBQbG90QXJ0aWZhY3QoZiJjeC17Z3JvdXB9LXtpeH0iLCBib2R5PXBsdC5nY2YoKSksIAogICAgICAgICAgICAgICAgICAgIGxvY2FsX3BhdGg9ZiJ7cGxvdHNfZGVzdH0vY3gte2dyb3VwfS17aXh9Lmh0bWwiKQogICAgICAgICAgICAgICAgZ2NmX2NsZWFyKHBsdCkKCmRlZiBfa2FwbGFuX21laWVyX2xvZ19tb2RlbCgKICAgIGNvbnRleHQsCiAgICBtb2RlbCwgCiAgICB0aW1lX2NvbHVtbjogc3RyID0gInRlbnVyZSIsCiAgICBkYXRhc2V0X2tleTogc3RyICA9ICJrbS10aW1lbGluZXMiLAogICAgcGxvdF9rZXk6IHN0ciAgPSAia20tc3Vydml2YWwiLAogICAgcGxvdHNfZGVzdDogc3RyID0gInBsb3RzIiwKICAgIG1vZGVsc19kZXN0OiBzdHIgPSAibW9kZWxzIiwKICAgIGZpbGVfZXh0OiBzdHIgPSAiY3N2IgopOgogICAgaW1wb3J0IG1hdHBsb3RsaWIucHlwbG90IGFzIHBsdAogICAgbyA9IFtdCiAgICBmb3Igb2JqIGluIG1vZGVsLl9fZGljdF9fLmtleXMoKToKICAgICAgICBpZiBpc2luc3RhbmNlKG1vZGVsLl9fZGljdF9fW29ial0sIHBkLkRhdGFGcmFtZSk6CiAgICAgICAgICAgIG8uYXBwZW5kKG1vZGVsLl9fZGljdF9fW29ial0pCiAgICBkZiA9IHBkLmNvbmNhdChvLCBheGlzPTEpCiAgICBkZi5pbmRleC5uYW1lID0gdGltZV9jb2x1bW4KICAgIGNvbnRleHQubG9nX2RhdGFzZXQoZGF0YXNldF9rZXksIGRmPWRmLCBpbmRleD1UcnVlLCBmb3JtYXQ9ZmlsZV9leHQpCiAgICBtb2RlbC5wbG90KCkKICAgIGNvbnRleHQubG9nX2FydGlmYWN0KFBsb3RBcnRpZmFjdChwbG90X2tleSwgYm9keT1wbHQuZ2NmKCkpLCAKICAgICAgICAgICAgICAgICAgICAgICAgIGxvY2FsX3BhdGg9ZiJ7cGxvdHNfZGVzdH0ve3Bsb3Rfa2V5fS5odG1sIikKICAgIGNvbnRleHQubG9nX21vZGVsKCJtb2RlbCIsIAogICAgICAgICAgICAgICAgICAgICAgYm9keT1kdW1wcyhtb2RlbCksIAogICAgICAgICAgICAgICAgICAgICAgbW9kZWxfZGlyPWYie21vZGVsc19kZXN0fS9rbSIsIAogICAgICAgICAgICAgICAgICAgICAgbW9kZWxfZmlsZT0ibW9kZWwucGtsIikKCmRlZiB0cmFpbl9tb2RlbCgKICAgIGNvbnRleHQ6IE1MQ2xpZW50Q3R4LAogICAgZGF0YXNldDogRGF0YUl0ZW0sCiAgICBldmVudF9jb2x1bW46IHN0ciA9ICJsYWJlbHMiLAogICAgdGltZV9jb2x1bW46IHN0ciA9ICJ0ZW51cmUiLAogICAgZW5jb2RlX2NvbHM6IGRpY3QgPSB7fSwKICAgIHN0cmF0YV9jb2xzOiBsaXN0ID0gW10sCiAgICBwbG90X2Nvdl9ncm91cHM6IGJvb2wgPSBGYWxzZSwKICAgIHBfdmFsdWU6IGZsb2F0ID0gMC4wMDUsCiAgICBlbmNfZHJvcF9maXJzdDogYm9vbCA9IFRydWUsCiAgICBzYW1wbGU6IGludCA9IC0xLAogICAgdGVzdF9zaXplOiBmbG9hdCA9IDAuMjUsCiAgICB2YWxpZF9zaXplOiBmbG9hdCA9IDAuNzUsICMgKGFmdGVyIHRlc3QgcmVtb3ZlZCkKICAgIHJhbmRvbV9zdGF0ZTogaW50ID0gMSwKICAgIG1vZGVsc19kZXN0OiBzdHIgPSAiIiwKICAgIHBsb3RzX2Rlc3Q6IHN0ciA9ICIiLAogICAgZmlsZV9leHQ6IHN0ciA9ICJjc3YiLAopIC0+IE5vbmU6CiAgICAiIiJ0cmFpbiBtb2RlbHMgdG8gcHJlZGljdCB0aGUgdGltaW5nIG9mIGV2ZW50cwogICAgCiAgICBBbHRob3VnaCBpZGVudGljYWwgaW4gc3RydWN0dXJlIHRvIG90aGVyIHRyYWluaW5nIGZ1bmN0aW9ucywgdGhpcyBvbmUKICAgIHJlcXVpcmVzIGdlbmVyYXRpbmcgYSAnWScgdGhhdCByZXByZXNlbnRzIHRoZSBhZ2UvZHVyYXRpb24vdGVudXJlIG9mCiAgICB0aGUgb2JlcnZhdGlvbiwgZGVzaWduYXRlZCAndGVudXJlJyBoZXJlLCBhbmQgYSBiaW5hcnkgbGFiZWxzIGNvbHVtbnMgdGhhdAogICAgcmVwcmVzZW50cyB0aGUgZXZlbnQgb2YgaW50ZXJlc3QsIGNodXJuZWQvbm90LWNodXJuZWQuCiAgICAKICAgIEluIGFkZGl0aW9uLCB0aGVyZSBpcyBhIHN0cmF0YV9jb2xzIHBhcmFtZXRlciwgcmVwcmVzZW50aW5nIGEgbGlzdCBvZiAKICAgIHN0cmF0aWZpY2F0aW9uIChha2EgZ3JvdXBpbmcpIHZhcmlhYmxlcy4KICAgIAogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgICAgICB0aGUgZnVuY3Rpb24gY29udGV4dAogICAgOnBhcmFtIGRhdGFzZXQ6ICAgICAgICAgICAoImRhdGEiKSBuYW1lIG9mIHJhdyBkYXRhIGZpbGUKICAgIDpwYXJhbSBldmVudF9jb2x1bW46ICAgICAgZ3JvdW5kLXRydXRoICh5KSBsYWJlbHMgKGNvbnNpZGVyZWQgYXMgZXZlbnRzIGluIHRoaXMgbW9kZWwpCiAgICA6cGFyYW0gdGltZV9jb2x1bW46ICAgICAgIGFnZSBvciB0ZW51cmUgY29sdW1uCiAgICA6cGFyYW0gZW5jb2RlX2NvbHM6ICAgICAgIGRpY3Rpb25hcnkgb2YgbmFtZXMgYW5kIHByZWZpeGVzIGZvciBjb2x1bW5zIHRoYXQgYXJlCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRvIGhvdCBiZSBlbmNvZGVkLiAoZGlmZiBzdHJhdGFfY29scykKICAgIDpwYXJhbSBlbmNfZHJvcF9maXJzdDogICAgKFRydWUpIHdoZXRoZXIgdG8gZHJvcCB0aGUgZmlyc3QgY29sdW1uIG9mIGhvdCBlbmNvZGVkIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YXJpYWJsZXMgKGF2b2lkIGNvbHVtbiBleGFjdCBkZXBlbmRlbmNpZXMpCiAgICA6cGFyYW0gc3RyYXRhX2NvbHM6ICAgICAgIGNvbHVtbnMgdXNlZCB0byBzdHJhdGlmeSBhbmFseXNpcyAoYWthIGdyb3VwcykKICAgIDpwYXJhbSBwX3ZhbHVlOiAgICAgICAgICAgKDAuMDA1KSBtYXggcCB2YWx1ZSBmb3IgY29lZmZjaWVudHMgc2VsZWN0ZWQKICAgIDpwYXJhbSBzYW1wbGU6ICAgICAgICAgICAgU2VsZWN0cyB0aGUgZmlyc3QgbiByb3dzLCBvciBzZWxlY3QgYSBzYW1wbGUKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RhcnRpbmcgZnJvbSB0aGUgZmlyc3QuIElmIG5lZ2F0aXZlIDwtMSwgc2VsZWN0CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGEgcmFuZG9tIHNhbXBsZQogICAgOnBhcmFtIHRlc3Rfc2l6ZTogICAgICAgICAoMC4yNSkgdGVzdCBzZXQgc2l6ZQogICAgOnBhcmFtIHZhbGlkX3NpemU6ICAgICAgICAoMC43NSkgT25jZSB0aGUgdGVzdCBzZXQgaGFzIGJlZW4gcmVtb3ZlZCB0aGUKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdHJhaW5pbmcgc2V0IGdldHMgdGhpcyBwcm9wb3J0aW9uLgogICAgOnBhcmFtIHJhbmRvbV9zdGF0ZTogICAgICAoMSkgc2tsZWFybiBybmcgc2VlZAogICAgOnBhcmFtIG1vZGVsc19kZXN0OiAgICAgICBkZXN0aW5hdGlvbiBzdWJmb2xkZXIgZm9yIG1vZGVsIGFydGlmYWN0cwogICAgOnBhcmFtIHBsb3RzX2Rlc3Q6ICAgICAgICBkZXN0aW5hdGlvbiBzdWJmb2xkZXIgZm9yIHBsb3QgYXJ0aWZhY3RzCiAgICA6cGFyYW0gZmlsZV9leHQ6ICAgICAgICAgIGZvcm1hdCBmb3IgdGVzdF9zZXRfa2V5IGhvbGQgb3V0IGRhdGEKICAgICIiIgogICAgZnJvbSBsaWZlbGluZXMucGxvdHRpbmcgaW1wb3J0IHBsb3RfbGlmZXRpbWVzCiAgICBpbXBvcnQgbWF0cGxvdGxpYi5weXBsb3QgYXMgcGx0CiAgICAKICAgIG1vZGVsc19kZXN0ID0gbW9kZWxzX2Rlc3Qgb3IgIm1vZGVscyIKICAgIHBsb3RzX2Rlc3QgPSBwbG90c19kZXN0IG9yIGYicGxvdHMve2NvbnRleHQubmFtZX0iCiAgICAKICAgIHJhdywgdGVudXJlLCBoZWFkZXIgPSBnZXRfc2FtcGxlKGRhdGFzZXQsIHNhbXBsZSwgdGltZV9jb2x1bW4pCgogICAgaWYgZW5jb2RlX2NvbHM6CiAgICAgICAgcmF3ID0gcGQuZ2V0X2R1bW1pZXMocmF3LCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb2x1bW5zPWxpc3QoZW5jb2RlX2NvbHMua2V5cygpKSwgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcHJlZml4PWxpc3QoZW5jb2RlX2NvbHMudmFsdWVzKCkpLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkcm9wX2ZpcnN0PWVuY19kcm9wX2ZpcnN0KQoKICAgICh4dHJhaW4sIHl0cmFpbiksICh4dmFsaWQsIHl2YWxpZCksICAgICAgICAgKHh0ZXN0LCB5dGVzdCksIF8gPSBnZXRfc3BsaXRzKHJhdywgdGVudXJlLCAzLCB0ZXN0X3NpemUsIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWxpZF9zaXplLCBbdGltZV9jb2x1bW5dLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByYW5kb21fc3RhdGUpCiAgICBmb3IgWCBpbiBbeHRyYWluLCB4dmFsaWQsIHh0ZXN0XToKICAgICAgICBkcm9wX2NvbHMgPSBYLmNvbHVtbnMuc3RyLnN0YXJ0c3dpdGgodGltZV9jb2x1bW4pCiAgICAgICAgWC5kcm9wKFguY29sdW1uc1tkcm9wX2NvbHNdLCBheGlzPTEsIGlucGxhY2U9VHJ1ZSkKICAgIGZvciBZIGluIFt5dHJhaW4sIHl2YWxpZCwgeXRlc3RdOgogICAgICAgIFkubmFtZSA9IHRpbWVfY29sdW1uCiAgICAKICAgIGNvbnRleHQubG9nX2RhdGFzZXQoInRlbnVyZWQtdGVzdC1zZXQiLCAKICAgICAgICAgICAgICAgICAgICAgICAgZGY9cGQuY29uY2F0KFt4dGVzdCwgeXRlc3QudG9fZnJhbWUoKV0sIGF4aXM9MSksIAogICAgICAgICAgICAgICAgICAgICAgICBmb3JtYXQ9ZmlsZV9leHQsIGluZGV4PUZhbHNlKQoKICAgIGttX21vZGVsID0gS2FwbGFuTWVpZXJGaXR0ZXIoKS5maXQoeXRyYWluLCB4dHJhaW4ubGFiZWxzKQogICAgX2thcGxhbl9tZWllcl9sb2dfbW9kZWwoY29udGV4dCwga21fbW9kZWwsIG1vZGVsc19kZXN0PW1vZGVsc19kZXN0KQogICAgCiAgICBjb3hkYXRhID0gcGQuY29uY2F0KFt4dHJhaW4sIHl0cmFpbi50b19mcmFtZSgpXSwgYXhpcz0xKQogICAgY3hfbW9kZWwgPSBDb3hQSEZpdHRlcigpLmZpdChjb3hkYXRhLCB0aW1lX2NvbHVtbiwgZXZlbnRfY29sdW1uLCBzdHJhdGE9c3RyYXRhX2NvbHMpICAgIAogICAgX2NveHBoX2xvZ19tb2RlbChjb250ZXh0LCBjeF9tb2RlbCwgbW9kZWxzX2Rlc3Q9bW9kZWxzX2Rlc3QsIAogICAgICAgICAgICAgICAgICAgICBwbG90X2Nvdl9ncm91cHM9cGxvdF9jb3ZfZ3JvdXBzLCAKICAgICAgICAgICAgICAgICAgICAgZXh0cmFfZGF0YT17ImttIjogZiJ7bW9kZWxzX2Rlc3R9L2ttIn0pCgo=
+    commands: []
+    code_origin: https://github.com/yjb-ds/functions.git#8645360c007329479cd2978eba44ef4c2784e859:cox_hazards.ipynb

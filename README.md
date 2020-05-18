@@ -1,66 +1,116 @@
-# function hub (wip)
+# Functions hub 
+
+This functions hub is intended to be a centralized location for open source contributions of function components.  
+These are functions expected to be run as independent mlrun pipeline compnents, and as public contributions, 
+it is expected that contributors follow certain guidelines/protocols (please chip-in).
+
+## Functions
 
 
-This functions hub is intended to be a centralized location for open source contributions of function components.  These are functions expected to be run as independent mlrun pipeline compnents, and as public contributions, it is expected that contributors follow certain guidelines/protocols (please chip-in).
+### [aggregate (job)](aggregate/aggregate.ipynb)
 
-## data
+Rolling aggregation over Metrics and Lables according to specifications
 
-**[arc_to_parquet](arc_to_parquet/arc_to_parquet.ipynb)**<br>
-download remote archive files and save to parquet
+categories: data-prep
 
-**[gen_class_data](gen_class_data/gen_class_data.ipynb)**<br>
-generate simulated classification data according to detailed specs.  Great for testing algorithms and metrics and whole pipelines.
+### [arc-to-parquet (job)](arc_to_parquet/arc_to_parquet.ipynb)
 
-**[load_datasets](load_datasets/load_datasets.ipynb)**<br>
-download toy datasets from sklearn, tensorflow datasets, and other data external curated datasets.
+retrieve remote archive, open and save as parquet
 
-**[open_archive](open_archive/open_archive.ipynb)**<br>
-download a zip or tar archive and extract its contents into a folder (preserving the directory structure)
+categories: data-movement, utils
 
-**[load_dask](load_dask/load_dask.ipynb)**<br>
-define a dask cluster, load your parquet data into it<br>
+### [describe (job)](describe/describe.ipynb)
 
-## explore
+describe and visualizes dataset stats
 
-**[describe](describe/describe.ipynb)**<br>
-estimate a set of descriptive statistics on pipeline data
+categories: analysis
 
-**[describe_dask](describe/describe.ipynb)**<br>
-estimate a set of descriptive statistics on pipeline data that has been loaded into a dask cluster
+### [describe-dask (job)](describe_dask/describe_dask.ipynb)
 
-## model
+describe and visualizes dataset stats
 
-**[aggregate](aggregate/aggregate.ipynb)**<br>
-rolling aggregations on time seriesA
+categories: analysis
 
-**[feature_selection](feature_selection/feature_selection.ipynb)**<br>
-feture selection using the scikit feature-selection module
+### [feature-selection (job)](feature_selection/feature_selection.ipynb)
 
-**[sklearn classifier](sklearn_classifier/sklearn_classifier.ipynb)**<br>
-train any sklearn class has that has a fit function, including estimators, tranformers, etc...
+Select features through multiple Statistical and Model filters
 
-**[xgb_trainer](xgb_trainer/xgb_trainer.ipynb)**<br>
-train any one of 5 xgboost model types (classifier, regressor,...)
+categories: data-prep, ml
 
-## serve
+### [gen-class-data (job)](gen_class_data/gen_class_data.ipynb)
 
-**[tf1_serving](tf1_serving/tf1_serving.ipynb)**<br>
-deploy a tensorflow 1.x server
+simulate classification data using scikit-learn
 
-**[tf2_serving](tf2_serving/tf2_serving.ipynb)**<br>
-deploy a tensorflow 2.x server
+categories: simulators, ml
 
-**[xgb_serving](xgb_serving/xgb_serving.ipynb)**<br>
-deploy any xgboost model
+### [github-utils (job)](github_utils/github_utils.ipynb)
 
-**[model_server](model_server/model_server.ipynb)**<br>
-deploy an scikit-learn or almost any pickled model
+add comments to github pull requests
 
-## test
+categories: notifications, utils
 
-**[model_server_tester](model_server_tester/model_server_tester.ipynb)**<br>
-deploy an scikit-learn or almost any pickled model
+### [load-dask (dask)](load_dask/load_dask.ipynb)
 
-**[test_classifier](test_classifier/test_classifier.ipynb)**<br>
-test a classifier's model against help-out or new data
+load dask cluster with data
 
+categories: data-movement, utils
+
+### [load-dataset (job)](load_dataset/load_dataset.ipynb)
+
+load a toy dataset from scikit-learn
+
+categories: data-source, ml
+
+### [sklearn-server (nuclio)](model_server/model_server.ipynb)
+
+generic sklearn model server
+
+categories: serving, ml
+
+### [model-server-tester (job)](model_server_tester/model_server_tester.ipynb)
+
+test model servers
+
+categories: ml, test
+
+### [open-archive (job)](open_archive/open_archive.ipynb)
+
+Open a file/object archive into a target directory
+
+categories: data-movement, utils
+
+### [sklearn-classifier (job)](sklearn_classifier/sklearn_classifier.ipynb)
+
+train any classifier using scikit-learn's API
+
+categories: ml, training
+
+### [test-classifier (job)](test_classifier/test_classifier.ipynb)
+
+test a classifier using held-out or new data
+
+categories: ml, test
+
+### [tensorflow-v1-2layers (nuclio)](tf1_serving/tf1_serving.ipynb)
+
+tf1 image classification server
+
+categories: serving, dl
+
+### [tensorflow-v2-2layers (nuclio)](tf2_serving/tf2_serving.ipynb)
+
+tf2 image classification server
+
+categories: serving, dl
+
+### [iris-xgb-serving (nuclio)](xgb_serving/xgb_serving.ipynb)
+
+xgboost iris classification server
+
+categories: serving, ml
+
+### [xgb-trainer (job)](xgb_trainer/xgb_trainer.ipynb)
+
+train any classifier using scikit-learn's API
+
+categories: training, ml

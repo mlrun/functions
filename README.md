@@ -19,6 +19,24 @@ retrieve remote archive, open and save as parquet
 
 categories: data-movement, utils
 
+### [churn-test (nuclio)](churn_server/churn_server.ipynb)
+
+churn classification and predictor
+
+categories: serving, ml
+
+### [cox-test (job)](coxph_test/coxph_test.ipynb)
+
+test a classifier using held-out or new data
+
+categories: ml, test
+
+### [cox-hazards (job)](coxph_trainer/coxph_trainer.ipynb)
+
+train any classifier using scikit-learn's API
+
+categories: training, ml
+
 ### [describe (job)](describe/describe.ipynb)
 
 describe and visualizes dataset stats
@@ -85,6 +103,12 @@ train any classifier using scikit-learn's API
 
 categories: ml, training
 
+### [slack-notify (job)](slack_notify/slack_notify.ipynb)
+
+Send Slack notification
+
+categories: ops
+
 ### [test-classifier (job)](test_classifier/test_classifier.ipynb)
 
 test a classifier using held-out or new data
@@ -109,8 +133,14 @@ xgboost iris classification server
 
 categories: serving, ml
 
+### [xgb-test (job)](xgb_test/xgb_test.ipynb)
+
+test a classifier using held-out or new data
+
+categories: ml, test
+
 ### [xgb-trainer (job)](xgb_trainer/xgb_trainer.ipynb)
 
-train any classifier using scikit-learn's API
+train multiple model types using xgboost
 
-categories: training, ml
+categories: training, ml, experimental

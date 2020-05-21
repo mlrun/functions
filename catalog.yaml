@@ -15,6 +15,33 @@ arc-to-parquet:
   kind: job
   versions:
     latest: arc_to_parquet/function.yaml
+churn-test:
+  categories:
+  - serving
+  - ml
+  description: churn classification and predictor
+  docfile: churn_server/churn_server.ipynb
+  kind: remote
+  versions:
+    latest: churn_server/function.yaml
+cox-hazards:
+  categories:
+  - training
+  - ml
+  description: train any classifier using scikit-learn's API
+  docfile: coxph_trainer/coxph_trainer.ipynb
+  kind: job
+  versions:
+    latest: coxph_trainer/function.yaml
+cox-test:
+  categories:
+  - ml
+  - test
+  description: test a classifier using held-out or new data
+  docfile: coxph_test/coxph_test.ipynb
+  kind: job
+  versions:
+    latest: coxph_test/function.yaml
 describe:
   categories:
   - analysis
@@ -121,6 +148,14 @@ sklearn-server:
   kind: remote
   versions:
     latest: model_server/function.yaml
+slack-notify:
+  categories:
+  - ops
+  description: Send Slack notification
+  docfile: slack_notify/slack_notify.ipynb
+  kind: job
+  versions:
+    latest: slack_notify/function.yaml
 tensorflow-v1-2layers:
   categories:
   - serving
@@ -148,11 +183,21 @@ test-classifier:
   kind: job
   versions:
     latest: test_classifier/function.yaml
+xgb-test:
+  categories:
+  - ml
+  - test
+  description: test a classifier using held-out or new data
+  docfile: xgb_test/xgb_test.ipynb
+  kind: job
+  versions:
+    latest: xgb_test/function.yaml
 xgb-trainer:
   categories:
   - training
   - ml
-  description: train any classifier using scikit-learn's API
+  - experimental
+  description: train multiple model types using xgboost
   docfile: xgb_trainer/xgb_trainer.ipynb
   kind: job
   versions:

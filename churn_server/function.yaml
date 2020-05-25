@@ -1,7 +1,7 @@
 kind: remote
 metadata:
   name: churn-test
-  hash: 4a25be34fdfe3ae37bac559041f057e169f244de
+  hash: 9fe03d4e4df8c920fb17c7a4e8b90e6405ae4897
   project: default
   labels:
     author: yashab
@@ -35,12 +35,12 @@ spec:
     kind: nuclio:serving
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 19-05-2020
+        nuclio.io/generated_by: function generated from 25-05-2020
       labels: {}
       name: churn-test
     spec:
       build:
-        baseImage: yjbds/ml-models:0.4.7
+        baseImage: yjbds/ml-models:0.4.8
         commands: []
         functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKCgppbXBvcnQgb3MKaW1wb3J0IGpzb24KaW1wb3J0IG51bXB5IGFzIG5wCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGxvYWQKCgppbXBvcnQgbWxydW4KY2xhc3MgQ2h1cm5Nb2RlbChtbHJ1bi5ydW50aW1lcy5NTE1vZGVsU2VydmVyKToKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgICIiIgogICAgICAgIGxvYWQgbXVsdGlwbGUgbW9kZWxzIGluIG5lc3RlZCBmb2xkZXJzLCBjaHVybiBtb2RlbCBvbmx5CiAgICAgICAgIiIiCiAgICAgICAgY2xmX21vZGVsX2ZpbGUsIGV4dHJhX2RhdGEgPSBzZWxmLmdldF9tb2RlbCgiLnBrbCIpCiAgICAgICAgc2VsZi5tb2RlbCA9IGxvYWQob3BlbihzdHIoY2xmX21vZGVsX2ZpbGUpLCAicmIiKSkKICAgICAgICAKICAgICAgICBpZiAiY294IiBpbiBleHRyYV9kYXRhLmtleXMoKToKICAgICAgICAgICAgY294X21vZGVsX2ZpbGUgPSBleHRyYV9kYXRhWyJjb3giXQogICAgICAgICAgICBzZWxmLmNveF9tb2RlbCA9IGxvYWQob3BlbihzdHIoY294X21vZGVsX2ZpbGUpLCAicmIiKSkKICAgICAgICAgICAgaWYgImNveC9rbSIgaW4gZXh0cmFfZGF0YS5rZXlzKCk6CiAgICAgICAgICAgICAgICBrbV9tb2RlbF9maWxlID0gZXh0cmFfZGF0YVsiY294L2ttIl0KICAgICAgICAgICAgICAgIHNlbGYua21fbW9kZWwgPSBsb2FkKG9wZW4oc3RyKGttX21vZGVsX2ZpbGUpLCAicmIiKSkKICAgICAgICByZXR1cm4KCiAgICBkZWYgcHJlZGljdChzZWxmLCBib2R5KToKICAgICAgICB0cnk6CiAgICAgICAgICAgIGZlYXRzID0gbnAuYXNhcnJheShib2R5WyJpbnN0YW5jZXMiXSwgZHR5cGU9bnAuZmxvYXQzMikucmVzaGFwZSgtMSwgMjMpCiAgICAgICAgICAgIHJlc3VsdCA9IHNlbGYubW9kZWwucHJlZGljdChmZWF0cywgdmFsaWRhdGVfZmVhdHVyZXM9RmFsc2UpCiAgICAgICAgICAgIHJldHVybiByZXN1bHQudG9saXN0KCkKICAgICAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgICAgIHJhaXNlIEV4Y2VwdGlvbigiRmFpbGVkIHRvIHByZWRpY3QgJXMiICUgZSkKCgpmcm9tIG1scnVuLnJ1bnRpbWVzIGltcG9ydCBudWNsaW9faW5pdF9ob29rCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBudWNsaW9faW5pdF9ob29rKGNvbnRleHQsIGdsb2JhbHMoKSwgJ3NlcnZpbmcnKQoKZGVmIGhhbmRsZXIoY29udGV4dCwgZXZlbnQpOgogICAgcmV0dXJuIGNvbnRleHQubWxydW5faGFuZGxlcihjb250ZXh0LCBldmVudCkK
         noBaseImagesPull: true

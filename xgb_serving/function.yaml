@@ -1,7 +1,7 @@
 kind: remote
 metadata:
-  name: iris-xgb-serving
-  hash: c33b95d5e33514b3ce3cd5d12c6a0b4504d04af1
+  name: xgb-test
+  hash: b46f842187ed1e5d6a0b8696e5df17cf3e5bb69d
   project: default
   labels:
     author: yaronh
@@ -13,12 +13,12 @@ spec:
   command: ''
   args: []
   image: ''
-  description: xgboost iris classification server
+  description: xgboost test data classification server
   min_replicas: 0
   max_replicas: 4
   env:
-  - name: SERVING_MODEL_iris_v1
-    value: /User/artifacts/xgb_trainer/models/xgb-model-save_model.json
+  - name: SERVING_MODEL_xgb_serving_v2
+    value: /home/jovyan/data/models
   - name: MODEL_CLASS
     value: XGBoostModel
   - name: ENABLE_EXPLAINER
@@ -35,15 +35,14 @@ spec:
     kind: nuclio:serving
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated at 02-05-2020 by admin from /User/functions/xgb_serving/xgb_serving.ipynb
+        nuclio.io/generated_by: function generated from 25-05-2020
       labels: {}
-      name: iris-xgb-serving
+      name: xgb-test
     spec:
       build:
-        baseImage: mlrun/ml-serving
-        commands:
-        - pip install xgboost
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA1LTAyIDAxOjEyCgoKCmltcG9ydCBvcwppbXBvcnQganNvbgppbXBvcnQgbnVtcHkgYXMgbnAKaW1wb3J0IHhnYm9vc3QgYXMgeGdiCgppbXBvcnQgbWxydW4KY2xhc3MgWEdCb29zdE1vZGVsKG1scnVuLnJ1bnRpbWVzLk1MTW9kZWxTZXJ2ZXIpOgogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgbW9kZWxfZmlsZSwgZXh0cmFfZGF0YSA9IHNlbGYuZ2V0X21vZGVsKCcuanNvbicpCiAgICAgICAgc2VsZi5tb2RlbCA9IHhnYi5Cb29zdGVyKG1vZGVsX2ZpbGU9bW9kZWxfZmlsZSkKICAgIAogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keSk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBucF9hcnJheV8yZCA9IG5wLmFzYXJyYXkoYm9keVsnaW5zdGFuY2VzJ10sIGR0eXBlPW5wLmZsb2F0MzIpLnJlc2hhcGUoLTEsMSkKICAgICAgICAgICAgZG1hdHJpeCA9IHhnYi5ETWF0cml4KG5wX2FycmF5XzJkKQogICAgICAgICAgICByZXN1bHQ6IHhnYi5ETWF0cml4ID0gc2VsZi5tb2RlbC5wcmVkaWN0KGRtYXRyaXgpCiAgICAgICAgICAgIHJldHVybiByZXN1bHQudG9saXN0KCkKICAgICAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgICAgIHJhaXNlIEV4Y2VwdGlvbigiRmFpbGVkIHRvIHByZWRpY3QgJXMiICUgZSkKCgpmcm9tIG1scnVuLnJ1bnRpbWVzIGltcG9ydCBudWNsaW9faW5pdF9ob29rCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBudWNsaW9faW5pdF9ob29rKGNvbnRleHQsIGdsb2JhbHMoKSwgJ3NlcnZpbmcnKQoKZGVmIGhhbmRsZXIoY29udGV4dCwgZXZlbnQpOgogICAgcmV0dXJuIGNvbnRleHQubWxydW5faGFuZGxlcihjb250ZXh0LCBldmVudCkK
+        baseImage: yjbds/ml-models:0.4.8
+        commands: []
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKCgppbXBvcnQgb3MKaW1wb3J0IGpzb24KaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCB4Z2Jvb3N0IGFzIHhnYgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCgoKaW1wb3J0IG1scnVuCmNsYXNzIFhHQm9vc3RNb2RlbChtbHJ1bi5ydW50aW1lcy5NTE1vZGVsU2VydmVyKToKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgIG1vZGVsX2ZpbGUsIGV4dHJhX2RhdGEgPSBzZWxmLmdldF9tb2RlbCgiLnBrbCIpCiAgICAgICAgc2VsZi5tb2RlbCA9IGxvYWQob3BlbihzdHIobW9kZWxfZmlsZSksICJyYiIpKQogIAoKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGJvZHkpOgogICAgICAgIHRyeToKICAgICAgICAgICAgZmVhdHMgPSBucC5hc2FycmF5KGJvZHlbImluc3RhbmNlcyJdLCBkdHlwZT1ucC5mbG9hdDMyKS5yZXNoYXBlKC0xLCA0KQogICAgICAgICAgICByZXN1bHQgPSBzZWxmLm1vZGVsLnByZWRpY3QoZmVhdHMsIHZhbGlkYXRlX2ZlYXR1cmVzPUZhbHNlKQogICAgICAgICAgICByZXR1cm4gcmVzdWx0LnRvbGlzdCgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oIkZhaWxlZCB0byBwcmVkaWN0ICVzIiAlIGUpCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
         noBaseImagesPull: true
       env:
       - name: MODEL_CLASS

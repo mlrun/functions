@@ -54,22 +54,32 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 
 '''
 
-mdfunc = '''
-### [{} ({})]({})
 
-{}
+def gen_md_table(header, rows=None):
+    rows = [] if rows is None else rows
 
-categories: {}
-'''
+    def gen_list(items=None):
+        items = [] if items is None else items
+        out = '|'
+        for i in items:
+            out += ' {} |'.format(i)
+        return out
+
+    out = gen_list(header) + '\n' + gen_list(len(header) * ['---']) + '\n'
+    for r in rows:
+        out += gen_list(r) + '\n'
+    return out
+
 
 with open('README.md', 'w') as fp:
     fp.write(mdheader)
+    rows = []
     for k, v in catalog.items():
         kind = v['kind']
         if kind == 'remote':
             kind = 'nuclio'
-        text = mdfunc.format(k, kind, v['docfile'],
-                             v['description'],
-                             ', '.join(v['categories'] or []))
+        rows.append([f"[{k}]({v['docfile']})", kind,
+                    v['description'], ', '.join(v['categories'] or [])])
 
-        fp.write(text)
+    text = gen_md_table(['function', 'kind', 'description', 'categories'], rows)
+    fp.write(text)

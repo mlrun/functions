@@ -1,7 +1,7 @@
 kind: remote
 metadata:
   name: xgb-test
-  hash: b46f842187ed1e5d6a0b8696e5df17cf3e5bb69d
+  hash: 7f861275ae6c055890d67e070c9318fc2615365c
   project: default
   labels:
     author: yaronh
@@ -18,7 +18,7 @@ spec:
   max_replicas: 4
   env:
   - name: SERVING_MODEL_xgb_serving_v2
-    value: /home/jovyan/data/models
+    value: /User/artifacts/models
   - name: MODEL_CLASS
     value: XGBoostModel
   - name: ENABLE_EXPLAINER
@@ -35,14 +35,14 @@ spec:
     kind: nuclio:serving
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 25-05-2020
+        nuclio.io/generated_by: function generated from 27-05-2020 by admin
       labels: {}
       name: xgb-test
     spec:
       build:
         baseImage: yjbds/ml-models:0.4.8
         commands: []
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKCgppbXBvcnQgb3MKaW1wb3J0IGpzb24KaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCB4Z2Jvb3N0IGFzIHhnYgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCgoKaW1wb3J0IG1scnVuCmNsYXNzIFhHQm9vc3RNb2RlbChtbHJ1bi5ydW50aW1lcy5NTE1vZGVsU2VydmVyKToKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgIG1vZGVsX2ZpbGUsIGV4dHJhX2RhdGEgPSBzZWxmLmdldF9tb2RlbCgiLnBrbCIpCiAgICAgICAgc2VsZi5tb2RlbCA9IGxvYWQob3BlbihzdHIobW9kZWxfZmlsZSksICJyYiIpKQogIAoKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGJvZHkpOgogICAgICAgIHRyeToKICAgICAgICAgICAgZmVhdHMgPSBucC5hc2FycmF5KGJvZHlbImluc3RhbmNlcyJdLCBkdHlwZT1ucC5mbG9hdDMyKS5yZXNoYXBlKC0xLCA0KQogICAgICAgICAgICByZXN1bHQgPSBzZWxmLm1vZGVsLnByZWRpY3QoZmVhdHMsIHZhbGlkYXRlX2ZlYXR1cmVzPUZhbHNlKQogICAgICAgICAgICByZXR1cm4gcmVzdWx0LnRvbGlzdCgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oIkZhaWxlZCB0byBwcmVkaWN0ICVzIiAlIGUpCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKCgppbXBvcnQgb3MKaW1wb3J0IGpzb24KaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCB4Z2Jvb3N0IGFzIHhnYgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCgoKaW1wb3J0IG1scnVuCmNsYXNzIFhHQm9vc3RNb2RlbChtbHJ1bi5ydW50aW1lcy5NTE1vZGVsU2VydmVyKToKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgIG1vZGVsX2ZpbGUsIGV4dHJhX2RhdGEgPSBzZWxmLmdldF9tb2RlbCgiLnBrbCIpCiAgICAgICAgc2VsZi5tb2RlbCA9IGxvYWQob3BlbihzdHIobW9kZWxfZmlsZSksICJyYiIpKQogIAoKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGJvZHkpOgogICAgICAgIHRyeToKICAgICAgICAgICAgZmVhdHMgPSBucC5hc2FycmF5KGJvZHlbImluc3RhbmNlcyJdLCBkdHlwZT1ucC5mbG9hdDMyKS5yZXNoYXBlKC0xLCAyNCkKICAgICAgICAgICAgcmVzdWx0ID0gc2VsZi5tb2RlbC5wcmVkaWN0KGZlYXRzLCB2YWxpZGF0ZV9mZWF0dXJlcz1GYWxzZSkKICAgICAgICAgICAgcmV0dXJuIHJlc3VsdC50b2xpc3QoKQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZToKICAgICAgICAgICAgcmFpc2UgRXhjZXB0aW9uKCJGYWlsZWQgdG8gcHJlZGljdCAlcyIgJSBlKQoKCmZyb20gbWxydW4ucnVudGltZXMgaW1wb3J0IG51Y2xpb19pbml0X2hvb2sKZGVmIGluaXRfY29udGV4dChjb250ZXh0KToKICAgIG51Y2xpb19pbml0X2hvb2soY29udGV4dCwgZ2xvYmFscygpLCAnc2VydmluZycpCgpkZWYgaGFuZGxlcihjb250ZXh0LCBldmVudCk6CiAgICByZXR1cm4gY29udGV4dC5tbHJ1bl9oYW5kbGVyKGNvbnRleHQsIGV2ZW50KQo=
         noBaseImagesPull: true
       env:
       - name: MODEL_CLASS

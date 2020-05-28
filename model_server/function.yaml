@@ -1,7 +1,7 @@
 kind: remote
 metadata:
   name: sklearn-server
-  hash: 698cc790afe76216b1a5b36a09febd6f0d152b87
+  hash: cc41bdb0de739a45887d6c77ad34687c314d11c7
   project: default
   labels:
     author: yaronh
@@ -33,14 +33,14 @@ spec:
     kind: nuclio:serving
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 25-05-2020
+        nuclio.io/generated_by: function generated from 27-05-2020 by admin
       labels: {}
       name: sklearn-server
     spec:
       build:
-        baseImage: mlrun/mlrun:0.4.8
+        baseImage: yjbds/ml-models:0.4.8
         commands:
-        - python -m pip install numpy cloudpickle v3io sklearn
+        - python -m pip install v3io
         functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG9zCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGxvYWQKaW1wb3J0IG51bXB5IGFzIG5wCmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CmZyb20gZGF0ZXRpbWUgaW1wb3J0IGRhdGV0aW1lCmltcG9ydCBtbHJ1bgoKY2xhc3MgQ2xhc3NpZmllck1vZGVsKG1scnVuLnJ1bnRpbWVzLk1MTW9kZWxTZXJ2ZXIpOgogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgIiIiTG9hZCBtb2RlbCBmcm9tIHN0b3JhZ2UuIiIiCiAgICAgICAgbW9kZWxfZmlsZSwgZXh0cmFfZGF0YSA9IHNlbGYuZ2V0X21vZGVsKCcucGtsJykKICAgICAgICBzZWxmLm1vZGVsID0gbG9hZChvcGVuKG1vZGVsX2ZpbGUsICdyYicpKQoKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGJvZHk6IGRpY3QpIC0+IExpc3Q6CiAgICAgICAgIiIiR2VuZXJhdGUgbW9kZWwgcHJlZGljdGlvbnMgZnJvbSBzYW1wbGUuCiAgICAgICAgCiAgICAgICAgOnBhcmFtIGJvZHkgOiBBIGRpY3Qgb2Ygb2JzZXJ2YXRpb25zLCBlYWNoIG9mIHdoaWNoIGlzIGFuIDEtZGltZW5zaW9uYWwgZmVhdHVyZSB2ZWN0b3IuCiAgICAgICAgICAgIAogICAgICAgIFJldHVybnMgbW9kZWwgcHJlZGljdGlvbnMgYXMgYSBgTGlzdGAsIG9uZSBmb3IgZWFjaCByb3cgaW4gdGhlIGBib2R5YCBpbnB1dCBgTGlzdGAuCiAgICAgICAgIiIiCiAgICAgICAgdHJ5OgogICAgICAgICAgICBmZWF0cyA9IG5wLmFzYXJyYXkoYm9keVsnaW5zdGFuY2VzJ10pCiAgICAgICAgICAgIHJlc3VsdDogbnAubmRhcnJheSA9IHNlbGYubW9kZWwucHJlZGljdChmZWF0cykKICAgICAgICAgICAgcmVzcCA9IHJlc3VsdC50b2xpc3QoKQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZToKICAgICAgICAgICAgcmFpc2UgRXhjZXB0aW9uKGYiRmFpbGVkIHRvIHByZWRpY3Qge2V9IikKICAgICAgICAKICAgICAgICByZXR1cm4gcmVzcAoKCmZyb20gbWxydW4ucnVudGltZXMgaW1wb3J0IG51Y2xpb19pbml0X2hvb2sKZGVmIGluaXRfY29udGV4dChjb250ZXh0KToKICAgIG51Y2xpb19pbml0X2hvb2soY29udGV4dCwgZ2xvYmFscygpLCAnc2VydmluZycpCgpkZWYgaGFuZGxlcihjb250ZXh0LCBldmVudCk6CiAgICByZXR1cm4gY29udGV4dC5tbHJ1bl9oYW5kbGVyKGNvbnRleHQsIGV2ZW50KQo=
         noBaseImagesPull: true
       env:

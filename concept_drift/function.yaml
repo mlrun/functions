@@ -1,8 +1,8 @@
-kind: remote
+kind: job
 metadata:
   name: concept-drift
   tag: ''
-  hash: 16cf111b423b88fcb9deee48e1a4b43d987d1efb
+  hash: becc3056df8eb917251ee094d2b3bc540871cddf
   project: ''
   labels:
     author: orz
@@ -13,115 +13,62 @@ metadata:
 spec:
   command: ''
   args: []
-  image: ''
+  env: []
+  default_handler: handler
   entry_points:
-    split_path:
-      name: split_path
-      doc: ''
+    concept_drift_deployer:
+      name: concept_drift_deployer
+      doc: "    \n    \n    "
       parameters:
-      - name: mntpath
+      - name: context
+        type: MLClientCtx
+      - name: base_dataset
+        type: DataItem
+      - name: input_stream
+        type: str
+      - name: output_stream
+        type: str
+      - name: output_tsdb
+        type: str
+      - name: tsdb_batch_size
+        type: int
+      - name: callbacks
+        type: list
+      - name: models
+        type: list
+        default:
+        - ddm
+        - eddm
+        - pagehinkley
+      - name: models_dest
+        default: models
+      - name: pagehinkley_threshold
+        type: float
+        default: 10
+      - name: ddm_warning_level
+        type: float
+        default: 2
+      - name: ddm_out_control_level
+        type: float
+        default: 3
+      - name: label_col
+        default: label
+      - name: prediction_col
+        default: prediction
+      - name: hub_url
+        type: str
+        default: <_ast.Name object at 0x7f320b8a6d30>
+      - name: fn_tag
+        type: str
+        default: master
       outputs: []
       lineno: 14
-    create_stream:
-      name: create_stream
-      doc: ''
-      parameters:
-      - name: context
-      - name: path
-      - name: shards
-        default: 1
-      outputs: []
-      lineno: 25
-    push_to_stream:
-      name: push_to_stream
-      doc: ''
-      parameters:
-      - name: context
-      - name: stream_path
-      - name: data
-      outputs: []
-      lineno: 35
-    construct_record:
-      name: construct_record
-      doc: ''
-      parameters:
-      - name: record
-      outputs: []
-      lineno: 43
-    init_context:
-      name: init_context
-      doc: ''
-      parameters:
-      - name: context
-      outputs: []
-      lineno: 58
-    handler:
-      name: handler
-      doc: ''
-      parameters:
-      - name: context
-      - name: event
-      outputs: []
-      lineno: 101
   description: Deploy a streaming Concept Drift detector on a labeled stream
-  min_replicas: 0
-  max_replicas: 4
-  env: []
-  base_spec:
-    apiVersion: nuclio.io/v1
-    kind: Function
-    metadata:
-      annotations:
-        nuclio.io/generated_by: function generated from 21-05-2020 by admin
-      labels: {}
-      name: concept-drift
-    spec:
-      build:
-        baseImage: mlrun/ml-models:0.4.7
-        commands:
-        - python -m pip install scikit-multiflow
-        - python -m pip install v3io_frames
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHNrbXVsdGlmbG93LmRyaWZ0X2RldGVjdGlvbgppbXBvcnQgbnVtcHkgYXMgbnAKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgb3MKaW1wb3J0IGpzb24KaW1wb3J0IHYzaW8uZGF0YXBsYW5lCmltcG9ydCB2M2lvX2ZyYW1lcyBhcyB2M2YKaW1wb3J0IHJlcXVlc3RzCgppbXBvcnQgcmFuZG9tCgpkZWYgc3BsaXRfcGF0aChtbnRwYXRoPScnKToKICAgIGlmIG1udHBhdGhbMF0gPT0gJy8nOgogICAgICAgIG1udHBhdGggPSBtbnRwYXRoWzE6XQogICAgcGF0aHMgPSBtbnRwYXRoLnNwbGl0KCcvJykKICAgIGNvbnRhaW5lciA9IHBhdGhzWzBdCiAgICBzdWJwYXRoID0gJycKICAgIGlmIGxlbihwYXRocykgPiAxOgogICAgICAgIHN1YnBhdGggPSBtbnRwYXRoW2xlbihjb250YWluZXIpOl0KICAgIHJldHVybiBjb250YWluZXIsIHN1YnBhdGgKCgpkZWYgY3JlYXRlX3N0cmVhbShjb250ZXh0LCBwYXRoLCBzaGFyZHM9MSk6CiAgICBjb250YWluZXIsIHN0cmVhbV9wYXRoID0gc3BsaXRfcGF0aChwYXRoKQogICAgY29udGV4dC5sb2dnZXIuaW5mbyhmJ0NyZWF0aW5nIHN0cmVhbSBpbiBDb250YWluZXI6IHtjb250YWluZXJ9ICYgUGF0aCB7c3RyZWFtX3BhdGh9JykKICAgIHJlc3BvbnNlID0gY29udGV4dC52M2lvX2NsaWVudC5jcmVhdGVfc3RyZWFtKGNvbnRhaW5lcj1jb250YWluZXIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBwYXRoPXN0cmVhbV9wYXRoLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNoYXJkX2NvdW50PXNoYXJkcywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJhaXNlX2Zvcl9zdGF0dXM9djNpby5kYXRhcGxhbmUuUmFpc2VGb3JTdGF0dXMubmV2ZXIpCiAgICByZXNwb25zZS5yYWlzZV9mb3Jfc3RhdHVzKFs0MDksIDIwNF0pCiAgICAKICAgIApkZWYgcHVzaF90b19zdHJlYW0oY29udGV4dCwgc3RyZWFtX3BhdGgsIGRhdGEpOgogICAgcmVjb3JkcyA9IFt7J2RhdGEnOiBqc29uLmR1bXBzKHJlYyl9IGZvciByZWMgaW4gZGF0YV0KICAgIGNvbnRhaW5lciwgc3RyZWFtX3BhdGggPSBzcGxpdF9wYXRoKHN0cmVhbV9wYXRoKQogICAgcmVzcG9uc2UgPSBjb250ZXh0LnYzaW9fY2xpZW50LnB1dF9yZWNvcmRzKGNvbnRhaW5lcj1jb250YWluZXIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcGF0aD1zdHJlYW1fcGF0aCwgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmVjb3Jkcz1yZWNvcmRzKQoKCmRlZiBjb25zdHJ1Y3RfcmVjb3JkKHJlY29yZCk6CiAgICBsYWJlbF9jb2wgPSBvcy5nZXRlbnYoJ2xhYmVsX2NvbCcsICdsYWJlbCcpCiAgICBwcmVkaWN0aW9uX2NvbCA9IG9zLmdldGVudigncHJlZGljdGlvbl9jb2wnLCAncHJlZGljdGlvbicpCiAgICByZXMgPSBkaWN0KFsoaywgcmVjb3JkW2tdKSBmb3IgayBpbiBbJ3doZW4nLCAnY2xhc3MnLCAnbW9kZWwnLCAncmVzcCcsICdyZXF1ZXN0J11dKQogICAgcmVzWydmZWF0dXJlX3ZlY3RvciddID0gcmVzLnBvcCgncmVxdWVzdCcpWydpbnN0YW5jZXMnXVswXQogICAgcmVzWyd0aW1lc3RhbXAnXSA9IHJlcy5wb3AoJ3doZW4nKQogICAgcmVzWydwcmVkaWN0aW9uJ10gPSByZXNbJ3Jlc3AnXVswXQogICAgCiAgICBsYWJlbF9jaGFuY2UgPSByYW5kb20ucmFuZG9tKCkKICAgIGlmIHJlc1sncHJlZGljdGlvbiddID09IDA6CiAgICAgICAgcmVzWydsYWJlbCddID0gMCBpZiBsYWJlbF9jaGFuY2UgPiAwLjMgZWxzZSAxCiAgICBlbHNlOgogICAgICAgIHJlc1snbGFiZWwnXSA9IDEgaWYgbGFiZWxfY2hhbmNlID4gMC44IGVsc2UgMAogICAgcmV0dXJuIHJlcwoKZGVmIGluaXRfY29udGV4dChjb250ZXh0KToKICAgIHYzaW9fY2xpZW50ID0gdjNpby5kYXRhcGxhbmUuQ2xpZW50KCkKICAgIHNldGF0dHIoY29udGV4dCwgInYzaW9fY2xpZW50IiwgdjNpb19jbGllbnQpCiAgICAKICAgIHYzZl9jbGllbnQgPSB2M2YuQ2xpZW50KCdmcmFtZXNkOjgwODEnLCBjb250YWluZXI9J2JpZ2RhdGEnKQogICAgc2V0YXR0cihjb250ZXh0LCAidjNmIiwgdjNmX2NsaWVudCkKICAgIHdpbmRvdyA9IFtdCiAgICBzZXRhdHRyKGNvbnRleHQsICd3aW5kb3cnLCB3aW5kb3cpCiAgICBzZXRhdHRyKGNvbnRleHQsICd0c2RiX3RhYmxlJywgb3MuZ2V0ZW52KCd0c2RiX3RhYmxlJywgJ2NvbmNlcHRfZHJpZnRfdHNkYl8xJykpCiAgICB0cnk6CiAgICAgICAgY29udGV4dC52M2YuY3JlYXRlKCd0c2RiJywgY29udGV4dC50c2RiX3RhYmxlLCByYXRlPScxL3MnLCBpZl9leGlzdHM9MSkKICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZToKICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYnQ3JlYXRpbmcgY29udGV4dCB3aXRoIHJhdGU9IGZhaWxlIGZvciB7ZX0nKQogICAgICAgIGNvbnRleHQudjNmLmNyZWF0ZSgndHNkYicsIGNvbnRleHQudHNkYl90YWJsZSwgYXR0cnM9eydyYXRlJzogJzEvcyd9LCBpZl9leGlzdHM9MSkKICAgIAogICAgY2FsbGJhY2tzID0gW2NhbGxiYWNrLnN0cmlwKCkgZm9yIGNhbGxiYWNrIGluIG9zLmdldGVudignY2FsbGJhY2tzJywgJycpLnNwbGl0KCcsJyldCiAgICBzZXRhdHRyKGNvbnRleHQsICdjYWxsYmFja3MnLCBjYWxsYmFja3MpCiAgICAKICAgIHNldGF0dHIoY29udGV4dCwgJ2RyaWZ0X3N0cmVhbScsIG9zLmdldGVudignZHJpZnRfc3RyZWFtJywgJy9iaWdkYXRhL2RyaWZ0X3N0cmVhbScpKQogICAgdHJ5OgogICAgICAgIGNyZWF0ZV9zdHJlYW0oY29udGV4dCwgY29udGV4dC5kcmlmdF9zdHJlYW0sIGludChvcy5nZXRlbnYoJ2RyaWZ0X3N0cmVhbV9zaGFyZHMnLCAxKSkpCiAgICBleGNlcHQ6CiAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbyhmJ3tjb250ZXh0LmRyaWZ0X3N0cmVhbX0gYWxyZWFkeSBleGlzdHMnKQogICAgYmFzZV9kZiA9IHBkLnJlYWRfcGFycXVldChvcy5nZXRlbnYoJ3Rlc3Rfc2V0JywgJycpKQogICAgYmFzZV9wcmVkaWN0aW9uc19zdHJlYW0gPSBiYXNlX2RmLmxvY1s6LCBvcy5nZXRlbnYoJ3Rlc3Rfc2V0X2xhYmVsX2NvbCcsICdsYWJlbCcpXS52YWx1ZXMKICAgIAogICAgbW9kZWxzID0gW21vZGVsLnN0cmlwKCkgZm9yIG1vZGVsIGluIG9zLmdldGVudignbW9kZWxzJywgJ3BhZ2VoaW5rbGV5LCBkZG0sIGVkZG0nKS5zcGxpdCgnLCcpXQogICAgbW9kZWxzID0geydlZGRtJzogc2ttdWx0aWZsb3cuZHJpZnRfZGV0ZWN0aW9uLkVERE0oKSwKICAgICAgICAgICAgICAncGFnZWhpbmtsZXknOiBza211bHRpZmxvdy5kcmlmdF9kZXRlY3Rpb24uUGFnZUhpbmtsZXkobWluX2luc3RhbmNlcz1sZW4oYmFzZV9wcmVkaWN0aW9uc19zdHJlYW0pLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aHJlc2hvbGQ9ZmxvYXQob3MuZ2V0ZW52KCdwYWdlaGlua2xleV90aHJlc2hvbGQnKSkpLAogICAgICAgICAgICAgICdkZG0nOiBza211bHRpZmxvdy5kcmlmdF9kZXRlY3Rpb24uRERNKG1pbl9udW1faW5zdGFuY2VzPWxlbihiYXNlX3ByZWRpY3Rpb25zX3N0cmVhbSksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgd2FybmluZ19sZXZlbD1mbG9hdChvcy5nZXRlbnYoJ2RkbV93YXJuaW5nX2xldmVsJywgMikpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG91dF9jb250cm9sX2xldmVsPWZsb2F0KG9zLmdldGVudignZGRtX291dF9jb250cm9sX2xldmVsJywgMykpKX0KICAgIHNldGF0dHIoY29udGV4dCwgJ21vZGVscycsIG1vZGVscykKICAgIAogICAgZm9yIGkgaW4gcmFuZ2UobGVuKGJhc2VfcHJlZGljdGlvbnNfc3RyZWFtKSk6CiAgICAgICAgZm9yIG1vZGVsX25hbWUsIG1vZGVsIGluIG1vZGVscy5pdGVtcygpOgogICAgICAgICAgICBtb2RlbC5hZGRfZWxlbWVudChiYXNlX3ByZWRpY3Rpb25zX3N0cmVhbVtpXSkKICAgICAgICAgICAgCiAgICBzZXRhdHRyKGNvbnRleHQsICdsYWJlbF9jb2wnLCBvcy5nZXRlbnYoJ2xhYmVsX2NvbCcsICdsYWJlbCcpKQogICAgc2V0YXR0cihjb250ZXh0LCAncHJlZGljdGlvbl9jb2wnLCBvcy5nZXRlbnYoJ3ByZWRpY3Rpb25fY29sJywgJ3ByZWRpY3Rpb24nKSkKICAgIHNldGF0dHIoY29udGV4dCwgJ3dpbmRvd19zaXplJywgaW50KG9zLmdldGVudignd2luZG93X3NpemUnLCAxMCkpKQoKZGVmIGhhbmRsZXIoY29udGV4dCwgZXZlbnQpOgogICAgY29udGV4dC5sb2dnZXIuaW5mbyhmJ2V2ZW50OiB7ZXZlbnQuYm9keX0nKQogICAgZnVsbF9ldmVudCA9IGpzb24ubG9hZHMoZXZlbnQuYm9keSkKICAgIHJlY29yZCA9IGNvbnN0cnVjdF9yZWNvcmQoZnVsbF9ldmVudCkKICAgIAogICAgaXNfZXJyb3IgPSByZWNvcmRbY29udGV4dC5sYWJlbF9jb2xdICE9IHJlY29yZFtjb250ZXh0LnByZWRpY3Rpb25fY29sXQogICAgY29udGV4dC5sb2dnZXIuaW5mbyhmJ0FkZGluZyB7aXNfZXJyb3J9JykKICAgIAogICAgZm9yIG5hbWUsIG1vZGVsIGluIGNvbnRleHQubW9kZWxzLml0ZW1zKCk6CiAgICAgICAgcmVzdWx0cyA9IHsndGltZXN0YW1wJzogcmVjb3JkWyd0aW1lc3RhbXAnXX0KICAgICAgICByZXN1bHRzWydhbGdvcml0aG0nXSA9IG5hbWUKICAgICAgICBtb2RlbC5hZGRfZWxlbWVudChpc19lcnJvcikKICAgICAgICAKICAgICAgICBpZiBoYXNhdHRyKG1vZGVsLCAnZGV0ZWN0ZWRfd2FybmluZ196b25lJykgYW5kIG1vZGVsLmRldGVjdGVkX3dhcm5pbmdfem9uZSgpOgogICAgICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYne25hbWV9XHRXYXJuaW5nIHpvbmUgZGV0ZWN0ZWQnKQogICAgICAgICAgICByZXN1bHRzWyd3YXJuaW5nX3pvbmUnXSA9IDEKICAgICAgICAgICAgZnVsbF9ldmVudFtmJ3tuYW1lfV93YXJuaW5nX3pvbmUnXSA9IDEKICAgICAgICBlbHNlOgogICAgICAgICAgICByZXN1bHRzWyd3YXJuaW5nX3pvbmUnXSA9IDAKICAgICAgICAgICAgZnVsbF9ldmVudFtmJ3tuYW1lfV93YXJuaW5nX3pvbmUnXSA9IDAKICAgICAgICAKICAgICAgICBpZiBtb2RlbC5kZXRlY3RlZF9jaGFuZ2UoKToKICAgICAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbygnQ2hhbmdlIERldGVjdGVkJykKICAgICAgICAgICAgcmVzdWx0c1snY2hhbmdlX2RldGVjdGVkJ10gPSAxCiAgICAgICAgICAgIGZ1bGxfZXZlbnRbZid7bmFtZX1fZHJpZnQnXSA9IDEKICAgICAgICBlbHNlOgogICAgICAgICAgICByZXN1bHRzWydjaGFuZ2VfZGV0ZWN0ZWQnXSA9IDAKICAgICAgICAgICAgZnVsbF9ldmVudFtmJ3tuYW1lfV9kcmlmdCddID0gMAogICAgICAgIGNvbnRleHQud2luZG93LmFwcGVuZChyZXN1bHRzKQogICAgCiAgICBwdXNoX3RvX3N0cmVhbShjb250ZXh0LCBjb250ZXh0LmRyaWZ0X3N0cmVhbSwgW2Z1bGxfZXZlbnRdKQogICAgCiAgICBpZiBjb250ZXh0LmNhbGxiYWNrcyAhPSBbJyddOgogICAgICAgIGZvciBjYWxsYmFjayBpbiBjb250ZXh0LmNhbGxiYWNrczoKICAgICAgICAgICAgcmVxdWVzdHMucG9zdCh1cmw9Y2FsbGJhY2ssCiAgICAgICAgICAgICAgICAgICAgICAgICAganNvbj1mdWxsX2V2ZW50KQogICAgCiAgICBpZiAobGVuKGNvbnRleHQud2luZG93KSAvIGxlbihjb250ZXh0Lm1vZGVscykpID49IGNvbnRleHQud2luZG93X3NpemU6CiAgICAgICAgZGYgPSBwZC5EYXRhRnJhbWUoY29udGV4dC53aW5kb3cpCiAgICAgICAgZGZbJ3RpbWVzdGFtcCddID0gcGQudG9fZGF0ZXRpbWUoZGZbJ3RpbWVzdGFtcCddKQogICAgICAgIGRmID0gZGYuc2V0X2luZGV4KFsndGltZXN0YW1wJywgJ2FsZ29yaXRobSddKQogICAgICAgIGNvbnRleHQudjNmLndyaXRlKCd0c2RiJywgY29udGV4dC50c2RiX3RhYmxlLCBkZikKICAgICAgICBjb250ZXh0LndpbmRvdyA9IFtdCgo=
-        noBaseImagesPull: true
-      env:
-      - name: V3IO_FRAMESD
-        value: framesd.default-tenant.svc:8080
-      - name: V3IO_USERNAME
-        value: admin
-      - name: V3IO_ACCESS_KEY
-        value: 76ba0f0d-c2bf-4790-9ba1-60067b960cac
-      - name: V3IO_API
-        value: v3io-webapi.default-tenant.svc:8081
-      - name: test_set
-        value: /User/demo-network-operations/artifacts/selected_features.parquet
-      - name: test_set_label_col
-        value: is_error
-      - name: label_col
-        value: resp
-      - name: prediction_col
-        value: prediction
-      - name: drift_stream
-        value: /bigdata/network-operations/drift_stream
-      - name: tsdb_table
-        value: network-operations/drift_tsdb
-      - name: pagehinkley_threshold
-        value: '10'
-      - name: models
-        value: pagehinkley, ddm, eddm
-      - name: window_size
-        value: '10'
-      handler: concept_drift:handler
-      runtime: python:3.6
-      triggers:
-        labeled_stream:
-          attributes:
-            partitions:
-            - 0
-            pollingIntervalMs: 500
-            readBatchSize: 64
-            seekTo: earliest
-          kind: v3ioStream
-          maxWorkers: 1
-          url: /bigdata/network-operations/inference_stream@cd
-      volumes: []
-  source: ''
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHNrbXVsdGlmbG93LmRyaWZ0X2RldGVjdGlvbgppbXBvcnQgbnVtcHkgYXMgbnAKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgb3MKZnJvbSBjbG91ZHBpY2tsZSBpbXBvcnQgZHVtcHMsIGxvYWQsIGR1bXAKCmZyb20gbnVjbGlvLnRyaWdnZXJzIGltcG9ydCBWM0lPU3RyZWFtVHJpZ2dlcgpmcm9tIG1scnVuIGltcG9ydCBEYXRhSXRlbSwgaW1wb3J0X2Z1bmN0aW9uLCBtbGNvbmYsIE1MQ2xpZW50Q3R4LCBtb3VudF92M2lvCgppbXBvcnQgcmFuZG9tCgpkZWYgY29uY2VwdF9kcmlmdF9kZXBsb3llcihjb250ZXh0OiBNTENsaWVudEN0eCwgYmFzZV9kYXRhc2V0OkRhdGFJdGVtLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfc3RyZWFtOnN0ciwgb3V0cHV0X3N0cmVhbTpzdHIsIG91dHB1dF90c2RiOnN0ciwgdHNkYl9iYXRjaF9zaXplOmludCwgY2FsbGJhY2tzOmxpc3QsIAogICAgICAgICAgICAgICAgICAgICAgICAgICBtb2RlbHM6bGlzdD1bJ2RkbScsICdlZGRtJywgJ3BhZ2VoaW5rbGV5J10sIG1vZGVsc19kZXN0PSdtb2RlbHMnLAogICAgICAgICAgICAgICAgICAgICAgICAgICBwYWdlaGlua2xleV90aHJlc2hvbGQ6ZmxvYXQ9MTAsIGRkbV93YXJuaW5nX2xldmVsOmZsb2F0PTIsIGRkbV9vdXRfY29udHJvbF9sZXZlbDpmbG9hdD0zLAogICAgICAgICAgICAgICAgICAgICAgICAgICBsYWJlbF9jb2w9J2xhYmVsJywgcHJlZGljdGlvbl9jb2w9J3ByZWRpY3Rpb24nLCBodWJfdXJsOnN0cj1tbGNvbmYuaHViX3VybCwgZm5fdGFnOnN0cj0nbWFzdGVyJyk6CiAgICAnJycKICAgIAogICAgCiAgICAnJycKICAgIG1sY29uZi5kYnBhdGggPSBtbGNvbmYuZGJwYXRoIG9yICdodHRwOi8vbWxydW4tYXBpOjgwODAnCiAgICBtbGNvbmYuaHViX3VybCA9IGh1Yl91cmwKICAgIGZuID0gaW1wb3J0X2Z1bmN0aW9uKHVybD0naHViOi8vY29uY2VwdF9kcmlmdF9zdHJlYW1pbmcnKQogICAgCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCdMb2FkaW5nIGJhc2UgZGF0YXNldCcpCiAgICBiYXNlX2RmID0gYmFzZV9kYXRhc2V0LmFzX2RmKCkKICAgIGVycm9yX3N0cmVhbSA9IG5wLndoZXJlKGJhc2VfZGZbcHJlZGljdGlvbl9jb2xdLnZhbHVlcz09YmFzZV9kZltsYWJlbF9jb2xdLnZhbHVlcywgMCwgMSkKICAgIAogICAgY29udGV4dC5sb2dnZXIuaW5mbygnQ3JlYXRpbmcgbW9kZWxzJykKICAgIG1vZGVscyA9IFttb2RlbC5zdHJpcCgpIGZvciBtb2RlbCBpbiBvcy5nZXRlbnYoJ21vZGVscycsICdwYWdlaGlua2xleSwgZGRtLCBlZGRtJykuc3BsaXQoJywnKV0KICAgIG1vZGVscyA9IHsnZWRkbSc6IHNrbXVsdGlmbG93LmRyaWZ0X2RldGVjdGlvbi5FRERNKCksCiAgICAgICAgICAgICAgJ3BhZ2VoaW5rbGV5Jzogc2ttdWx0aWZsb3cuZHJpZnRfZGV0ZWN0aW9uLlBhZ2VIaW5rbGV5KG1pbl9pbnN0YW5jZXM9bGVuKGVycm9yX3N0cmVhbSksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRocmVzaG9sZD1wYWdlaGlua2xleV90aHJlc2hvbGQpLAogICAgICAgICAgICAgICdkZG0nOiBza211bHRpZmxvdy5kcmlmdF9kZXRlY3Rpb24uRERNKG1pbl9udW1faW5zdGFuY2VzPWxlbihlcnJvcl9zdHJlYW0pLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHdhcm5pbmdfbGV2ZWw9ZGRtX3dhcm5pbmdfbGV2ZWwsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgb3V0X2NvbnRyb2xfbGV2ZWw9ZGRtX291dF9jb250cm9sX2xldmVsKX0KICAgIAogICAgY29udGV4dC5sb2dnZXIuaW5mbygnU3RyZWFtaW5nIGRhdGEgdG8gbW9kZWxzJykKICAgIGZvciBpIGluIHJhbmdlKGxlbihlcnJvcl9zdHJlYW0pKToKICAgICAgICBmb3IgbW9kZWxfbmFtZSwgbW9kZWwgaW4gbW9kZWxzLml0ZW1zKCk6CiAgICAgICAgICAgIG1vZGVsLmFkZF9lbGVtZW50KGVycm9yX3N0cmVhbVtpXSkKICAgICAgICAgICAgCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCdMb2dnaW5nIHJlYWR5IG1vZGVscycpCiAgICBmb3IgbmFtZSwgbW9kZWwgaW4gbW9kZWxzLml0ZW1zKCk6CiAgICAgICAgZGF0YSA9IGR1bXBzKG1vZGVsKQogICAgICAgIG1vZGVsX2ZpbGUgPSBmJ3tuYW1lfS5wa2wnCiAgICAgICAgY29udGV4dC5sb2dfbW9kZWwoZid7bmFtZX1fY29uY2VwdF9kcmlmdCcsIGJvZHk9ZGF0YSwgbGFiZWxzPVsnY29uY2VwdF9kcmlmdCddLAogICAgICAgICAgICAgICAgICAgICAgICAgIG1vZGVsX2ZpbGU9bW9kZWxfZmlsZSwgbW9kZWxfZGlyPW1vZGVsc19kZXN0KQogICAgICAgIGZuLnNldF9lbnZzKHtmJ3tuYW1lfV9tb2RlbF9wYXRoJzogb3MucGF0aC5qb2luKGNvbnRleHQuYXJ0aWZhY3RfcGF0aCwgbW9kZWxzX2Rlc3QsIG1vZGVsX2ZpbGUpfSkKICAgICAgICAgICAgCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCdEZXBsb3lpbmcgQ29uY2VwdCBEcmlmdCBTdHJlYW1pbmcgZnVuY3Rpb24nKQogICAgZm4uc2V0X2VudnMoeydsYWJlbF9jb2wnOiBsYWJlbF9jb2wsCiAgICAgICAgICAgICAgICAgJ3ByZWRpY3Rpb25fY29sJzogcHJlZGljdGlvbl9jb2wsIAogICAgICAgICAgICAgICAgICdkcmlmdF9zdHJlYW0nOiBvdXRwdXRfc3RyZWFtLAogICAgICAgICAgICAgICAgICd0c2RiX3RhYmxlJzogb3V0cHV0X3RzZGIsCiAgICAgICAgICAgICAgICAgJ3BhZ2VoaW5rbGV5X3RocmVzaG9sZCc6IHBhZ2VoaW5rbGV5X3RocmVzaG9sZCwKICAgICAgICAgICAgICAgICAnZGRtX3dhcm5pbmdfbGV2ZWwnOiBkZG1fd2FybmluZ19sZXZlbCwKICAgICAgICAgICAgICAgICAnZGRtX291dF9jb250cm9sJzogZGRtX291dF9jb250cm9sX2xldmVsfSkgICAgCiAgICBmbi5hZGRfdHJpZ2dlcignbGFiZWxlZF9zdHJlYW0nLCBWM0lPU3RyZWFtVHJpZ2dlcih1cmw9aW5wdXRfc3RyZWFtKSkKICAgIGZuLmFwcGx5KG1vdW50X3YzaW8oKSkKICAgIHByaW50KGZuLnRvX3lhbWwoKSkKICAgIGZuLmRlcGxveShwcm9qZWN0PWNvbnRleHQucHJvamVjdCkKCg==
+    base_image: mlrun/ml-models:0.4.7
+    commands:
+    - python -m pip install scikit-multiflow==0.4.1
+    - python -m pip install v3io_frames
+    - python -m pip install git+https://github.com/nuclio/nuclio-jupyter.git
+    code_origin: https://github.com/mlrun/functions#a29953add7917e0bbeda4517f48bcfbc63f90d15:concept_drift.ipynb

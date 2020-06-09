@@ -1,0 +1,50 @@
+kind: job
+metadata:
+  name: sparkrun
+  tag: ''
+  hash: 79d7323ba8b3b18bc439bc446f2ce8b24043def6
+  project: sprak
+  categories: []
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  env:
+  - name: V3IO_API
+    value: ''
+  - name: V3IO_USERNAME
+    value: ''
+  - name: V3IO_ACCESS_KEY
+    value: ''
+  - name: PYTHONPATH
+    value: /User/functions/spark-submit
+  default_handler: ''
+  entry_points:
+    main:
+      name: main
+      doc: ''
+      parameters:
+      - name: context
+      outputs: []
+      lineno: 5
+    get_shell_pod_name:
+      name: get_shell_pod_name
+      doc: ''
+      parameters:
+      - name: self
+      outputs: []
+      lineno: 35
+    exec_shell_cmd:
+      name: exec_shell_cmd
+      doc: ''
+      parameters:
+      - name: self
+      - name: cmd
+      outputs: []
+      lineno: 44
+  description: ''
+  service_account: mlrun-api
+  build:
+    functionSourceCode: ZnJvbSBtbHJ1biBpbXBvcnQgZ2V0X29yX2NyZWF0ZV9jdHgKZnJvbSBrdWJlcm5ldGVzIGltcG9ydCBjb25maWcsIGNsaWVudApmcm9tIGt1YmVybmV0ZXMuc3RyZWFtIGltcG9ydCBzdHJlYW0KCmRlZiBtYWluKGNvbnRleHQpOgogICAgY29udGV4dC5sb2dnZXIuaW5mbygiU3RhcnRpbmcgdG8gY21kIikKICAgIGNsaSA9IEs4U0NsaWVudChjb250ZXh0LmxvZ2dlcikKICAgIAogICAgY21kID0gJ3NwYXJrLXN1Ym1pdCcKICAgIAogICAgY2xpLmV4ZWNfc2hlbGxfY21kKGNtZCkKCmNsYXNzIEs4U0NsaWVudChvYmplY3QpOgoKICAgIGRlZiBfX2luaXRfXyhzZWxmLCBsb2dnZXIsIG5hbWVzcGFjZT0nZGVmYXVsdC10ZW5hbnQnLCBjb25maWdfZmlsZT1Ob25lKToKICAgICAgICBzZWxmLm5hbWVzcGFjZSA9IG5hbWVzcGFjZQogICAgICAgIHNlbGYubG9nZ2VyID0gbG9nZ2VyCiAgICAgICAgc2VsZi5faW5pdF9rOHNfY29uZmlnKGNvbmZpZ19maWxlKQogICAgICAgIHNlbGYudjFhcGkgPSBjbGllbnQuQ29yZVYxQXBpKCkKCiAgICBkZWYgX2luaXRfazhzX2NvbmZpZyhzZWxmLCBjb25maWdfZmlsZSk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBjb25maWcubG9hZF9pbmNsdXN0ZXJfY29uZmlnKCkKICAgICAgICAgICAgc2VsZi5sb2dnZXIuaW5mbygndXNpbmcgaW4tY2x1c3RlciBjb25maWcuJykKICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBjb25maWcubG9hZF9rdWJlX2NvbmZpZyhjb25maWdfZmlsZSkKICAgICAgICAgICAgICAgIHNlbGYubG9nZ2VyLmluZm8oJ3VzaW5nIGxvY2FsIGt1YmVybmV0ZXMgY29uZmlnLicpCiAgICAgICAgICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgICAgICAgICByYWlzZSBSdW50aW1lRXJyb3IoCiAgICAgICAgICAgICAgICAgICAgJ2Nhbm5vdCBmaW5kIGxvY2FsIGt1YmVybmV0ZXMgY29uZmlnIGZpbGUsJwogICAgICAgICAgICAgICAgICAgICcgcGxhY2UgaXQgaW4gfi8ua3ViZS9jb25maWcgb3Igc3BlY2lmeSBpdCBpbiAnCiAgICAgICAgICAgICAgICAgICAgJ0tVQkVDT05GSUcgZW52IHZhcicpCgogICAgZGVmIGdldF9zaGVsbF9wb2RfbmFtZShzZWxmKToKICAgICAgICBzaGVsbF9wb2QgPSBzZWxmLnYxYXBpLmxpc3RfbmFtZXNwYWNlZF9wb2QobmFtZXNwYWNlPXNlbGYubmFtZXNwYWNlKQogICAgICAgIGZvciBpIGluIHNoZWxsX3BvZC5pdGVtczoKICAgICAgICAgICAgaWYgInNoZWxsIiBpbiBpLm1ldGFkYXRhLm5hbWU6CiAgICAgICAgICAgICAgICBzZWxmLmxvZ2dlci5pbmZvKCIlc1x0JXNcdCVzIiAlIChpLnN0YXR1cy5wb2RfaXAsIGkubWV0YWRhdGEubmFtZXNwYWNlLCBpLm1ldGFkYXRhLm5hbWUpKQogICAgICAgICAgICAgICAgc2hlbGxfbmFtZSA9IGkubWV0YWRhdGEubmFtZQogICAgICAgICAgICAgICAgYnJlYWsKICAgICAgICByZXR1cm4gc2hlbGxfbmFtZQoKICAgIGRlZiBleGVjX3NoZWxsX2NtZChzZWxmLCBjbWQpOgogICAgICAgIHNoZWxsX25hbWUgPSBzZWxmLmdldF9zaGVsbF9wb2RfbmFtZSgpCiAgICAgICAgIyBDYWxsaW5nIGV4ZWMgYW5kIHdhaXRpbmcgZm9yIHJlc3BvbnNlCiAgICAgICAgZXhlY19jb21tYW5kID0gWwogICAgICAgICAgICAnL2Jpbi9iYXNoJywKICAgICAgICAgICAgJy1jJywKICAgICAgICAgICAgY21kXQogICAgICAgIHJlc3AgPSBzdHJlYW0oc2VsZi52MWFwaS5jb25uZWN0X2dldF9uYW1lc3BhY2VkX3BvZF9leGVjLAogICAgICAgICAgICAgICAgICAgICAgc2hlbGxfbmFtZSwKICAgICAgICAgICAgICAgICAgICAgIHNlbGYubmFtZXNwYWNlLAogICAgICAgICAgICAgICAgICAgICAgY29tbWFuZD1leGVjX2NvbW1hbmQsCiAgICAgICAgICAgICAgICAgICAgICBzdGRlcnI9VHJ1ZSwgc3RkaW49RmFsc2UsCiAgICAgICAgICAgICAgICAgICAgICBzdGRvdXQ9VHJ1ZSwgdHR5PUZhbHNlKQogICAgICAgIHNlbGYubG9nZ2VyLmluZm8oIlJlc3BvbnNlOiAiICsgcmVzcCkKCgppZiBfX25hbWVfXyA9PSAnX19tYWluX18nOgogICAgY29udGV4dCA9IGdldF9vcl9jcmVhdGVfY3R4KCdzcGFyay1ydW5uZXInKQogICAgbWFpbihjb250ZXh0KQo=
+    commands: []
+    code_origin: https://github.com/aviaIguazio/functions.git#a908e02a270017aca6e663eca95763a56265eaa6

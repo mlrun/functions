@@ -2,13 +2,12 @@ from mlrun import get_or_create_ctx
 from kubernetes import config, client
 from kubernetes.stream import stream
 
-def main(context):
+
+def main(context, cmd='spark-submit'):
     context.logger.info("Starting to cmd")
     cli = K8SClient(context.logger)
-    
-    cmd = 'spark-submit'
-    
     cli.exec_shell_cmd(cmd)
+
 
 class K8SClient(object):
 

@@ -1,0 +1,53 @@
+kind: job
+metadata:
+  name: submit
+  tag: ''
+  hash: 02615f8f69dadb1ea0350de7a5be91279852eb80
+  project: ''
+  categories: []
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  env:
+  - name: V3IO_API
+    value: ''
+  - name: V3IO_USERNAME
+    value: ''
+  - name: V3IO_ACCESS_KEY
+    value: ''
+  default_handler: handler
+  entry_points:
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+      - name: spark_options
+      - name: shell_pod_name
+        default: shell
+      outputs: []
+      lineno: 7
+    get_shell_pod_name:
+      name: get_shell_pod_name
+      doc: ''
+      parameters:
+      - name: self
+      - name: shell_pod_name
+      outputs: []
+      lineno: 34
+    exec_shell_cmd:
+      name: exec_shell_cmd
+      doc: ''
+      parameters:
+      - name: self
+      - name: cmd
+      - name: shell_pod_name
+      outputs: []
+      lineno: 43
+  description: ''
+  service_account: mlrun-api
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA2LTExIDE5OjEzCgpmcm9tIG1scnVuIGltcG9ydCBnZXRfb3JfY3JlYXRlX2N0eApmcm9tIGt1YmVybmV0ZXMgaW1wb3J0IGNvbmZpZywgY2xpZW50CmZyb20ga3ViZXJuZXRlcy5zdHJlYW0gaW1wb3J0IHN0cmVhbQoKZGVmIGhhbmRsZXIoY29udGV4dCxzcGFya19vcHRpb25zPScnLHNoZWxsX3BvZF9uYW1lID0gJ3NoZWxsJyk6ICAgICAgICAKICAgIGNtZCA9ICdzcGFyay1zdWJtaXQgJyArIHNwYXJrX29wdGlvbnMKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oInN1Ym1pdGluZyA6IiArIGNtZCkKICAgIGNsaSA9IEs4U0NsaWVudChjb250ZXh0LmxvZ2dlcikKICAgIGNsaS5leGVjX3NoZWxsX2NtZChjbWQsIHNoZWxsX3BvZF9uYW1lKQoKY2xhc3MgSzhTQ2xpZW50KG9iamVjdCk6CiAgICBkZWYgX19pbml0X18oc2VsZiwgbG9nZ2VyLCBuYW1lc3BhY2U9J2RlZmF1bHQtdGVuYW50JywgY29uZmlnX2ZpbGU9Tm9uZSk6CiAgICAgICAgc2VsZi5uYW1lc3BhY2UgPSBuYW1lc3BhY2UKICAgICAgICBzZWxmLmxvZ2dlciA9IGxvZ2dlcgogICAgICAgIHNlbGYuX2luaXRfazhzX2NvbmZpZyhjb25maWdfZmlsZSkKICAgICAgICBzZWxmLnYxYXBpID0gY2xpZW50LkNvcmVWMUFwaSgpCgogICAgZGVmIF9pbml0X2s4c19jb25maWcoc2VsZiwgY29uZmlnX2ZpbGUpOgogICAgICAgIHRyeToKICAgICAgICAgICAgY29uZmlnLmxvYWRfaW5jbHVzdGVyX2NvbmZpZygpCiAgICAgICAgICAgIHNlbGYubG9nZ2VyLmluZm8oJ3VzaW5nIGluLWNsdXN0ZXIgY29uZmlnLicpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgdHJ5OgogICAgICAgICAgICAgICAgY29uZmlnLmxvYWRfa3ViZV9jb25maWcoY29uZmlnX2ZpbGUpCiAgICAgICAgICAgICAgICBzZWxmLmxvZ2dlci5pbmZvKCd1c2luZyBsb2NhbCBrdWJlcm5ldGVzIGNvbmZpZy4nKQogICAgICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICAgICAgcmFpc2UgUnVudGltZUVycm9yKAogICAgICAgICAgICAgICAgICAgICdjYW5ub3QgZmluZCBsb2NhbCBrdWJlcm5ldGVzIGNvbmZpZyBmaWxlLCcKICAgICAgICAgICAgICAgICAgICAnIHBsYWNlIGl0IGluIH4vLmt1YmUvY29uZmlnIG9yIHNwZWNpZnkgaXQgaW4gJwogICAgICAgICAgICAgICAgICAgICdLVUJFQ09ORklHIGVudiB2YXInKQoKICAgIGRlZiBnZXRfc2hlbGxfcG9kX25hbWUoc2VsZiwgc2hlbGxfcG9kX25hbWUpOgogICAgICAgIHNoZWxsX3BvZCA9IHNlbGYudjFhcGkubGlzdF9uYW1lc3BhY2VkX3BvZChuYW1lc3BhY2U9c2VsZi5uYW1lc3BhY2UpCiAgICAgICAgZm9yIGkgaW4gc2hlbGxfcG9kLml0ZW1zOiAgICAgICAgICAgIAogICAgICAgICAgICBpZiBzaGVsbF9wb2RfbmFtZSBpbiBpLm1ldGFkYXRhLm5hbWU6CiAgICAgICAgICAgICAgICBzZWxmLmxvZ2dlci5pbmZvKCIlc1x0JXNcdCVzIiAlIChpLnN0YXR1cy5wb2RfaXAsIGkubWV0YWRhdGEubmFtZXNwYWNlLCBpLm1ldGFkYXRhLm5hbWUpKQogICAgICAgICAgICAgICAgc2hlbGxfbmFtZSA9IGkubWV0YWRhdGEubmFtZQogICAgICAgICAgICAgICAgYnJlYWsKICAgICAgICByZXR1cm4gc2hlbGxfbmFtZQoKICAgIGRlZiBleGVjX3NoZWxsX2NtZChzZWxmLCBjbWQsIHNoZWxsX3BvZF9uYW1lKToKICAgICAgICBzaGVsbF9uYW1lID0gc2VsZi5nZXRfc2hlbGxfcG9kX25hbWUoc2hlbGxfcG9kX25hbWUpCiAgICAgICAgZXhlY19jb21tYW5kID0gWwogICAgICAgICAgICAnL2Jpbi9iYXNoJywKICAgICAgICAgICAgJy1jJywKICAgICAgICAgICAgY21kXQogICAgICAgIHJlc3AgPSBzdHJlYW0oc2VsZi52MWFwaS5jb25uZWN0X2dldF9uYW1lc3BhY2VkX3BvZF9leGVjLAogICAgICAgICAgICAgICAgICAgICAgc2hlbGxfbmFtZSwKICAgICAgICAgICAgICAgICAgICAgIHNlbGYubmFtZXNwYWNlLAogICAgICAgICAgICAgICAgICAgICAgY29tbWFuZD1leGVjX2NvbW1hbmQsCiAgICAgICAgICAgICAgICAgICAgICBzdGRlcnI9VHJ1ZSwgc3RkaW49RmFsc2UsCiAgICAgICAgICAgICAgICAgICAgICBzdGRvdXQ9VHJ1ZSwgdHR5PUZhbHNlKQogICAgICAgIHNlbGYubG9nZ2VyLmluZm8oIlJlc3BvbnNlOiAiICsgcmVzcCkgICAgCiAgICAKCg==
+    commands: []
+    code_origin: https://github.com/aviaIguazio/functions.git#b457d9f52c3d7a722d0b62970ca27b43c315630d:submit.ipynb

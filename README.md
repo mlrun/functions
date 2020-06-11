@@ -10,6 +10,7 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | --- | --- | --- | --- |
 | [aggregate](aggregate/aggregate.ipynb) | job | Rolling aggregation over Metrics and Lables according to specifications | data-prep |
 | [arc-to-parquet](arc_to_parquet/arc_to_parquet.ipynb) | job | retrieve remote archive, open and save as parquet | data-movement, utils |
+| [bert-embeddings](bert-embeddings/bert-embeddings-endpoint.ipynb) | nuclio | Get BERT based embeddings for given text | NLP, BERT, embeddings |
 | [churn-test](churn_server/churn_server.ipynb) | nuclio | churn classification and predictor | serving, ml |
 | [cox-test](coxph_test/coxph_test.ipynb) | job | test a classifier using held-out or new data | ml, test |
 | [cox-hazards](coxph_trainer/coxph_trainer.ipynb) | job | train any classifier using scikit-learn's API | training, ml |

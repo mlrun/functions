@@ -15,6 +15,16 @@ arc-to-parquet:
   kind: job
   versions:
     latest: arc_to_parquet/function.yaml
+bert-embeddings:
+  categories:
+  - NLP
+  - BERT
+  - embeddings
+  description: Get BERT based embeddings for given text
+  docfile: bert-embeddings/bert-embeddings-endpoint.ipynb
+  kind: remote
+  versions:
+    latest: bert-embeddings/function.yaml
 churn-test:
   categories:
   - serving

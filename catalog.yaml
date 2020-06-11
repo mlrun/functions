@@ -155,7 +155,7 @@ sentiment-analysis-server:
   - BERT
   - sentiment analysis
   description: BERT based sentiment classification model
-  docfile: sentiment-analysis-server/BERT_sentiment_analysis_serving.ipynb
+  docfile: sentiment-analysis-server/sentiment_analysis_serving.ipynb
   kind: remote
   versions:
     latest: sentiment-analysis-server/function.yaml

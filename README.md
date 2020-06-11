@@ -25,6 +25,7 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [sklearn-server](model_server/model_server.ipynb) | nuclio | generic sklearn model server | serving, ml |
 | [model-server-tester](model_server_tester/model_server_tester.ipynb) | job | test model servers | ml, test |
 | [open-archive](open_archive/open_archive.ipynb) | job | Open a file/object archive into a target directory | data-movement, utils |
+| [sentiment-analysis-server](sentiment-analysis-server/BERT_sentiment_analysis_serving.ipynb) | nuclio | BERT based sentiment classification model | serving, NLP, BERT, sentiment analysis |
 | [sklearn-classifier](sklearn_classifier/sklearn_classifier.ipynb) | job | train any classifier using scikit-learn's API | ml, training |
 | [slack-notify](slack_notify/slack_notify.ipynb) | job | Send Slack notification | ops |
 | [test-classifier](test_classifier/test_classifier.ipynb) | job | test a classifier using held-out or new data | ml, test |

@@ -148,6 +148,17 @@ open-archive:
   kind: job
   versions:
     latest: open_archive/function.yaml
+sentiment-analysis-server:
+  categories:
+  - serving
+  - NLP
+  - BERT
+  - sentiment analysis
+  description: BERT based sentiment classification model
+  docfile: sentiment-analysis-server/BERT_sentiment_analysis_serving.ipynb
+  kind: remote
+  versions:
+    latest: sentiment-analysis-server/function.yaml
 sklearn-classifier:
   categories:
   - ml

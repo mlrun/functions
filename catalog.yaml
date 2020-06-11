@@ -2,6 +2,7 @@ aggregate:
   categories:
   - data-prep
   description: Rolling aggregation over Metrics and Lables according to specifications
+  docfile: aggregate/aggregate.ipynb
   kind: job
   versions:
     latest: aggregate/function.yaml
@@ -10,13 +11,52 @@ arc-to-parquet:
   - data-movement
   - utils
   description: retrieve remote archive, open and save as parquet
+  docfile: arc_to_parquet/arc_to_parquet.ipynb
   kind: job
   versions:
     latest: arc_to_parquet/function.yaml
+bert-embeddings:
+  categories:
+  - NLP
+  - BERT
+  - embeddings
+  description: Get BERT based embeddings for given text
+  docfile: bert-embeddings/bert-embeddings-endpoint.ipynb
+  kind: remote
+  versions:
+    latest: bert-embeddings/function.yaml
+churn-test:
+  categories:
+  - serving
+  - ml
+  description: churn classification and predictor
+  docfile: churn_server/churn_server.ipynb
+  kind: remote
+  versions:
+    latest: churn_server/function.yaml
+cox-hazards:
+  categories:
+  - training
+  - ml
+  description: train any classifier using scikit-learn's API
+  docfile: coxph_trainer/coxph_trainer.ipynb
+  kind: job
+  versions:
+    latest: coxph_trainer/function.yaml
+cox-test:
+  categories:
+  - ml
+  - test
+  description: test a classifier using held-out or new data
+  docfile: coxph_test/coxph_test.ipynb
+  kind: job
+  versions:
+    latest: coxph_test/function.yaml
 describe:
   categories:
   - analysis
   description: describe and visualizes dataset stats
+  docfile: describe/describe.ipynb
   kind: job
   versions:
     latest: describe/function.yaml
@@ -24,14 +64,24 @@ describe-dask:
   categories:
   - analysis
   description: describe and visualizes dataset stats
+  docfile: describe_dask/describe_dask.ipynb
   kind: job
   versions:
     latest: describe_dask/function.yaml
+feature-perms:
+  categories:
+  - analysis
+  description: estimate feature importances using permutations
+  docfile: feature_perms/feature_perms.ipynb
+  kind: job
+  versions:
+    latest: feature_perms/function.yaml
 feature-selection:
   categories:
   - data-prep
   - ml
   description: Select features through multiple Statistical and Model filters
+  docfile: feature_selection/feature_selection.ipynb
   kind: job
   versions:
     latest: feature_selection/function.yaml
@@ -40,14 +90,25 @@ gen-class-data:
   - simulators
   - ml
   description: simulate classification data using scikit-learn
+  docfile: gen_class_data/gen_class_data.ipynb
   kind: job
   versions:
     latest: gen_class_data/function.yaml
+github-utils:
+  categories:
+  - notifications
+  - utils
+  description: add comments to github pull requests
+  docfile: github_utils/github_utils.ipynb
+  kind: job
+  versions:
+    latest: github_utils/function.yaml
 iris-xgb-serving:
   categories:
   - serving
   - ml
   description: xgboost iris classification server
+  docfile: xgb_serving/xgb_serving.ipynb
   kind: remote
   versions:
     latest: xgb_serving/function.yaml
@@ -56,6 +117,7 @@ load-dask:
   - data-movement
   - utils
   description: load dask cluster with data
+  docfile: load_dask/load_dask.ipynb
   kind: dask
   versions:
     latest: load_dask/function.yaml
@@ -64,6 +126,7 @@ load-dataset:
   - data-source
   - ml
   description: load a toy dataset from scikit-learn
+  docfile: load_dataset/load_dataset.ipynb
   kind: job
   versions:
     latest: load_dataset/function.yaml
@@ -72,6 +135,7 @@ model-server-tester:
   - ml
   - test
   description: test model servers
+  docfile: model_server_tester/model_server_tester.ipynb
   kind: job
   versions:
     latest: model_server_tester/function.yaml
@@ -80,14 +144,27 @@ open-archive:
   - data-movement
   - utils
   description: Open a file/object archive into a target directory
+  docfile: open_archive/open_archive.ipynb
   kind: job
   versions:
     latest: open_archive/function.yaml
+sentiment-analysis-server:
+  categories:
+  - serving
+  - NLP
+  - BERT
+  - sentiment analysis
+  description: BERT based sentiment classification model
+  docfile: sentiment-analysis-server/BERT_sentiment_analysis_serving.ipynb
+  kind: remote
+  versions:
+    latest: sentiment-analysis-server/function.yaml
 sklearn-classifier:
   categories:
   - ml
   - training
   description: train any classifier using scikit-learn's API
+  docfile: sklearn_classifier/sklearn_classifier.ipynb
   kind: job
   versions:
     latest: sklearn_classifier/function.yaml
@@ -96,14 +173,24 @@ sklearn-server:
   - serving
   - ml
   description: generic sklearn model server
+  docfile: model_server/model_server.ipynb
   kind: remote
   versions:
     latest: model_server/function.yaml
+slack-notify:
+  categories:
+  - ops
+  description: Send Slack notification
+  docfile: slack_notify/slack_notify.ipynb
+  kind: job
+  versions:
+    latest: slack_notify/function.yaml
 tensorflow-v1-2layers:
   categories:
   - serving
   - dl
   description: tf1 image classification server
+  docfile: tf1_serving/tf1_serving.ipynb
   kind: remote
   versions:
     latest: tf1_serving/function.yaml
@@ -112,6 +199,7 @@ tensorflow-v2-2layers:
   - serving
   - dl
   description: tf2 image classification server
+  docfile: tf2_serving/tf2_serving.ipynb
   kind: remote
   versions:
     latest: tf2_serving/function.yaml
@@ -120,14 +208,26 @@ test-classifier:
   - ml
   - test
   description: test a classifier using held-out or new data
+  docfile: test_classifier/test_classifier.ipynb
   kind: job
   versions:
     latest: test_classifier/function.yaml
+xgb-test:
+  categories:
+  - ml
+  - test
+  description: test a classifier using held-out or new data
+  docfile: xgb_test/xgb_test.ipynb
+  kind: job
+  versions:
+    latest: xgb_test/function.yaml
 xgb-trainer:
   categories:
   - training
   - ml
-  description: train any classifier using scikit-learn's API
+  - experimental
+  description: train multiple model types using xgboost
+  docfile: xgb_trainer/xgb_trainer.ipynb
   kind: job
   versions:
     latest: xgb_trainer/function.yaml

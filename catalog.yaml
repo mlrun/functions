@@ -21,10 +21,10 @@ bert-embeddings:
   - BERT
   - embeddings
   description: Get BERT based embeddings for given text
-  docfile: bert-embeddings/bert-embeddings-endpoint.ipynb
+  docfile: bert_embeddings/bert_embeddings.ipynb
   kind: remote
   versions:
-    latest: bert-embeddings/function.yaml
+    latest: bert_embeddings/function.yaml
 churn-test:
   categories:
   - serving
@@ -155,10 +155,10 @@ sentiment-analysis-server:
   - BERT
   - sentiment analysis
   description: BERT based sentiment classification model
-  docfile: sentiment-analysis-server/sentiment_analysis_serving.ipynb
+  docfile: sentiment_analysis_serving/bert_sentiment_analysis_serving.ipynb
   kind: remote
   versions:
-    latest: sentiment-analysis-server/function.yaml
+    latest: sentiment_analysis_serving/function.yaml
 sklearn-classifier:
   categories:
   - ml

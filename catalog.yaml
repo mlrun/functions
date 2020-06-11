@@ -58,6 +58,14 @@ describe-dask:
   kind: job
   versions:
     latest: describe_dask/function.yaml
+feature-perms:
+  categories:
+  - analysis
+  description: estimate feature importances using permutations
+  docfile: feature_perms/feature_perms.ipynb
+  kind: job
+  versions:
+    latest: feature_perms/function.yaml
 feature-selection:
   categories:
   - data-prep

@@ -15,6 +15,7 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [cox-hazards](coxph_trainer/coxph_trainer.ipynb) | job | train any classifier using scikit-learn's API | training, ml |
 | [describe](describe/describe.ipynb) | job | describe and visualizes dataset stats | analysis |
 | [describe-dask](describe_dask/describe_dask.ipynb) | job | describe and visualizes dataset stats | analysis |
+| [feature-perms](feature_perms/feature_perms.ipynb) | job | estimate feature importances using permutations | analysis |
 | [feature-selection](feature_selection/feature_selection.ipynb) | job | Select features through multiple Statistical and Model filters | data-prep, ml |
 | [gen-class-data](gen_class_data/gen_class_data.ipynb) | job | simulate classification data using scikit-learn | simulators, ml |
 | [github-utils](github_utils/github_utils.ipynb) | job | add comments to github pull requests | notifications, utils |

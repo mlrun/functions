@@ -1,6 +1,6 @@
 kind: job
 metadata:
-  name: features
+  name: feature-perms
   tag: ''
   hash: a050b879c78768ebf63db7aa3870ef63e94ec50b
   project: ''

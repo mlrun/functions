@@ -45,7 +45,7 @@ spec:
       name: tensorflow-v2-2layers
     spec:
       build:
-        baseImage: mlrun/ml-serving
+        baseImage: mlrun/mlrun
         commands:
         - pip install tensorflow>=2.1
         - pip install requests pillow

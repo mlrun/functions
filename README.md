@@ -1,66 +1,36 @@
-# function hub (wip)
+# Functions hub 
 
+This functions hub is intended to be a centralized location for open source contributions of function components.  
+These are functions expected to be run as independent mlrun pipeline compnents, and as public contributions, 
+it is expected that contributors follow certain guidelines/protocols (please chip-in).
 
-This functions hub is intended to be a centralized location for open source contributions of function components.  These are functions expected to be run as independent mlrun pipeline compnents, and as public contributions, it is expected that contributors follow certain guidelines/protocols (please chip-in).
+## Functions
 
-## data
-
-**[arc_to_parquet](arc_to_parquet/arc_to_parquet.ipynb)**<br>
-download remote archive files and save to parquet
-
-**[gen_class_data](gen_class_data/gen_class_data.ipynb)**<br>
-generate simulated classification data according to detailed specs.  Great for testing algorithms and metrics and whole pipelines.
-
-**[load_datasets](load_datasets/load_datasets.ipynb)**<br>
-download toy datasets from sklearn, tensorflow datasets, and other data external curated datasets.
-
-**[open_archive](open_archive/open_archive.ipynb)**<br>
-download a zip or tar archive and extract its contents into a folder (preserving the directory structure)
-
-**[load_dask](load_dask/load_dask.ipynb)**<br>
-define a dask cluster, load your parquet data into it<br>
-
-## explore
-
-**[describe](describe/describe.ipynb)**<br>
-estimate a set of descriptive statistics on pipeline data
-
-**[describe_dask](describe/describe.ipynb)**<br>
-estimate a set of descriptive statistics on pipeline data that has been loaded into a dask cluster
-
-## model
-
-**[aggregate](aggregate/aggregate.ipynb)**<br>
-rolling aggregations on time seriesA
-
-**[feature_selection](feature_selection/feature_selection.ipynb)**<br>
-feture selection using the scikit feature-selection module
-
-**[sklearn classifier](sklearn_classifier/sklearn_classifier.ipynb)**<br>
-train any sklearn class has that has a fit function, including estimators, tranformers, etc...
-
-**[xgb_trainer](xgb_trainer/xgb_trainer.ipynb)**<br>
-train any one of 5 xgboost model types (classifier, regressor,...)
-
-## serve
-
-**[tf1_serving](tf1_serving/tf1_serving.ipynb)**<br>
-deploy a tensorflow 1.x server
-
-**[tf2_serving](tf2_serving/tf2_serving.ipynb)**<br>
-deploy a tensorflow 2.x server
-
-**[xgb_serving](xgb_serving/xgb_serving.ipynb)**<br>
-deploy any xgboost model
-
-**[model_server](model_server/model_server.ipynb)**<br>
-deploy an scikit-learn or almost any pickled model
-
-## test
-
-**[model_server_tester](model_server_tester/model_server_tester.ipynb)**<br>
-deploy an scikit-learn or almost any pickled model
-
-**[test_classifier](test_classifier/test_classifier.ipynb)**<br>
-test a classifier's model against help-out or new data
-
+| function | kind | description | categories |
+| --- | --- | --- | --- |
+| [aggregate](aggregate/aggregate.ipynb) | job | Rolling aggregation over Metrics and Lables according to specifications | data-prep |
+| [arc-to-parquet](arc_to_parquet/arc_to_parquet.ipynb) | job | retrieve remote archive, open and save as parquet | data-movement, utils |
+| [bert-embeddings](bert_embeddings/bert_embeddings.ipynb) | nuclio | Get BERT based embeddings for given text | NLP, BERT, embeddings |
+| [churn-test](churn_server/churn_server.ipynb) | nuclio | churn classification and predictor | serving, ml |
+| [cox-test](coxph_test/coxph_test.ipynb) | job | test a classifier using held-out or new data | ml, test |
+| [cox-hazards](coxph_trainer/coxph_trainer.ipynb) | job | train any classifier using scikit-learn's API | training, ml |
+| [describe](describe/describe.ipynb) | job | describe and visualizes dataset stats | analysis |
+| [describe-dask](describe_dask/describe_dask.ipynb) | job | describe and visualizes dataset stats | analysis |
+| [feature-perms](feature_perms/feature_perms.ipynb) | job | estimate feature importances using permutations | analysis |
+| [feature-selection](feature_selection/feature_selection.ipynb) | job | Select features through multiple Statistical and Model filters | data-prep, ml |
+| [gen-class-data](gen_class_data/gen_class_data.ipynb) | job | simulate classification data using scikit-learn | simulators, ml |
+| [github-utils](github_utils/github_utils.ipynb) | job | add comments to github pull requests | notifications, utils |
+| [load-dask](load_dask/load_dask.ipynb) | dask | load dask cluster with data | data-movement, utils |
+| [load-dataset](load_dataset/load_dataset.ipynb) | job | load a toy dataset from scikit-learn | data-source, ml |
+| [sklearn-server](model_server/model_server.ipynb) | nuclio | generic sklearn model server | serving, ml |
+| [model-server-tester](model_server_tester/model_server_tester.ipynb) | job | test model servers | ml, test |
+| [open-archive](open_archive/open_archive.ipynb) | job | Open a file/object archive into a target directory | data-movement, utils |
+| [sentiment-analysis-server](sentiment_analysis_serving/bert_sentiment_analysis_serving.ipynb) | nuclio | BERT based sentiment classification model | serving, NLP, BERT, sentiment analysis |
+| [sklearn-classifier](sklearn_classifier/sklearn_classifier.ipynb) | job | train any classifier using scikit-learn's API | ml, training |
+| [slack-notify](slack_notify/slack_notify.ipynb) | job | Send Slack notification | ops |
+| [test-classifier](test_classifier/test_classifier.ipynb) | job | test a classifier using held-out or new data | ml, test |
+| [tensorflow-v1-2layers](tf1_serving/tf1_serving.ipynb) | nuclio | tf1 image classification server | serving, dl |
+| [tensorflow-v2-2layers](tf2_serving/tf2_serving.ipynb) | nuclio | tf2 image classification server | serving, dl |
+| [iris-xgb-serving](xgb_serving/xgb_serving.ipynb) | nuclio | xgboost iris classification server | serving, ml |
+| [xgb-test](xgb_test/xgb_test.ipynb) | job | test a classifier using held-out or new data | ml, test |
+| [xgb-trainer](xgb_trainer/xgb_trainer.ipynb) | job | train multiple model types using xgboost | training, ml, experimental |

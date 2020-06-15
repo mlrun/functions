@@ -45,7 +45,7 @@ spec:
       name: tensorflow-v1-2layers
     spec:
       build:
-        baseImage: mlrun/ml-serving:0.4.7-py36
+        baseImage: mlrun/mlrun
         commands:
         - pip install tensorflow==1.14 keras
         - pip install requests pillow

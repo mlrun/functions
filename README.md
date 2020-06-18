@@ -25,6 +25,7 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [open-archive](open_archive/open_archive.ipynb) | job | Open a file/object archive into a target directory | data-movement, utils |
 | [sklearn-classifier](sklearn_classifier/sklearn_classifier.ipynb) | job | train any classifier using scikit-learn's API | ml, training |
 | [slack-notify](slack_notify/slack_notify.ipynb) | job | Send Slack notification | ops |
+| [spark-submit](spark_submit/spark_submit.ipynb) | job | runing spark submit job | data-movement, ml |
 | [test-classifier](test_classifier/test_classifier.ipynb) | job | test a classifier using held-out or new data | ml, test |
 | [tensorflow-v1-2layers](tf1_serving/tf1_serving.ipynb) | nuclio | tf1 image classification server | serving, dl |
 | [tensorflow-v2-2layers](tf2_serving/tf2_serving.ipynb) | nuclio | tf2 image classification server | serving, dl |

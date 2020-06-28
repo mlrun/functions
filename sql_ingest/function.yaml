@@ -1,0 +1,51 @@
+kind: job
+metadata:
+  name: sql-ingest
+  tag: ''
+  hash: 1f353dacbfc01acdf037173a0f07a76abe94c940
+  project: ''
+  labels:
+    author: adih
+  categories:
+  - data-prep
+spec:
+  command: ''
+  args: []
+  image: .mlrun/func-default-sql-ingest-latest
+  env:
+  - name: V3IO_API
+    value: ''
+  - name: V3IO_USERNAME
+    value: ''
+  - name: V3IO_ACCESS_KEY
+    value: ''
+  default_handler: sql_ingest
+  entry_points:
+    sql_ingest:
+      name: sql_ingest
+      doc: SQL Ingest - Ingest data using SQL query
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+      - name: sql_query
+        type: str
+        doc: the sql query used to retrieve the data
+      - name: database_url
+        type: str
+        doc: database connection URL
+      - name: file_ext
+        type: str
+        doc: ("parquet") format for result file
+        default: parquet
+      outputs: []
+      lineno: 9
+  description: SQL Ingest - Ingest data using SQL query
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgcHloaXZlCmZyb20gc3FsYWxjaGVteS5lbmdpbmUgaW1wb3J0IGNyZWF0ZV9lbmdpbmUKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CgoKZGVmIHNxbF9pbmdlc3QoCiAgICBjb250ZXh0OiBNTENsaWVudEN0eCwKICAgIHNxbF9xdWVyeTogc3RyLAogICAgZGF0YWJhc2VfdXJsOiBzdHIsCiAgICBmaWxlX2V4dDogc3RyID0gInBhcnF1ZXQiLAopIC0+IE5vbmU6CiAgICAiIiJTUUwgSW5nZXN0IC0gSW5nZXN0IGRhdGEgdXNpbmcgU1FMIHF1ZXJ5CgogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgICAgICB0aGUgZnVuY3Rpb24gY29udGV4dAogICAgOnBhcmFtIHNxbF9xdWVyeTogICAgICAgICB0aGUgc3FsIHF1ZXJ5IHVzZWQgdG8gcmV0cmlldmUgdGhlIGRhdGEKICAgIDpwYXJhbSBkYXRhYmFzZV91cmw6ICAgICAgZGF0YWJhc2UgY29ubmVjdGlvbiBVUkwKICAgIDpwYXJhbSBmaWxlX2V4dDogICAgICAgICAgKCJwYXJxdWV0IikgZm9ybWF0IGZvciByZXN1bHQgZmlsZQoKIiIiCgogICAgZW5naW5lID0gY3JlYXRlX2VuZ2luZShkYXRhYmFzZV91cmwpCiAgICBkZiA9IHBkLnJlYWRfc3FsKHNxbF9xdWVyeSwgZW5naW5lKQoKICAgIGNvbnRleHQubG9nX2RhdGFzZXQoJ3F1ZXJ5IHJlc3VsdCcsCiAgICAgICAgICAgICAgICAgICAgICAgIGRmPWRmLAogICAgICAgICAgICAgICAgICAgICAgICBmb3JtYXQ9ZmlsZV9leHQsCiAgICAgICAgICAgICAgICAgICAgICAgIGFydGlmYWN0X3BhdGg9Y29udGV4dC5hcnRpZmFjdF9zdWJwYXRoKCdkYXRhJykpCgo=
+    image: .mlrun/func-default-sql-ingest-latest
+    commands:
+    - pip install --no-cache-dir git+https://github.com/v3io/PyHive.git@v0.6.999
+    - pip install sqlalchemy==1.3.11
+    - pip install PyMySQL==0.9.3
+    code_origin: sql_ingest.ipynb

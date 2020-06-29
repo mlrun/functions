@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: sql-ingest
   tag: ''
-  hash: 1f353dacbfc01acdf037173a0f07a76abe94c940
+  hash: c744e61870b1ed2981b2d59762ff213dffddd3f3
   project: ''
   labels:
     author: adih
@@ -12,13 +12,7 @@ spec:
   command: ''
   args: []
   image: .mlrun/func-default-sql-ingest-latest
-  env:
-  - name: V3IO_API
-    value: ''
-  - name: V3IO_USERNAME
-    value: ''
-  - name: V3IO_ACCESS_KEY
-    value: ''
+  env: []
   default_handler: sql_ingest
   entry_points:
     sql_ingest:
@@ -48,4 +42,4 @@ spec:
     - pip install --no-cache-dir git+https://github.com/v3io/PyHive.git@v0.6.999
     - pip install sqlalchemy==1.3.11
     - pip install PyMySQL==0.9.3
-    code_origin: sql_ingest.ipynb
+    code_origin: https://github.com/mlrun/functions.git#b216a2571412e8a539e30e8a17abadbee8ef7383:sql_ingest.ipynb

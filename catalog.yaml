@@ -15,6 +15,16 @@ arc-to-parquet:
   kind: job
   versions:
     latest: arc_to_parquet/function.yaml
+bert-embeddings:
+  categories:
+  - NLP
+  - BERT
+  - embeddings
+  description: Get BERT based embeddings for given text
+  docfile: bert_embeddings/bert_embeddings.ipynb
+  kind: remote
+  versions:
+    latest: bert_embeddings/function.yaml
 churn-test:
   categories:
   - serving
@@ -28,7 +38,7 @@ cox-hazards:
   categories:
   - training
   - ml
-  description: train any classifier using scikit-learn's API
+  description: cox proportional hazards, kaplan meier plots
   docfile: coxph_trainer/coxph_trainer.ipynb
   kind: job
   versions:
@@ -37,7 +47,7 @@ cox-test:
   categories:
   - ml
   - test
-  description: test a classifier using held-out or new data
+  description: test cox proportional hazards model
   docfile: coxph_test/coxph_test.ipynb
   kind: job
   versions:
@@ -58,6 +68,14 @@ describe-dask:
   kind: job
   versions:
     latest: describe_dask/function.yaml
+feature-perms:
+  categories:
+  - analysis
+  description: estimate feature importances using permutations
+  docfile: feature_perms/feature_perms.ipynb
+  kind: job
+  versions:
+    latest: feature_perms/function.yaml
 feature-selection:
   categories:
   - data-prep
@@ -85,15 +103,6 @@ github-utils:
   kind: job
   versions:
     latest: github_utils/function.yaml
-iris-xgb-serving:
-  categories:
-  - serving
-  - ml
-  description: xgboost iris classification server
-  docfile: xgb_serving/xgb_serving.ipynb
-  kind: remote
-  versions:
-    latest: xgb_serving/function.yaml
 load-dask:
   categories:
   - data-movement
@@ -130,6 +139,25 @@ open-archive:
   kind: job
   versions:
     latest: open_archive/function.yaml
+send-email:
+  categories:
+  - notifications
+  description: Send Email messages through SMTP server
+  docfile: send_email/send_email.ipynb
+  kind: job
+  versions:
+    latest: send_email/function.yaml
+sentiment-analysis-server:
+  categories:
+  - serving
+  - NLP
+  - BERT
+  - sentiment analysis
+  description: BERT based sentiment classification model
+  docfile: sentiment_analysis_serving/bert_sentiment_analysis_serving.ipynb
+  kind: remote
+  versions:
+    latest: sentiment_analysis_serving/function.yaml
 sklearn-classifier:
   categories:
   - ml
@@ -156,6 +184,21 @@ slack-notify:
   kind: job
   versions:
     latest: slack_notify/function.yaml
+sql-to-file:
+  categories:
+  - data-prep
+  description: SQL To File - Ingest data using SQL query
+  docfile: sql_to_file/sql_to_file.ipynb
+  kind: job
+  versions:
+    latest: sql_to_file/function.yaml
+submit:
+  categories: []
+  description: ''
+  docfile: spark_submit/spark_submit.ipynb
+  kind: job
+  versions:
+    latest: spark_submit/function.yaml
 tensorflow-v1-2layers:
   categories:
   - serving
@@ -183,13 +226,21 @@ test-classifier:
   kind: job
   versions:
     latest: test_classifier/function.yaml
+xgb-custom:
+  categories:
+  - analysis
+  description: train an xgboost model using the low-level api
+  docfile: xgb_custom/xgb_custom.ipynb
+  kind: job
+  versions:
+    latest: xgb_custom/function.yaml
 xgb-test:
   categories:
+  - serving
   - ml
-  - test
-  description: test a classifier using held-out or new data
-  docfile: xgb_test/xgb_test.ipynb
-  kind: job
+  description: xgboost test data classification server
+  docfile: xgb_serving/xgb_serving.ipynb
+  kind: remote
   versions:
     latest: xgb_test/function.yaml
 xgb-trainer:

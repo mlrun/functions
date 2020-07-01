@@ -18,7 +18,8 @@ def aggregate(context,
               window: int = 3, 
               center: bool = False, 
               inplace: bool = False,
-              drop_na: bool = True):
+              drop_na: bool = True,
+              files_to_select: int = 1):
     """Time-series aggregation function
     
     Will perform a rolling aggregation on {df_artifact}, over {window} by the selected {keys}
@@ -27,7 +28,9 @@ def aggregate(context,
     
     if not {inplace}, will return the original {df_artifact}, joined by the aggregated result.
     
-    :param df_artifact: MLRun input pointing to pandas dataframe (csv/parquet file path)
+    :param df_artifact: MLRun input pointing to pandas dataframe (csv/parquet file path) or a 
+                        directory containing parquet files.
+                        * When given a directory the latest {files_to_select} will be selected
     :param save_to:     Where to save the result dataframe.
                         * If relative will add to the {artifact_path}
     :param keys:        Subset of indexes from the source dataframe to aggregate by (default=all)
@@ -45,6 +48,7 @@ def aggregate(context,
     :param inplace:     If True, will return only the aggregated results.
                         If False, will join the aggregated results with the original dataframe
     :param drop_na:     Will drop na lines due to the Rolling.
+    :param files_to_select: Specifies the number of *latest* files to select (and concat) for aggregation.
     """
     
     from_model = type(df_artifact) == pd.DataFrame
@@ -53,10 +57,12 @@ def aggregate(context,
         input_df = df_artifact
     else:
         if df_artifact.url.endswith('/'):   # is a directory?
-            mpath = [os.path.join(df_artifact.url, file) for file in df_artifact.listdir()]
-            latest = max(mpath, key=os.path.getmtime) 
+            mpath = [os.path.join(df_artifact.url, file) for file in df_artifact.listdir() if file.endswith(('parquet', 'pq'))]
+            files_by_updated = sorted(mpath, key=os.path.getmtime, reverse=True)
+            context.logger.info(files_by_updated)
+            latest = files_by_updated[:files_to_select]
             context.logger.info(f'Aggregating {latest}')
-            input_df = context.get_dataitem(latest).as_df()
+            input_df = pd.concat([context.get_dataitem(df).as_df() for df in latest])
         else:  # A regular artifact
             context.logger.info(f'Aggregating {df_artifact.url}')
             input_df = df_artifact.as_df()

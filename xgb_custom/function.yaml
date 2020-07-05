@@ -1,0 +1,202 @@
+kind: job
+metadata:
+  name: xgb-custom
+  tag: ''
+  hash: e6f6e0e49eae57ca1d297a233c95e1e9bd9061a2
+  project: ''
+  labels:
+    author: yjb
+  categories:
+  - analysis
+spec:
+  command: ''
+  args: []
+  image: mlrun/ml-models
+  env: []
+  default_handler: fit
+  entry_points:
+    gen_outliers:
+      name: gen_outliers
+      doc: simulate data with outliers
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function's execution context
+      - name: nrows
+        doc: (4096) number of data points
+        default: 4096
+      - name: feats
+        doc: (16) number of features
+        default: 16
+      - name: outs
+        doc: (64) number of outliers
+        default: 64
+      - name: omax
+        doc: (10_100) max value of outliers
+        default: 10000
+      - name: labels_col
+        doc: (labels) name of labels column
+        default: labels
+      - name: header
+        doc: () header for dataset, will default to `feat_`
+      - name: label_type
+        doc: (int32) data type for the label column
+        default: int32
+      - name: key
+        doc: key of datset in artifact store
+        default: xgb-outs
+      - name: local_path
+        doc: path in artifact store where data will be serialized
+        default: xgb_custom
+      outputs: []
+      lineno: 22
+    gradient:
+      name: gradient
+      doc: gradient of squared log error
+      parameters:
+      - name: predt
+      - name: dtrain
+        type: DMatrix
+      outputs: []
+      lineno: 59
+    hessian:
+      name: hessian
+      doc: hessian of squared log error
+      parameters:
+      - name: predt
+      - name: dtrain
+        type: DMatrix
+      outputs: []
+      lineno: 65
+    squared_log:
+      name: squared_log
+      doc: 'squared log error objective
+
+
+        simplified version for RMSLE used as objective function'
+      parameters:
+      - name: predt
+      - name: dtrain
+        type: DMatrix
+      outputs: []
+      lineno: 72
+    rmsle:
+      name: rmsle
+      doc: Root mean squared log error metric.
+      parameters:
+      - name: predt
+      - name: dtrain
+        type: DMatrix
+      outputs: []
+      lineno: 83
+    learning_curves:
+      name: learning_curves
+      doc: 'plot xgb learning curves
+
+
+        this will also log a model''s learning curves'
+      parameters:
+      - name: context
+        type: MLClientCtx
+      - name: results
+        type: dict
+      - name: figsz
+        type: Tuple[int, int]
+        default:
+        - 10
+        - 10
+      - name: plots_dest
+        type: str
+        default: plots
+      outputs: []
+      lineno: 91
+    fit:
+      name: fit
+      doc: "low level xgboost train api\n\nfor the xgboost `train` params see:\nhttps://xgboost.readthedocs.io/en/latest/python/python_api.html#xgboost.train\n\
+        \nNote:  the first parameter of xgboost's `train` method is a dict of parameters\n\
+        \       supplied to the booster (engine).  To modify one of those simply\n\
+        \       add a task parameter (when running you supply an mlrun NewTask) with\
+        \ the\n       prefix \"XGB_\". So for example, to set the 'tree_method' parameter\
+        \ to 'approx',\n       add {\"XGB_tree_method\":\"approx\"} to the task params\
+        \ key."
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+      - name: dataset
+        type: DataItem
+        doc: the full data set, train, valid and test will be extracted and each converted
+          to a DMatrix for input to xgboost's `train`
+      - name: num_boost_round
+        type: int
+        default: 10
+      - name: evals
+        type: List[Tuple[DMatrix, str]]
+      - name: obj
+        type: Union[Callable, str]
+      - name: feval
+        type: Union[Callable, str]
+      - name: maximize
+        type: bool
+      - name: early_stopping_rounds
+        type: int
+      - name: evals_result
+        type: dict
+      - name: verbose_eval
+        type: bool
+        default: true
+      - name: xgb_model
+        type: DataItem
+      - name: callbacks
+        type: List[Callable]
+      - name: label_column
+        type: str
+        doc: ground-truth (y) labels
+        default: labels
+      - name: encode_cols
+        type: dict
+        doc: dictionary of names and prefixes for columns that are to hot be encoded.
+      - name: sample
+        type: int
+        doc: Selects the first n rows, or select a sample starting from the first.
+          If negative <-1, select a random sample
+        default: <_ast.USub object at 0x7f5a004d4d30>
+      - name: test_size
+        type: float
+        doc: (0.05) test set size
+        default: 0.25
+      - name: valid_size
+        type: float
+        doc: (0.75) Once the test set has been removed the training set gets this
+          proportion.
+        default: 0.75
+      - name: random_state
+        type: int
+        doc: (1) sklearn rng seed
+        default: 1994
+      - name: models_dest
+        type: str
+        doc: destination subfolder for model artifacts
+        default: models
+      - name: plots_dest
+        type: str
+        doc: destination subfolder for plot artifacts
+        default: plots
+      - name: file_ext
+        type: str
+        doc: format for test_set_key hold out data
+        default: csv
+      - name: test_set_key
+        type: str
+        doc: (test-set), key of held out data in artifact store
+        default: test-set
+      - name: gpus
+        type: bool
+        doc: (False), run on gpus
+      outputs: []
+      lineno: 112
+  description: train an xgboost model using the low-level api
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSBvcyBpbXBvcnQgcGF0aAppbXBvcnQgbnVtcHkgYXMgbnAKZnJvbSBudW1weS5yYW5kb20gaW1wb3J0IHJhbmRpbnQsIHJhbmRuLCBzZWVkCmltcG9ydCBwYW5kYXMgYXMgcGQKZnJvbSB4Z2Jvb3N0IGltcG9ydCBETWF0cml4LCB0cmFpbgppbXBvcnQgbWF0cGxvdGxpYi5weXBsb3QgYXMgcGx0CmZyb20gbWxydW4uZXhlY3V0aW9uIGltcG9ydCBNTENsaWVudEN0eApmcm9tIG1scnVuLmRhdGFzdG9yZSBpbXBvcnQgRGF0YUl0ZW0KZnJvbSBtbHJ1bi5hcnRpZmFjdHMgaW1wb3J0IFBsb3RBcnRpZmFjdApmcm9tIG1scnVuLm1sdXRpbHMgaW1wb3J0IGdldF9zcGxpdHMsIGdldF9zYW1wbGUKCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzCgpmcm9tIHR5cGluZyBpbXBvcnQgKFR1cGxlLCBEaWN0LCBMaXN0LCBVbmlvbiwgQ2FsbGFibGUpCgpzZWVkKHNlZWQ9MTk5NCkKCkRFQlVHX0VSUk9SID0gMCAjIHRoaXMgd2lsbCBiZSBhZGRlZCB0byB0aGUgY3VzdG9tIGV2YWwgZnVuY3Rpb24tLXNldCBpdCB0byBzb21lIHZhbHVlIGxpa2UgOTk5IAoKZGVmIGdlbl9vdXRsaWVycyhjb250ZXh0OiBNTENsaWVudEN0eCwgbnJvd3M9NDA5NiwgZmVhdHM9MTYsIAogICAgICAgICAgICAgICAgIG91dHM9NjQsIG9tYXg9MTBfMDAwLCBsYWJlbHNfY29sPSJsYWJlbHMiLAogICAgICAgICAgICAgICAgIGhlYWRlcj1bXSwgbGFiZWxfdHlwZT0iaW50MzIiLCBrZXk9InhnYi1vdXRzIiwKICAgICAgICAgICAgICAgICBsb2NhbF9wYXRoPSJ4Z2JfY3VzdG9tIik6CiAgICAiIiJzaW11bGF0ZSBkYXRhIHdpdGggb3V0bGllcnMKICAgIAogICAgOnBhcmFtIGNvbnRleHQ6ICAgIHRoZSBmdW5jdGlvbidzIGV4ZWN1dGlvbiBjb250ZXh0CiAgICA6cGFyYW0gbnJvd3M6ICAgICAgKDQwOTYpIG51bWJlciBvZiBkYXRhIHBvaW50cwogICAgOnBhcmFtIGZlYXRzOiAgICAgICgxNikgbnVtYmVyIG9mIGZlYXR1cmVzCiAgICA6cGFyYW0gb3V0czogICAgICAgKDY0KSBudW1iZXIgb2Ygb3V0bGllcnMKICAgIDpwYXJhbSBvbWF4OiAgICAgICAoMTBfMTAwKSBtYXggdmFsdWUgb2Ygb3V0bGllcnMKICAgIDpwYXJhbSBsYWJlbHNfY29sOiAobGFiZWxzKSBuYW1lIG9mIGxhYmVscyBjb2x1bW4KICAgIDpwYXJhbSBoZWFkZXI6ICAgICAoKSBoZWFkZXIgZm9yIGRhdGFzZXQsIHdpbGwgZGVmYXVsdCB0bwogICAgICAgICAgICAgICAgICAgICAgIGBmZWF0X2AKICAgIDpwYXJhbSBsYWJlbF90eXBlOiAoaW50MzIpIGRhdGEgdHlwZSBmb3IgdGhlIGxhYmVsIGNvbHVtbgogICAgOnBhcmFtIGtleTogICAgICAgIGtleSBvZiBkYXRzZXQgaW4gYXJ0aWZhY3Qgc3RvcmUKICAgIDpwYXJhbSBsb2NhbF9wYXRoOiBwYXRoIGluIGFydGlmYWN0IHN0b3JlIHdoZXJlIGRhdGEgd2lsbCBiZQogICAgICAgICAgICAgICAgICAgICAgIHNlcmlhbGl6ZWQKICAgICIiIgogICAgeCA9IHJhbmRuKG5yb3dzLCBmZWF0cykKICAgIHkgPSByYW5kbihucm93cykKICAgIHkgKz0gbnAuYWJzKG5wLm1pbih5KSkKCiAgICBmb3IgaSBpbiByYW5nZSgwLCBvdXRzKToKICAgICAgICBpbmQgPSByYW5kaW50KDAsIGxlbih5KS0xKQogICAgICAgIHlbaW5kXSArPSByYW5kaW50KDAsIG9tYXgpCiAgICAKICAgIGlmIG5vdCBoZWFkZXI6CiAgICAgICAgaGVhZGVyID0gW2YiZmVhdF97an0iIGZvciBqIGluIHJhbmdlKGZlYXRzKV0KICAgICAgICBoZWFkZXIuYXBwZW5kKGxhYmVsc19jb2wpCgogICAgZGF0YSA9IHBkLkRhdGFGcmFtZShkYXRhPW5wLmNvbmNhdGVuYXRlKCh4LHkucmVzaGFwZSgtMSwxKSksYXhpcz0tMSksCiAgICAgICAgICAgICAgICAgICAgICAgIGNvbHVtbnM9aGVhZGVyKQogICAgZGF0YSA9IGRhdGEuYXN0eXBlKHtsYWJlbHNfY29sOiBsYWJlbF90eXBlfSkKICAgIAogICAgY29udGV4dC5sb2dfZGF0YXNldChrZXksIGRmPWRhdGEsIGxvY2FsX3BhdGg9bG9jYWxfcGF0aCkKCmRlZiBncmFkaWVudChwcmVkdDogbnAubmRhcnJheSwgZHRyYWluOiBETWF0cml4KSAtPiBucC5uZGFycmF5OgogICAgIiIiZ3JhZGllbnQgb2Ygc3F1YXJlZCBsb2cgZXJyb3IiIiIKICAgIHkgPSBkdHJhaW4uZ2V0X2xhYmVsKCkKICAgIHJldHVybiAobnAubG9nMXAocHJlZHQpIC0gbnAubG9nMXAoeSkpIC8gKHByZWR0ICsgMSkKCgpkZWYgaGVzc2lhbihwcmVkdDogbnAubmRhcnJheSwgZHRyYWluOiBETWF0cml4KSAtPiBucC5uZGFycmF5OgogICAgIiIiaGVzc2lhbiBvZiBzcXVhcmVkIGxvZyBlcnJvciIiIgogICAgeSA9IGR0cmFpbi5nZXRfbGFiZWwoKQogICAgcmV0dXJuICgoLW5wLmxvZzFwKHByZWR0KSArIG5wLmxvZzFwKHkpICsgMSkgLwogICAgICAgICAgICBucC5wb3dlcihwcmVkdCArIDEsIDIpKQoKCmRlZiBzcXVhcmVkX2xvZyhwcmVkdDogbnAubmRhcnJheSwgZHRyYWluOiBETWF0cml4KSAtPiBUdXBsZVtucC5uZGFycmF5LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbnAubmRhcnJheV06CiAgICAiIiJzcXVhcmVkIGxvZyBlcnJvciBvYmplY3RpdmUKCiAgICBzaW1wbGlmaWVkIHZlcnNpb24gZm9yIFJNU0xFIHVzZWQgYXMgb2JqZWN0aXZlIGZ1bmN0aW9uCiAgICAiIiIKICAgIHByZWR0W3ByZWR0IDwgLTFdID0gLTEgKyAxZS02CiAgICBncmFkID0gZ3JhZGllbnQocHJlZHQsIGR0cmFpbikKICAgIGhlc3MgPSBoZXNzaWFuKHByZWR0LCBkdHJhaW4pCiAgICByZXR1cm4gZ3JhZCwgaGVzcwoKZGVmIHJtc2xlKHByZWR0OiBucC5uZGFycmF5LCBkdHJhaW46IERNYXRyaXgpIC0+IFR1cGxlW3N0ciwgZmxvYXRdOgogICAgIiIiIFJvb3QgbWVhbiBzcXVhcmVkIGxvZyBlcnJvciBtZXRyaWMuCiAgICAiIiIKICAgIHkgPSBkdHJhaW4uZ2V0X2xhYmVsKCkKICAgIHByZWR0W3ByZWR0IDwgLTFdID0gLTEgKyAxZS02CiAgICBlbGVtZW50cyA9IG5wLnBvd2VyKG5wLmxvZzFwKHkpIC0gbnAubG9nMXAocHJlZHQpLCAyKQogICAgcmV0dXJuICJteV9ybXNsZSIsIGZsb2F0KG5wLnNxcnQobnAuc3VtKGVsZW1lbnRzKSAvIGxlbih5KSkpICsgREVCVUdfRVJST1IKCmRlZiBsZWFybmluZ19jdXJ2ZXMoCiAgICBjb250ZXh0OiBNTENsaWVudEN0eCwKICAgIHJlc3VsdHM6IGRpY3QsCiAgICBmaWdzejogVHVwbGVbaW50LGludF09KDEwLDEwKSwKICAgIHBsb3RzX2Rlc3Q6IHN0ciA9ICJwbG90cyIKKSAtPiBOb25lOgogICAgIiIicGxvdCB4Z2IgbGVhcm5pbmcgY3VydmVzCiAgICAKICAgIHRoaXMgd2lsbCBhbHNvIGxvZyBhIG1vZGVsJ3MgbGVhcm5pbmcgY3VydmVzCiAgICAiIiIKICAgIHBsdC5jbGYoKQogICAgcGx0LmZpZ3VyZShmaWdzaXplPWZpZ3N6KQogICAgcGx0LnBsb3QocmVzdWx0c1sidHJhaW4iXVsibXlfcm1zbGUiXSwgbGFiZWw9InRyYWluLW15LXJtc2xlIikKICAgIHBsdC5wbG90KHJlc3VsdHNbInZhbGlkIl1bIm15X3Jtc2xlIl0sIGxhYmVsPSJ2YWxpZC1teS1ybXNsZSIpCiAgICBwbHQudGl0bGUoZiJsZWFybmluZyBjdXJ2ZXMiKQogICAgcGx0LmxlZ2VuZCgpCiAKICAgIGNvbnRleHQubG9nX2FydGlmYWN0KAogICAgICAgIFBsb3RBcnRpZmFjdChmImxlYXJuaW5nLWN1cnZlcyIsIGJvZHk9cGx0LmdjZigpKSwKICAgICAgICBsb2NhbF9wYXRoPWYie3Bsb3RzX2Rlc3R9L2xlYXJuaW5nLWN1cnZlcy5odG1sIikKCmRlZiBmaXQoCiAgICBjb250ZXh0OiBNTENsaWVudEN0eCwKICAgIGRhdGFzZXQ6IERhdGFJdGVtLAogICAgbnVtX2Jvb3N0X3JvdW5kOiBpbnQgPSAxMCwKICAgIGV2YWxzOiBMaXN0W1R1cGxlW0RNYXRyaXgsIHN0cl1dID0gW10sCiAgICBvYmo6IFVuaW9uW0NhbGxhYmxlLCBzdHJdID0gIiIsCiAgICBmZXZhbDogVW5pb25bQ2FsbGFibGUsIHN0cl0gPSBOb25lLAogICAgbWF4aW1pemU6IGJvb2wgPSBGYWxzZSwKICAgIGVhcmx5X3N0b3BwaW5nX3JvdW5kczogaW50ID0gTm9uZSwKICAgIGV2YWxzX3Jlc3VsdDogZGljdCA9IHt9LAogICAgdmVyYm9zZV9ldmFsOiBib29sID0gVHJ1ZSwKICAgIHhnYl9tb2RlbDogRGF0YUl0ZW0gPSBOb25lLAogICAgY2FsbGJhY2tzOiBMaXN0W0NhbGxhYmxlXSA9IFtdLAogICAgbGFiZWxfY29sdW1uOiBzdHIgPSAibGFiZWxzIiwKICAgIGVuY29kZV9jb2xzOiBkaWN0ID0ge30sCiAgICBzYW1wbGU6IGludCA9IC0xLAogICAgdGVzdF9zaXplOiBmbG9hdCA9IDAuMjUsCiAgICB2YWxpZF9zaXplOiBmbG9hdCA9IDAuNzUsCiAgICByYW5kb21fc3RhdGU6IGludCA9IDE5OTQsCiAgICBtb2RlbHNfZGVzdDogc3RyID0gIm1vZGVscyIsCiAgICBwbG90c19kZXN0OiBzdHIgPSAicGxvdHMiLAogICAgZmlsZV9leHQ6IHN0ciA9ICJjc3YiLAogICAgdGVzdF9zZXRfa2V5OiBzdHIgPSAidGVzdC1zZXQiLAogICAgZ3B1czogYm9vbCA9IEZhbHNlCikgLT4gTm9uZToKICAgICIiImxvdyBsZXZlbCB4Z2Jvb3N0IHRyYWluIGFwaQogICAgCiAgICBmb3IgdGhlIHhnYm9vc3QgYHRyYWluYCBwYXJhbXMgc2VlOgogICAgaHR0cHM6Ly94Z2Jvb3N0LnJlYWR0aGVkb2NzLmlvL2VuL2xhdGVzdC9weXRob24vcHl0aG9uX2FwaS5odG1sI3hnYm9vc3QudHJhaW4KCiAgICBOb3RlOiAgdGhlIGZpcnN0IHBhcmFtZXRlciBvZiB4Z2Jvb3N0J3MgYHRyYWluYCBtZXRob2QgaXMgYSBkaWN0IG9mIHBhcmFtZXRlcnMKICAgICAgICAgICBzdXBwbGllZCB0byB0aGUgYm9vc3RlciAoZW5naW5lKS4gIFRvIG1vZGlmeSBvbmUgb2YgdGhvc2Ugc2ltcGx5CiAgICAgICAgICAgYWRkIGEgdGFzayBwYXJhbWV0ZXIgKHdoZW4gcnVubmluZyB5b3Ugc3VwcGx5IGFuIG1scnVuIE5ld1Rhc2spIHdpdGggdGhlCiAgICAgICAgICAgcHJlZml4ICJYR0JfIi4gU28gZm9yIGV4YW1wbGUsIHRvIHNldCB0aGUgJ3RyZWVfbWV0aG9kJyBwYXJhbWV0ZXIgdG8gJ2FwcHJveCcsCiAgICAgICAgICAgYWRkIHsiWEdCX3RyZWVfbWV0aG9kIjoiYXBwcm94In0gdG8gdGhlIHRhc2sgcGFyYW1zIGtleS4KICAgIAogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgICAgICB0aGUgZnVuY3Rpb24gY29udGV4dAogICAgOnBhcmFtIGRhdGFzZXQ6ICAgICAgICAgICB0aGUgZnVsbCBkYXRhIHNldCwgdHJhaW4sIHZhbGlkIGFuZCB0ZXN0IHdpbGwgYmUgZXh0cmFjdGVkIGFuZAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlYWNoIGNvbnZlcnRlZCB0byBhIERNYXRyaXggZm9yIGlucHV0IHRvIHhnYm9vc3QncyBgdHJhaW5gCiAgICA6cGFyYW0gbGFiZWxfY29sdW1uOiAgICAgIGdyb3VuZC10cnV0aCAoeSkgbGFiZWxzCiAgICA6cGFyYW0gZW5jb2RlX2NvbHM6ICAgICAgIGRpY3Rpb25hcnkgb2YgbmFtZXMgYW5kIHByZWZpeGVzIGZvciBjb2x1bW5zIHRoYXQgYXJlCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRvIGhvdCBiZSBlbmNvZGVkLgogICAgOnBhcmFtIHNhbXBsZTogICAgICAgICAgICBTZWxlY3RzIHRoZSBmaXJzdCBuIHJvd3MsIG9yIHNlbGVjdCBhIHNhbXBsZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdGFydGluZyBmcm9tIHRoZSBmaXJzdC4gSWYgbmVnYXRpdmUgPC0xLCBzZWxlY3QKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYSByYW5kb20gc2FtcGxlCiAgICA6cGFyYW0gdGVzdF9zaXplOiAgICAgICAgICgwLjA1KSB0ZXN0IHNldCBzaXplCiAgICA6cGFyYW0gdmFsaWRfc2l6ZTogICAgICAgICgwLjc1KSBPbmNlIHRoZSB0ZXN0IHNldCBoYXMgYmVlbiByZW1vdmVkIHRoZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0cmFpbmluZyBzZXQgZ2V0cyB0aGlzIHByb3BvcnRpb24uCiAgICA6cGFyYW0gcmFuZG9tX3N0YXRlOiAgICAgICgxKSBza2xlYXJuIHJuZyBzZWVkCiAgICA6cGFyYW0gbW9kZWxzX2Rlc3Q6ICAgICAgIGRlc3RpbmF0aW9uIHN1YmZvbGRlciBmb3IgbW9kZWwgYXJ0aWZhY3RzCiAgICA6cGFyYW0gcGxvdHNfZGVzdDogICAgICAgIGRlc3RpbmF0aW9uIHN1YmZvbGRlciBmb3IgcGxvdCBhcnRpZmFjdHMKICAgIDpwYXJhbSBmaWxlX2V4dDogICAgICAgICAgZm9ybWF0IGZvciB0ZXN0X3NldF9rZXkgaG9sZCBvdXQgZGF0YQogICAgOnBhcmFtIHRlc3Rfc2V0X2tleTogICAgICAodGVzdC1zZXQpLCBrZXkgb2YgaGVsZCBvdXQgZGF0YSBpbiBhcnRpZmFjdCBzdG9yZQogICAgOnBhcmFtIGdwdXM6ICAgICAgICAgICAgICAoRmFsc2UpLCBydW4gb24gZ3B1cwogICAgIiIiCiAgICByYXcsIGxhYmVscywgaGVhZGVyID0gZ2V0X3NhbXBsZShkYXRhc2V0LCBzYW1wbGUsIGxhYmVsX2NvbHVtbikKICAgIAogICAgaWYgZW5jb2RlX2NvbHM6CiAgICAgICAgcmF3ID0gcGQuZ2V0X2R1bW1pZXMocmF3LCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb2x1bW5zPWxpc3QoZW5jb2RlX2NvbHMua2V5cygpKSwgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcHJlZml4PWxpc3QoZW5jb2RlX2NvbHMudmFsdWVzKCkpLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkcm9wX2ZpcnN0PVRydWUpCiAgICAKICAgICh4dHJhaW4sIHl0cmFpbiksICh4dmFsaWQsIHl2YWxpZCksICh4dGVzdCwgeXRlc3QpID0gICAgICAgICBnZXRfc3BsaXRzKHJhdywgbGFiZWxzLCAzLCB0ZXN0X3NpemUsIHZhbGlkX3NpemUsIHJhbmRvbV9zdGF0ZSkKICAgIAogICAgY29udGV4dC5sb2dfZGF0YXNldCh0ZXN0X3NldF9rZXksIGRmPXBkLmNvbmNhdChbeHRlc3QsIHl0ZXN0XSwgYXhpcz0xKSwKICAgICAgICAgICAgICAgICAgICAgICAgZm9ybWF0PWZpbGVfZXh0LCBpbmRleD1GYWxzZSkKICAgIAogICAgZHRyYWluID0gRE1hdHJpeCh4dHJhaW4sIGxhYmVsPXl0cmFpbikKICAgIGR2YWxpZCA9IERNYXRyaXgoeHZhbGlkLCBsYWJlbD15dmFsaWQpCiAgICAKICAgIGJvb3N0X3BhcmFtcyA9IHsKICAgICAgICAidHJlZV9tZXRob2QiOiAiZ3B1X2hpc3QiIGlmIGdwdXMgZWxzZSAiaGlzdCIsIAogICAgICAgICJzZWVkIjogcmFuZG9tX3N0YXRlLAogICAgICAgICJkaXNhYmxlX2RlZmF1bHRfZXZhbF9tZXRyaWMiOiAxLAogICAgICAgICJvYmplY3RpdmUiOiAicmVnOnNxdWFyZWRsb2dlcnJvciIsCiAgICAgICAgImV2YWxfbWV0cmljIjogInJtc2xlIn0KCiAgICBmb3IgaywgdiBpbiBjb250ZXh0LnBhcmFtZXRlcnMuaXRlbXMoKToKICAgICAgICBpZiBrLnN0YXJ0c3dpdGgoJ1hHQl8nKToKICAgICAgICAgICAgYm9vc3RfcGFyYW1zW2tbNDpdXSA9IHYKICAgIAogICAgcmVzdWx0cyA9IGRpY3QoKQogICAgCiAgICBib29zdGVyID0gdHJhaW4oCiAgICAgICAgYm9vc3RfcGFyYW1zLAogICAgICAgIGR0cmFpbj1kdHJhaW4sCiAgICAgICAgbnVtX2Jvb3N0X3JvdW5kPW51bV9ib29zdF9yb3VuZCwKICAgICAgICBldmFscz1bKGR0cmFpbiwgInRyYWluIiksIChkdmFsaWQsICJ2YWxpZCIpXSwKICAgICAgICBldmFsc19yZXN1bHQ9cmVzdWx0cywKICAgICAgICBvYmo9c3F1YXJlZF9sb2csCiAgICAgICAgZmV2YWw9cm1zbGUsCiAgICAgICAgbWF4aW1pemU9bWF4aW1pemUsCiAgICAgICAgZWFybHlfc3RvcHBpbmdfcm91bmRzPWVhcmx5X3N0b3BwaW5nX3JvdW5kcywKICAgICAgICB2ZXJib3NlX2V2YWw9dmVyYm9zZV9ldmFsLAogICAgKQogICAgCiAgICBjb250ZXh0LmxvZ19tb2RlbCgibW9kZWwiLCAKICAgICAgICAgICAgICAgICAgICAgIGJvZHk9ZHVtcHMoYm9vc3RlciksCiAgICAgICAgICAgICAgICAgICAgICBtb2RlbF9maWxlID0gIm1vZGVsLnBrbCIsCiAgICAgICAgICAgICAgICAgICAgICBhcnRpZmFjdF9wYXRoPScvVXNlci9hcnRpZmFjdHMvdHR0dCcpCiAgICAKICAgIGxlYXJuaW5nX2N1cnZlcyhjb250ZXh0LCByZXN1bHRzKQoK
+    commands: []
+    code_origin: https://github.com/yjb-ds/functions.git#3374c1e154fa4ec2763dddf098b57a2b40a3902d:xgb_custom.ipynb

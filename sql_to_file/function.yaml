@@ -1,0 +1,44 @@
+kind: job
+metadata:
+  name: sql-to-file
+  tag: ''
+  hash: 6ee2ccf33ed78ff830ea6fa436b4e49678698bee
+  project: ''
+  labels:
+    author: adih
+  categories:
+  - data-prep
+spec:
+  command: ''
+  args: []
+  env: []
+  default_handler: sql_to_file
+  entry_points:
+    sql_to_file:
+      name: sql_to_file
+      doc: SQL Ingest - Ingest data using SQL query
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+      - name: sql_query
+        type: str
+        doc: the sql query used to retrieve the data
+      - name: database_url
+        type: str
+        doc: database connection URL
+      - name: file_ext
+        type: str
+        doc: ("parquet") format for result file
+        default: parquet
+      outputs: []
+      lineno: 9
+  description: SQL To File - Ingest data using SQL query
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgcHloaXZlCmZyb20gc3FsYWxjaGVteS5lbmdpbmUgaW1wb3J0IGNyZWF0ZV9lbmdpbmUKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CgoKZGVmIHNxbF90b19maWxlKAogICAgY29udGV4dDogTUxDbGllbnRDdHgsCiAgICBzcWxfcXVlcnk6IHN0ciwKICAgIGRhdGFiYXNlX3VybDogc3RyLAogICAgZmlsZV9leHQ6IHN0ciA9ICJwYXJxdWV0IiwKKSAtPiBOb25lOgogICAgIiIiU1FMIEluZ2VzdCAtIEluZ2VzdCBkYXRhIHVzaW5nIFNRTCBxdWVyeQoKICAgIDpwYXJhbSBjb250ZXh0OiAgICAgICAgICAgdGhlIGZ1bmN0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBzcWxfcXVlcnk6ICAgICAgICAgdGhlIHNxbCBxdWVyeSB1c2VkIHRvIHJldHJpZXZlIHRoZSBkYXRhCiAgICA6cGFyYW0gZGF0YWJhc2VfdXJsOiAgICAgIGRhdGFiYXNlIGNvbm5lY3Rpb24gVVJMCiAgICA6cGFyYW0gZmlsZV9leHQ6ICAgICAgICAgICgicGFycXVldCIpIGZvcm1hdCBmb3IgcmVzdWx0IGZpbGUKCiIiIgoKICAgIGVuZ2luZSA9IGNyZWF0ZV9lbmdpbmUoZGF0YWJhc2VfdXJsKQogICAgZGYgPSBwZC5yZWFkX3NxbChzcWxfcXVlcnksIGVuZ2luZSkKCiAgICBjb250ZXh0LmxvZ19kYXRhc2V0KCdxdWVyeSByZXN1bHQnLAogICAgICAgICAgICAgICAgICAgICAgICBkZj1kZiwKICAgICAgICAgICAgICAgICAgICAgICAgZm9ybWF0PWZpbGVfZXh0LAogICAgICAgICAgICAgICAgICAgICAgICBhcnRpZmFjdF9wYXRoPWNvbnRleHQuYXJ0aWZhY3Rfc3VicGF0aCgnZGF0YScpKQoK
+    base_image: mlrun/mlrun
+    commands:
+    - pip install --no-cache-dir git+https://github.com/v3io/PyHive.git@v0.6.999
+    - pip install sqlalchemy==1.3.11
+    - pip install PyMySQL==0.9.3
+    code_origin: https://github.com/mlrun/functions.git#017f4bef5225975b682682d550e8531b67920506:sql_to_file.ipynb

@@ -12,8 +12,8 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [arc-to-parquet](arc_to_parquet/arc_to_parquet.ipynb) | job | retrieve remote archive, open and save as parquet | data-movement, utils |
 | [bert-embeddings](bert_embeddings/bert_embeddings.ipynb) | nuclio | Get BERT based embeddings for given text | NLP, BERT, embeddings |
 | [churn-test](churn_server/churn_server.ipynb) | nuclio | churn classification and predictor | serving, ml |
-| [cox-test](coxph_test/coxph_test.ipynb) | job | test a classifier using held-out or new data | ml, test |
-| [cox-hazards](coxph_trainer/coxph_trainer.ipynb) | job | train any classifier using scikit-learn's API | training, ml |
+| [cox-test](coxph_test/coxph_test.ipynb) | job | test cox proportional hazards model | ml, test |
+| [cox-hazards](coxph_trainer/coxph_trainer.ipynb) | job | cox proportional hazards, kaplan meier plots | training, ml |
 | [describe](describe/describe.ipynb) | job | describe and visualizes dataset stats | analysis |
 | [describe-dask](describe_dask/describe_dask.ipynb) | job | describe and visualizes dataset stats | analysis |
 | [feature-perms](feature_perms/feature_perms.ipynb) | job | estimate feature importances using permutations | analysis |
@@ -25,12 +25,15 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [sklearn-server](model_server/model_server.ipynb) | nuclio | generic sklearn model server | serving, ml |
 | [model-server-tester](model_server_tester/model_server_tester.ipynb) | job | test model servers | ml, test |
 | [open-archive](open_archive/open_archive.ipynb) | job | Open a file/object archive into a target directory | data-movement, utils |
+| [send-email](send_email/send_email.ipynb) | job | Send Email messages through SMTP server | notifications |
 | [sentiment-analysis-server](sentiment_analysis_serving/bert_sentiment_analysis_serving.ipynb) | nuclio | BERT based sentiment classification model | serving, NLP, BERT, sentiment analysis |
 | [sklearn-classifier](sklearn_classifier/sklearn_classifier.ipynb) | job | train any classifier using scikit-learn's API | ml, training |
 | [slack-notify](slack_notify/slack_notify.ipynb) | job | Send Slack notification | ops |
+| [submit](spark_submit/spark_submit.ipynb) | job |  |  |
+| [sql-to-file](sql_to_file/sql_to_file.ipynb) | job | SQL To File - Ingest data using SQL query | data-prep |
 | [test-classifier](test_classifier/test_classifier.ipynb) | job | test a classifier using held-out or new data | ml, test |
 | [tensorflow-v1-2layers](tf1_serving/tf1_serving.ipynb) | nuclio | tf1 image classification server | serving, dl |
 | [tensorflow-v2-2layers](tf2_serving/tf2_serving.ipynb) | nuclio | tf2 image classification server | serving, dl |
-| [iris-xgb-serving](xgb_serving/xgb_serving.ipynb) | nuclio | xgboost iris classification server | serving, ml |
-| [xgb-test](xgb_test/xgb_test.ipynb) | job | test a classifier using held-out or new data | ml, test |
+| [xgb-custom](xgb_custom/xgb_custom.ipynb) | job | train an xgboost model using the low-level api | analysis |
+| [xgb-test](xgb_serving/xgb_serving.ipynb) | nuclio | xgboost test data classification server | serving, ml |
 | [xgb-trainer](xgb_trainer/xgb_trainer.ipynb) | job | train multiple model types using xgboost | training, ml, experimental |

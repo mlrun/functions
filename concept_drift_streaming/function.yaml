@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: concept-drift-streaming
   tag: ''
-  hash: f5b5b2385c4ac5b93c6a87168e6c11833bf89678
+  hash: 855ebc1ca1a12e5cbb30172b57dbb5e67c1c7871
   project: ''
   labels:
     author: orz
@@ -64,7 +64,7 @@ spec:
       outputs: []
       lineno: 97
   description: Deploy a streaming Concept Drift detector on a labeled stream
-  min_replicas: 0
+  min_replicas: 1
   max_replicas: 4
   env: []
   base_spec:
@@ -72,12 +72,12 @@ spec:
     kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 02-06-2020 by admin
+        nuclio.io/generated_by: function generated from 12-07-2020 by admin
       labels: {}
       name: concept-drift-streaming
     spec:
       build:
-        baseImage: mlrun/ml-models:0.4.7
+        baseImage: mlrun/ml-models
         commands:
         - python -m pip install scikit-multiflow==0.4.1
         - python -m pip install v3io_frames

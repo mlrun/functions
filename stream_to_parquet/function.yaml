@@ -1,0 +1,77 @@
+kind: remote
+metadata:
+  name: stream-to-parquet
+  tag: ''
+  hash: e73254b83f3f84b03e4e14b4b03dea29aba1d69b
+  project: ''
+  labels:
+    author: orz
+  categories:
+  - ml
+  - serve
+spec:
+  command: ''
+  args: []
+  image: ''
+  entry_points:
+    record_to_features:
+      name: record_to_features
+      doc: ''
+      parameters:
+      - name: record
+      outputs: []
+      lineno: 10
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+      outputs: []
+      lineno: 17
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+      - name: event
+      outputs: []
+      lineno: 41
+  description: Saves a stream to Parquet and can lunch drift detection task on it
+  min_replicas: 0
+  max_replicas: 4
+  env: []
+  base_spec:
+    apiVersion: nuclio.io/v1
+    kind: Function
+    metadata:
+      annotations:
+        nuclio.io/generated_by: function generated from 02-06-2020 by admin
+      labels: {}
+      name: stream-to-parquet
+    spec:
+      build:
+        baseImage: mlrun/ml-models:0.4.7
+        commands: []
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG9zCmltcG9ydCBwYW5kYXMgYXMgcGQKaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCBqc29uCmltcG9ydCBkYXRldGltZQppbXBvcnQgbWxydW4KCmRlZiByZWNvcmRfdG9fZmVhdHVyZXMocmVjb3JkKToKICAgIGZlYXR1cmVzID0gcmVjb3JkWydyZXF1ZXN0J11bJ2luc3RhbmNlcyddWzBdCiAgICB0aW1lc3RhbXAgPSByZWNvcmRbJ3doZW4nXQogICAgcHJlZGljdGlvbiA9IHJlY29yZFsncmVzcCddCiAgICAKICAgIHJldHVybiBbdGltZXN0YW1wXSArIFtmZWF0dXJlIGZvciBmZWF0dXJlIGluIGZlYXR1cmVzXSArIHByZWRpY3Rpb24KCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBzZXRhdHRyKGNvbnRleHQsICdiYXRjaCcsIFtdKQogICAgc2V0YXR0cihjb250ZXh0LCAnd2luZG93JywgaW50KG9zLmdldGVudignd2luZG93JywgMTApKSkKICAgIAogICAgZmVhdHVyZXMgPSBvcy5nZXRlbnYoJ2ZlYXR1cmVzJywgTm9uZSkKICAgIGlmIGZlYXR1cmVzIGlzIG5vdCBOb25lOgogICAgICAgIGZlYXR1cmVzID0gZmVhdHVyZXMuc3BsaXQoJywnKSAgICAKICAgIHNldGF0dHIoY29udGV4dCwgJ2ZlYXR1cmVzJywgZmVhdHVyZXMpCiAgICAgICAgCiAgICBwcmVkaWN0aW9ucyA9IG9zLmdldGVudigncHJlZGljdGlvbnMnLCBOb25lKQogICAgaWYgcHJlZGljdGlvbnMgaXMgbm90IE5vbmU6CiAgICAgICAgcHJlZGljdGlvbnMgPSBwcmVkaWN0aW9ucy5zcGxpdCgnLCcpCiAgICBzZXRhdHRyKGNvbnRleHQsICdjb2x1bW5zJywgWyd0aW1lc3RhbXAnXSArIGZlYXR1cmVzICsgcHJlZGljdGlvbnMpCiAgICAKICAgIHNldGF0dHIoY29udGV4dCwgJ3NhdmVfdG8nLCBvcy5nZXRlbnYoJ3NhdmVfdG8nLCAnL2JpZ2RhdGEvaW5mZXJlbmNlX3BxLycpKQogICAgb3MubWFrZWRpcnMoY29udGV4dC5zYXZlX3RvLCBleGlzdF9vaz1UcnVlKQogICAgCiAgICBpZiAnaHViX3VybCcgaW4gb3MuZW52aXJvbjoKICAgICAgICBtbHJ1bi5tbGNvbmYuaHViX3VybCA9IG9zLmVudmlyb25bJ2h1Yl91cmwnXQogICAgdmlydHVhbF9kcmlmdF9mbiA9IG1scnVuLmltcG9ydF9mdW5jdGlvbignaHViOi8vdmlydHVhbF9kcmlmdCcpCiAgICB2aXJ0dWFsX2RyaWZ0X2ZuLmFwcGx5KG1scnVuLm1vdW50X3YzaW8obmFtZT0ndmZuX21vdW50JywgbW91bnRfcGF0aD1vcy5nZXRlbnYoJ21vdW50X3BhdGgnLCAnfi8nKSwgcmVtb3RlPW9zLmdldGVudignbW91bnRfcmVtb3RlJywgJy9Vc2VyJykpKQogICAgc2V0YXR0cihjb250ZXh0LCAndmlydHVhbF9kcmlmdF9mbicsIHZpcnR1YWxfZHJpZnRfZm4pCiAgICBzZXRhdHRyKGNvbnRleHQsICdiYXNlX2RhdGFzZXQnLCBvcy5nZXRlbnYoJ2Jhc2VfZGF0YXNldCcsICcnKSkKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIAogICAgY29udGV4dC5sb2dnZXIuaW5mbyhmJ0FkZGluZyB7ZXZlbnQuYm9keX0nKQogICAgY29udGV4dC5iYXRjaC5hcHBlbmQocmVjb3JkX3RvX2ZlYXR1cmVzKGpzb24ubG9hZHMoZXZlbnQuYm9keSkpKQogICAgCiAgICBpZiBsZW4oY29udGV4dC5iYXRjaCkgPiBjb250ZXh0LndpbmRvdzoKICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGNvbnRleHQuYmF0Y2gpCiAgICAgICAgZGYgPSBwZC5EYXRhRnJhbWUoZGF0YT1jb250ZXh0LmJhdGNoLAogICAgICAgICAgICAgICAgICAgICAgICAgIGNvbHVtbnM9Y29udGV4dC5jb2x1bW5zKQogICAgICAgIGRmX3BhdGggPSBvcy5wYXRoLmpvaW4oY29udGV4dC5zYXZlX3RvLCBmIntkYXRldGltZS5kYXRldGltZS5ub3coKS5zdHJmdGltZSgnJVktJW0tJWRUJUg6JU06JVMnKX0ucHEiKQogICAgICAgIGRmLnRvX3BhcnF1ZXQoZGZfcGF0aCkKCiAgICAgICAgdGFzayA9IG1scnVuLk5ld1Rhc2sobmFtZT0nZHJpZnRfbWFnbml0dWRlJywKICAgICAgICAgICAgICAgICAgICAgICAgaGFuZGxlcj0nZHJpZnRfbWFnbml0dWRlJywKICAgICAgICAgICAgICAgICAgICAgICAgcGFyYW1zPXsnbGFiZWxfY29sJzogJ2lzX2Vycm9yJywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAncmVzdWx0c190c2RiX2NvbnRhaW5lcic6ICdiaWdkYXRhJywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAncmVzdWx0c190c2RiX3RhYmxlJzogJ2RyaWZ0X21hZ25pdHVkZSd9LAogICAgICAgICAgICAgICAgICAgICAgICBpbnB1dHM9eyd0JzogY29udGV4dC5iYXNlX2RhdGFzZXQsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJ3UnOiBkZl9wYXRofSwKICAgICAgICAgICAgICAgICAgICAgICAgYXJ0aWZhY3RfcGF0aD1vcy5wYXRoLmFic3BhdGgoJy9iaWdkYXRhL2RhdGEnKSkKICAgICAgICAKICAgICAgICBjb250ZXh0LnZpcnR1YWxfZHJpZnRfZm4ucnVuKHRhc2ssCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB3YXRjaD1GYWxzZSkKICAgICAgICAKICAgICAgICBjb250ZXh0LmJhdGNoID0gW10KCg==
+        noBaseImagesPull: true
+      env:
+      - name: window
+        value: '10'
+      - name: features
+        value: a,b
+      - name: predictions
+        value: prediction
+      - name: save_to
+        value: /bigdata/inference_pq/
+      - name: base_dataset
+        value: /bigdata/migdal/data/selected_features.parquet
+      - name: hub_url
+        value: /User/functions/{name}/function.yaml
+      - name: mount_remote
+        value: /bigdata
+      - name: mount_path
+        value: /bigdata
+      handler: stream_to_parquet:handler
+      runtime: python:3.6
+      volumes: []
+  source: ''

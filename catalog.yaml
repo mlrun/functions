@@ -34,6 +34,25 @@ churn-test:
   kind: remote
   versions:
     latest: churn_server/function.yaml
+concept-drift:
+  categories:
+  - ml
+  - serve
+  description: Deploy a streaming Concept Drift detector on a labeled stream
+  docfile: concept_drift/concept_drift.ipynb
+  kind: job
+  versions:
+    latest: concept_drift/function.yaml
+concept-drift-streaming:
+  categories:
+  - ml
+  - serve
+  description: Deploy a streaming Concept Drift detector on a labeled stream. the
+    nuclio part of the concept_drift function
+  docfile: concept_drift_streaming/concept_drift_streaming.ipynb
+  kind: remote
+  versions:
+    latest: concept_drift_streaming/function.yaml
 cox-hazards:
   categories:
   - training
@@ -139,6 +158,14 @@ open-archive:
   kind: job
   versions:
     latest: open_archive/function.yaml
+project-runner:
+  categories:
+  - utils
+  description: Nuclio based - Cron scheduler for running your MLRun projects
+  docfile: project_runner/project_runner.ipynb
+  kind: remote
+  versions:
+    latest: project_runner/function.yaml
 send-email:
   categories:
   - notifications
@@ -192,6 +219,15 @@ sql-to-file:
   kind: job
   versions:
     latest: sql_to_file/function.yaml
+stream-to-parquet:
+  categories:
+  - ml
+  - serve
+  description: Saves a stream to Parquet and can lunch drift detection task on it
+  docfile: stream_to_parquet/stream_to_parquet.ipynb
+  kind: remote
+  versions:
+    latest: stream_to_parquet/function.yaml
 submit:
   categories: []
   description: ''
@@ -226,6 +262,16 @@ test-classifier:
   kind: job
   versions:
     latest: test_classifier/function.yaml
+virtual-drift:
+  categories:
+  - ml
+  - serve
+  - concept-drift
+  description: Compute drift magnitude between Time-Samples T and U
+  docfile: virtual_drift/virtual_drift.ipynb
+  kind: job
+  versions:
+    latest: virtual_drift/function.yaml
 xgb-custom:
   categories:
   - analysis

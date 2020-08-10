@@ -13,7 +13,6 @@ spec:
   args: []
   image: ''
   description: tf2 image classification server
-  min_replicas: 0
   max_replicas: 4
   env:
   - name: SERVING_MODEL_cat_vs_dog_tfv2

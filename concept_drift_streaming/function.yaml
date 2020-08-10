@@ -65,7 +65,6 @@ spec:
       lineno: 91
   description: Deploy a streaming Concept Drift detector on a labeled stream. the
     nuclio part of the concept_drift function
-  min_replicas: 1
   max_replicas: 4
   env: []
   base_spec:

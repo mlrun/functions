@@ -34,7 +34,6 @@ spec:
       outputs: []
       lineno: 16
   description: Get BERT based embeddings for given text
-  min_replicas: 0
   max_replicas: 4
   env: []
   base_spec:

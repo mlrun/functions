@@ -100,9 +100,9 @@ Uses the distance between two consecutive errors.
 ### PageHinkley Test:
 
 The PageHinkley test is a sequential analysis technique typically used for monitoring change detection. (The test was designed to detect change in avg. of a Gaussian signal). In this test we use:  
-$x_1, ..., x_n$ - labeled dataset  
-$\delta$ - magnitude threshold  
-$\lambda$ - detection threshold
+x*1*, ..., x*n* - labeled dataset  
+δ - magnitude threshold  
+λ - detection threshold
 
 <center>
 

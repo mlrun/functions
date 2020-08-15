@@ -4,7 +4,7 @@ Concept drift and shift are major issues that greatly affect the accuracy and re
 
 ## How to integrate
 
-The Virtual Drift function is built to receive two data batches of data (as `dataitem` or `Dataframe`), base batch $u$ and current batch $t$.  
+The Virtual Drift function is built to receive two data batches of data (as `dataitem` or `Dataframe`), base batch *t* and current batch *u*.  
 
 ```markdown
 :param context:   MLRun context
@@ -20,7 +20,7 @@ The Virtual Drift function is built to receive two data batches of data (as `dat
 :param results_tsdb_table: TSDB table to push metrics to
 ```
 
-The function will calculate the selected drift mangitude metrics that were selected and apply them to the **features**, **labels** and **predictions**.  It will then save those metrics and export them via Parquet and TSDB.
+The function will calculate the selected drift mangitude metrics that were selected and apply them to the **features**, **labels** and **predictions**.  It will then save those metrics and export them via Parquet and TSDB.  Alerting could be added on top of the metrics via Grafana or a function.
 
 ## Metrics
 
@@ -29,24 +29,25 @@ The drift magnitude metrics we calculate are:
 ### TVD - Total Variation Distance
 
 Provides a symetric drift distance between two periods $u$ and $t$  
-$Z$ - vector of random variables  
-$P_t$ - Probability distribution over timespan $t$  
+Z - vector of random variables  
+P*t* - Probability distribution over timespan *t*  
 
-$\sigma_{t, u}(Z)=\frac{1}{2}\sum_{\hat{z}\in{dom(Z)}}{|P_t{(\hat{Z})-P_u{(\hat{Z})}}|}$
+![\sigma_{t, u}(Z)=\frac{1}{2}\sum_{\hat{z}\in{dom(Z)}}{|P_t{(\hat{Z})-P_u{(\hat{Z})}}|}](<https://latex.codecogs.com/svg.latex?\sigma_{t, u}(Z)=\frac{1}{2}\sum_{\hat{z}\in{dom(Z)}}{|P_t{(\hat{Z})-P_u{(\hat{Z})}}|}>)
 
 ### Helinger Distance
 
 Hellinger distance is an $f$ divergence measuer, similar to the Kullback-Leibler (KL) divergence. However, unlike KL Divergence the Hellinger divergence is symmetric and bounded over a probability space.
 
-$P, Q$ - Discrete probability distributions ($p_i, ..., p_k$)
+P, Q - Discrete probability distributions (P*i*, ..., P*k*).  
 
-$H(P,Q)=\frac{1}{\sqrt{2}}\sqrt{\sum_{i=1}^{k}{(\sqrt{p_i}-\sqrt{q_i})^2}}$
+![H(P,Q)=\frac{1}{\sqrt{2}}\sqrt{\sum_{i=1}^{k}{(\sqrt{p_i}-\sqrt{q_i})^2}}](<https://latex.codecogs.com/svg.latex?H(P,Q)=\frac{1}{\sqrt{2}}\sqrt{\sum_{i=1}^{k}{(\sqrt{p_i}-\sqrt{q_i})^2}}>)
+
 
 ### KL Divergence
 
 KL Divergence (or relative entropy) is a measure of how one probability distribution differs from another.  It is an asymmetric measure (thus it's not a metric) and it doesn't satisfy the triangle inequality. KL Divergence of 0, indicates two identical distributrions.
 
-$D_{KL}(P||Q)=\sum_{x\in{X}}{(P(x)\log{\frac{P(x)}{Q(x)}})}$
+![D_{KL}(P||Q)=\sum_{x\in{X}}{(P(x)\log{\frac{P(x)}{Q(x)}})}](<https://latex.codecogs.com/svg.latex?D_{KL}(P||Q)=\sum_{x\in{X}}{(P(x)\log{\frac{P(x)}{Q(x)}})}>)
 
 ## Additional Resources
 

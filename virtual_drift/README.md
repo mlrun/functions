@@ -28,7 +28,7 @@ The drift magnitude metrics we calculate are:
 
 ### TVD - Total Variation Distance
 
-Provides a symetric drift distance between two periods $u$ and $t$  
+Provides a symetric drift distance between two periods *t* and *u*  
 Z - vector of random variables  
 P*t* - Probability distribution over timespan *t*  
 
@@ -36,7 +36,7 @@ P*t* - Probability distribution over timespan *t*
 
 ### Helinger Distance
 
-Hellinger distance is an $f$ divergence measuer, similar to the Kullback-Leibler (KL) divergence. However, unlike KL Divergence the Hellinger divergence is symmetric and bounded over a probability space.
+Hellinger distance is an *f* divergence measuer, similar to the Kullback-Leibler (KL) divergence. However, unlike KL Divergence the Hellinger divergence is symmetric and bounded over a probability space.
 
 P, Q - Discrete probability distributions (P*i*, ..., P*k*).  
 

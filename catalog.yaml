@@ -91,7 +91,7 @@ feature-perms:
   categories:
   - analysis
   description: estimate feature importances using permutations
-  docfile: feature_perms/feature_perms.ipynb
+  docfile: feature_perms/README.ipynb
   kind: job
   versions:
     latest: feature_perms/function.yaml

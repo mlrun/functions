@@ -5,6 +5,7 @@ models/
 *.swp
 dask-worker-space
 images/
+.idea/
 .vscode/
 .empty/
 # Byte-compiled / optimized / DLL files

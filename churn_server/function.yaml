@@ -1,7 +1,7 @@
 kind: remote
 metadata:
-  name: churn-test
-  hash: 5c3f4fb920981272f771186cebb40aa685c29840
+  name: churn-server
+  hash: c18a06be870a239420439f6aba76ca8bbadcc578
   project: default
   labels:
     author: yashab
@@ -34,9 +34,9 @@ spec:
     kind: nuclio:serving
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 14-06-2020 by admin
+        nuclio.io/generated_by: function generated from 30-08-2020
       labels: {}
-      name: churn-test
+      name: churn-server
     spec:
       build:
         baseImage: mlrun/ml-models

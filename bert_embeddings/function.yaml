@@ -2,13 +2,11 @@ kind: remote
 metadata:
   name: bert-embeddings
   tag: ''
-  hash: 54c9d7ce59bd167b4dbcbaca0169dbed77999603
-  project: ''
+  hash: 62fed7071dba474f445cfc5beae9b49e791e7c54
+  project: default
   labels:
     author: roye
-    framework:
-    - pytorch
-    - transformers
+    framework: pytorch
   categories:
   - NLP
   - BERT
@@ -23,15 +21,20 @@ spec:
       doc: ''
       parameters:
       - name: context
-      outputs: []
+        default: ''
+      outputs:
+      - default: ''
       lineno: 9
     handler:
       name: handler
       doc: ''
       parameters:
       - name: context
+        default: ''
       - name: event
-      outputs: []
+        default: ''
+      outputs:
+      - default: ''
       lineno: 16
   description: Get BERT based embeddings for given text
   max_replicas: 4
@@ -41,7 +44,7 @@ spec:
     kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 11-06-2020 by iguazio
+        nuclio.io/generated_by: function generated from 30-08-2020
       labels: {}
       name: bert-embeddings
     spec:

@@ -1,7 +1,7 @@
 kind: remote
 metadata:
   name: tf2-serving
-  hash: 36cdd32aae68d2603712322f0dbd4f2263b7e760
+  hash: 134293b94996e74275d90546f8d4ef96198af679
   project: default
   labels:
     author: yaronh
@@ -39,12 +39,12 @@ spec:
     kind: nuclio:serving
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 30-08-2020
+        nuclio.io/generated_by: function generated from 01-09-2020
       labels: {}
       name: tf2-serving
     spec:
       build:
-        baseImage: mlrun/ml-serving
+        baseImage: mlrun/mlrun
         commands:
         - pip install tensorflow>=2.1
         - pip install requests pillow

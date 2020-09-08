@@ -1,11 +1,13 @@
 kind: remote
 metadata:
-  name: sentiment-analysis-serving
-  hash: f10f391cf02e5a96051d5acdf945da82d810c2d2
+  name: sentiment-analysis-server
+  hash: 1493fdb0d41c34cfb9b7b9f861f3d95a8c6c1dfe
   project: default
   labels:
     author: roye
-    framework: pytorch
+    framework:
+    - transformers
+    - pytorch
   categories:
   - serving
   - NLP
@@ -16,10 +18,9 @@ spec:
   args: []
   image: ''
   description: BERT based sentiment classification model
+  min_replicas: 1
   max_replicas: 4
   env:
-  - name: SERVING_MODEL_bert_classifier_v1
-    value: /User/models/model.pt
   - name: MODEL_CLASS
     value: SentimentClassifierServing
   - name: ENABLE_EXPLAINER
@@ -36,9 +37,9 @@ spec:
     kind: nuclio:serving
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 30-08-2020
+        nuclio.io/generated_by: function generated from 08-09-2020 by admin
       labels: {}
-      name: sentiment-analysis-serving
+      name: sentiment-analysis-server
     spec:
       build:
         baseImage: mlrun/ml-base

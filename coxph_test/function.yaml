@@ -1,8 +1,8 @@
 kind: job
 metadata:
-  name: cox-test
+  name: coxph-test
   tag: ''
-  hash: 630bb5875179464c106e6707b62ecbb056759723
+  hash: e5c0296a91b49521aeaf1e25fef16a0614e1b8a4
   project: ''
   labels:
     author: yjb
@@ -13,7 +13,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: yjbds/ml-models:0.4.7
+  image: mlrun/ml-models
   env: []
   default_handler: cox_test
   entry_points:
@@ -26,14 +26,18 @@ spec:
       parameters:
       - name: context
         doc: the function context
+        default: ''
       - name: models_path
         type: DataItem
+        default: ''
       - name: test_set
         type: DataItem
         doc: test features and labels
+        default: ''
       - name: label_column
         type: str
         doc: column name for ground truth labels
+        default: ''
       - name: plots_dest
         type: str
         doc: dir for test plots
@@ -41,10 +45,12 @@ spec:
       - name: model_evaluator
         doc: 'WIP: specific method to generate eval, passed in as string or available
           in this folder'
-      outputs: []
+        default: null
+      outputs:
+      - default: ''
       lineno: 13
-  description: test a classifier using held-out or new data
+  description: test cox proportional hazards model
   build:
     functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHdhcm5pbmdzCndhcm5pbmdzLnNpbXBsZWZpbHRlcihhY3Rpb249Imlnbm9yZSIsIGNhdGVnb3J5PUZ1dHVyZVdhcm5pbmcpCgppbXBvcnQgb3MKaW1wb3J0IHBhbmRhcyBhcyBwZApmcm9tIG1scnVuLmRhdGFzdG9yZSBpbXBvcnQgRGF0YUl0ZW0KZnJvbSBtbHJ1bi5hcnRpZmFjdHMgaW1wb3J0IGdldF9tb2RlbApmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmZyb20gbWxydW4ubWx1dGlscyBpbXBvcnQgZXZhbF9jbGFzc19tb2RlbAoKZGVmIGNveF90ZXN0KAogICAgY29udGV4dCwKICAgIG1vZGVsc19wYXRoOiBEYXRhSXRlbSwgCiAgICB0ZXN0X3NldDogRGF0YUl0ZW0sCiAgICBsYWJlbF9jb2x1bW46IHN0ciwKICAgIHBsb3RzX2Rlc3Q6IHN0ciA9ICJwbG90cyIsCiAgICBtb2RlbF9ldmFsdWF0b3IgPSBOb25lCikgLT4gTm9uZToKICAgICIiIlRlc3Qgb25lIG9yIG1vcmUgY2xhc3NpZmllciBtb2RlbHMgYWdhaW5zdCBoZWxkLW91dCBkYXRhc2V0CiAgICAKICAgIFVzaW5nIGhlbGQtb3V0IHRlc3QgZmVhdHVyZXMsIGV2YWx1YXRlcyB0aGUgcGVmb3JtYW5jZSBvZiB0aGUgZXN0aW1hdGVkIG1vZGVsCiAgICAKICAgIENhbiBiZSBwYXJ0IG9mIGEga3ViZWZsb3cgcGlwZWxpbmUgYXMgYSB0ZXN0IHN0ZXAgdGhhdCBpcyBydW4gcG9zdCBFREEgYW5kIAogICAgdHJhaW5pbmcvdmFsaWRhdGlvbiBjeWNsZXMKICAgIAogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgICAgdGhlIGZ1bmN0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBtb2RlbF9maWxlOiAgICAgIG1vZGVsIGFydGlmYWN0IHRvIGJlIHRlc3RlZAogICAgOnBhcmFtIHRlc3Rfc2V0OiAgICAgICAgdGVzdCBmZWF0dXJlcyBhbmQgbGFiZWxzCiAgICA6cGFyYW0gbGFiZWxfY29sdW1uOiAgICBjb2x1bW4gbmFtZSBmb3IgZ3JvdW5kIHRydXRoIGxhYmVscwogICAgOnBhcmFtIHNjb3JlX21ldGhvZDogICAgZm9yIG11bHRpY2xhc3MgY2xhc3NpZmljYXRpb24KICAgIDpwYXJhbSBwbG90c19kZXN0OiAgICAgIGRpciBmb3IgdGVzdCBwbG90cwogICAgOnBhcmFtIG1vZGVsX2V2YWx1YXRvcjogV0lQOiBzcGVjaWZpYyBtZXRob2QgdG8gZ2VuZXJhdGUgZXZhbCwgcGFzc2VkIGluIGFzIHN0cmluZwogICAgICAgICAgICAgICAgICAgICAgICAgICAgb3IgYXZhaWxhYmxlIGluIHRoaXMgZm9sZGVyCiAgICAiIiIgIAogICAgeHRlc3QgPSB0ZXN0X3NldC5hc19kZigpCiAgICB5dGVzdCA9IHh0ZXN0LnBvcChsYWJlbF9jb2x1bW4pCiAgICAKICAgIG1vZGVsX2ZpbGUsIG1vZGVsX29iaiwgXyA9IGdldF9tb2RlbChtb2RlbHNfcGF0aC51cmwsIHN1ZmZpeD0nLnBrbCcpCiAgICBtb2RlbF9vYmogPSBsb2FkKG9wZW4oc3RyKG1vZGVsX2ZpbGUpLCAicmIiKSkKCiAgICB0cnk6CiAgICAgICAgaWYgbm90IG1vZGVsX2V2YWx1YXRvcjoKICAgICAgICAgICAgZXZhbF9tZXRyaWNzID0gZXZhbF9jbGFzc19tb2RlbChjb250ZXh0LCB4dGVzdCwgeXRlc3QsIG1vZGVsX29iaikKCiAgICAgICAgbW9kZWxfcGxvdHMgPSBldmFsX21ldHJpY3MucG9wKCJwbG90cyIpCiAgICAgICAgbW9kZWxfdGFibGVzID0gZXZhbF9tZXRyaWNzLnBvcCgidGFibGVzIikKICAgICAgICBmb3IgcGxvdCBpbiBtb2RlbF9wbG90czoKICAgICAgICAgICAgY29udGV4dC5sb2dfYXJ0aWZhY3QocGxvdCwgbG9jYWxfcGF0aD1mIntwbG90c19kZXN0fS97cGxvdC5rZXl9Lmh0bWwiKQogICAgICAgIGZvciB0YmwgaW4gbW9kZWxfdGFibGVzOgogICAgICAgICAgICBjb250ZXh0LmxvZ19hcnRpZmFjdCh0YmwsIGxvY2FsX3BhdGg9ZiJ7cGxvdHNfZGVzdH0ve3Bsb3Qua2V5fS5jc3YiKQoKICAgICAgICBjb250ZXh0LmxvZ19yZXN1bHRzKGV2YWxfbWV0cmljcykKICAgIGV4Y2VwdDoKICAgICAgICBjb250ZXh0LmxvZ19kYXRhc2V0KCJjb3gtdGVzdC1zdW1tYXJ5IiwgZGY9bW9kZWxfb2JqLnN1bW1hcnksIGluZGV4PVRydWUsIGZvcm1hdD0iY3N2IikKICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCJjb3ggdGVzdGVyIG5vdCBpbXBsZW1lbnRlZCIpCgo=
     commands: []
-    code_origin: https://github.com/yjb-ds/functions.git#5a858f627203e3708519818a7e65938f6607ff12:cox_test.ipynb
+    code_origin: git@github.com:mlrun/functions.git#eac3a9647ad45b06c25c0ef28095edd2f2578df4:coxph_test.ipynb

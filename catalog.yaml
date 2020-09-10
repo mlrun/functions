@@ -21,11 +21,11 @@ bert-embeddings:
   - BERT
   - embeddings
   description: Get BERT based embeddings for given text
-  docfile: bert-embeddings/bert-embeddings-endpoint.ipynb
+  docfile: bert_embeddings/bert_embeddings.ipynb
   kind: remote
   versions:
-    latest: bert-embeddings/function.yaml
-churn-test:
+    latest: bert_embeddings/function.yaml
+churn-server:
   categories:
   - serving
   - ml
@@ -34,24 +34,43 @@ churn-test:
   kind: remote
   versions:
     latest: churn_server/function.yaml
-cox-hazards:
+concept-drift:
   categories:
-  - training
   - ml
-  description: train any classifier using scikit-learn's API
-  docfile: coxph_trainer/coxph_trainer.ipynb
+  - serve
+  description: Deploy a streaming Concept Drift detector on a labeled stream
+  docfile: concept_drift/concept_drift.ipynb
   kind: job
   versions:
-    latest: coxph_trainer/function.yaml
-cox-test:
+    latest: concept_drift/function.yaml
+concept-drift-streaming:
+  categories:
+  - ml
+  - serve
+  description: Deploy a streaming Concept Drift detector on a labeled stream. the
+    nuclio part of the concept_drift function
+  docfile: concept_drift_streaming/concept_drift_streaming.ipynb
+  kind: remote
+  versions:
+    latest: concept_drift_streaming/function.yaml
+coxph-test:
   categories:
   - ml
   - test
-  description: test a classifier using held-out or new data
+  description: test cox proportional hazards model
   docfile: coxph_test/coxph_test.ipynb
   kind: job
   versions:
     latest: coxph_test/function.yaml
+coxph-trainer:
+  categories:
+  - training
+  - ml
+  description: cox proportional hazards, kaplan meier plots
+  docfile: coxph_trainer/coxph_trainer.ipynb
+  kind: job
+  versions:
+    latest: coxph_trainer/function.yaml
 describe:
   categories:
   - analysis
@@ -72,7 +91,7 @@ feature-perms:
   categories:
   - analysis
   description: estimate feature importances using permutations
-  docfile: feature_perms/feature_perms.ipynb
+  docfile: feature_perms/README.ipynb
   kind: job
   versions:
     latest: feature_perms/function.yaml
@@ -103,15 +122,6 @@ github-utils:
   kind: job
   versions:
     latest: github_utils/function.yaml
-iris-xgb-serving:
-  categories:
-  - serving
-  - ml
-  description: xgboost iris classification server
-  docfile: xgb_serving/xgb_serving.ipynb
-  kind: remote
-  versions:
-    latest: xgb_serving/function.yaml
 load-dask:
   categories:
   - data-movement
@@ -130,6 +140,15 @@ load-dataset:
   kind: job
   versions:
     latest: load_dataset/function.yaml
+model-server:
+  categories:
+  - serving
+  - ml
+  description: generic sklearn model server
+  docfile: model_server/model_server.ipynb
+  kind: remote
+  versions:
+    latest: model_server/function.yaml
 model-server-tester:
   categories:
   - ml
@@ -148,17 +167,37 @@ open-archive:
   kind: job
   versions:
     latest: open_archive/function.yaml
-sentiment-analysis-server:
+project-runner:
+  categories:
+  - utils
+  description: Nuclio based - Cron scheduler for running your MLRun projects
+  docfile: project_runner/project_runner.ipynb
+  kind: remote
+  versions:
+    latest: project_runner/function.yaml
+send-email:
+  categories:
+  - notifications
+  description: Send Email messages through SMTP server
+  docfile: send_email/send_email.ipynb
+  kind: job
+  versions:
+    latest: send_email/function.yaml
+sentiment-analysis-serving:
   categories:
   - serving
   - NLP
   - BERT
   - sentiment analysis
   description: BERT based sentiment classification model
+<<<<<<< HEAD
   docfile: sentiment-analysis-server/sentiment_analysis_serving.ipynb
+=======
+  docfile: sentiment_analysis_serving/bert_sentiment_analysis_serving.ipynb
+>>>>>>> 9f2fcaecc9b5b4f8267f1917fd9d5ace4700c2ca
   kind: remote
   versions:
-    latest: sentiment-analysis-server/function.yaml
+    latest: sentiment_analysis_serving/function.yaml
 sklearn-classifier:
   categories:
   - ml
@@ -168,15 +207,6 @@ sklearn-classifier:
   kind: job
   versions:
     latest: sklearn_classifier/function.yaml
-sklearn-server:
-  categories:
-  - serving
-  - ml
-  description: generic sklearn model server
-  docfile: model_server/model_server.ipynb
-  kind: remote
-  versions:
-    latest: model_server/function.yaml
 slack-notify:
   categories:
   - ops
@@ -185,24 +215,30 @@ slack-notify:
   kind: job
   versions:
     latest: slack_notify/function.yaml
-tensorflow-v1-2layers:
+spark-submit:
+  categories: []
+  description: ''
+  docfile: spark_submit/spark_submit.ipynb
+  kind: job
+  versions:
+    latest: spark_submit/function.yaml
+sql-to-file:
   categories:
-  - serving
-  - dl
-  description: tf1 image classification server
-  docfile: tf1_serving/tf1_serving.ipynb
+  - data-prep
+  description: SQL To File - Ingest data using SQL query
+  docfile: sql_to_file/sql_to_file.ipynb
+  kind: job
+  versions:
+    latest: sql_to_file/function.yaml
+stream-to-parquet:
+  categories:
+  - ml
+  - serve
+  description: Saves a stream to Parquet and can lunch drift detection task on it
+  docfile: stream_to_parquet/stream_to_parquet.ipynb
   kind: remote
   versions:
-    latest: tf1_serving/function.yaml
-tensorflow-v2-2layers:
-  categories:
-  - serving
-  - dl
-  description: tf2 image classification server
-  docfile: tf2_serving/tf2_serving.ipynb
-  kind: remote
-  versions:
-    latest: tf2_serving/function.yaml
+    latest: stream_to_parquet/function.yaml
 test-classifier:
   categories:
   - ml
@@ -212,6 +248,51 @@ test-classifier:
   kind: job
   versions:
     latest: test_classifier/function.yaml
+tf1-serving:
+  categories:
+  - serving
+  - dl
+  description: tf1 image classification server
+  docfile: tf1_serving/tf1_serving.ipynb
+  kind: remote
+  versions:
+    latest: tf1_serving/function.yaml
+tf2-serving:
+  categories:
+  - serving
+  - dl
+  description: tf2 image classification server
+  docfile: tf2_serving/tf2_serving.ipynb
+  kind: remote
+  versions:
+    latest: tf2_serving/function.yaml
+virtual-drift:
+  categories:
+  - ml
+  - serve
+  - concept-drift
+  description: Compute drift magnitude between Time-Samples T and U
+  docfile: virtual_drift/virtual_drift.ipynb
+  kind: job
+  versions:
+    latest: virtual_drift/function.yaml
+xgb-custom:
+  categories:
+  - analysis
+  description: train an xgboost model using the low-level api
+  docfile: xgb_custom/xgb_custom.ipynb
+  kind: job
+  versions:
+    latest: xgb_custom/function.yaml
+xgb-serving:
+  categories:
+  - serving
+  - ml
+  description: xgboost test data classification server
+  docfile: xgb_serving/xgb_serving.ipynb
+  kind: remote
+  versions:
+    latest: xgb_serving/function.yaml
 xgb-test:
   categories:
   - ml

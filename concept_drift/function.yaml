@@ -1,0 +1,106 @@
+kind: job
+metadata:
+  name: concept-drift
+  tag: ''
+  hash: b595277b1164ecb097fefbac24d362a19de0de77
+  project: default
+  labels:
+    author: orz
+    framework: sklearn
+  categories:
+  - ml
+  - serve
+spec:
+  command: ''
+  args: []
+  env: []
+  default_handler: concept_drift_deployer
+  entry_points:
+    concept_drift_deployer:
+      name: concept_drift_deployer
+      doc: "Deploy a streaming Concept Drift detector on a labeled stream\n   This\
+        \ function is the Deployment step for the Streaming Concept Drift Detector.\n\
+        \   It will load the selected drift detectors and initialize them with the\
+        \ \n   base_dataset's statistics.  Then it will deploy the concept_drift_streaming\
+        \ \n   function and pass the models to it for streaming concept-drift detection\
+        \ on top\n   of a labeled stream."
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: MLRun context
+        default: ''
+      - name: base_dataset
+        type: DataItem
+        doc: Dataset containing label_col and prediction_col to initialize the detectors
+        default: ''
+      - name: input_stream
+        type: str
+        doc: labeled stream to track. Should contain label_col and prediction_col
+        default: ''
+      - name: output_stream
+        type: str
+        doc: Output stream to push the detector's alerts
+        default: ''
+      - name: output_tsdb
+        type: str
+        doc: Output TSDB table to allow analysis and display
+        default: ''
+      - name: tsdb_batch_size
+        type: int
+        doc: Batch size of alerts to buffer before pushing to the TSDB
+        default: ''
+      - name: callbacks
+        type: list
+        doc: Additional rest endpoints to send the alert data to
+        default: ''
+      - name: models
+        type: list
+        doc: List of the detectors to deploy  Defaults to ['ddm', 'eddm', 'pagehinkley'].
+        default:
+        - ddm
+        - eddm
+        - pagehinkley
+      - name: models_dest
+        doc: Location for saving the detectors  Defaults to 'models' (in relation
+          to artifact_path).
+        default: models
+      - name: pagehinkley_threshold
+        type: float
+        doc: Drift level threshold for PH detector Defaults to 10.
+        default: 10
+      - name: ddm_warning_level
+        type: float
+        doc: Warning level alert for DDM detector Defaults to 2.
+        default: 2
+      - name: ddm_out_control_level
+        type: float
+        doc: Drift level alert for DDM detector Defaults to 3.
+        default: 3
+      - name: label_col
+        doc: Label column to be used on base_dataset and input_stream  Defaults to
+          'label'.
+        default: label
+      - name: prediction_col
+        doc: Prediction column to be used on base_dataset and input_stream  Defaults
+          to 'prediction'.
+        default: prediction
+      - name: hub_url
+        type: str
+        doc: hub_url in case the default is not used, concept_drift_streaming will
+          be loaded  by this url  Defaults to mlconf.hub_url.
+        default: <_ast.Name object at 0x7f94677d54e0>
+      - name: fn_tag
+        type: str
+        doc: hub tag to use Defaults to 'master'
+        default: master
+      outputs:
+      - default: ''
+      lineno: 39
+  description: Deploy a streaming Concept Drift detector on a labeled stream
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHNrbXVsdGlmbG93LmRyaWZ0X2RldGVjdGlvbgppbXBvcnQgbnVtcHkgYXMgbnAKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgb3MKZnJvbSBjbG91ZHBpY2tsZSBpbXBvcnQgZHVtcHMsIGxvYWQsIGR1bXAKCmZyb20gbnVjbGlvLnRyaWdnZXJzIGltcG9ydCBOdWNsaW9UcmlnZ2VyCmZyb20gbWxydW4gaW1wb3J0IERhdGFJdGVtLCBpbXBvcnRfZnVuY3Rpb24sIG1sY29uZiwgTUxDbGllbnRDdHgsIG1vdW50X3YzaW8KCmltcG9ydCByYW5kb20KCmNsYXNzIFYzSU9TdHJlYW1UcmlnZ2VyKE51Y2xpb1RyaWdnZXIpOgogICAga2luZCA9ICd2M2lvU3RyZWFtJwoKICAgIGRlZiBfX2luaXRfXyhzZWxmLCB1cmw6IHN0ciwgc2Vla1RvOiBzdHIgPSAnZWFybGllc3QnLAogICAgICAgICAgICAgICAgIHBhcnRpdGlvbnM6IGxpc3QgPSBbMF0sIHBvbGxpbmdJbnRlcnZhbE1TOiBpbnQgPSAyNTAsCiAgICAgICAgICAgICAgICAgcmVhZEJhdGNoU2l6ZTogaW50ID0gNjQsIG1heFdvcmtlcnM6IGludCA9IDEsIAogICAgICAgICAgICAgICAgIHVzZXJuYW1lOiBzdHIgPSBOb25lLCBwYXNzd29yZDogc3RyID0gTm9uZSk6CiAgICAgICAgc2VsZi5fc3RydWN0ID0geydraW5kJzogc2VsZi5raW5kLAogICAgICAgICAgICAgICAgICAgICAgICAndXJsJzogdXJsLAogICAgICAgICAgICAgICAgICAgICAgICAnYXR0cmlidXRlcyc6IHt9fQogICAgICAgIGlmIG1heFdvcmtlcnM6CiAgICAgICAgICAgIHNlbGYuX3N0cnVjdFsnbWF4V29ya2VycyddID0gbWF4V29ya2VycwogICAgICAgIGlmIHNlZWtUbzoKICAgICAgICAgICAgc2VsZi5fc3RydWN0WydhdHRyaWJ1dGVzJ11bJ3NlZWtUbyddID0gc2Vla1RvCiAgICAgICAgaWYgcGFydGl0aW9uczoKICAgICAgICAgICAgc2VsZi5fc3RydWN0WydhdHRyaWJ1dGVzJ11bJ3BhcnRpdGlvbnMnXSA9IHBhcnRpdGlvbnMKICAgICAgICBpZiByZWFkQmF0Y2hTaXplOgogICAgICAgICAgICBzZWxmLl9zdHJ1Y3RbJ2F0dHJpYnV0ZXMnXVsncmVhZEJhdGNoU2l6ZSddID0gcmVhZEJhdGNoU2l6ZQogICAgICAgIGlmIHBvbGxpbmdJbnRlcnZhbE1TOgogICAgICAgICAgICBzZWxmLl9zdHJ1Y3RbJ2F0dHJpYnV0ZXMnXVsncG9sbGluZ0ludGVydmFsTXMnXSA9IHBvbGxpbmdJbnRlcnZhbE1TCiAgICAgICAgdXNlciA9IHVzZXJuYW1lIGlmIHVzZXJuYW1lIGVsc2Ugb3MuZW52aXJvblsnVjNJT19VU0VSTkFNRSddCiAgICAgICAgc2VsZi5fc3RydWN0Wyd1c2VybmFtZSddID0gdXNlcgogICAgICAgIGFjY2Vzc19rZXkgPSBwYXNzd29yZCBpZiBwYXNzd29yZCBlbHNlIG9zLmVudmlyb25bJ1YzSU9fQUNDRVNTX0tFWSddCiAgICAgICAgc2VsZi5fc3RydWN0WydwYXNzd29yZCddID0gYWNjZXNzX2tleQoKZGVmIGNvbmNlcHRfZHJpZnRfZGVwbG95ZXIoY29udGV4dDogTUxDbGllbnRDdHgsIGJhc2VfZGF0YXNldDpEYXRhSXRlbSwgCiAgICAgICAgICAgICAgICAgICAgICAgICAgIGlucHV0X3N0cmVhbTpzdHIsIG91dHB1dF9zdHJlYW06c3RyLCBvdXRwdXRfdHNkYjpzdHIsIHRzZGJfYmF0Y2hfc2l6ZTppbnQsIGNhbGxiYWNrczpsaXN0LCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgbW9kZWxzOmxpc3Q9WydkZG0nLCAnZWRkbScsICdwYWdlaGlua2xleSddLCBtb2RlbHNfZGVzdD0nbW9kZWxzJywKICAgICAgICAgICAgICAgICAgICAgICAgICAgcGFnZWhpbmtsZXlfdGhyZXNob2xkOmZsb2F0PTEwLCBkZG1fd2FybmluZ19sZXZlbDpmbG9hdD0yLCBkZG1fb3V0X2NvbnRyb2xfbGV2ZWw6ZmxvYXQ9MywKICAgICAgICAgICAgICAgICAgICAgICAgICAgbGFiZWxfY29sPSdsYWJlbCcsIHByZWRpY3Rpb25fY29sPSdwcmVkaWN0aW9uJywgaHViX3VybDpzdHI9bWxjb25mLmh1Yl91cmwsIGZuX3RhZzpzdHI9J21hc3RlcicpOgogICAgIiIiRGVwbG95IGEgc3RyZWFtaW5nIENvbmNlcHQgRHJpZnQgZGV0ZWN0b3Igb24gYSBsYWJlbGVkIHN0cmVhbQogICAgICAgVGhpcyBmdW5jdGlvbiBpcyB0aGUgRGVwbG95bWVudCBzdGVwIGZvciB0aGUgU3RyZWFtaW5nIENvbmNlcHQgRHJpZnQgRGV0ZWN0b3IuCiAgICAgICBJdCB3aWxsIGxvYWQgdGhlIHNlbGVjdGVkIGRyaWZ0IGRldGVjdG9ycyBhbmQgaW5pdGlhbGl6ZSB0aGVtIHdpdGggdGhlIAogICAgICAgYmFzZV9kYXRhc2V0J3Mgc3RhdGlzdGljcy4gIFRoZW4gaXQgd2lsbCBkZXBsb3kgdGhlIGNvbmNlcHRfZHJpZnRfc3RyZWFtaW5nIAogICAgICAgZnVuY3Rpb24gYW5kIHBhc3MgdGhlIG1vZGVscyB0byBpdCBmb3Igc3RyZWFtaW5nIGNvbmNlcHQtZHJpZnQgZGV0ZWN0aW9uIG9uIHRvcAogICAgICAgb2YgYSBsYWJlbGVkIHN0cmVhbS4gCgogICAgOnBhcmFtIGNvbnRleHQ6IE1MUnVuIGNvbnRleHQKICAgIDpwYXJhbSBiYXNlX2RhdGFzZXQ6IERhdGFzZXQgY29udGFpbmluZyBsYWJlbF9jb2wgYW5kIHByZWRpY3Rpb25fY29sIHRvIGluaXRpYWxpemUgdGhlIGRldGVjdG9ycwogICAgOnBhcmFtIGlucHV0X3N0cmVhbTogbGFiZWxlZCBzdHJlYW0gdG8gdHJhY2suCiAgICAgICAgICAgICAgICAgICAgICAgICBTaG91bGQgY29udGFpbiBsYWJlbF9jb2wgYW5kIHByZWRpY3Rpb25fY29sCiAgICA6cGFyYW0gb3V0cHV0X3N0cmVhbTogT3V0cHV0IHN0cmVhbSB0byBwdXNoIHRoZSBkZXRlY3RvcidzIGFsZXJ0cwogICAgOnBhcmFtIG91dHB1dF90c2RiOiBPdXRwdXQgVFNEQiB0YWJsZSB0byBhbGxvdyBhbmFseXNpcyBhbmQgZGlzcGxheQogICAgOnBhcmFtIHRzZGJfYmF0Y2hfc2l6ZTogQmF0Y2ggc2l6ZSBvZiBhbGVydHMgdG8gYnVmZmVyIGJlZm9yZSBwdXNoaW5nIHRvIHRoZSBUU0RCCiAgICA6cGFyYW0gY2FsbGJhY2tzOiBBZGRpdGlvbmFsIHJlc3QgZW5kcG9pbnRzIHRvIHNlbmQgdGhlIGFsZXJ0IGRhdGEgdG8KICAgIDpwYXJhbSBtb2RlbHM6IExpc3Qgb2YgdGhlIGRldGVjdG9ycyB0byBkZXBsb3kgCiAgICAgICAgICAgICAgICAgICBEZWZhdWx0cyB0byBbJ2RkbScsICdlZGRtJywgJ3BhZ2VoaW5rbGV5J10uCiAgICA6cGFyYW0gbW9kZWxzX2Rlc3Q6IExvY2F0aW9uIGZvciBzYXZpbmcgdGhlIGRldGVjdG9ycyAKICAgICAgICAgICAgICAgICAgICAgICAgRGVmYXVsdHMgdG8gJ21vZGVscycgKGluIHJlbGF0aW9uIHRvIGFydGlmYWN0X3BhdGgpLgogICAgOnBhcmFtIHBhZ2VoaW5rbGV5X3RocmVzaG9sZDogIERyaWZ0IGxldmVsIHRocmVzaG9sZCBmb3IgUEggZGV0ZWN0b3IgRGVmYXVsdHMgdG8gMTAuCiAgICA6cGFyYW0gZGRtX3dhcm5pbmdfbGV2ZWw6ICAgICAgV2FybmluZyBsZXZlbCBhbGVydCBmb3IgRERNIGRldGVjdG9yIERlZmF1bHRzIHRvIDIuCiAgICA6cGFyYW0gZGRtX291dF9jb250cm9sX2xldmVsOiAgRHJpZnQgbGV2ZWwgYWxlcnQgZm9yIERETSBkZXRlY3RvciBEZWZhdWx0cyB0byAzLgogICAgOnBhcmFtIGxhYmVsX2NvbDogTGFiZWwgY29sdW1uIHRvIGJlIHVzZWQgb24gYmFzZV9kYXRhc2V0IGFuZCBpbnB1dF9zdHJlYW0gCiAgICAgICAgICAgICAgICAgICAgICBEZWZhdWx0cyB0byAnbGFiZWwnLgogICAgOnBhcmFtIHByZWRpY3Rpb25fY29sOiBQcmVkaWN0aW9uIGNvbHVtbiB0byBiZSB1c2VkIG9uIGJhc2VfZGF0YXNldCBhbmQgaW5wdXRfc3RyZWFtIAogICAgICAgICAgICAgICAgICAgICAgICAgICBEZWZhdWx0cyB0byAncHJlZGljdGlvbicuCiAgICA6cGFyYW0gaHViX3VybDogaHViX3VybCBpbiBjYXNlIHRoZSBkZWZhdWx0IGlzIG5vdCB1c2VkLCBjb25jZXB0X2RyaWZ0X3N0cmVhbWluZyB3aWxsIGJlIGxvYWRlZCAKICAgICAgICAgICAgICAgICAgICBieSB0aGlzIHVybCAKICAgICAgICAgICAgICAgICAgICBEZWZhdWx0cyB0byBtbGNvbmYuaHViX3VybC4KICAgIDpwYXJhbSBmbl90YWc6IGh1YiB0YWcgdG8gdXNlCiAgICAgICAgICAgICAgICAgICBEZWZhdWx0cyB0byAnbWFzdGVyJwogICAgIiIiCgogICAgbWxjb25mLmRicGF0aCA9IG1sY29uZi5kYnBhdGggb3IgJ2h0dHA6Ly9tbHJ1bi1hcGk6ODA4MCcKICAgIG1sY29uZi5odWJfdXJsID0gaHViX3VybAogICAgZm4gPSBpbXBvcnRfZnVuY3Rpb24odXJsPSdodWI6Ly9jb25jZXB0X2RyaWZ0X3N0cmVhbWluZycpCiAgICAKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oJ0xvYWRpbmcgYmFzZSBkYXRhc2V0JykKICAgIGJhc2VfZGYgPSBiYXNlX2RhdGFzZXQuYXNfZGYoKQogICAgZXJyb3Jfc3RyZWFtID0gbnAud2hlcmUoYmFzZV9kZltwcmVkaWN0aW9uX2NvbF0udmFsdWVzPT1iYXNlX2RmW2xhYmVsX2NvbF0udmFsdWVzLCAwLCAxKQogICAgCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCdDcmVhdGluZyBtb2RlbHMnKQogICAgbW9kZWxzID0gW21vZGVsLnN0cmlwKCkgZm9yIG1vZGVsIGluIG9zLmdldGVudignbW9kZWxzJywgJ3BhZ2VoaW5rbGV5LCBkZG0sIGVkZG0nKS5zcGxpdCgnLCcpXQogICAgbW9kZWxzID0geydlZGRtJzogc2ttdWx0aWZsb3cuZHJpZnRfZGV0ZWN0aW9uLkVERE0oKSwKICAgICAgICAgICAgICAncGFnZWhpbmtsZXknOiBza211bHRpZmxvdy5kcmlmdF9kZXRlY3Rpb24uUGFnZUhpbmtsZXkobWluX2luc3RhbmNlcz1sZW4oZXJyb3Jfc3RyZWFtKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGhyZXNob2xkPXBhZ2VoaW5rbGV5X3RocmVzaG9sZCksCiAgICAgICAgICAgICAgJ2RkbSc6IHNrbXVsdGlmbG93LmRyaWZ0X2RldGVjdGlvbi5ERE0obWluX251bV9pbnN0YW5jZXM9bGVuKGVycm9yX3N0cmVhbSksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgd2FybmluZ19sZXZlbD1kZG1fd2FybmluZ19sZXZlbCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBvdXRfY29udHJvbF9sZXZlbD1kZG1fb3V0X2NvbnRyb2xfbGV2ZWwpfQogICAgCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCdTdHJlYW1pbmcgZGF0YSB0byBtb2RlbHMnKQogICAgZm9yIGkgaW4gcmFuZ2UobGVuKGVycm9yX3N0cmVhbSkpOgogICAgICAgIGZvciBtb2RlbF9uYW1lLCBtb2RlbCBpbiBtb2RlbHMuaXRlbXMoKToKICAgICAgICAgICAgbW9kZWwuYWRkX2VsZW1lbnQoZXJyb3Jfc3RyZWFtW2ldKQogICAgICAgICAgICAKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oJ0xvZ2dpbmcgcmVhZHkgbW9kZWxzJykKICAgIGZvciBuYW1lLCBtb2RlbCBpbiBtb2RlbHMuaXRlbXMoKToKICAgICAgICBkYXRhID0gZHVtcHMobW9kZWwpCiAgICAgICAgbW9kZWxfZmlsZSA9IGYne25hbWV9LnBrbCcKICAgICAgICBjb250ZXh0LmxvZ19tb2RlbChmJ3tuYW1lfV9jb25jZXB0X2RyaWZ0JywgYm9keT1kYXRhLCBsYWJlbHM9eydmcmFtZXdvcmsnOiAnc2ttdWx0aWZsb3cnLCAnd29ya2Zsb3cnOiAnY29uY2VwdC1kcmlmdCd9LAogICAgICAgICAgICAgICAgICAgICAgICAgIG1vZGVsX2ZpbGU9bW9kZWxfZmlsZSwgbW9kZWxfZGlyPW1vZGVsc19kZXN0LCB0YWc9J2xhdGVzdCcpCiAgICAgICAgZm4uc2V0X2VudnMoe2Yne25hbWV9X21vZGVsX3BhdGgnOiBvcy5wYXRoLmpvaW4oY29udGV4dC5hcnRpZmFjdF9wYXRoLCBtb2RlbHNfZGVzdCwgbW9kZWxfZmlsZSl9KQogICAgICAgICAgICAKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oJ0RlcGxveWluZyBDb25jZXB0IERyaWZ0IFN0cmVhbWluZyBmdW5jdGlvbicpCiAgICBmbi5zZXRfZW52cyh7J2xhYmVsX2NvbCc6IGxhYmVsX2NvbCwKICAgICAgICAgICAgICAgICAncHJlZGljdGlvbl9jb2wnOiBwcmVkaWN0aW9uX2NvbCwgCiAgICAgICAgICAgICAgICAgJ2RyaWZ0X3N0cmVhbSc6IG91dHB1dF9zdHJlYW0sCiAgICAgICAgICAgICAgICAgJ3RzZGJfdGFibGUnOiBvdXRwdXRfdHNkYiwKICAgICAgICAgICAgICAgICAncGFnZWhpbmtsZXlfdGhyZXNob2xkJzogcGFnZWhpbmtsZXlfdGhyZXNob2xkLAogICAgICAgICAgICAgICAgICdkZG1fd2FybmluZ19sZXZlbCc6IGRkbV93YXJuaW5nX2xldmVsLAogICAgICAgICAgICAgICAgICdkZG1fb3V0X2NvbnRyb2wnOiBkZG1fb3V0X2NvbnRyb2xfbGV2ZWx9KSAgICAKICAgIGZuLmFkZF90cmlnZ2VyKCdsYWJlbGVkX3N0cmVhbScsIFYzSU9TdHJlYW1UcmlnZ2VyKHVybD1pbnB1dF9zdHJlYW0pKQogICAgZm4uYXBwbHkobW91bnRfdjNpbygpKQogICAgZm4uZGVwbG95KHByb2plY3Q9Y29udGV4dC5wcm9qZWN0KQoK
+    base_image: mlrun/ml-models
+    commands:
+    - python -m pip install scikit-multiflow==0.4.1
+    - python -m pip install v3io_frames
+    code_origin: https://github.com/mlrun/functions#651dcf94718a1a5a4ca7c3d5dcf1fb19607ba3f6:concept_drift.ipynb

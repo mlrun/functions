@@ -1,0 +1,99 @@
+kind: job
+metadata:
+  name: spark-submit
+  tag: ''
+  hash: 8ed3ec186d126141a558aab6a5a0582a18c5e502
+  project: ''
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  env:
+  - name: V3IO_API
+    value: ''
+  - name: V3IO_USERNAME
+    value: ''
+  - name: V3IO_ACCESS_KEY
+    value: ''
+  default_handler: spark_submit
+  entry_points:
+    get_shell_pod_name:
+      name: get_shell_pod_name
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: pod_name
+        default: shell
+      outputs:
+      - default: ''
+      lineno: 29
+    exec_shell_cmd:
+      name: exec_shell_cmd
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: cmd
+        default: ''
+      - name: shell_pod_name
+        default: shell
+      outputs:
+      - default: ''
+      lineno: 38
+    spark_command_builder:
+      name: spark_command_builder
+      doc: ''
+      parameters:
+      - name: name
+        default: ''
+      - name: class_name
+        default: ''
+      - name: jars
+        default: ''
+      - name: packages
+        default: ''
+      - name: spark_options
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 53
+    spark_submit:
+      name: spark_submit
+      doc: 'spark_submit function
+
+
+        submiting spark via shell'
+      parameters:
+      - name: context
+        default: ''
+      - name: v3io_access_key
+        default: ''
+      - name: name
+        doc: A name of your application.
+        default: null
+      - name: class_name
+        doc: Your application's main class (for Java / Scala apps). * If relative
+          will add to the {artifact_path}
+        default: null
+      - name: jars
+        doc: Comma-separated list of jars to include on the driver and executor classpaths.
+        default: null
+      - name: packages
+        doc: Comma-separated list of maven coordinates of jars to include on the driver
+          and executor classpaths. Will search the local maven repo, then maven central
+          and any additional remote repositories given by --repositories. The format
+          for the
+        default: null
+      - name: spark_options
+        doc: spark parametes that are not included as function arguments
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 73
+  description: ''
+  service_account: mlrun-api
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSBtbHJ1biBpbXBvcnQgZ2V0X29yX2NyZWF0ZV9jdHgKZnJvbSBrdWJlcm5ldGVzIGltcG9ydCBjb25maWcsIGNsaWVudApmcm9tIGt1YmVybmV0ZXMuc3RyZWFtIGltcG9ydCBzdHJlYW0KCmNsYXNzIEs4U0NsaWVudChvYmplY3QpOgoKICAgIGRlZiBfX2luaXRfXyhzZWxmLCBsb2dnZXIsIG5hbWVzcGFjZT0nZGVmYXVsdC10ZW5hbnQnLCBjb25maWdfZmlsZT1Ob25lKToKICAgICAgICBzZWxmLm5hbWVzcGFjZSA9IG5hbWVzcGFjZQogICAgICAgIHNlbGYubG9nZ2VyID0gbG9nZ2VyCiAgICAgICAgc2VsZi5faW5pdF9rOHNfY29uZmlnKGNvbmZpZ19maWxlKQogICAgICAgIHNlbGYudjFhcGkgPSBjbGllbnQuQ29yZVYxQXBpKCkKCiAgICBkZWYgX2luaXRfazhzX2NvbmZpZyhzZWxmLCBjb25maWdfZmlsZSk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBjb25maWcubG9hZF9pbmNsdXN0ZXJfY29uZmlnKCkKICAgICAgICAgICAgc2VsZi5sb2dnZXIuaW5mbygndXNpbmcgaW4tY2x1c3RlciBjb25maWcuJykKICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBjb25maWcubG9hZF9rdWJlX2NvbmZpZyhjb25maWdfZmlsZSkKICAgICAgICAgICAgICAgIHNlbGYubG9nZ2VyLmluZm8oJ3VzaW5nIGxvY2FsIGt1YmVybmV0ZXMgY29uZmlnLicpCiAgICAgICAgICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgICAgICAgICByYWlzZSBSdW50aW1lRXJyb3IoCiAgICAgICAgICAgICAgICAgICAgJ2Nhbm5vdCBmaW5kIGxvY2FsIGt1YmVybmV0ZXMgY29uZmlnIGZpbGUsJwogICAgICAgICAgICAgICAgICAgICcgcGxhY2UgaXQgaW4gfi8ua3ViZS9jb25maWcgb3Igc3BlY2lmeSBpdCBpbiAnCiAgICAgICAgICAgICAgICAgICAgJ0tVQkVDT05GSUcgZW52IHZhcicpCgogICAgZGVmIGdldF9zaGVsbF9wb2RfbmFtZShzZWxmLCBwb2RfbmFtZT0nc2hlbGwnKToKICAgICAgICBzaGVsbF9wb2QgPSBzZWxmLnYxYXBpLmxpc3RfbmFtZXNwYWNlZF9wb2QobmFtZXNwYWNlPXNlbGYubmFtZXNwYWNlKQogICAgICAgIGZvciBpIGluIHNoZWxsX3BvZC5pdGVtczoKICAgICAgICAgICAgaWYgcG9kX25hbWUgaW4gaS5tZXRhZGF0YS5uYW1lOgogICAgICAgICAgICAgICAgc2VsZi5sb2dnZXIuaW5mbygiJXNcdCVzXHQlcyIgJSAoaS5zdGF0dXMucG9kX2lwLCBpLm1ldGFkYXRhLm5hbWVzcGFjZSwgaS5tZXRhZGF0YS5uYW1lKSkKICAgICAgICAgICAgICAgIHNoZWxsX25hbWUgPSBpLm1ldGFkYXRhLm5hbWUKICAgICAgICAgICAgICAgIGJyZWFrCiAgICAgICAgcmV0dXJuIHNoZWxsX25hbWUKCiAgICBkZWYgZXhlY19zaGVsbF9jbWQoc2VsZiwgY21kLCBzaGVsbF9wb2RfbmFtZSA9ICdzaGVsbCcpOgogICAgICAgIHNoZWxsX25hbWUgPSBzZWxmLmdldF9zaGVsbF9wb2RfbmFtZShzaGVsbF9wb2RfbmFtZSkKICAgICAgICBleGVjX2NvbW1hbmQgPSBbCiAgICAgICAgICAgICcvYmluL2Jhc2gnLAogICAgICAgICAgICAnLWMnLAogICAgICAgICAgICBjbWRdCiAgICAgICAgcmVzcCA9IHN0cmVhbShzZWxmLnYxYXBpLmNvbm5lY3RfZ2V0X25hbWVzcGFjZWRfcG9kX2V4ZWMsCiAgICAgICAgICAgICAgICAgICAgICBzaGVsbF9uYW1lLAogICAgICAgICAgICAgICAgICAgICAgc2VsZi5uYW1lc3BhY2UsCiAgICAgICAgICAgICAgICAgICAgICBjb21tYW5kPWV4ZWNfY29tbWFuZCwKICAgICAgICAgICAgICAgICAgICAgIHN0ZGVycj1UcnVlLCBzdGRpbj1GYWxzZSwKICAgICAgICAgICAgICAgICAgICAgIHN0ZG91dD1UcnVlLCB0dHk9RmFsc2UpCiAgICAgICAgc2VsZi5sb2dnZXIuaW5mbygiUmVzcG9uc2U6ICIgKyByZXNwKQoKCmRlZiBzcGFya19jb21tYW5kX2J1aWxkZXIobmFtZSwgY2xhc3NfbmFtZSwgamFycywgcGFja2FnZXMsIHNwYXJrX29wdGlvbnMpOgogICAgY21kID0gJ3NwYXJrLXN1Ym1pdCcKICAgIGlmIG5hbWU6CiAgICAgICAgY21kICs9ICcgLS1uYW1lICcgKyBuYW1lCgogICAgaWYgY2xhc3NfbmFtZToKICAgICAgICBjbWQgKz0gJyAtLWNsYXNzICcgKyBjbGFzc19uYW1lCgogICAgaWYgamFyczoKICAgICAgICBjbWQgKz0gJyAtLWphcnMgJyArIGphcnMKCiAgICBpZiBwYWNrYWdlczoKICAgICAgICBjbWQgKz0gJyAtLXBhY2thZ2VzICcgKyBwYWNrYWdlcwoKICAgIGlmIHNwYXJrX29wdGlvbnM6CiAgICAgICAgY21kICs9ICcgJyArIHNwYXJrX29wdGlvbnMKCiAgICByZXR1cm4gY21kCgoKZGVmIHNwYXJrX3N1Ym1pdChjb250ZXh0LCB2M2lvX2FjY2Vzc19rZXksIG5hbWU9Tm9uZSwgY2xhc3NfbmFtZT1Ob25lLCBqYXJzPU5vbmUsIHBhY2thZ2VzPU5vbmUsIHNwYXJrX29wdGlvbnM9JycpOgogICAgIiIic3Bhcmtfc3VibWl0IGZ1bmN0aW9uCiAgICAKICAgIHN1Ym1pdGluZyBzcGFyayB2aWEgc2hlbGwKICAgIAogICAgOnBhcmFtIG5hbWU6ICAgICAgICBBIG5hbWUgb2YgeW91ciBhcHBsaWNhdGlvbi4KICAgIDpwYXJhbSBjbGFzc19uYW1lOiAgWW91ciBhcHBsaWNhdGlvbidzIG1haW4gY2xhc3MgKGZvciBKYXZhIC8gU2NhbGEgYXBwcykuCiAgICAgICAgICAgICAgICAgICAgICAgICogSWYgcmVsYXRpdmUgd2lsbCBhZGQgdG8gdGhlIHthcnRpZmFjdF9wYXRofQogICAgOnBhcmFtIGphcnM6ICAgICAgICBDb21tYS1zZXBhcmF0ZWQgbGlzdCBvZiBqYXJzIHRvIGluY2x1ZGUgb24gdGhlIGRyaXZlcgogICAgICAgICAgICAgICAgICAgICAgICBhbmQgZXhlY3V0b3IgY2xhc3NwYXRocy4KICAgIDpwYXJhbSBwYWNrYWdlczogICAgQ29tbWEtc2VwYXJhdGVkIGxpc3Qgb2YgbWF2ZW4gY29vcmRpbmF0ZXMgb2YgamFycyB0byBpbmNsdWRlCiAgICAgICAgICAgICAgICAgICAgICAgIG9uIHRoZSBkcml2ZXIgYW5kIGV4ZWN1dG9yIGNsYXNzcGF0aHMuIFdpbGwgc2VhcmNoIHRoZSBsb2NhbAogICAgICAgICAgICAgICAgICAgICAgICBtYXZlbiByZXBvLCB0aGVuIG1hdmVuIGNlbnRyYWwgYW5kIGFueSBhZGRpdGlvbmFsIHJlbW90ZQogICAgICAgICAgICAgICAgICAgICAgICByZXBvc2l0b3JpZXMgZ2l2ZW4gYnkgLS1yZXBvc2l0b3JpZXMuIFRoZSBmb3JtYXQgZm9yIHRoZQogICAgOnBhcmFtIHNwYXJrX29wdGlvbnM6IHNwYXJrIHBhcmFtZXRlcyB0aGF0IGFyZSBub3QgaW5jbHVkZWQgYXMgZnVuY3Rpb24gYXJndW1lbnRzCiAgICAiIiIKICAgIGNtZCA9IHNwYXJrX2NvbW1hbmRfYnVpbGRlcihuYW1lLCBjbGFzc19uYW1lLCBqYXJzLCBwYWNrYWdlcywgc3Bhcmtfb3B0aW9ucykKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oInN1Ym1pdGluZyA6IiArIGNtZCkKICAgIGNsaSA9IEs4U0NsaWVudChjb250ZXh0LmxvZ2dlcikKICAgIGNsaS5leGVjX3NoZWxsX2NtZChjbWQpCgo=
+    commands: []
+    code_origin: git@github.com:mlrun/functions.git#7d1bbd3549935c3e85cc1cdc1eb556dd33b656e2:spark-submit.ipynb

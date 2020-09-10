@@ -1,0 +1,90 @@
+kind: remote
+metadata:
+  name: concept-drift-streaming
+  tag: ''
+  hash: d46e323d5bb4cac5e580f3b78e56c3e0c5a09a1e
+  project: ''
+  labels:
+    author: orz
+    framework: sklearn
+  categories:
+  - ml
+  - serve
+spec:
+  command: ''
+  args: []
+  image: ''
+  entry_points:
+    split_path:
+      name: split_path
+      doc: ''
+      parameters:
+      - name: mntpath
+      outputs: []
+      lineno: 15
+    create_stream:
+      name: create_stream
+      doc: ''
+      parameters:
+      - name: context
+      - name: path
+      - name: shards
+        default: 1
+      outputs: []
+      lineno: 26
+    push_to_stream:
+      name: push_to_stream
+      doc: ''
+      parameters:
+      - name: context
+      - name: stream_path
+      - name: data
+      outputs: []
+      lineno: 36
+    construct_record:
+      name: construct_record
+      doc: ''
+      parameters:
+      - name: record
+      outputs: []
+      lineno: 44
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+      outputs: []
+      lineno: 53
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+      - name: event
+      outputs: []
+      lineno: 91
+  description: Deploy a streaming Concept Drift detector on a labeled stream. the
+    nuclio part of the concept_drift function
+  max_replicas: 4
+  env: []
+  base_spec:
+    apiVersion: nuclio.io/v1
+    kind: Function
+    metadata:
+      annotations:
+        nuclio.io/generated_by: function generated from 14-07-2020 by admin
+      labels: {}
+      name: concept-drift-streaming
+    spec:
+      build:
+        baseImage: mlrun/ml-models
+        commands:
+        - python -m pip install scikit-multiflow==0.4.1
+        - python -m pip install v3io_frames
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHNrbXVsdGlmbG93LmRyaWZ0X2RldGVjdGlvbgppbXBvcnQgbnVtcHkgYXMgbnAKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgb3MKaW1wb3J0IGpzb24KaW1wb3J0IHYzaW8uZGF0YXBsYW5lCmltcG9ydCB2M2lvX2ZyYW1lcyBhcyB2M2YKaW1wb3J0IHJlcXVlc3RzCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGxvYWQKCmltcG9ydCByYW5kb20KCmRlZiBzcGxpdF9wYXRoKG1udHBhdGg9JycpOgogICAgaWYgbW50cGF0aFswXSA9PSAnLyc6CiAgICAgICAgbW50cGF0aCA9IG1udHBhdGhbMTpdCiAgICBwYXRocyA9IG1udHBhdGguc3BsaXQoJy8nKQogICAgY29udGFpbmVyID0gcGF0aHNbMF0KICAgIHN1YnBhdGggPSAnJwogICAgaWYgbGVuKHBhdGhzKSA+IDE6CiAgICAgICAgc3VicGF0aCA9IG1udHBhdGhbbGVuKGNvbnRhaW5lcik6XQogICAgcmV0dXJuIGNvbnRhaW5lciwgc3VicGF0aAoKCmRlZiBjcmVhdGVfc3RyZWFtKGNvbnRleHQsIHBhdGgsIHNoYXJkcz0xKToKICAgIGNvbnRhaW5lciwgc3RyZWFtX3BhdGggPSBzcGxpdF9wYXRoKHBhdGgpCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYnQ3JlYXRpbmcgc3RyZWFtIGluIENvbnRhaW5lcjoge2NvbnRhaW5lcn0gJiBQYXRoIHtzdHJlYW1fcGF0aH0nKQogICAgcmVzcG9uc2UgPSBjb250ZXh0LnYzaW9fY2xpZW50LmNyZWF0ZV9zdHJlYW0oY29udGFpbmVyPWNvbnRhaW5lciwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHBhdGg9c3RyZWFtX3BhdGgsIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2hhcmRfY291bnQ9c2hhcmRzLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmFpc2VfZm9yX3N0YXR1cz12M2lvLmRhdGFwbGFuZS5SYWlzZUZvclN0YXR1cy5uZXZlcikKICAgIHJlc3BvbnNlLnJhaXNlX2Zvcl9zdGF0dXMoWzQwOSwgMjA0XSkKICAgIAogICAgCmRlZiBwdXNoX3RvX3N0cmVhbShjb250ZXh0LCBzdHJlYW1fcGF0aCwgZGF0YSk6CiAgICByZWNvcmRzID0gW3snZGF0YSc6IGpzb24uZHVtcHMocmVjKX0gZm9yIHJlYyBpbiBkYXRhXQogICAgY29udGFpbmVyLCBzdHJlYW1fcGF0aCA9IHNwbGl0X3BhdGgoc3RyZWFtX3BhdGgpCiAgICByZXNwb25zZSA9IGNvbnRleHQudjNpb19jbGllbnQucHV0X3JlY29yZHMoY29udGFpbmVyPWNvbnRhaW5lciwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBwYXRoPXN0cmVhbV9wYXRoLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByZWNvcmRzPXJlY29yZHMpCgoKZGVmIGNvbnN0cnVjdF9yZWNvcmQocmVjb3JkKToKICAgIGxhYmVsX2NvbCA9IG9zLmdldGVudignbGFiZWxfY29sJywgJ2xhYmVsJykKICAgIHByZWRpY3Rpb25fY29sID0gb3MuZ2V0ZW52KCdwcmVkaWN0aW9uX2NvbCcsICdwcmVkaWN0aW9uJykKICAgIHJlcyA9IGRpY3QoWyhrLCByZWNvcmRba10pIGZvciBrIGluIFsnd2hlbicsICdjbGFzcycsICdtb2RlbCcsICdyZXNwJywgJ3JlcXVlc3QnXV0pCiAgICByZXNbJ2ZlYXR1cmVfdmVjdG9yJ10gPSByZXMucG9wKCdyZXF1ZXN0JylbJ2luc3RhbmNlcyddWzBdCiAgICByZXNbJ3RpbWVzdGFtcCddID0gcmVzLnBvcCgnd2hlbicpCiAgICByZXNbJ3ByZWRpY3Rpb24nXSA9IHJlc1sncmVzcCddWzBdCiAgICByZXR1cm4gcmVzCgpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgdjNpb19jbGllbnQgPSB2M2lvLmRhdGFwbGFuZS5DbGllbnQoKQogICAgc2V0YXR0cihjb250ZXh0LCAidjNpb19jbGllbnQiLCB2M2lvX2NsaWVudCkKICAgIAogICAgdjNmX2NsaWVudCA9IHYzZi5DbGllbnQoJ2ZyYW1lc2Q6ODA4MScsIGNvbnRhaW5lcj0nYmlnZGF0YScpCiAgICBzZXRhdHRyKGNvbnRleHQsICJ2M2YiLCB2M2ZfY2xpZW50KQogICAgd2luZG93ID0gW10KICAgIHNldGF0dHIoY29udGV4dCwgJ3dpbmRvdycsIHdpbmRvdykKICAgIHNldGF0dHIoY29udGV4dCwgJ3dpbmRvd19zaXplJywgaW50KG9zLmdldGVudignd2luZG93X3NpemUnLCAxMCkpKQogICAgc2V0YXR0cihjb250ZXh0LCAndHNkYl90YWJsZScsIG9zLmdldGVudigndHNkYl90YWJsZScsICdjb25jZXB0X2RyaWZ0X3RzZGJfMScpKQogICAgdHJ5OgogICAgICAgIGNvbnRleHQudjNmLmNyZWF0ZSgndHNkYicsIGNvbnRleHQudHNkYl90YWJsZSwgcmF0ZT0nMS9zJywgaWZfZXhpc3RzPTEpCiAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbyhmJ0NyZWF0aW5nIGNvbnRleHQgd2l0aCByYXRlPSBmYWlsZSBmb3Ige2V9JykKICAgICAgICBjb250ZXh0LnYzZi5jcmVhdGUoJ3RzZGInLCBjb250ZXh0LnRzZGJfdGFibGUsIGF0dHJzPXsncmF0ZSc6ICcxL3MnfSwgaWZfZXhpc3RzPTEpCiAgICAKICAgIGNhbGxiYWNrcyA9IFtjYWxsYmFjay5zdHJpcCgpIGZvciBjYWxsYmFjayBpbiBvcy5nZXRlbnYoJ2NhbGxiYWNrcycsICcnKS5zcGxpdCgnLCcpXQogICAgc2V0YXR0cihjb250ZXh0LCAnY2FsbGJhY2tzJywgY2FsbGJhY2tzKQogICAgCiAgICBzZXRhdHRyKGNvbnRleHQsICdkcmlmdF9zdHJlYW0nLCBvcy5nZXRlbnYoJ2RyaWZ0X3N0cmVhbScsICcvYmlnZGF0YS9kcmlmdF9zdHJlYW0nKSkKICAgIHRyeToKICAgICAgICBjcmVhdGVfc3RyZWFtKGNvbnRleHQsIGNvbnRleHQuZHJpZnRfc3RyZWFtLCBpbnQob3MuZ2V0ZW52KCdkcmlmdF9zdHJlYW1fc2hhcmRzJywgMSkpKQogICAgZXhjZXB0OgogICAgICAgIGNvbnRleHQubG9nZ2VyLmluZm8oZid7Y29udGV4dC5kcmlmdF9zdHJlYW19IGFscmVhZHkgZXhpc3RzJykKICAgIAogICAgbW9kZWxzID0ge30KICAgIG1vZGVsX3R5cGVzID0gWydwYWdlaGlua2VseScsICdkZG0nLCAnZWRkbSddCiAgICBwYXRoX3N1ZmZpeCA9ICdfbW9kZWxfcGF0aCcKICAgIGZvciBtb2RlbCBpbiBtb2RlbF90eXBlczoKICAgICAgICBtb2RlbF9lbnYgPSBmJ3ttb2RlbH17cGF0aF9zdWZmaXh9JwogICAgICAgIGlmIG1vZGVsX2VudiBpbiBvcy5lbnZpcm9uOgogICAgICAgICAgICB3aXRoIG9wZW4ob3MuZW52aXJvblttb2RlbF9lbnZdLCAncmInKSBhcyBmOgogICAgICAgICAgICAgICAgbW9kZWxzW21vZGVsXSA9IGxvYWQoZikKICAgIHNldGF0dHIoY29udGV4dCwgJ21vZGVscycsIG1vZGVscykKICAgIAogICAgc2V0YXR0cihjb250ZXh0LCAnbGFiZWxfY29sJywgb3MuZ2V0ZW52KCdsYWJlbF9jb2wnLCAnbGFiZWwnKSkKICAgIHNldGF0dHIoY29udGV4dCwgJ3ByZWRpY3Rpb25fY29sJywgb3MuZ2V0ZW52KCdwcmVkaWN0aW9uX2NvbCcsICdwcmVkaWN0aW9uJykpCgpkZWYgaGFuZGxlcihjb250ZXh0LCBldmVudCk6CiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYnZXZlbnQ6IHtldmVudC5ib2R5fScpCiAgICBmdWxsX2V2ZW50ID0ganNvbi5sb2FkcyhldmVudC5ib2R5KQogICAgcmVjb3JkID0gY29uc3RydWN0X3JlY29yZChmdWxsX2V2ZW50KQogICAgCiAgICBpc19lcnJvciA9IHJlY29yZFtjb250ZXh0LmxhYmVsX2NvbF0gIT0gcmVjb3JkW2NvbnRleHQucHJlZGljdGlvbl9jb2xdCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYnQWRkaW5nIHtpc19lcnJvcn0nKQogICAgCiAgICBmb3IgbmFtZSwgbW9kZWwgaW4gY29udGV4dC5tb2RlbHMuaXRlbXMoKToKICAgICAgICByZXN1bHRzID0geyd0aW1lc3RhbXAnOiByZWNvcmRbJ3RpbWVzdGFtcCddfQogICAgICAgIHJlc3VsdHNbJ2FsZ29yaXRobSddID0gbmFtZQogICAgICAgIG1vZGVsLmFkZF9lbGVtZW50KGlzX2Vycm9yKQogICAgICAgIAogICAgICAgIGlmIGhhc2F0dHIobW9kZWwsICdkZXRlY3RlZF93YXJuaW5nX3pvbmUnKSBhbmQgbW9kZWwuZGV0ZWN0ZWRfd2FybmluZ196b25lKCk6CiAgICAgICAgICAgIGNvbnRleHQubG9nZ2VyLmluZm8oZid7bmFtZX1cdFdhcm5pbmcgem9uZSBkZXRlY3RlZCcpCiAgICAgICAgICAgIHJlc3VsdHNbJ3dhcm5pbmdfem9uZSddID0gMQogICAgICAgICAgICBmdWxsX2V2ZW50W2Yne25hbWV9X3dhcm5pbmdfem9uZSddID0gMQogICAgICAgIGVsc2U6CiAgICAgICAgICAgIHJlc3VsdHNbJ3dhcm5pbmdfem9uZSddID0gMAogICAgICAgICAgICBmdWxsX2V2ZW50W2Yne25hbWV9X3dhcm5pbmdfem9uZSddID0gMAogICAgICAgIAogICAgICAgIGlmIG1vZGVsLmRldGVjdGVkX2NoYW5nZSgpOgogICAgICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCdDaGFuZ2UgRGV0ZWN0ZWQnKQogICAgICAgICAgICByZXN1bHRzWydjaGFuZ2VfZGV0ZWN0ZWQnXSA9IDEKICAgICAgICAgICAgZnVsbF9ldmVudFtmJ3tuYW1lfV9kcmlmdCddID0gMQogICAgICAgIGVsc2U6CiAgICAgICAgICAgIHJlc3VsdHNbJ2NoYW5nZV9kZXRlY3RlZCddID0gMAogICAgICAgICAgICBmdWxsX2V2ZW50W2Yne25hbWV9X2RyaWZ0J10gPSAwCiAgICAgICAgY29udGV4dC53aW5kb3cuYXBwZW5kKHJlc3VsdHMpCiAgICAKICAgIHB1c2hfdG9fc3RyZWFtKGNvbnRleHQsIGNvbnRleHQuZHJpZnRfc3RyZWFtLCBbZnVsbF9ldmVudF0pCiAgICAKICAgIGlmIGNvbnRleHQuY2FsbGJhY2tzICE9IFsnJ106CiAgICAgICAgZm9yIGNhbGxiYWNrIGluIGNvbnRleHQuY2FsbGJhY2tzOgogICAgICAgICAgICByZXF1ZXN0cy5wb3N0KHVybD1jYWxsYmFjaywKICAgICAgICAgICAgICAgICAgICAgICAgICBqc29uPWZ1bGxfZXZlbnQpCiAgICAKICAgIGlmIChsZW4oY29udGV4dC53aW5kb3cpIC8gbGVuKGNvbnRleHQubW9kZWxzKSkgPj0gY29udGV4dC53aW5kb3dfc2l6ZToKICAgICAgICBkZiA9IHBkLkRhdGFGcmFtZShjb250ZXh0LndpbmRvdykKICAgICAgICBkZlsndGltZXN0YW1wJ10gPSBwZC50b19kYXRldGltZShkZlsndGltZXN0YW1wJ10pCiAgICAgICAgZGYgPSBkZi5zZXRfaW5kZXgoWyd0aW1lc3RhbXAnLCAnYWxnb3JpdGhtJ10pCiAgICAgICAgY29udGV4dC52M2Yud3JpdGUoJ3RzZGInLCBjb250ZXh0LnRzZGJfdGFibGUsIGRmKQogICAgICAgIGNvbnRleHQud2luZG93ID0gW10KCg==
+        noBaseImagesPull: true
+      env: []
+      handler: concept_drift_streaming:handler
+      runtime: python:3.6
+      volumes: []
+  source: ''

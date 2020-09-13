@@ -2,13 +2,11 @@ kind: remote
 metadata:
   name: bert-embeddings
   tag: ''
-  hash: 54c9d7ce59bd167b4dbcbaca0169dbed77999603
-  project: ''
+  hash: b38a93f8ec58f8113892799cf946cd188563a577
+  project: default
   labels:
     author: roye
-    framework:
-    - pytorch
-    - transformers
+    framework: pytorch
   categories:
   - NLP
   - BERT
@@ -23,18 +21,23 @@ spec:
       doc: ''
       parameters:
       - name: context
-      outputs: []
+        default: ''
+      outputs:
+      - default: ''
       lineno: 9
     handler:
       name: handler
       doc: ''
       parameters:
       - name: context
+        default: ''
       - name: event
-      outputs: []
+        default: ''
+      outputs:
+      - default: ''
       lineno: 16
   description: Get BERT based embeddings for given text
-  min_replicas: 0
+  min_replicas: 1
   max_replicas: 4
   env: []
   base_spec:
@@ -42,14 +45,14 @@ spec:
     kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 11-06-2020 by iguazio
+        nuclio.io/generated_by: function generated from 13-09-2020
       labels: {}
       name: bert-embeddings
     spec:
       build:
         commands:
-        - pip install torch
-        - pip install transformers
+        - pip install torch==1.6.0
+        - pip install transformers==3.0.1
         functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSB0cmFuc2Zvcm1lcnMgaW1wb3J0IEJlcnRNb2RlbCwgQmVydFRva2VuaXplcgppbXBvcnQgdG9yY2gKZnJvbSB0eXBpbmcgaW1wb3J0IFVuaW9uLCBMaXN0CmltcG9ydCBqc29uCmltcG9ydCBwaWNrbGUKCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICB0b2tlbml6ZXIgPSBCZXJ0VG9rZW5pemVyLmZyb21fcHJldHJhaW5lZCgnYmVydC1iYXNlLXVuY2FzZWQnKQogICAgbW9kZWwgPSBCZXJ0TW9kZWwuZnJvbV9wcmV0cmFpbmVkKCdiZXJ0LWJhc2UtdW5jYXNlZCcpCiAgICBtb2RlbC5ldmFsKCkKICAgIHNldGF0dHIoY29udGV4dC51c2VyX2RhdGEsICd0b2tlbml6ZXInLCB0b2tlbml6ZXIpCiAgICBzZXRhdHRyKGNvbnRleHQudXNlcl9kYXRhLCAnbW9kZWwnLCBtb2RlbCkKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIGRvY3MgPSBqc29uLmxvYWRzKGV2ZW50LmJvZHkpCiAgICBkb2NzID0gW2RvYy5sb3dlcigpIGZvciBkb2MgaW4gZG9jc10KICAgIGRvY3MgPSBjb250ZXh0LnVzZXJfZGF0YS50b2tlbml6ZXIuYmF0Y2hfZW5jb2RlX3BsdXMoZG9jcywgcGFkX3RvX21heF9sZW5ndGg9VHJ1ZSwgcmV0dXJuX3RlbnNvcnM9J3B0JykKICAgIHdpdGggdG9yY2gubm9fZ3JhZCgpOgogICAgICAgIGVtYmVkZGluZ3MgPSBjb250ZXh0LnVzZXJfZGF0YS5tb2RlbCgqKmRvY3MpCiAgICBlbWJlZGRpbmdzID0gW2VtYmVkZGluZ3NbMF0ubnVtcHkoKSwgZW1iZWRkaW5nc1sxXS5udW1weSgpXQogICAgcmV0dXJuIHBpY2tsZS5kdW1wcyhlbWJlZGRpbmdzKQoK
         noBaseImagesPull: true
       env: []

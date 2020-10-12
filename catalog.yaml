@@ -91,7 +91,7 @@ feature-perms:
   categories:
   - analysis
   description: estimate feature importances using permutations
-  docfile: feature_perms/README.ipynb
+  docfile: feature_perms/feature_perms.ipynb
   kind: job
   versions:
     latest: feature_perms/function.yaml
@@ -262,6 +262,24 @@ tf2-serving:
   kind: remote
   versions:
     latest: tf2_serving/function.yaml
+v2-model-server:
+  categories:
+  - serving
+  - ml
+  description: generic sklearn model server
+  docfile: v2_model_server/v2_model_server.ipynb
+  kind: serving
+  versions:
+    latest: v2_model_server/function.yaml
+v2-model-tester:
+  categories:
+  - ml
+  - test
+  description: test v2 model servers
+  docfile: v2_model_tester/v2_model_tester.ipynb
+  kind: job
+  versions:
+    latest: v2_model_tester/function.yaml
 virtual-drift:
   categories:
   - ml

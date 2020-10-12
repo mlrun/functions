@@ -7,7 +7,7 @@ import json
 import numpy as np
 from datetime import datetime
 from mlrun.datastore import DataItem
-from mlrun.artifacts import get_model, ChartArtifact
+from mlrun.artifacts import ChartArtifact
 
 def model_server_tester(context,
                         table: DataItem,

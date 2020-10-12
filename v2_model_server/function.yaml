@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: v2-model-server
   tag: ''
-  hash: 677c4f96fc3771b6e77b35e54c78e937a3b6c224
+  hash: 22485e4f7ad229768915af4ef48b058d6af4476e
   project: default
   labels:
     author: yaronh
@@ -23,7 +23,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 11
+      lineno: 10
     predict:
       name: predict
       doc: Generate model predictions from sample.
@@ -36,7 +36,7 @@ spec:
       outputs:
       - default: ''
         type: List
-      lineno: 17
+      lineno: 15
     init_context:
       name: init_context
       doc: ''
@@ -45,7 +45,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 25
+      lineno: 23
     handler:
       name: handler
       doc: ''
@@ -56,7 +56,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 28
+      lineno: 26
   description: generic sklearn model server
   min_replicas: 1
   max_replicas: 4
@@ -66,7 +66,7 @@ spec:
     kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 07-10-2020 by admin
+        nuclio.io/generated_by: function generated from 12-10-2020 by admin
       labels: {}
       name: v2-model-server
     spec:
@@ -74,12 +74,12 @@ spec:
         baseImage: mlrun/mlrun
         commands:
         - python -m pip install numpy cloudpickle v3io sklearn
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG9zCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGxvYWQKaW1wb3J0IG51bXB5IGFzIG5wCmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CmZyb20gZGF0ZXRpbWUgaW1wb3J0IGRhdGV0aW1lCmltcG9ydCBtbHJ1bgoKY2xhc3MgQ2xhc3NpZmllck1vZGVsKG1scnVuLnNlcnZpbmcuVjJNb2RlbFNlcnZlcik6CiAgICBkZWYgbG9hZChzZWxmKToKICAgICAgICAiIiJsb2FkIGFuZCBpbml0aWFsaXplIHRoZSBtb2RlbCBhbmQvb3Igb3RoZXIgZWxlbWVudHMiIiIKICAgICAgICBtb2RlbF9maWxlLCBleHRyYV9kYXRhID0gc2VsZi5nZXRfbW9kZWwoJy5wa2wnKQogICAgICAgIHByaW50KG1vZGVsX2ZpbGUpCiAgICAgICAgc2VsZi5tb2RlbCA9IGxvYWQob3Blbihtb2RlbF9maWxlLCAncmInKSkKCiAgICBkZWYgcHJlZGljdChzZWxmLCBib2R5OiBkaWN0KSAtPiBMaXN0OgogICAgICAgICIiIkdlbmVyYXRlIG1vZGVsIHByZWRpY3Rpb25zIGZyb20gc2FtcGxlLiIiIgogICAgICAgIGZlYXRzID0gbnAuYXNhcnJheShib2R5WydpbnB1dHMnXSkKICAgICAgICByZXN1bHQ6IG5wLm5kYXJyYXkgPSBzZWxmLm1vZGVsLnByZWRpY3QoZmVhdHMpCiAgICAgICAgcmV0dXJuIHJlc3VsdC50b2xpc3QoKQoKCmZyb20gbWxydW4ucnVudGltZXMgaW1wb3J0IG51Y2xpb19pbml0X2hvb2sKZGVmIGluaXRfY29udGV4dChjb250ZXh0KToKICAgIG51Y2xpb19pbml0X2hvb2soY29udGV4dCwgZ2xvYmFscygpLCAndjJzZXJ2aW5nJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG1scnVuCgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmltcG9ydCBudW1weSBhcyBucApmcm9tIHR5cGluZyBpbXBvcnQgTGlzdAoKY2xhc3MgQ2xhc3NpZmllck1vZGVsKG1scnVuLnNlcnZpbmcuVjJNb2RlbFNlcnZlcik6CiAgICBkZWYgbG9hZChzZWxmKToKICAgICAgICAiIiJsb2FkIGFuZCBpbml0aWFsaXplIHRoZSBtb2RlbCBhbmQvb3Igb3RoZXIgZWxlbWVudHMiIiIKICAgICAgICBtb2RlbF9maWxlLCBleHRyYV9kYXRhID0gc2VsZi5nZXRfbW9kZWwoJy5wa2wnKQogICAgICAgIHNlbGYubW9kZWwgPSBsb2FkKG9wZW4obW9kZWxfZmlsZSwgJ3JiJykpCgogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keTogZGljdCkgLT4gTGlzdDoKICAgICAgICAiIiJHZW5lcmF0ZSBtb2RlbCBwcmVkaWN0aW9ucyBmcm9tIHNhbXBsZS4iIiIKICAgICAgICBmZWF0cyA9IG5wLmFzYXJyYXkoYm9keVsnaW5wdXRzJ10pCiAgICAgICAgcmVzdWx0OiBucC5uZGFycmF5ID0gc2VsZi5tb2RlbC5wcmVkaWN0KGZlYXRzKQogICAgICAgIHJldHVybiByZXN1bHQudG9saXN0KCkKCgpmcm9tIG1scnVuLnJ1bnRpbWVzIGltcG9ydCBudWNsaW9faW5pdF9ob29rCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBudWNsaW9faW5pdF9ob29rKGNvbnRleHQsIGdsb2JhbHMoKSwgJ3NlcnZpbmdfdjInKQoKZGVmIGhhbmRsZXIoY29udGV4dCwgZXZlbnQpOgogICAgcmV0dXJuIGNvbnRleHQubWxydW5faGFuZGxlcihjb250ZXh0LCBldmVudCkK
         noBaseImagesPull: true
       env: []
       handler: v2_model_server:handler
       runtime: python:3.6
       volumes: []
   source: ''
-  function_kind: v2serving
+  function_kind: serving_v2
   default_class: ClassifierModel

@@ -4,7 +4,7 @@ Get the table's summary statistics and summary plots
 
 The functions will require the following parameters:
 
-'''
+```markdown
 
 :param context:         the function context
 :param table:           MLRun input pointing to pandas dataframe (csv/parquet file path)
@@ -14,7 +14,7 @@ The functions will require the following parameters:
 :param plots_dest:      destination folder of summary plots (relative to artifact_path)
 :param update_dataset:  when the table is a registered dataset update the charts in-place
 
-'''
+```
 
 The function will output the following artifacts per column within the data frame (based on data types):
 

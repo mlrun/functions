@@ -1,4 +1,4 @@
-# describe
+# Describe
 
 Get the table's summary statistics and summary plots
 

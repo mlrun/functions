@@ -11,6 +11,14 @@ from mlrun.mlutils import eval_model_v2
 from cloudpickle import load
 from urllib.request import urlopen
 
+import os
+import pandas as pd
+from mlrun.datastore import DataItem
+from mlrun.artifacts import get_model, update_model
+from mlrun.mlutils import eval_model_v2
+from cloudpickle import load
+from urllib.request import urlopen
+
 def test_classifier(
     context,
     models_path: DataItem, 
@@ -51,12 +59,18 @@ def test_classifier(
         raise Exception("model location likely specified")
     
     extra_data = eval_model_v2(context, xtest, ytest.values, model_obj)
+    if model_obj and model_update == True:
+        update_model(models_path, extra_data=extra_data, 
+                     metrics=context.results, key_prefix='validation-')
     
+    # get y_hat:
     y_hat = model_obj.predict(xtest)
+    # give the prediction columns titles/headers
     if y_hat.ndim == 1 or y_hat.shape[1] == 1:
         score_names = [predictions_column]
     else:
         score_names = [f"{predictions_column}_" + str(x) for x in range(y_hat.shape[1])]
 
+    # log the test set and its predictions (should also bind model and metadata)
     df = pd.concat([xtest, ytest, pd.DataFrame(y_hat, columns=score_names)], axis=1)
     context.log_dataset("test_set_preds", df=df, format="parquet", index=False)

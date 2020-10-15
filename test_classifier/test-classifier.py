@@ -20,7 +20,8 @@ def test_classifier(
     plots_dest: str = "",
     model_evaluator = None,
     default_model: str = "model.pkl",
-    predictions_column: str = 'yscore'
+    predictions_column: str = 'yscore',
+    model_update = True
 ) -> None:
     """Test one or more classifier models against held-out dataset
     
@@ -38,6 +39,7 @@ def test_classifier(
     :param model_evaluator:    NOT IMPLEMENTED: specific method to generate eval, passed in as string
                                or available in this folder
     :param predictions_column: column name for the predictions column on the resulted artifact
+    :param model_update:       (True) update model, when running as stand alone no need in update
     """
     xtest = test_set.as_df()
     ytest = xtest.pop(label_column)
@@ -49,9 +51,6 @@ def test_classifier(
         raise Exception("model location likely specified")
     
     extra_data = eval_model_v2(context, xtest, ytest.values, model_obj)
-    if model_obj:
-        update_model(models_path, extra_data=extra_data, 
-                     metrics=context.results, key_prefix='validation-')
     
     y_hat = model_obj.predict(xtest)
     if y_hat.ndim == 1 or y_hat.shape[1] == 1:
@@ -61,4 +60,3 @@ def test_classifier(
 
     df = pd.concat([xtest, ytest, pd.DataFrame(y_hat, columns=score_names)], axis=1)
     context.log_dataset("test_set_preds", df=df, format="parquet", index=False)
-

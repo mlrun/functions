@@ -1,7 +1,7 @@
 kind: remote
 metadata:
   name: sentiment-analysis-serving
-  hash: 1f3429021d7644bd88dd843bc4ad4b81edf5d640
+  hash: 1a84c1e1ebd9d89542435bbe80df57e6c9892ccd
   project: default
   labels:
     author: roye
@@ -19,8 +19,6 @@ spec:
   min_replicas: 1
   max_replicas: 1
   env:
-  - name: SERVING_MODEL_bert_classifier_v1
-    value: /User/demo-stocks/artifacts/models/bert_sentiment_analysis_model.pt
   - name: MODEL_CLASS
     value: SentimentClassifierServing
   - name: ENABLE_EXPLAINER

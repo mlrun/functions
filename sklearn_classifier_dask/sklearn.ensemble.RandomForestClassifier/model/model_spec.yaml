@@ -1,0 +1,38 @@
+key: model
+kind: model
+iter: 0
+tree: b42b3d8f1f2947628274346c97c5f64d
+target_path: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.RandomForestClassifier/model/
+hash: efe8ab2759b2a9e45f1718b6b53cb4b2b2daedbf
+size: 123589
+db_key: sklearn_ensemble_RandomForestClassifier_model
+extra_data:
+  confusion matrix table.csv: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.RandomForestClassifier/model/confusion
+    matrix table.csv
+  confusion matrix: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.RandomForestClassifier/model/plots/confusion-matrix.html
+  feature importances: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.RandomForestClassifier/model/plots/feature-importances.html
+  feature importances table.csv: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.RandomForestClassifier/model/feature
+    importances table.csv
+  precision_recall_multi: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.RandomForestClassifier/model/plots/precision-recall-multiclass.html
+  roc_multi: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.RandomForestClassifier/model/plots/roc-multiclass.html
+model_file: model.pkl
+metrics:
+  accuracy: 0.8846153846153846
+  test-error: 0.11538461538461539
+  auc-micro: 0.9933431952662722
+  auc-weighted: 1.0
+  f1-score: 0.8454106280193238
+  precision_score: 0.8333333333333334
+  recall_score: 0.923076923076923
+inputs: []
+outputs: []
+framework: ''
+labels:
+  class: sklearn.ensemble.RandomForestClassifier
+producer:
+  name: sklearn_ensemble_RandomForestClassifier
+  kind: run
+  uri: default/b42b3d8f1f2947628274346c97c5f64d
+  owner: nick
+sources: []
+project: default

@@ -1,0 +1,35 @@
+key: model
+kind: model
+iter: 0
+tree: e874033aec7a4719a546f68188f5815c
+target_path: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.linear_model.LogisticRegression/model/
+hash: c62350684423b5da1c95c7e9aa29f1a5ff28f185
+size: 814
+db_key: sklearn_linear_model_LogisticRegression_model
+extra_data:
+  confusion matrix table.csv: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.linear_model.LogisticRegression/model/confusion
+    matrix table.csv
+  confusion matrix: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.linear_model.LogisticRegression/model/plots/confusion-matrix.html
+  precision_recall_multi: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.linear_model.LogisticRegression/model/plots/precision-recall-multiclass.html
+  roc_multi: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.linear_model.LogisticRegression/model/plots/roc-multiclass.html
+model_file: model.pkl
+metrics:
+  accuracy: 0.8846153846153846
+  test-error: 0.11538461538461539
+  auc-micro: 0.9763313609467454
+  auc-weighted: 0.9953691793156676
+  f1-score: 0.8454106280193238
+  precision_score: 0.8333333333333334
+  recall_score: 0.923076923076923
+inputs: []
+outputs: []
+framework: ''
+labels:
+  class: sklearn.linear_model.LogisticRegression
+producer:
+  name: sklearn_linear_model_LogisticRegression
+  kind: run
+  uri: default/e874033aec7a4719a546f68188f5815c
+  owner: nick
+sources: []
+project: default

@@ -1,0 +1,38 @@
+key: model
+kind: model
+iter: 0
+tree: 13acb38e2786454e86df90b17c5fb11c
+target_path: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.AdaBoostClassifier/model/
+hash: b2e9b2ad791f8cf30485dc695b12dfba6342e12d
+size: 114390
+db_key: sklearn_ensemble_AdaBoostClassifier_model
+extra_data:
+  confusion matrix table.csv: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.AdaBoostClassifier/model/confusion
+    matrix table.csv
+  confusion matrix: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.AdaBoostClassifier/model/plots/confusion-matrix.html
+  feature importances: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.AdaBoostClassifier/model/plots/feature-importances.html
+  feature importances table.csv: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.AdaBoostClassifier/model/feature
+    importances table.csv
+  precision_recall_multi: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.AdaBoostClassifier/model/plots/precision-recall-multiclass.html
+  roc_multi: /User/mlrun_repos/functions/sklearn_classifier_dask/sklearn.ensemble.AdaBoostClassifier/model/plots/roc-multiclass.html
+model_file: model.pkl
+metrics:
+  accuracy: 0.8846153846153846
+  test-error: 0.11538461538461539
+  auc-micro: 0.94896449704142
+  auc-weighted: 1.0
+  f1-score: 0.8454106280193238
+  precision_score: 0.8333333333333334
+  recall_score: 0.923076923076923
+inputs: []
+outputs: []
+framework: ''
+labels:
+  class: sklearn.ensemble.AdaBoostClassifier
+producer:
+  name: sklearn_ensemble_AdaBoostClassifier
+  kind: run
+  uri: default/13acb38e2786454e86df90b17c5fb11c
+  owner: nick
+sources: []
+project: default

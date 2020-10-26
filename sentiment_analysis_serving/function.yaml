@@ -1,13 +1,11 @@
 kind: remote
 metadata:
-  name: sentiment-analysis-server
-  hash: af41e6673b8675d1b4f2638029a2bfe82db07e33
+  name: sentiment-analysis-serving
+  hash: 1a84c1e1ebd9d89542435bbe80df57e6c9892ccd
   project: default
   labels:
     author: roye
-    framework:
-    - transformers
-    - pytorch
+    framework: pytorch
   categories:
   - serving
   - NLP
@@ -18,10 +16,9 @@ spec:
   args: []
   image: ''
   description: BERT based sentiment classification model
-  max_replicas: 4
+  min_replicas: 1
+  max_replicas: 1
   env:
-  - name: SERVING_MODEL_bert_classifier_v1
-    value: /User/models/model.pt
   - name: MODEL_CLASS
     value: SentimentClassifierServing
   - name: ENABLE_EXPLAINER
@@ -38,21 +35,20 @@ spec:
     kind: nuclio:serving
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 11-06-2020 by iguazio
+        nuclio.io/generated_by: function generated from 18-10-2020 by admin
       labels: {}
-      name: sentiment-analysis-server
+      name: sentiment-analysis-serving
     spec:
       build:
-        baseImage: mlrun/ml-base
-        commands:
-        - pip install torch
-        - pip install transformers
+        baseImage: mlrun/ml-models-gpu
+        commands: []
         functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHRvcmNoCmltcG9ydCB0b3JjaC5ubiBhcyBubgpmcm9tIHRyYW5zZm9ybWVycyBpbXBvcnQgQmVydE1vZGVsLCBCZXJ0VG9rZW5pemVyCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzCgpQUkVUUkFJTkVEX01PREVMID0gJ2JlcnQtYmFzZS1jYXNlZCcKdG9rZW5pemVyID0gQmVydFRva2VuaXplci5mcm9tX3ByZXRyYWluZWQoJ2JlcnQtYmFzZS1jYXNlZCcpCgpjbGFzcyBCZXJ0U2VudGltZW50Q2xhc3NpZmllcihubi5Nb2R1bGUpOgogICAgZGVmIF9faW5pdF9fKHNlbGYsIG5fY2xhc3Nlcyk6CiAgICAgICAgc3VwZXIoQmVydFNlbnRpbWVudENsYXNzaWZpZXIsIHNlbGYpLl9faW5pdF9fKCkKICAgICAgICBzZWxmLmJlcnQgPSBCZXJ0TW9kZWwuZnJvbV9wcmV0cmFpbmVkKFBSRVRSQUlORURfTU9ERUwpCiAgICAgICAgc2VsZi5kcm9wb3V0ID0gbm4uRHJvcG91dChwPTAuMikKICAgICAgICBzZWxmLm91dF9saW5lYXIgPSBubi5MaW5lYXIoc2VsZi5iZXJ0LmNvbmZpZy5oaWRkZW5fc2l6ZSwgbl9jbGFzc2VzKQogICAgICAgIHNlbGYuc29mdG1heCA9IG5uLlNvZnRtYXgoZGltPTEpCgogICAgZGVmIGZvcndhcmQoc2VsZiwgaW5wdXRfaWRzLCBhdHRlbnRpb25fbWFzayk6CiAgICAgICAgXywgcG9vbGVkX291dCA9IHNlbGYuYmVydCgKICAgICAgICAgICAgaW5wdXRfaWRzPWlucHV0X2lkcywKICAgICAgICAgICAgYXR0ZW50aW9uX21hc2s9YXR0ZW50aW9uX21hc2sKICAgICAgICApCiAgICAgICAgb3V0ID0gc2VsZi5kcm9wb3V0KHBvb2xlZF9vdXQpCiAgICAgICAgb3V0ID0gc2VsZi5vdXRfbGluZWFyKG91dCkKICAgICAgICByZXR1cm4gc2VsZi5zb2Z0bWF4KG91dCkKCmltcG9ydCBtbHJ1bgpjbGFzcyBTZW50aW1lbnRDbGFzc2lmaWVyU2VydmluZyhtbHJ1bi5ydW50aW1lcy5NTE1vZGVsU2VydmVyKToKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgIG1vZGVsX2ZpbGUsIF8gPSBzZWxmLmdldF9tb2RlbCgnLnB0JykKICAgICAgICBkZXZpY2UgPSB0b3JjaC5kZXZpY2UoJ2N1ZGE6MCcpIGlmIHRvcmNoLmN1ZGEuaXNfYXZhaWxhYmxlKCkgZWxzZSB0b3JjaC5kZXZpY2UoJ2NwdScpCiAgICAgICAgbW9kZWwgPSBCZXJ0U2VudGltZW50Q2xhc3NpZmllcihuX2NsYXNzZXM9MykKICAgICAgICBtb2RlbC5sb2FkX3N0YXRlX2RpY3QodG9yY2gubG9hZChtb2RlbF9maWxlLCBtYXBfbG9jYXRpb249ZGV2aWNlKSkKICAgICAgICBtb2RlbC5ldmFsKCkKICAgICAgICBzZWxmLm1vZGVsID0gbW9kZWwKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGJvZHkpOgogICAgICAgIHRyeToKICAgICAgICAgICAgaW5zdGFuY2VzID0gYm9keVsnaW5zdGFuY2VzJ10KICAgICAgICAgICAgZW5jID0gdG9rZW5pemVyLmJhdGNoX2VuY29kZV9wbHVzKGluc3RhbmNlcywgcmV0dXJuX3RlbnNvcnM9J3B0JywgcGFkX3RvX21heF9sZW5ndGg9VHJ1ZSkKICAgICAgICAgICAgb3V0cHV0cyA9IHNlbGYubW9kZWwoaW5wdXRfaWRzPWVuY1snaW5wdXRfaWRzJ10sIGF0dGVudGlvbl9tYXNrPWVuY1snYXR0ZW50aW9uX21hc2snXSkKICAgICAgICAgICAgXywgcHJlZHMgPSB0b3JjaC5tYXgob3V0cHV0cywgZGltPTEpCiAgICAgICAgICAgIHJldHVybiBwcmVkcy5jcHUoKS50b2xpc3QoKQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZToKICAgICAgICAgICAgcmFpc2UgRXhjZXB0aW9uKCJGYWlsZWQgdG8gcHJlZGljdCAlcyIgJSBlKQoKCmZyb20gbWxydW4ucnVudGltZXMgaW1wb3J0IG51Y2xpb19pbml0X2hvb2sKZGVmIGluaXRfY29udGV4dChjb250ZXh0KToKICAgIG51Y2xpb19pbml0X2hvb2soY29udGV4dCwgZ2xvYmFscygpLCAnc2VydmluZycpCgpkZWYgaGFuZGxlcihjb250ZXh0LCBldmVudCk6CiAgICByZXR1cm4gY29udGV4dC5tbHJ1bl9oYW5kbGVyKGNvbnRleHQsIGV2ZW50KQo=
         noBaseImagesPull: true
       env:
       - name: MODEL_CLASS
-        value: '"SentimentClassifierServing"'
-      handler: BERT_sentiment_analysis_serving:handler
+        value: SentimentClassifierServing
+      handler: bert_sentiment_analysis_serving:handler
+      readiness_timeout: 500
       runtime: python:3.6
       volumes: []
   source: ''

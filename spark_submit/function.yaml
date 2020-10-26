@@ -1,6 +1,6 @@
 kind: job
 metadata:
-  name: submit
+  name: spark-submit
   tag: ''
   hash: e0b494cfbf67f5bb3dd5728a573f9a6a57378268
   project: default

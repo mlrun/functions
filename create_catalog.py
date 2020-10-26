@@ -6,7 +6,11 @@ import os
 
 catalog = {}
 
-for f in Path('.').glob('**/*.yaml'):
+file_list = Path('.').glob('**/*.yaml')
+
+sorted_file_list = sorted(file_list, key=lambda f: str(f))
+
+for f in sorted_file_list:
     specpath = str(f).replace('\\', '/')
     print('path:', specpath)
 

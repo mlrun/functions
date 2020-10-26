@@ -17,7 +17,7 @@ from dask import array as da
 from dask.delayed import delayed
 from dask_ml import model_selection
 from dask_ml import metrics
-from dask_ml.preprocessing import LabelEncoder, StandardScaler
+from dask_ml.preprocessing import StandardScaler, LabelEncoder
 
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
@@ -86,16 +86,16 @@ def train_model(context: MLClientCtx,
         context.dask_client = dask_client
     
     context.logger.info("Read Data")
-    temp = dataset.as_df()
+    temp = dataset.as_df() # fix dask df ability
     
-    df = dd.from_pandas(temp, chunksize=1000)
-    df_header = df.columns
+    df = dd.from_pandas(temp, chunksize=100000)
     
     context.logger.info("Prep Data")
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     df = df.select_dtypes(include=numerics)
     
-    df = df.dropna()
+    df = df.drop([c for c in df.columns if df[c].isna().any().compute()], axis = 1) # no dropna with axis param in dask
+    df_header = df.columns
     
     df = df.sample(frac=sample).reset_index(drop=True)
     
@@ -104,13 +104,12 @@ def train_model(context: MLClientCtx,
     X = df.drop(label_column, axis=1).to_dask_array(lengths=True)
     y = encoder.transform(df[label_column])
 
-    classes = df[label_column].drop_duplicates()
+    classes = df[label_column].drop_duplicates() # no unique values in dask
     classes = [str(i) for i in classes]
 
     context.logger.info("Split and Train")
-    X_train, X_test, y_train, y_test = delayed(model_selection.train_test_split)(X, y, 
-                                                                                 train_size=train_validation_size,
-                                                                                 random_state=random_state).compute()
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, train_size=train_validation_size,
+                                                                        random_state=random_state)
     
     scaler = StandardScaler()
     scaler = scaler.fit(X_train)
@@ -145,8 +144,8 @@ def train_model(context: MLClientCtx,
         plt.close()
         
         viz = report(model, classes=classes, per_class=True, is_fitted=True)
-        viz.fit(X_train_transformed, y_train)        # Fit the training data to the visualizer
-        viz.score(X_test_transformed, y_test)        # Evaluate the model on the test data
+        viz.fit(X_train_transformed, y_train)               # Fit the training data to the visualizer
+        viz.score(X_test_transformed, y_test.compute())     # Evaluate the model on the test data
         
         plot = context.log_artifact(PlotArtifact(report_name, 
                                                  body=viz.fig,
@@ -167,7 +166,8 @@ def train_model(context: MLClientCtx,
         
         viz.show()
     
-    viz = FeatureImportances(model, classes=classes, per_class=True, is_fitted=True, labels=df_header)
+    viz = FeatureImportances(model, classes=classes, per_class=True, 
+                             is_fitted=True, labels=df_header.delete(df_header.get_loc(label_column)))
     viz.fit(X_train_transformed, y_train) 
     viz.score(X_test_transformed, y_test)
     viz.show()
@@ -206,7 +206,8 @@ def train_model(context: MLClientCtx,
     
     df_to_save = delayed(np.column_stack)((X_test, y_test)).compute()
     context.log_dataset(test_set_key, 
-                        df=pd.DataFrame(df_to_save, columns=df_header), # talk with the team
+                        df=pd.DataFrame(df_to_save, 
+                                        columns=df_header), # improve log dataset ability
                         format=file_ext, index=False, 
                         labels={"data-type": "held-out"},
                         artifact_path=context.artifact_subpath('data'))
@@ -226,10 +227,10 @@ artifact_path = mlrun.set_environment(api_path = 'http://mlrun-api:8080',
 
 DATA_URL = 'https://s3.wasabisys.com/iguazio/data/iris/iris_dataset.csv'
 
+
 task_params = {
     "params" : {
         "sample"             : 1,
-        "test_size"          : 0.30,
         "train_val_split"    : 0.75,
         "random_state"       : 42,
         "n_jobs"             : -1,
@@ -238,9 +239,9 @@ task_params = {
 
 
 models = [
-    "sklearn.ensemble.RandomForestClassifier", 
-    "sklearn.linear_model.LogisticRegression",
-    "sklearn.ensemble.AdaBoostClassifier"
+    "sklearn.ensemble.RandomForestClassifier",
+    "sklearn.ensemble.AdaBoostClassifier",
+    "sklearn.linear_model.LogisticRegression"
 ]
 
 outputs = []
@@ -249,7 +250,7 @@ for model in models:
     task_copy.update(
         {
             "params":{ "model_pkg_class" : model,
-                       "label_column"    : "label"}
+                       "label_column"    : "VendorID"}
         }
     )
     

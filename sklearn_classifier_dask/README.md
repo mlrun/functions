@@ -45,4 +45,5 @@ Train a sklearn classifier with Dask
 
 1. Add cross validation methods
 2. Improve dask efficiency by calling dask data frame (not from pandas)
-3. log dataset artifact as dask data frame  
+3. Log dataset artifact as dask data frame 
+4. Add values imputer (instead of drop na)

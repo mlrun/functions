@@ -21,7 +21,7 @@ Run any scikit-learn compatible classifier or list of classifiers with Dask
 6. **Evaluate the model**
    * a custom evaluator can be provided, see function doc for details
 
-'''
+
 Train a sklearn classifier with Dask
     
     :param context:                 Function context.
@@ -39,7 +39,7 @@ Train a sklearn classifier with Dask
     :param scheduler_key:           (scheduler) Dask scheduler configuration, json also logged as an artifact.
     :param file_ext:                (parquet) format for test_set_key hold out data
     :param random_state:            (42) sklearn seed
-'''
+
 
 ### TODO
 

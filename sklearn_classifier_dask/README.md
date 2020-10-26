@@ -21,7 +21,7 @@ Run any scikit-learn compatible classifier or list of classifiers with Dask
 6. **Evaluate the model**
    * a custom evaluator can be provided, see function doc for details
 
-'''markdown
+'''
 Train a sklearn classifier with Dask
     
     :param context:                 Function context.

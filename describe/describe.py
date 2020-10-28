@@ -13,6 +13,7 @@ from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.artifacts import PlotArtifact, TableArtifact
 from mlrun.mlutils import gcf_clear
+import mlrun
 
 from typing import List
 

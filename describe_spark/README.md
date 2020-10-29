@@ -63,10 +63,10 @@ Based on pandas_profiling, but for Spark's DataFrames instead of pandas.
 
 For each column the following statistics - if relevant for the column type - are presented:
 
-`Essentials:` type, unique values, missing values
-`Quantile statistics:` minimum value, Q1, median, Q3, maximum, range, interquartile range
-`Descriptive statistics:` mean, mode, standard deviation, sum, median absolute deviation, coefficient of variation, kurtosis, skewness
-`Most frequent values:` for categorical data
+* `Essentials:` type, unique values, missing values
+* `Quantile statistics:` minimum value, Q1, median, Q3, maximum, range, interquartile range
+* `Descriptive statistics:` mean, mode, standard deviation, sum, median absolute deviation, coefficient of variation, kurtosis, skewness
+* `Most frequent values:` for categorical data
 
 ```
 Function params

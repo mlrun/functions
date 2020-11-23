@@ -40,7 +40,7 @@ def train_model(context: MLClientCtx,
                 plots_dest: str = "plots",
                 dask_key: str = "dask_key",
                 dask_persist: bool = False,
-                scheduler_key: str = None,
+                scheduler_key: str = '',
                 file_ext: str = "parquet",
                 random_state: int = 42) -> None:
     
@@ -64,41 +64,25 @@ def train_model(context: MLClientCtx,
     :param random_state:            (42) sklearn seed
     """
     
-    if hasattr(context, "dask_client"):
-        dask_client = context.dask_client
-        dask_client.write_scheduler_file("scheduler.json")
-        
-    elif scheduler_key != None:
-        dask_client = Client(scheduler_file=str(scheduler_key))
-        dask_client.write_scheduler_file(scheduler_key + ".json")
+    if scheduler_key:
+        client = Client(scheduler_key)
         
     else:
-        dask_client = Client()
-        dask_client.write_scheduler_file("scheduler.json")
-        
-    if dask_persist:
-        df = dask_client.persist(df)
-        if dask_client.datasets and dask_key in dask_client.datasets:
-            dask_client.unpublish_dataset(dask_key)
-        dask_client.publish_dataset(df, name=dask_key)
-    
-    if context:
-        context.dask_client = dask_client
-    
+        client = Client()
+
     context.logger.info("Read Data")
-    temp = dataset.as_df() # fix dask df ability
-    
-    df = dd.from_pandas(temp, chunksize=100000)
-    
+    df = dataset.as_df(df_module=dd) 
+
     context.logger.info("Prep Data")
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     df = df.select_dtypes(include=numerics)
     
-    df = df.drop([c for c in df.columns if df[c].isna().any().compute()], axis = 1) # no dropna with axis param in dask
+    if df.isna().any().any().compute() == True:
+        raise Exception('NAs valus found')
+    
     df_header = df.columns
     
     df = df.sample(frac=sample).reset_index(drop=True)
-    
     encoder = LabelEncoder()
     encoder = encoder.fit(df[label_column])
     X = df.drop(label_column, axis=1).to_dask_array(lengths=True)
@@ -128,7 +112,7 @@ def train_model(context: MLClientCtx,
     
     with joblib.parallel_backend("dask"):
         
-        model = delayed(model.fit)(**model_config["FIT"]).compute()
+        model = model.fit(**model_config["FIT"])
 
     artifact_path = context.artifact_subpath(models_dest)
     
@@ -164,13 +148,11 @@ def train_model(context: MLClientCtx,
                     context.log_results({score_name + "-" + score_class : 
                                          viz.scores_[score_name].get(score_class)})
         
-        viz.show()
     
     viz = FeatureImportances(model, classes=classes, per_class=True, 
                              is_fitted=True, labels=df_header.delete(df_header.get_loc(label_column)))
     viz.fit(X_train_transformed, y_train) 
     viz.score(X_test_transformed, y_test)
-    viz.show()
     
     plot = context.log_artifact(PlotArtifact("FeatureImportances", body=viz.fig, 
                                              title="FeatureImportances"), db_key=False)
@@ -213,64 +195,4 @@ def train_model(context: MLClientCtx,
                         artifact_path=context.artifact_subpath('data'))
     
     context.logger.info("Done!")
-
-dsf = mlrun.code_to_function('sklearn-classifier-dask', kind='dask', code_output=".") .apply(mlrun.mount_v3io())
-
-dsf.spec.image = 'mlrun/ml-models'
-dsf.spec.remote = True
-dsf.spec.replicas = 1
-dsf.spec.service_type = 'NodePort'
-dsf.export("function.yaml")
-
-artifact_path = mlrun.set_environment(api_path = 'http://mlrun-api:8080',
-                                      artifact_path = os.path.abspath('./'))
-
-DATA_URL = 'https://s3.wasabisys.com/iguazio/data/iris/iris_dataset.csv'
-
-
-task_params = {
-    "params" : {
-        "sample"             : 1,
-        "train_val_split"    : 0.75,
-        "random_state"       : 42,
-        "n_jobs"             : -1,
-        "plots_dest"         : "plots-p",
-        "models_dest"        : 'sklearn-clfmodel'}}
-
-
-models = [
-    "sklearn.ensemble.RandomForestClassifier",
-    "sklearn.ensemble.AdaBoostClassifier",
-    "sklearn.linear_model.LogisticRegression"
-]
-
-outputs = []
-for model in models:
-    task_copy = task_params.copy()
-    task_copy.update(
-        {
-            "params":{ "model_pkg_class" : model,
-                       "label_column"    : "VendorID"}
-        }
-    )
-    
-    if "RandomForestClassifier" in model:
-        task_copy["params"].update({"CLASS_max_depth" : 5})
-
-    if "LogisticRegression" in model:
-        task_copy["params"].update({"CLASS_solver" : "liblinear"})
-    
-    if "AdaBoostClassifier" in model:
-        task_copy["params"].update({"CLASS_n_estimators"  : 200,
-                                    "CLASS_learning_rate" : 0.01
-                                   })
-    
-    name = model.replace('.', '_')
-    output = dsf.run(mlrun.NewTask(**task_copy),
-                             handler=train_model,
-                             name=name,
-                             inputs={"dataset"  : DATA_URL}, 
-                             artifact_path=os.path.join(artifact_path, model))
-    
-    outputs.append({name: output.outputs})
 

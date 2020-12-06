@@ -1,7 +1,7 @@
 kind: remote
 metadata:
   name: model-server
-  hash: 6b4e354be566a717534cb723359dd77f568982ab
+  hash: a1dc5a391186ead91ff5cef97ba9ab277adb0ceb
   project: default
   labels:
     author: yaronh
@@ -19,8 +19,6 @@ spec:
   env:
   - name: MODEL_CLASS
     value: ClassifierModel
-  - name: ENABLE_EXPLAINER
-    value: 'False'
   config:
     spec.triggers.http:
       kind: http
@@ -30,26 +28,23 @@ spec:
       annotations: {}
   base_spec:
     apiVersion: nuclio.io/v1
-    kind: job
+    kind: serving
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 28-10-2020 by admin
+        nuclio.io/generated_by: function generated from 29-11-2020 by admin
       labels: {}
       name: model-server
     spec:
       build:
         commands:
         - python -m pip install numpy cloudpickle v3io sklearn mlrun
-        - python -m pip install --upgrade pip
-        - pip install urllib3==1.25.10
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSBjbG91ZHBpY2tsZSBpbXBvcnQgbG9hZApmcm9tIHR5cGluZyBpbXBvcnQgTGlzdApmcm9tIGRhdGV0aW1lIGltcG9ydCBkYXRldGltZQpmcm9tIHNrbGVhcm4uZGF0YXNldHMgaW1wb3J0IGxvYWRfaXJpcwoKaW1wb3J0IHdhcm5pbmdzCndhcm5pbmdzLmZpbHRlcndhcm5pbmdzKCdpZ25vcmUnKQoKaW1wb3J0IG9zCmltcG9ydCBudW1weSBhcyBucAppbXBvcnQgbWxydW4KCmNsYXNzIENsYXNzaWZpZXJNb2RlbChtbHJ1bi5ydW50aW1lcy5NTE1vZGVsU2VydmVyKToKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgICIiIkxvYWQgbW9kZWwgZnJvbSBzdG9yYWdlLiIiIgogICAgICAgIG1vZGVsX2ZpbGUsIGV4dHJhX2RhdGEgPSBzZWxmLmdldF9tb2RlbCgnLnBrbCcpCiAgICAgICAgc2VsZi5tb2RlbCA9IGxvYWQob3Blbihtb2RlbF9maWxlLCAncmInKSkKCiAgICBkZWYgcHJlZGljdChzZWxmLCBib2R5OiBkaWN0KSAtPiBMaXN0OgogICAgICAgICIiIkdlbmVyYXRlIG1vZGVsIHByZWRpY3Rpb25zIGZyb20gc2FtcGxlLgogICAgICAgIAogICAgICAgIDpwYXJhbSBib2R5IDogQSBkaWN0IG9mIG9ic2VydmF0aW9ucywgZWFjaCBvZiB3aGljaCBpcyBhbiAxLWRpbWVuc2lvbmFsIGZlYXR1cmUgdmVjdG9yLgogICAgICAgICAgICAKICAgICAgICBSZXR1cm5zIG1vZGVsIHByZWRpY3Rpb25zIGFzIGEgYExpc3RgLCBvbmUgZm9yIGVhY2ggcm93IGluIHRoZSBgYm9keWAgaW5wdXQgYExpc3RgLgogICAgICAgICIiIgogICAgICAgIHRyeToKICAgICAgICAgICAgZmVhdHMgPSBucC5hc2FycmF5KGJvZHlbJ2luc3RhbmNlcyddKQogICAgICAgICAgICByZXN1bHQ6IG5wLm5kYXJyYXkgPSBzZWxmLm1vZGVsLnByZWRpY3QoZmVhdHMpCiAgICAgICAgICAgIHJlc3AgPSByZXN1bHQudG9saXN0KCkKICAgICAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgICAgIHJhaXNlIEV4Y2VwdGlvbihmIkZhaWxlZCB0byBwcmVkaWN0IHtlfSIpCiAgICAgICAgCiAgICAgICAgcmV0dXJuIHJlc3AKCgpmcm9tIG1scnVuLnJ1bnRpbWVzIGltcG9ydCBudWNsaW9faW5pdF9ob29rCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBudWNsaW9faW5pdF9ob29rKGNvbnRleHQsIGdsb2JhbHMoKSwgJ3NlcnZpbmcnKQoKZGVmIGhhbmRsZXIoY29udGV4dCwgZXZlbnQpOgogICAgcmV0dXJuIGNvbnRleHQubWxydW5faGFuZGxlcihjb250ZXh0LCBldmVudCkK
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG1scnVuCgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CmZyb20gZGF0ZXRpbWUgaW1wb3J0IGRhdGV0aW1lCmZyb20gc2tsZWFybi5kYXRhc2V0cyBpbXBvcnQgbG9hZF9pcmlzCgppbXBvcnQgd2FybmluZ3MKd2FybmluZ3MuZmlsdGVyd2FybmluZ3MoJ2lnbm9yZScpCgppbXBvcnQgb3MKaW1wb3J0IG51bXB5IGFzIG5wCgpjbGFzcyBDbGFzc2lmaWVyTW9kZWwobWxydW4ucnVudGltZXMuTUxNb2RlbFNlcnZlcik6CiAgICBkZWYgbG9hZChzZWxmKToKICAgICAgICAiIiJMb2FkIG1vZGVsIGZyb20gc3RvcmFnZS4iIiIKICAgICAgICBtb2RlbF9maWxlLCBleHRyYV9kYXRhID0gc2VsZi5nZXRfbW9kZWwoJy5wa2wnKQogICAgICAgIHNlbGYubW9kZWwgPSBsb2FkKG9wZW4obW9kZWxfZmlsZSwgJ3JiJykpCgogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keTogZGljdCkgLT4gTGlzdDoKICAgICAgICAiIiJHZW5lcmF0ZSBtb2RlbCBwcmVkaWN0aW9ucyBmcm9tIHNhbXBsZS4KICAgICAgICAKICAgICAgICA6cGFyYW0gYm9keSA6IEEgZGljdCBvZiBvYnNlcnZhdGlvbnMsIGVhY2ggb2Ygd2hpY2ggaXMgYW4gMS1kaW1lbnNpb25hbCBmZWF0dXJlIHZlY3Rvci4KICAgICAgICAgICAgCiAgICAgICAgUmV0dXJucyBtb2RlbCBwcmVkaWN0aW9ucyBhcyBhIGBMaXN0YCwgb25lIGZvciBlYWNoIHJvdyBpbiB0aGUgYGJvZHlgIGlucHV0IGBMaXN0YC4KICAgICAgICAiIiIKICAgICAgICB0cnk6CiAgICAgICAgICAgIGZlYXRzID0gbnAuYXNhcnJheShib2R5WydpbnN0YW5jZXMnXSkKICAgICAgICAgICAgcmVzdWx0OiBucC5uZGFycmF5ID0gc2VsZi5tb2RlbC5wcmVkaWN0KGZlYXRzKQogICAgICAgICAgICByZXNwID0gcmVzdWx0LnRvbGlzdCgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oZiJGYWlsZWQgdG8gcHJlZGljdCB7ZX0iKQogICAgICAgIAogICAgICAgIHJldHVybiByZXNwCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
         noBaseImagesPull: true
       env:
       - name: MODEL_CLASS
         value: ClassifierModel
       handler: model_server:handler
-      image: mlrun/mlrun
-      maxReplicas: 1
+      image: mlrun/ml-models
       runtime: python:3.6
       volumes: []
   source: ''

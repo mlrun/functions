@@ -23,7 +23,6 @@ from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.artifacts import PlotArtifact
 from mlrun.mlutils import (gen_sklearn_model, create_class)
-import mlrun
 
 import matplotlib.pyplot as plt
 from yellowbrick.classifier import ROCAUC, ClassificationReport, ConfusionMatrix

@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: v2-model-server
   tag: ''
-  hash: 593e520390a2ce3f337be4f074213b037e0b71df
+  hash: 06e79919a7cdc95ceeaf430fb10fc935a932e2f0
   project: default
   labels:
     author: yaronh
@@ -66,7 +66,7 @@ spec:
     kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 24-11-2020 by admin
+        nuclio.io/generated_by: function generated from 06-12-2020 by admin
       labels: {}
       name: v2-model-server
     spec:

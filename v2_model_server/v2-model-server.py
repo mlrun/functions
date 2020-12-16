@@ -3,8 +3,12 @@
 import mlrun
 
 from cloudpickle import load
-import numpy as np
 from typing import List
+from sklearn.datasets import load_iris
+import numpy as np
+
+import warnings 
+warnings.filterwarnings('ignore')
 
 class ClassifierModel(mlrun.serving.V2ModelServer):
     def load(self):

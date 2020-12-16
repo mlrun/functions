@@ -19,7 +19,7 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [describe](describe/describe.ipynb) | job | describe and visualizes dataset stats | analysis |
 | [describe-dask](describe_dask/describe_dask.ipynb) | job | describe and visualizes dataset stats | analysis |
 | [describe-spark](describe_spark/describe_spark.ipynb) | job |  |  |
-| [feature-perms](feature_perms/README.ipynb) | job | estimate feature importances using permutations | analysis |
+| [feature-perms](feature_perms/feature_perms.ipynb) | job | estimate feature importances using permutations | analysis |
 | [feature-selection](feature_selection/feature_selection.ipynb) | job | Select features through multiple Statistical and Model filters | data-prep, ml |
 | [gen-class-data](gen_class_data/gen_class_data.ipynb) | job | simulate classification data using scikit-learn | simulators, ml |
 | [github-utils](github_utils/github_utils.ipynb) | job | add comments to github pull requests | notifications, utils |
@@ -41,6 +41,7 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [test-classifier](test_classifier/test_classifier.ipynb) | job | test a classifier using held-out or new data | ml, test |
 | [tf1-serving](tf1_serving/tf1_serving.ipynb) | nuclio | tf1 image classification server | serving, dl |
 | [tf2-serving](tf2_serving/tf2_serving.ipynb) | nuclio | tf2 image classification server | serving, dl |
+| [v2-model-server](v2_model_server/v2_model_server.ipynb) | serving | generic sklearn model server | serving, ml |
 | [v2-model-tester](v2_model_tester/v2_model_tester.ipynb) | job | test v2 model servers | ml, test |
 | [virtual-drift](virtual_drift/virtual_drift.ipynb) | job | Compute drift magnitude between Time-Samples T and U | ml, serve, concept-drift |
 | [xgb-custom](xgb_custom/xgb_custom.ipynb) | job | train an xgboost model using the low-level api | analysis |

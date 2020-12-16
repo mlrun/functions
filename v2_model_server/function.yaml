@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: v2-model-server
   tag: ''
-  hash: 22485e4f7ad229768915af4ef48b058d6af4476e
+  hash: 06e79919a7cdc95ceeaf430fb10fc935a932e2f0
   project: default
   labels:
     author: yaronh
@@ -23,7 +23,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 10
+      lineno: 14
     predict:
       name: predict
       doc: Generate model predictions from sample.
@@ -36,7 +36,7 @@ spec:
       outputs:
       - default: ''
         type: List
-      lineno: 15
+      lineno: 19
     init_context:
       name: init_context
       doc: ''
@@ -45,7 +45,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 23
+      lineno: 27
     handler:
       name: handler
       doc: ''
@@ -56,7 +56,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 26
+      lineno: 30
   description: generic sklearn model server
   min_replicas: 1
   max_replicas: 4
@@ -66,15 +66,14 @@ spec:
     kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 12-10-2020 by admin
+        nuclio.io/generated_by: function generated from 06-12-2020 by admin
       labels: {}
       name: v2-model-server
     spec:
       build:
-        baseImage: mlrun/mlrun
-        commands:
-        - python -m pip install numpy cloudpickle v3io sklearn
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG1scnVuCgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmltcG9ydCBudW1weSBhcyBucApmcm9tIHR5cGluZyBpbXBvcnQgTGlzdAoKY2xhc3MgQ2xhc3NpZmllck1vZGVsKG1scnVuLnNlcnZpbmcuVjJNb2RlbFNlcnZlcik6CiAgICBkZWYgbG9hZChzZWxmKToKICAgICAgICAiIiJsb2FkIGFuZCBpbml0aWFsaXplIHRoZSBtb2RlbCBhbmQvb3Igb3RoZXIgZWxlbWVudHMiIiIKICAgICAgICBtb2RlbF9maWxlLCBleHRyYV9kYXRhID0gc2VsZi5nZXRfbW9kZWwoJy5wa2wnKQogICAgICAgIHNlbGYubW9kZWwgPSBsb2FkKG9wZW4obW9kZWxfZmlsZSwgJ3JiJykpCgogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keTogZGljdCkgLT4gTGlzdDoKICAgICAgICAiIiJHZW5lcmF0ZSBtb2RlbCBwcmVkaWN0aW9ucyBmcm9tIHNhbXBsZS4iIiIKICAgICAgICBmZWF0cyA9IG5wLmFzYXJyYXkoYm9keVsnaW5wdXRzJ10pCiAgICAgICAgcmVzdWx0OiBucC5uZGFycmF5ID0gc2VsZi5tb2RlbC5wcmVkaWN0KGZlYXRzKQogICAgICAgIHJldHVybiByZXN1bHQudG9saXN0KCkKCgpmcm9tIG1scnVuLnJ1bnRpbWVzIGltcG9ydCBudWNsaW9faW5pdF9ob29rCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBudWNsaW9faW5pdF9ob29rKGNvbnRleHQsIGdsb2JhbHMoKSwgJ3NlcnZpbmdfdjInKQoKZGVmIGhhbmRsZXIoY29udGV4dCwgZXZlbnQpOgogICAgcmV0dXJuIGNvbnRleHQubWxydW5faGFuZGxlcihjb250ZXh0LCBldmVudCkK
+        baseImage: mlrun/ml-models
+        commands: []
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG1scnVuCgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CmZyb20gc2tsZWFybi5kYXRhc2V0cyBpbXBvcnQgbG9hZF9pcmlzCmltcG9ydCBudW1weSBhcyBucAoKaW1wb3J0IHdhcm5pbmdzIAp3YXJuaW5ncy5maWx0ZXJ3YXJuaW5ncygnaWdub3JlJykKCmNsYXNzIENsYXNzaWZpZXJNb2RlbChtbHJ1bi5zZXJ2aW5nLlYyTW9kZWxTZXJ2ZXIpOgogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgIiIibG9hZCBhbmQgaW5pdGlhbGl6ZSB0aGUgbW9kZWwgYW5kL29yIG90aGVyIGVsZW1lbnRzIiIiCiAgICAgICAgbW9kZWxfZmlsZSwgZXh0cmFfZGF0YSA9IHNlbGYuZ2V0X21vZGVsKCcucGtsJykKICAgICAgICBzZWxmLm1vZGVsID0gbG9hZChvcGVuKG1vZGVsX2ZpbGUsICdyYicpKQoKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGJvZHk6IGRpY3QpIC0+IExpc3Q6CiAgICAgICAgIiIiR2VuZXJhdGUgbW9kZWwgcHJlZGljdGlvbnMgZnJvbSBzYW1wbGUuIiIiCiAgICAgICAgZmVhdHMgPSBucC5hc2FycmF5KGJvZHlbJ2lucHV0cyddKQogICAgICAgIHJlc3VsdDogbnAubmRhcnJheSA9IHNlbGYubW9kZWwucHJlZGljdChmZWF0cykKICAgICAgICByZXR1cm4gcmVzdWx0LnRvbGlzdCgpCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nX3YyJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
         noBaseImagesPull: true
       env: []
       handler: v2_model_server:handler
@@ -82,4 +81,6 @@ spec:
       volumes: []
   source: ''
   function_kind: serving_v2
+  graph:
+    kind: router
   default_class: ClassifierModel

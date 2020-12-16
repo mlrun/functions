@@ -71,6 +71,13 @@ coxph-trainer:
   kind: job
   versions:
     latest: coxph_trainer/function.yaml
+dask_init:
+  categories: []
+  description: ''
+  docfile: sklearn_classifier_dask/sklearn_classifier_dask.ipynb
+  kind: dask
+  versions:
+    latest: sklearn_classifier_dask/function.yaml
 describe:
   categories:
   - analysis
@@ -87,6 +94,13 @@ describe-dask:
   kind: job
   versions:
     latest: describe_dask/function.yaml
+describe-spark:
+  categories: []
+  description: ''
+  docfile: describe_spark/describe_spark.ipynb
+  kind: job
+  versions:
+    latest: describe_spark/function.yaml
 feature-perms:
   categories:
   - analysis
@@ -167,6 +181,14 @@ open-archive:
   kind: job
   versions:
     latest: open_archive/function.yaml
+pandas-profiling-report:
+  categories:
+  - analysis
+  description: Create Pandas Profiling Report from Dataset
+  docfile: pandas_profiling_report/pandas_profiling_report.ipynb
+  kind: job
+  versions:
+    latest: pandas_profiling_report/function.yaml
 project-runner:
   categories:
   - utils

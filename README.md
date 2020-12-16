@@ -18,6 +18,7 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [coxph-trainer](coxph_trainer/coxph_trainer.ipynb) | job | cox proportional hazards, kaplan meier plots | training, ml |
 | [describe](describe/describe.ipynb) | job | describe and visualizes dataset stats | analysis |
 | [describe-dask](describe_dask/describe_dask.ipynb) | job | describe and visualizes dataset stats | analysis |
+| [describe-spark](describe_spark/describe_spark.ipynb) | job |  |  |
 | [feature-perms](feature_perms/feature_perms.ipynb) | job | estimate feature importances using permutations | analysis |
 | [feature-selection](feature_selection/feature_selection.ipynb) | job | Select features through multiple Statistical and Model filters | data-prep, ml |
 | [gen-class-data](gen_class_data/gen_class_data.ipynb) | job | simulate classification data using scikit-learn | simulators, ml |
@@ -27,10 +28,12 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [model-server](model_server/model_server.ipynb) | nuclio | generic sklearn model server | serving, ml |
 | [model-server-tester](model_server_tester/model_server_tester.ipynb) | job | test model servers | ml, test |
 | [open-archive](open_archive/open_archive.ipynb) | job | Open a file/object archive into a target directory | data-movement, utils |
+| [pandas-profiling-report](pandas_profiling_report/pandas_profiling_report.ipynb) | job | Create Pandas Profiling Report from Dataset | analysis |
 | [project-runner](project_runner/project_runner.ipynb) | nuclio | Nuclio based - Cron scheduler for running your MLRun projects | utils |
 | [send-email](send_email/send_email.ipynb) | job | Send Email messages through SMTP server | notifications |
 | [sentiment-analysis-serving](sentiment_analysis_serving/bert_sentiment_analysis_serving.ipynb) | nuclio | BERT based sentiment classification model | serving, NLP, BERT, sentiment analysis |
 | [sklearn-classifier](sklearn_classifier/sklearn_classifier.ipynb) | job | train any classifier using scikit-learn's API | ml, training |
+| [dask_init](sklearn_classifier_dask/sklearn_classifier_dask.ipynb) | dask |  |  |
 | [slack-notify](slack_notify/slack_notify.ipynb) | job | Send Slack notification | ops |
 | [spark-submit](spark_submit/spark_submit.ipynb) | job |  |  |
 | [sql-to-file](sql_to_file/sql_to_file.ipynb) | job | SQL To File - Ingest data using SQL query | data-prep |

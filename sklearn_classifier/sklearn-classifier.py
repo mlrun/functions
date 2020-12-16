@@ -21,9 +21,10 @@ from typing import List
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.artifacts import PlotArtifact
-
 from mlrun.mlutils import (get_sample, get_splits,
                      gen_sklearn_model, create_class, eval_model_v2)
+
+import mlrun
 
 def train_model(
     context: MLClientCtx,
@@ -33,7 +34,7 @@ def train_model(
     encode_cols: List[str] = [],
     sample: int = -1,
     test_size: float = 0.30,
-    train_val_split: float = 0.75,
+    train_val_split: float = 0.70,
     test_set_key: str = "test_set",
     model_evaluator = None,
     models_dest: str = "",

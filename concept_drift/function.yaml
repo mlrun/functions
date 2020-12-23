@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: concept-drift
   tag: ''
-  hash: 4abb51efb6f214ee812bc40f349cd4d676ab409d
+  hash: 87192574c8dc75e953f3620ef1ff003f3431bf80
   project: default
   labels:
     author: orz
@@ -89,7 +89,7 @@ spec:
         type: str
         doc: hub_url in case the default is not used, concept_drift_streaming will
           be loaded by this url Defaults to mlconf.hub_url.
-        default: <_ast.Name object at 0x7fb816dc31d0>
+        default: <_ast.Name object at 0x7f215b1a4d90>
       - name: fn_tag
         type: str
         doc: hub tag to use Defaults to 'master'
@@ -104,5 +104,7 @@ spec:
     commands:
     - python -m pip install scikit-multiflow==0.4.1
     - python -m pip install v3io_frames
-    code_origin: https://github.com/mlrun/functions#be078749c9a28db208e19b6097afd547a22f7a4a:concept_drift.ipynb
+    - python -m pip uninstall nuclio-jupyter -y
+    - python -m pip install nuclio-jupyter
+    code_origin: https://github.com/mlrun/functions#a29d6090ec775a6d6600c80156f442143a129f5f:concept_drift.ipynb
 verbose: false

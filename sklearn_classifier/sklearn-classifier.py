@@ -21,10 +21,10 @@ from typing import List
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.artifacts import PlotArtifact
-from mlrun.mlutils import (get_sample, get_splits,
-                     gen_sklearn_model, create_class, eval_model_v2)
+from mlrun.mlutils.data import get_sample, get_splits
+from mlrun.mlutils.models import gen_sklearn_model, eval_model_v2
+from mlrun.utils.helpers import create_class
 
-import mlrun
 
 def train_model(
     context: MLClientCtx,

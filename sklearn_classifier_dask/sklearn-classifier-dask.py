@@ -22,7 +22,8 @@ from dask_ml.preprocessing import StandardScaler, LabelEncoder
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.artifacts import PlotArtifact
-from mlrun.mlutils import (gen_sklearn_model, create_class)
+from mlrun.mlutils.models import gen_sklearn_model
+from mlrun.utils.helpers import create_class
 
 import matplotlib.pyplot as plt
 from yellowbrick.classifier import ROCAUC, ClassificationReport, ConfusionMatrix

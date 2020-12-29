@@ -9,7 +9,7 @@ import mlrun
 
 from mlrun.datastore import DataItem
 from mlrun.artifacts import get_model, update_model
-from mlrun.mlutils import eval_model_v2
+from mlrun.mlutils.models import eval_model_v2
 from cloudpickle import load
 from urllib.request import urlopen
 

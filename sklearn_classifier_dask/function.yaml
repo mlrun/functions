@@ -1,8 +1,8 @@
 kind: dask
 metadata:
   name: dask_init
-  hash: b4b3af2251b76b5aea339535e1e9d5d71f83aae1
-  project: default
+  hash: 89bd0164f603fd919cd2e188038d0460a1dd00f5
+  project: ''
   categories: []
 spec:
   command: ''

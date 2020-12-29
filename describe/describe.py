@@ -12,8 +12,7 @@ import seaborn as sns
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.artifacts import PlotArtifact, TableArtifact
-from mlrun.mlutils import gcf_clear
-import mlrun
+from mlrun.mlutils.plots import gcf_clear
 
 from typing import List
 

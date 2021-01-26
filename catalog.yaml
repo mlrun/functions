@@ -71,13 +71,6 @@ coxph-trainer:
   kind: job
   versions:
     latest: coxph_trainer/function.yaml
-dask_init:
-  categories: []
-  description: ''
-  docfile: sklearn_classifier_dask/sklearn_classifier_dask.ipynb
-  kind: dask
-  versions:
-    latest: sklearn_classifier_dask/function.yaml
 describe:
   categories:
   - analysis
@@ -225,6 +218,16 @@ sklearn-classifier:
   kind: job
   versions:
     latest: sklearn_classifier/function.yaml
+sklearn-classifier-dask:
+  categories:
+  - ml
+  - training
+  - dask
+  description: train any classifier using scikit-learn's API over Dask
+  docfile: sklearn_classifier_dask/sklearn_classifier_dask.ipynb
+  kind: job
+  versions:
+    latest: sklearn_classifier_dask/function.yaml
 slack-notify:
   categories:
   - ops

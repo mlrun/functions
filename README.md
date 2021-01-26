@@ -33,7 +33,7 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [send-email](send_email/send_email.ipynb) | job | Send Email messages through SMTP server | notifications |
 | [sentiment-analysis-serving](sentiment_analysis_serving/bert_sentiment_analysis_serving.ipynb) | nuclio | BERT based sentiment classification model | serving, NLP, BERT, sentiment analysis |
 | [sklearn-classifier](sklearn_classifier/sklearn_classifier.ipynb) | job | train any classifier using scikit-learn's API | ml, training |
-| [dask_init](sklearn_classifier_dask/sklearn_classifier_dask.ipynb) | dask |  |  |
+| [sklearn-classifier-dask](sklearn_classifier_dask/sklearn_classifier_dask.ipynb) | job | train any classifier using scikit-learn's API over Dask | ml, training, dask |
 | [slack-notify](slack_notify/slack_notify.ipynb) | job | Send Slack notification | ops |
 | [spark-submit](spark_submit/spark_submit.ipynb) | job |  |  |
 | [sql-to-file](sql_to_file/sql_to_file.ipynb) | job | SQL To File - Ingest data using SQL query | data-prep |

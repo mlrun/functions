@@ -1,0 +1,24 @@
+apiVersion: v1
+categories:
+- ops
+description: Send Slack notification
+doc: ''
+example: slack_notify.ipynb
+generationDate: '2021-02-13 11:28:47.691466'
+icon: ''
+labels:
+  author: mdl
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.5.4
+name: slack-notify
+org: Iguazio
+platformVersion: 2.10.0
+spec:
+  filename: function.py
+  handler: slack_notify
+  image: python:3.6-jessie
+  kind: job
+  requirements: []
+url: ''
+version: 0.0.1

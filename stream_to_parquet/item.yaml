@@ -1,0 +1,25 @@
+apiVersion: v1
+categories:
+- ml
+- serve
+description: Saves a stream to Parquet and can lunch drift detection task on it
+doc: ''
+example: stream_to_parquet.ipynb
+generationDate: '2021-02-13 11:28:47.750229'
+icon: ''
+labels:
+  author: orz
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.5.4
+name: stream-to-parquet
+org: Iguazio
+platformVersion: 2.10.0
+spec:
+  filename: function.py
+  handler: handler
+  image: ''
+  kind: remote
+  requirements: []
+url: ''
+version: 0.0.1

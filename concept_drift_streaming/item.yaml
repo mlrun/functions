@@ -1,0 +1,27 @@
+apiVersion: v1
+categories:
+- ml
+- serve
+description: Deploy a streaming Concept Drift detector on a labeled stream. the nuclio
+  part of the concept_drift function
+doc: ''
+example: concept_drift_streaming.ipynb
+generationDate: '2021-02-13 11:28:47.303599'
+icon: ''
+labels:
+  author: orz
+  framework: sklearn
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.5.4
+name: concept-drift-streaming
+org: Iguazio
+platformVersion: 2.10.0
+spec:
+  filename: function.py
+  handler: ''
+  image: ''
+  kind: remote
+  requirements: []
+url: ''
+version: 0.0.1

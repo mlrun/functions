@@ -1,0 +1,25 @@
+apiVersion: v1
+categories:
+- serving
+- dl
+description: tf2 image classification server
+doc: ''
+example: tf2_serving.ipynb
+generationDate: '2021-02-13 11:28:47.619883'
+icon: ''
+labels:
+  author: yaronh
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.5.4
+name: tf2-serving
+org: Iguazio
+platformVersion: 2.10.0
+spec:
+  filename: function.py
+  handler: ''
+  image: ''
+  kind: remote
+  requirements: []
+url: ''
+version: 0.0.1

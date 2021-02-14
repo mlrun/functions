@@ -1,0 +1,26 @@
+apiVersion: v1
+categories:
+- serving
+- ml
+description: xgboost test data classification server
+doc: ''
+example: xgb_serving.ipynb
+generationDate: '2021-02-13 11:28:47.637981'
+icon: ''
+labels:
+  author: yaronh
+  framework: xgboost
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.5.4
+name: xgb-serving
+org: Iguazio
+platformVersion: 2.10.0
+spec:
+  filename: function.py
+  handler: ''
+  image: ''
+  kind: remote
+  requirements: []
+url: ''
+version: 0.0.1

@@ -1,0 +1,24 @@
+apiVersion: v1
+categories:
+- analysis
+description: Create Pandas Profiling Report from Dataset
+doc: ''
+example: pandas_profiling_report.ipynb
+generationDate: '2021-02-13 11:28:47.684747'
+icon: ''
+labels:
+  author: nicks
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.5.4
+name: pandas-profiling-report
+org: Iguazio
+platformVersion: 2.10.0
+spec:
+  filename: function.py
+  handler: pandas_profiling_report
+  image: mlrun/mlrun
+  kind: job
+  requirements: []
+url: ''
+version: 0.0.1

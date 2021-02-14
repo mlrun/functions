@@ -1,0 +1,27 @@
+apiVersion: v1
+categories:
+- NLP
+- BERT
+- embeddings
+description: Get BERT based embeddings for given text
+doc: ''
+example: bert_embeddings.ipynb
+generationDate: '2021-02-13 11:28:47.759006'
+icon: ''
+labels:
+  author: roye
+  framework: pytorch
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.5.4
+name: bert-embeddings
+org: Iguazio
+platformVersion: 2.10.0
+spec:
+  filename: function.py
+  handler: ''
+  image: ''
+  kind: remote
+  requirements: []
+url: ''
+version: 0.0.1

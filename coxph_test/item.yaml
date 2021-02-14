@@ -1,0 +1,26 @@
+apiVersion: v1
+categories:
+- ml
+- test
+description: test cox proportional hazards model
+doc: ''
+example: coxph_test.ipynb
+generationDate: '2021-02-13 11:28:47.433659'
+icon: ''
+labels:
+  author: yjb
+  framework: survival
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.5.4
+name: coxph-test
+org: Iguazio
+platformVersion: 2.10.0
+spec:
+  filename: function.py
+  handler: cox_test
+  image: mlrun/ml-models
+  kind: job
+  requirements: []
+url: ''
+version: 0.0.1

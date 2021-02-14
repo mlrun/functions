@@ -1,0 +1,28 @@
+apiVersion: v1
+categories:
+- serving
+- NLP
+- BERT
+- sentiment analysis
+description: BERT based sentiment classification model
+doc: ''
+example: bert_sentiment_analysis_serving.ipynb
+generationDate: '2021-02-13 11:28:47.580822'
+icon: ''
+labels:
+  author: roye
+  framework: pytorch
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.5.4
+name: sentiment-analysis-serving
+org: Iguazio
+platformVersion: 2.10.0
+spec:
+  filename: function.py
+  handler: ''
+  image: ''
+  kind: remote
+  requirements: []
+url: ''
+version: 0.0.1

@@ -1,0 +1,26 @@
+apiVersion: v1
+categories:
+- serving
+- ml
+description: churn classification and predictor
+doc: ''
+example: churn_server.ipynb
+generationDate: '2021-02-13 11:28:47.332079'
+icon: ''
+labels:
+  author: yashab
+  framework: churn
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.5.4
+name: churn-server
+org: Iguazio
+platformVersion: 2.10.0
+spec:
+  filename: function.py
+  handler: ''
+  image: ''
+  kind: remote
+  requirements: []
+url: ''
+version: 0.0.1

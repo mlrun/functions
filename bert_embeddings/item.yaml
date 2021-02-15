@@ -21,7 +21,10 @@ spec:
   filename: bert_embeddings.py
   handler: ''
   image: ''
-  kind: remote
-  requirements: []
+  kind: nuclio
+  requirements: 
+  - torch==1.6.0
+  - transformers==3.0.1
+  - nuclio
 url: ''
 version: 0.0.1

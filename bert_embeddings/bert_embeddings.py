@@ -5,7 +5,6 @@ import torch
 from typing import Union, List
 import json
 import pickle
-import nuclio
 
 def init_context(context):
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')

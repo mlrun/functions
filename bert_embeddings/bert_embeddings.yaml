@@ -1,0 +1,66 @@
+kind: remote
+metadata:
+  name: bert-embeddings
+  tag: ''
+  hash: b7a7ff9ce21490bffd2ffa0ef3ae0694e016872d
+  project: default
+  labels:
+    author: roye
+    framework: pytorch
+  categories:
+  - NLP
+  - BERT
+  - embeddings
+spec:
+  command: ''
+  args: []
+  image: ''
+  entry_points:
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 9
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: event
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 16
+  description: Get BERT based embeddings for given text
+  min_replicas: 1
+  max_replicas: 4
+  env: []
+  base_spec:
+    apiVersion: nuclio.io/v1
+    kind: Function
+    metadata:
+      name: bert-embeddings
+      labels: {}
+      annotations:
+        nuclio.io/generated_by: function generated from bert_embeddings.py
+    spec:
+      runtime: python:3.6
+      handler: bert_embeddings:handler
+      env: []
+      volumes: []
+      build:
+        commands: []
+        noBaseImagesPull: true
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSB0cmFuc2Zvcm1lcnMgaW1wb3J0IEJlcnRNb2RlbCwgQmVydFRva2VuaXplcgppbXBvcnQgdG9yY2gKZnJvbSB0eXBpbmcgaW1wb3J0IFVuaW9uLCBMaXN0CmltcG9ydCBqc29uCmltcG9ydCBwaWNrbGUKCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICB0b2tlbml6ZXIgPSBCZXJ0VG9rZW5pemVyLmZyb21fcHJldHJhaW5lZCgnYmVydC1iYXNlLXVuY2FzZWQnKQogICAgbW9kZWwgPSBCZXJ0TW9kZWwuZnJvbV9wcmV0cmFpbmVkKCdiZXJ0LWJhc2UtdW5jYXNlZCcpCiAgICBtb2RlbC5ldmFsKCkKICAgIHNldGF0dHIoY29udGV4dC51c2VyX2RhdGEsICd0b2tlbml6ZXInLCB0b2tlbml6ZXIpCiAgICBzZXRhdHRyKGNvbnRleHQudXNlcl9kYXRhLCAnbW9kZWwnLCBtb2RlbCkKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIGRvY3MgPSBqc29uLmxvYWRzKGV2ZW50LmJvZHkpCiAgICBkb2NzID0gW2RvYy5sb3dlcigpIGZvciBkb2MgaW4gZG9jc10KICAgIGRvY3MgPSBjb250ZXh0LnVzZXJfZGF0YS50b2tlbml6ZXIuYmF0Y2hfZW5jb2RlX3BsdXMoZG9jcywgcGFkX3RvX21heF9sZW5ndGg9VHJ1ZSwgcmV0dXJuX3RlbnNvcnM9J3B0JykKICAgIHdpdGggdG9yY2gubm9fZ3JhZCgpOgogICAgICAgIGVtYmVkZGluZ3MgPSBjb250ZXh0LnVzZXJfZGF0YS5tb2RlbCgqKmRvY3MpCiAgICBlbWJlZGRpbmdzID0gW2VtYmVkZGluZ3NbMF0ubnVtcHkoKSwgZW1iZWRkaW5nc1sxXS5udW1weSgpXQogICAgcmV0dXJuIHBpY2tsZS5kdW1wcyhlbWJlZGRpbmdzKQoK
+  source: ''
+  build:
+    commands:
+    - python -m pip install torch==1.6.0 transformers==3.0.1 nuclio
+    code_origin: https://github.com/AlonMaor14/functions.git#35470f1f6befb72c7ffa0da6d6dc7268940052f6:bert_embeddings.py
+  default_handler: ''
+verbose: false

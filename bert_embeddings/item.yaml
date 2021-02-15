@@ -9,7 +9,6 @@ example: bert_embeddings.ipynb
 generationDate: '2021-02-13 11:28:47.759006'
 icon: ''
 labels:
-  author: roye
   framework: pytorch
 maintainers: []
 marketplaceType: ''

@@ -2,10 +2,9 @@ kind: remote
 metadata:
   name: bert-embeddings
   tag: ''
-  hash: f94cf19a57b98abe57d00c4607ec4972dcde02e3
+  hash: 3b453086b3c59ccada33867139f33e496d3a0d50
   project: default
   labels:
-    author: roye
     framework: pytorch
   categories:
   - NLP
@@ -61,6 +60,6 @@ spec:
   build:
     commands:
     - python -m pip install torch==1.6.0 transformers==3.0.1 nuclio
-    code_origin: https://github.com/AlonMaor14/functions.git#4421479fa94fdbcbfa9f608954a2275c967cb591:bert_embeddings.py
+    code_origin: https://github.com/AlonMaor14/functions.git#477abad415565ce91d0633ba0dd003635d244687:bert_embeddings.py
   default_handler: ''
 verbose: false

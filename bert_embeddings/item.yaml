@@ -18,7 +18,7 @@ name: bert-embeddings
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: bert_embeddings.py
   handler: ''
   image: ''
   kind: remote

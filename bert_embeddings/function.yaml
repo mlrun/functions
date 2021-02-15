@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: bert-embeddings
   tag: ''
-  hash: b38a93f8ec58f8113892799cf946cd188563a577
+  hash: 8d6240006f6ccea5f9ba15821e3086a597aefc6f
   project: default
   labels:
     author: roye
@@ -15,28 +15,8 @@ spec:
   command: ''
   args: []
   image: ''
-  entry_points:
-    init_context:
-      name: init_context
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 9
-    handler:
-      name: handler
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      - name: event
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 16
   description: Get BERT based embeddings for given text
+  min_replicas: 1
   max_replicas: 4
   env: []
   base_spec:
@@ -44,18 +24,21 @@ spec:
     kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 13-09-2020
+        nuclio.io/generated_by: function generated from /User/functions/bert_embeddings/bert_embeddings.ipynb
       labels: {}
       name: bert-embeddings
     spec:
       build:
-        commands:
-        - pip install torch==1.6.0
-        - pip install transformers==3.0.1
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSB0cmFuc2Zvcm1lcnMgaW1wb3J0IEJlcnRNb2RlbCwgQmVydFRva2VuaXplcgppbXBvcnQgdG9yY2gKZnJvbSB0eXBpbmcgaW1wb3J0IFVuaW9uLCBMaXN0CmltcG9ydCBqc29uCmltcG9ydCBwaWNrbGUKCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICB0b2tlbml6ZXIgPSBCZXJ0VG9rZW5pemVyLmZyb21fcHJldHJhaW5lZCgnYmVydC1iYXNlLXVuY2FzZWQnKQogICAgbW9kZWwgPSBCZXJ0TW9kZWwuZnJvbV9wcmV0cmFpbmVkKCdiZXJ0LWJhc2UtdW5jYXNlZCcpCiAgICBtb2RlbC5ldmFsKCkKICAgIHNldGF0dHIoY29udGV4dC51c2VyX2RhdGEsICd0b2tlbml6ZXInLCB0b2tlbml6ZXIpCiAgICBzZXRhdHRyKGNvbnRleHQudXNlcl9kYXRhLCAnbW9kZWwnLCBtb2RlbCkKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIGRvY3MgPSBqc29uLmxvYWRzKGV2ZW50LmJvZHkpCiAgICBkb2NzID0gW2RvYy5sb3dlcigpIGZvciBkb2MgaW4gZG9jc10KICAgIGRvY3MgPSBjb250ZXh0LnVzZXJfZGF0YS50b2tlbml6ZXIuYmF0Y2hfZW5jb2RlX3BsdXMoZG9jcywgcGFkX3RvX21heF9sZW5ndGg9VHJ1ZSwgcmV0dXJuX3RlbnNvcnM9J3B0JykKICAgIHdpdGggdG9yY2gubm9fZ3JhZCgpOgogICAgICAgIGVtYmVkZGluZ3MgPSBjb250ZXh0LnVzZXJfZGF0YS5tb2RlbCgqKmRvY3MpCiAgICBlbWJlZGRpbmdzID0gW2VtYmVkZGluZ3NbMF0ubnVtcHkoKSwgZW1iZWRkaW5nc1sxXS5udW1weSgpXQogICAgcmV0dXJuIHBpY2tsZS5kdW1wcyhlbWJlZGRpbmdzKQoK
+        commands: []
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG51Y2xpbwpmcm9tIG51Y2xpbyBpbXBvcnQgYnVpbGRfZmlsZQppbXBvcnQganNvbgppbXBvcnQgcGlja2xlCmZyb20gdGVzdCBpbXBvcnQgaW5pdF9jb250ZXh0LCBoYW5kbGVyCgpjb250ZXh0ID0gbnVjbGlvLkNvbnRleHQoKQpldmVudCA9IG51Y2xpby5FdmVudChib2R5PWpzb24uZHVtcHMoWydKb2huIGxvdmVzIE1hcnknXSkpCmluaXRfY29udGV4dChjb250ZXh0KQpvdXRwdXRzID0gcGlja2xlLmxvYWRzKGhhbmRsZXIoY29udGV4dCwgZXZlbnQpKQoKcHJpbnQoZidlbWJlZGRpbmdzIHBlciB0b2tlbiBzaGFwZToge291dHB1dHNbMF0uc2hhcGV9LCBwb29sZWQgZW1iZWRkaW5ncyBzaGFwZToge291dHB1dHNbMV0uc2hhcGV9JykKCmZyb20gbWxydW4gaW1wb3J0IGNvZGVfdG9fZnVuY3Rpb24KZm4gPSBjb2RlX3RvX2Z1bmN0aW9uKCJiZXJ0X2VtYmVkZGluZ3MiLCBraW5kPSJudWNsaW8iLAogICAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb249IkdldCBCRVJUIGJhc2VkIGVtYmVkZGluZ3MgZm9yIGdpdmVuIHRleHQiLAogICAgICAgICAgICAgICAgICAgICAgY2F0ZWdvcmllcz1bIk5MUCIsICJCRVJUIiwgImVtYmVkZGluZ3MiXSwKICAgICAgICAgICAgICAgICAgICAgIGxhYmVscyA9IHsiYXV0aG9yIjogInJveWUiLCAiZnJhbWV3b3JrIjogInB5dG9yY2gifSwKICAgICAgICAgICAgICAgICAgICAgIGNvZGVfb3V0cHV0PScuJykKCmZuLmV4cG9ydCgiZnVuY3Rpb24ueWFtbCIpCgphZGRyID0gZm4uZGVwbG95KHByb2plY3Q9J25scC1zZXJ2ZXJzJykKCmltcG9ydCByZXF1ZXN0cwoKCmV2ZW50X2RhdGEgPSBbJ3RoZSBxdWljayBicm93biBmb3gganVtcHMgb3ZlciB0aGUgbGF6eSBkb2cnLCAnSGVsbG8gSSBhbSBKYWNvYiddCnJlc3AgPSByZXF1ZXN0cy5wb3N0KGFkZHIsIGpzb249anNvbi5kdW1wcyhldmVudF9kYXRhKSkKCm91dHB1dF9lbWJlZGRpbmdzID0gcGlja2xlLmxvYWRzKHJlc3AuY29udGVudCkKCnByaW50KGYnZW1iZWRkaW5ncyBwZXIgdG9rZW4gc2hhcGU6IHtvdXRwdXRfZW1iZWRkaW5nc1swXS5zaGFwZX0sIHBvb2xlZCBlbWJlZGRpbmdzIHNoYXBlOiB7b3V0cHV0X2VtYmVkZGluZ3NbMV0uc2hhcGV9JykKCg==
         noBaseImagesPull: true
       env: []
       handler: bert_embeddings:handler
       runtime: python:3.6
       volumes: []
   source: ''
+  build:
+    commands: []
+    code_origin: https://github.com/AlonMaor14/functions.git#1e9ed1108b1364fb85aa3a32d08605d9d7a2e926:bert_embeddings.ipynb
+  default_handler: ''
+verbose: false

@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: bert-embeddings
   tag: ''
-  hash: 3b453086b3c59ccada33867139f33e496d3a0d50
+  hash: 3fc2a4762f05d132a45cded8e60fd3baaa0df86c
   project: default
   labels:
     framework: pytorch
@@ -23,7 +23,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 9
+      lineno: 7
     handler:
       name: handler
       doc: ''
@@ -34,7 +34,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 16
+      lineno: 15
   description: Get BERT based embeddings for given text
   min_replicas: 1
   max_replicas: 4
@@ -55,11 +55,11 @@ spec:
       build:
         commands: []
         noBaseImagesPull: true
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSB0cmFuc2Zvcm1lcnMgaW1wb3J0IEJlcnRNb2RlbCwgQmVydFRva2VuaXplcgppbXBvcnQgdG9yY2gKZnJvbSB0eXBpbmcgaW1wb3J0IFVuaW9uLCBMaXN0CmltcG9ydCBqc29uCmltcG9ydCBwaWNrbGUKCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICB0b2tlbml6ZXIgPSBCZXJ0VG9rZW5pemVyLmZyb21fcHJldHJhaW5lZCgnYmVydC1iYXNlLXVuY2FzZWQnKQogICAgbW9kZWwgPSBCZXJ0TW9kZWwuZnJvbV9wcmV0cmFpbmVkKCdiZXJ0LWJhc2UtdW5jYXNlZCcpCiAgICBtb2RlbC5ldmFsKCkKICAgIHNldGF0dHIoY29udGV4dC51c2VyX2RhdGEsICd0b2tlbml6ZXInLCB0b2tlbml6ZXIpCiAgICBzZXRhdHRyKGNvbnRleHQudXNlcl9kYXRhLCAnbW9kZWwnLCBtb2RlbCkKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIGRvY3MgPSBqc29uLmxvYWRzKGV2ZW50LmJvZHkpCiAgICBkb2NzID0gW2RvYy5sb3dlcigpIGZvciBkb2MgaW4gZG9jc10KICAgIGRvY3MgPSBjb250ZXh0LnVzZXJfZGF0YS50b2tlbml6ZXIuYmF0Y2hfZW5jb2RlX3BsdXMoZG9jcywgcGFkX3RvX21heF9sZW5ndGg9VHJ1ZSwgcmV0dXJuX3RlbnNvcnM9J3B0JykKICAgIHdpdGggdG9yY2gubm9fZ3JhZCgpOgogICAgICAgIGVtYmVkZGluZ3MgPSBjb250ZXh0LnVzZXJfZGF0YS5tb2RlbCgqKmRvY3MpCiAgICBlbWJlZGRpbmdzID0gW2VtYmVkZGluZ3NbMF0ubnVtcHkoKSwgZW1iZWRkaW5nc1sxXS5udW1weSgpXQogICAgcmV0dXJuIHBpY2tsZS5kdW1wcyhlbWJlZGRpbmdzKQoK
+        functionSourceCode: ZnJvbSB0cmFuc2Zvcm1lcnMgaW1wb3J0IEJlcnRNb2RlbCwgQmVydFRva2VuaXplcgppbXBvcnQgdG9yY2gKZnJvbSB0eXBpbmcgaW1wb3J0IFVuaW9uLCBMaXN0CmltcG9ydCBqc29uCmltcG9ydCBwaWNrbGUKCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICB0b2tlbml6ZXIgPSBCZXJ0VG9rZW5pemVyLmZyb21fcHJldHJhaW5lZCgnYmVydC1iYXNlLXVuY2FzZWQnKQogICAgbW9kZWwgPSBCZXJ0TW9kZWwuZnJvbV9wcmV0cmFpbmVkKCdiZXJ0LWJhc2UtdW5jYXNlZCcpCiAgICBtb2RlbC5ldmFsKCkKICAgIAogICAgc2V0YXR0cihjb250ZXh0LnVzZXJfZGF0YSwgJ3Rva2VuaXplcicsIHRva2VuaXplcikKICAgIHNldGF0dHIoY29udGV4dC51c2VyX2RhdGEsICdtb2RlbCcsIG1vZGVsKQoKZGVmIGhhbmRsZXIoY29udGV4dCwgZXZlbnQpOgogICAgZG9jcyA9IGpzb24ubG9hZHMoZXZlbnQuYm9keSkKICAgIGRvY3MgPSBbZG9jLmxvd2VyKCkgZm9yIGRvYyBpbiBkb2NzXQogICAgZG9jcyA9IGNvbnRleHQudXNlcl9kYXRhLnRva2VuaXplci5iYXRjaF9lbmNvZGVfcGx1cyhkb2NzLCBwYWRfdG9fbWF4X2xlbmd0aD1UcnVlLCByZXR1cm5fdGVuc29ycz0ncHQnKQogICAgCiAgICB3aXRoIHRvcmNoLm5vX2dyYWQoKToKICAgICAgICBlbWJlZGRpbmdzID0gY29udGV4dC51c2VyX2RhdGEubW9kZWwoKipkb2NzKQogICAgZW1iZWRkaW5ncyA9IFtlbWJlZGRpbmdzWzBdLm51bXB5KCksIGVtYmVkZGluZ3NbMV0ubnVtcHkoKV0KICAgIHJldHVybiBwaWNrbGUuZHVtcHMoZW1iZWRkaW5ncykKCg==
   source: ''
   build:
     commands:
     - python -m pip install torch==1.6.0 transformers==3.0.1 nuclio
-    code_origin: https://github.com/AlonMaor14/functions.git#477abad415565ce91d0633ba0dd003635d244687:bert_embeddings.py
+    code_origin: https://github.com/AlonMaor14/functions.git#dad583ae8959456c9099e41b9e0f1fdb665fae05:bert_embeddings.py
   default_handler: ''
 verbose: false

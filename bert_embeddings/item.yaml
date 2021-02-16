@@ -9,7 +9,6 @@ example: bert_embeddings.ipynb
 generationDate: '2021-02-13 11:28:47.759006'
 icon: ''
 labels:
-  author: roye
   framework: pytorch
 maintainers: []
 marketplaceType: ''
@@ -18,10 +17,13 @@ name: bert-embeddings
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: bert_embeddings.py
   handler: ''
   image: ''
-  kind: remote
-  requirements: []
+  kind: nuclio
+  requirements: 
+  - torch==1.6.0
+  - transformers==3.0.1
+  - nuclio
 url: ''
 version: 0.0.1

@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: bert-embeddings
   tag: ''
-  hash: 3fc2a4762f05d132a45cded8e60fd3baaa0df86c
+  hash: acb7f04dc197d9535937e64d892ceb749a001027
   project: default
   labels:
     framework: pytorch
@@ -60,6 +60,6 @@ spec:
   build:
     commands:
     - python -m pip install torch==1.6.0 transformers==3.0.1 nuclio
-    code_origin: https://github.com/AlonMaor14/functions.git#dad583ae8959456c9099e41b9e0f1fdb665fae05:bert_embeddings.py
+    code_origin: https://github.com/AlonMaor14/functions.git#ff4abf34609f7887d3717b1604aa576e677c2c5c:bert_embeddings.py
   default_handler: ''
 verbose: false

@@ -13,14 +13,15 @@ labels:
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.5.4
-name: test-classifier
+name: test_classifier
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: test_classifier.py
   handler: test_classifier
   image: mlrun/ml-models
   kind: job
-  requirements: []
+  requirements: 
+  - nuclio
 url: ''
 version: 0.0.1

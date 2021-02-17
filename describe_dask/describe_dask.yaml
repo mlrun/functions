@@ -1,0 +1,68 @@
+kind: job
+metadata:
+  name: describe-dask
+  tag: ''
+  hash: bb332b4832ab499eb337b9bb07aeaf3e78fa23d3
+  project: default
+  labels:
+    author: Iguazio
+  categories:
+  - analysis
+spec:
+  command: ''
+  args: []
+  image: mlrun/ml-models
+  env: []
+  default_handler: summarize
+  entry_points:
+    summarize:
+      name: summarize
+      doc: 'Summarize a table
+
+
+        Connects to dask client through the function context, or through an optional
+
+        user-supplied scheduler.'
+      parameters:
+      - name: context
+        doc: the function context
+        default: ''
+      - name: dask_key
+        type: str
+        doc: key of dataframe in dask client "datasets" attribute
+        default: dask_key
+      - name: dataset
+        type: DataItem
+        default: null
+      - name: label_column
+        type: str
+        doc: ground truth column label
+        default: label
+      - name: class_labels
+        type: List[str]
+        doc: label for each class in tables and plots
+        default: []
+      - name: plot_hist
+        type: bool
+        doc: (True) set this to False for large tables
+        default: true
+      - name: plots_dest
+        type: str
+        doc: destination folder of summary plots (relative to artifact_path)
+        default: plots
+      - name: dask_function
+        type: str
+        doc: dask function url (db://..)
+        default: null
+      - name: dask_client
+        doc: dask client object
+        default: null
+      outputs:
+      - default: ''
+      lineno: 29
+  description: describe and visualizes dataset stats
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG1scnVuCgppbXBvcnQgd2FybmluZ3MKCndhcm5pbmdzLnNpbXBsZWZpbHRlcihhY3Rpb249Imlnbm9yZSIsIGNhdGVnb3J5PUZ1dHVyZVdhcm5pbmcpCgppbXBvcnQgb3MKaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCBwYW5kYXMgYXMgcGQKaW1wb3J0IG1hdHBsb3RsaWIucHlwbG90IGFzIHBsdAppbXBvcnQgc2VhYm9ybiBhcyBzbnMKCmltcG9ydCBkYXNrCmltcG9ydCBkYXNrLmRhdGFmcmFtZSBhcyBkZApmcm9tIGRhc2suZGlzdHJpYnV0ZWQgaW1wb3J0IENsaWVudAoKZnJvbSBtbHJ1bi5hcnRpZmFjdHMgaW1wb3J0IFBsb3RBcnRpZmFjdCwgVGFibGVBcnRpZmFjdApmcm9tIG1scnVuLm1sdXRpbHMucGxvdHMgaW1wb3J0IGdjZl9jbGVhcgoKZnJvbSB5ZWxsb3dicmljayBpbXBvcnQgQ2xhc3NCYWxhbmNlCgpmcm9tIHR5cGluZyBpbXBvcnQgTGlzdAoKcGQuc2V0X29wdGlvbigiZGlzcGxheS5mbG9hdF9mb3JtYXQiLCBsYW1iZGEgeDogIiUuMmYiICUgeCkKCgpkZWYgc3VtbWFyaXplKAogICAgY29udGV4dCwKICAgIGRhc2tfa2V5OiBzdHIgPSAiZGFza19rZXkiLAogICAgZGF0YXNldDogbWxydW4uRGF0YUl0ZW0gPSBOb25lLAogICAgbGFiZWxfY29sdW1uOiBzdHIgPSAibGFiZWwiLAogICAgY2xhc3NfbGFiZWxzOiBMaXN0W3N0cl0gPSBbXSwKICAgIHBsb3RfaGlzdDogYm9vbCA9IFRydWUsCiAgICBwbG90c19kZXN0OiBzdHIgPSAicGxvdHMiLAogICAgZGFza19mdW5jdGlvbjogc3RyID0gTm9uZSwKICAgIGRhc2tfY2xpZW50PU5vbmUsCikgLT4gTm9uZToKICAgICIiIlN1bW1hcml6ZSBhIHRhYmxlCgogICAgQ29ubmVjdHMgdG8gZGFzayBjbGllbnQgdGhyb3VnaCB0aGUgZnVuY3Rpb24gY29udGV4dCwgb3IgdGhyb3VnaCBhbiBvcHRpb25hbAogICAgdXNlci1zdXBwbGllZCBzY2hlZHVsZXIuCgogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgICAgdGhlIGZ1bmN0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBkYXNrX2tleTogICAgICAgIGtleSBvZiBkYXRhZnJhbWUgaW4gZGFzayBjbGllbnQgImRhdGFzZXRzIiBhdHRyaWJ1dGUKICAgIDpwYXJhbSBsYWJlbF9jb2x1bW46ICAgIGdyb3VuZCB0cnV0aCBjb2x1bW4gbGFiZWwKICAgIDpwYXJhbSBjbGFzc19sYWJlbHM6ICAgIGxhYmVsIGZvciBlYWNoIGNsYXNzIGluIHRhYmxlcyBhbmQgcGxvdHMKICAgIDpwYXJhbSBwbG90X2hpc3Q6ICAgICAgIChUcnVlKSBzZXQgdGhpcyB0byBGYWxzZSBmb3IgbGFyZ2UgdGFibGVzCiAgICA6cGFyYW0gcGxvdHNfZGVzdDogICAgICBkZXN0aW5hdGlvbiBmb2xkZXIgb2Ygc3VtbWFyeSBwbG90cyAocmVsYXRpdmUgdG8gYXJ0aWZhY3RfcGF0aCkKICAgIDpwYXJhbSBkYXNrX2Z1bmN0aW9uOiAgIGRhc2sgZnVuY3Rpb24gdXJsIChkYjovLy4uKQogICAgOnBhcmFtIGRhc2tfY2xpZW50OiAgICAgZGFzayBjbGllbnQgb2JqZWN0CiAgICAiIiIKICAgIGlmIGRhc2tfZnVuY3Rpb246CiAgICAgICAgY2xpZW50ID0gbWxydW4uaW1wb3J0X2Z1bmN0aW9uKGRhc2tfZnVuY3Rpb24pLmNsaWVudAogICAgZWxpZiBkYXNrX2NsaWVudDoKICAgICAgICBjbGllbnQgPSBkYXNrX2NsaWVudAogICAgZWxzZToKICAgICAgICByYWlzZSBWYWx1ZUVycm9yKCJkYXNrIGNsaWVudCB3YXMgbm90IHByb3ZpZGVkIikKCiAgICBpZiBkYXNrX2tleSBpbiBjbGllbnQuZGF0YXNldHM6CiAgICAgICAgdGFibGUgPSBjbGllbnQuZ2V0X2RhdGFzZXQoZGFza19rZXkpCiAgICBlbGlmIGRhdGFzZXQ6CiAgICAgICAgdGFibGUgPSBkYXRhc2V0LmFzX2RmKGRmX21vZHVsZT1kZCkKICAgIGVsc2U6CiAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbygKICAgICAgICAgICAgZiJvbmx5IHRoZXNlIGRhdGFzZXRzIGFyZSBhdmFpbGFibGUge2NsaWVudC5kYXRhc2V0c30gaW4gY2xpZW50IHtjbGllbnR9IgogICAgICAgICkKICAgICAgICByYWlzZSBFeGNlcHRpb24oImRhdGFzZXQgbm90IGZvdW5kIG9uIGRhc2sgY2x1c3RlciIpCiAgICBoZWFkZXIgPSB0YWJsZS5jb2x1bW5zLnZhbHVlcwoKICAgIGdjZl9jbGVhcihwbHQpCiAgICB0YWJsZSA9IHRhYmxlLmNvbXB1dGUoKQogICAgc25zcGx0ID0gc25zLnBhaXJwbG90KHRhYmxlLCBodWU9bGFiZWxfY29sdW1uLCBkaWFnX2t3cz17ImJ3IjogMS41fSkKICAgIGNvbnRleHQubG9nX2FydGlmYWN0KAogICAgICAgIFBsb3RBcnRpZmFjdCgiaGlzdG9ncmFtcyIsIGJvZHk9cGx0LmdjZigpKSwgbG9jYWxfcGF0aD1mIntwbG90c19kZXN0fS9oaXN0Lmh0bWwiCiAgICApCgogICAgZ2NmX2NsZWFyKHBsdCkKICAgIGxhYmVscyA9IHRhYmxlLnBvcChsYWJlbF9jb2x1bW4pCiAgICBpZiBub3QgY2xhc3NfbGFiZWxzOgogICAgICAgIGNsYXNzX2xhYmVscyA9IGxhYmVscy51bmlxdWUoKQogICAgY2xhc3NfYmFsYW5jZV9tb2RlbCA9IENsYXNzQmFsYW5jZShsYWJlbHM9Y2xhc3NfbGFiZWxzKQogICAgY2xhc3NfYmFsYW5jZV9tb2RlbC5maXQobGFiZWxzKQogICAgc2NhbGVfcG9zX3dlaWdodCA9IGNsYXNzX2JhbGFuY2VfbW9kZWwuc3VwcG9ydF9bMF0gLyBjbGFzc19iYWxhbmNlX21vZGVsLnN1cHBvcnRfWzFdCiAgICBjb250ZXh0LmxvZ19yZXN1bHQoInNjYWxlX3Bvc193ZWlnaHQiLCBmIntzY2FsZV9wb3Nfd2VpZ2h0OjAuMmZ9IikKICAgIGNvbnRleHQubG9nX2FydGlmYWN0KAogICAgICAgIFBsb3RBcnRpZmFjdCgiaW1iYWxhbmNlIiwgYm9keT1wbHQuZ2NmKCkpLAogICAgICAgIGxvY2FsX3BhdGg9ZiJ7cGxvdHNfZGVzdH0vaW1iYWxhbmNlLmh0bWwiLAogICAgKQoKICAgIGdjZl9jbGVhcihwbHQpCiAgICB0Ymxjb3JyID0gdGFibGUuY29ycigpCiAgICBheCA9IHBsdC5heGVzKCkKICAgIHNucy5oZWF0bWFwKHRibGNvcnIsIGF4PWF4LCBhbm5vdD1GYWxzZSwgY21hcD1wbHQuY20uUmVkcykKICAgIGF4LnNldF90aXRsZSgiZmVhdHVyZXMgY29ycmVsYXRpb24iKQogICAgY29udGV4dC5sb2dfYXJ0aWZhY3QoCiAgICAgICAgUGxvdEFydGlmYWN0KCJjb3JyZWxhdGlvbiIsIGJvZHk9cGx0LmdjZigpKSwKICAgICAgICBsb2NhbF9wYXRoPWYie3Bsb3RzX2Rlc3R9L2NvcnIuaHRtbCIsCiAgICApCiAgICBnY2ZfY2xlYXIocGx0KQo=
+    commands: []
+    code_origin: https://github.com/mlrun/functions.git#b3ab4ee9d5b4b56424640068a969d35bf208cfa7:describe_dask.py
+verbose: false

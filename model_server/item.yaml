@@ -17,10 +17,12 @@ name: model-server
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: model_server.py
   handler: ''
-  image: ''
-  kind: remote
-  requirements: []
+  image: 'mlrun/mlrun'
+  kind: serving
+  requirements: 
+  - nuclio
+  - cloudpickle
 url: ''
 version: 0.0.1

@@ -1,0 +1,50 @@
+kind: remote
+metadata:
+  name: model-server
+  hash: bd92fd1b68fde8239e5f860bd61a21439c33bd1f
+  project: default
+  labels:
+    author: yaronh
+    framework: sklearn
+  categories:
+  - serving
+  - ml
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  description: generic sklearn model server
+  min_replicas: 1
+  max_replicas: 4
+  env:
+  - name: MODEL_CLASS
+    value: ClassifierModel
+  config:
+    spec.triggers.http:
+      kind: http
+      maxWorkers: 8
+      attributes:
+        ingresses: {}
+      annotations: {}
+  base_spec:
+    apiVersion: nuclio.io/v1
+    kind: Function
+    metadata:
+      name: model-server
+      labels: {}
+      annotations:
+        nuclio.io/generated_by: function generated from model_server.py
+    spec:
+      runtime: python:3.6
+      handler: model_server:handler
+      env: []
+      volumes: []
+      build:
+        commands: []
+        noBaseImagesPull: true
+        functionSourceCode: ZnJvbSBjbG91ZHBpY2tsZSBpbXBvcnQgbG9hZApmcm9tIHR5cGluZyBpbXBvcnQgTGlzdAoKaW1wb3J0IHdhcm5pbmdzCgp3YXJuaW5ncy5maWx0ZXJ3YXJuaW5ncygiaWdub3JlIikKCmltcG9ydCBudW1weSBhcyBucApmcm9tIG1scnVuLnJ1bnRpbWVzIGltcG9ydCBNTE1vZGVsU2VydmVyCgoKY2xhc3MgQ2xhc3NpZmllck1vZGVsKE1MTW9kZWxTZXJ2ZXIpOgogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgIiIiTG9hZCBtb2RlbCBmcm9tIHN0b3JhZ2UuIiIiCiAgICAgICAgbW9kZWxfZmlsZSwgZXh0cmFfZGF0YSA9IHNlbGYuZ2V0X21vZGVsKCIucGtsIikKICAgICAgICBzZWxmLm1vZGVsID0gbG9hZChvcGVuKG1vZGVsX2ZpbGUsICJyYiIpKQoKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGJvZHk6IGRpY3QpIC0+IExpc3Q6CiAgICAgICAgIiIiR2VuZXJhdGUgbW9kZWwgcHJlZGljdGlvbnMgZnJvbSBzYW1wbGUuCgogICAgICAgIDpwYXJhbSBib2R5IDogQSBkaWN0IG9mIG9ic2VydmF0aW9ucywgZWFjaCBvZiB3aGljaCBpcyBhbiAxLWRpbWVuc2lvbmFsIGZlYXR1cmUgdmVjdG9yLgoKICAgICAgICBSZXR1cm5zIG1vZGVsIHByZWRpY3Rpb25zIGFzIGEgYExpc3RgLCBvbmUgZm9yIGVhY2ggcm93IGluIHRoZSBgYm9keWAgaW5wdXQgYExpc3RgLgogICAgICAgICIiIgogICAgICAgIHRyeToKICAgICAgICAgICAgZmVhdHMgPSBucC5hc2FycmF5KGJvZHlbImluc3RhbmNlcyJdKQogICAgICAgICAgICByZXN1bHQ6IG5wLm5kYXJyYXkgPSBzZWxmLm1vZGVsLnByZWRpY3QoZmVhdHMpCiAgICAgICAgICAgIHJlc3AgPSByZXN1bHQudG9saXN0KCkKICAgICAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgICAgIHJhaXNlIEV4Y2VwdGlvbihmIkZhaWxlZCB0byBwcmVkaWN0IHtlfSIpCgogICAgICAgIHJldHVybiByZXNwCgpmcm9tIG1scnVuLnJ1bnRpbWVzIGltcG9ydCBudWNsaW9faW5pdF9ob29rCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBudWNsaW9faW5pdF9ob29rKGNvbnRleHQsIGdsb2JhbHMoKSwgJ3NlcnZpbmcnKQoKZGVmIGhhbmRsZXIoY29udGV4dCwgZXZlbnQpOgogICAgcmV0dXJuIGNvbnRleHQubWxydW5faGFuZGxlcihjb250ZXh0LCBldmVudCkK
+  source: ''
+  function_kind: serving
+  build:
+    commands: []
+verbose: false

@@ -8,7 +8,6 @@ example: sklearn_classifier.ipynb
 generationDate: '2021-02-13 11:28:47.383932'
 icon: ''
 labels:
-  author: yjb
   framework: sklearn
 maintainers: []
 marketplaceType: ''
@@ -17,7 +16,7 @@ name: sklearn-classifier
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: sklearn_classifier.py
   handler: train_model
   image: mlrun/ml-models
   kind: job

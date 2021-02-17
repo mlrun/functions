@@ -18,11 +18,11 @@ from mlrun.execution import MLClientCtx
 
 
 def load_dataset(
-    context: MLClientCtx,
-    dataset: str,
-    name: str = "",
-    file_ext: str = "parquet",
-    params: dict = {},
+        context: MLClientCtx,
+        dataset: str,
+        name: str = '',
+        file_ext: str = 'parquet',
+        params: dict = {}
 ) -> None:
     """Loads a scikit-learn toy dataset for classification or regression
 
@@ -53,24 +53,27 @@ def load_dataset(
     :param params:     params of the sklearn load_data method
     """
     dataset = str(dataset)
+    
     # reach into module and import the appropriate load_xxx function
-    pkg_module = "sklearn.datasets"
-    fname = f"load_{dataset}"
+    pkg_module = 'sklearn.datasets'
+    fname = f'load_{dataset}'
 
     pkg_module = __import__(pkg_module, fromlist=[fname])
     load_data_fn = getattr(pkg_module, fname)
 
     data = load_data_fn(**params)
-    feature_names = data["feature_names"]
+    feature_names = data['feature_names']
 
     # create the toy dataset
-    xy = np.concatenate([data["data"], data["target"].reshape(-1, 1)], axis=1)
-    if hasattr(feature_names, "append"):
+    xy = np.concatenate([data['data'], data['target'].reshape(-1, 1)], axis=1)
+    if hasattr(feature_names, 'append'):
+        
         # its a list
-        feature_names.append("labels")
+        feature_names.append('labels')
     else:
+        
         # its an array
-        feature_names = np.append(feature_names, "labels")
+        feature_names = np.append(feature_names, 'labels')
     df = pd.DataFrame(data=xy, columns=feature_names)
 
     # log and upload the dataset

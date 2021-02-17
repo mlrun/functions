@@ -15,7 +15,7 @@ name: send-email
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: send_email.py
   handler: send_email
   image: mlrun/ml-models
   kind: job

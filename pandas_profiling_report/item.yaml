@@ -15,10 +15,11 @@ name: pandas-profiling-report
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: pandas_profiling_report.py
   handler: pandas_profiling_report
   image: mlrun/mlrun
   kind: job
-  requirements: []
+  requirements:
+  - pandas_profiling
 url: ''
 version: 0.0.1

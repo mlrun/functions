@@ -4,7 +4,6 @@ import mlrun
 
 from cloudpickle import load
 from typing import List
-from sklearn.datasets import load_iris
 import numpy as np
 
 import warnings 

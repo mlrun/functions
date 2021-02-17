@@ -17,7 +17,7 @@ name: load-dataset
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: load_dataset.py
   handler: load_dataset
   image: mlrun/ml-models
   kind: job

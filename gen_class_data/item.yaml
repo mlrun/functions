@@ -8,7 +8,7 @@ example: gen_class_data.ipynb
 generationDate: '2021-02-13 11:28:47.323581'
 icon: ''
 labels:
-  author: yjb
+  author: Iguazio
   framework: sklearn
 maintainers: []
 marketplaceType: ''
@@ -17,7 +17,7 @@ name: gen-class-data
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: gen_class_data.py
   handler: gen_class_data
   image: mlrun/ml-models
   kind: job

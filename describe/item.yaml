@@ -7,7 +7,7 @@ example: describe.ipynb
 generationDate: '2021-02-13 11:28:47.408604'
 icon: ''
 labels:
-  author: yjb
+  author: 'Iguazio'
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.5.4
@@ -15,10 +15,10 @@ name: describe
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: describe.py
   handler: summarize
   image: mlrun/ml-models
   kind: job
-  requirements: []
+  requirements:
 url: ''
 version: 0.0.1

@@ -16,7 +16,7 @@ name: github-utils
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: github_utils.py
   handler: run_summary_comment
   image: mlrun/mlrun
   kind: job

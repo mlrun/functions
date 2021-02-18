@@ -1,0 +1,46 @@
+kind: job
+metadata:
+  name: slack-notify
+  tag: ''
+  hash: cec23a0f3668229277ec65eb40139a7e179b8551
+  project: default
+  labels:
+    author: Iguazio
+  categories:
+  - ops
+spec:
+  command: ''
+  args: []
+  image: ''
+  env: []
+  default_handler: slack_notify
+  entry_points:
+    slack_notify:
+      name: slack_notify
+      doc: Summarize a table
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+        default: ''
+      - name: webhook_url
+        type: str
+        doc: 'Slack incoming webhook URL. Please read: https://api.slack.com/messaging/webhooks'
+        default: URL
+      - name: slack_blocks
+        type: List[str]
+        doc: Message blocks list. NOT IMPLEMENTED YET
+        default: []
+      - name: notification_text
+        type: str
+        doc: Notification text
+        default: Notification
+      outputs:
+      - default: ''
+      lineno: 12
+  description: Send Slack notification
+  build:
+    functionSourceCode: aW1wb3J0IHdhcm5pbmdzCgp3YXJuaW5ncy5zaW1wbGVmaWx0ZXIoYWN0aW9uPSJpZ25vcmUiLCBjYXRlZ29yeT1GdXR1cmVXYXJuaW5nKQoKaW1wb3J0IG9zCmltcG9ydCBqc29uCmltcG9ydCByZXF1ZXN0cwpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSB0eXBpbmcgaW1wb3J0IExpc3QKCgpkZWYgc2xhY2tfbm90aWZ5KAogICAgY29udGV4dDogTUxDbGllbnRDdHgsCiAgICB3ZWJob29rX3VybDogc3RyID0gIlVSTCIsCiAgICBzbGFja19ibG9ja3M6IExpc3Rbc3RyXSA9IFtdLAogICAgbm90aWZpY2F0aW9uX3RleHQ6IHN0ciA9ICJOb3RpZmljYXRpb24iLAopIC0+IE5vbmU6CiAgICAiIiJTdW1tYXJpemUgYSB0YWJsZQogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgICAgdGhlIGZ1bmN0aW9uIGNvbnRleHQKICAgIDpwYXJhbSB3ZWJob29rX3VybDogICAgIFNsYWNrIGluY29taW5nIHdlYmhvb2sgVVJMLiBQbGVhc2UgcmVhZDogaHR0cHM6Ly9hcGkuc2xhY2suY29tL21lc3NhZ2luZy93ZWJob29rcwogICAgOnBhcmFtIG5vdGlmaWNhdGlvbl90ZXh0OiAgICAgICAgICAgIE5vdGlmaWNhdGlvbiB0ZXh0CiAgICA6cGFyYW0gc2xhY2tfYmxvY2tzOiAgICAgICAgICBNZXNzYWdlIGJsb2NrcyBsaXN0LiBOT1QgSU1QTEVNRU5URUQgWUVUCiAgICAiIiIKCiAgICBkYXRhID0geyJ0ZXh0Ijogbm90aWZpY2F0aW9uX3RleHR9CiAgICBwcmludCgiPT09PSIsIHdlYmhvb2tfdXJsKQogICAgcmVzcG9uc2UgPSByZXF1ZXN0cy5wb3N0KAogICAgICAgIHdlYmhvb2tfdXJsLCBkYXRhPWpzb24uZHVtcHMoZGF0YSksIGhlYWRlcnM9eyJDb250ZW50LVR5cGUiOiAiYXBwbGljYXRpb24vanNvbiJ9CiAgICApCgogICAgcHJpbnQoIlJlc3BvbnNlOiAiICsgc3RyKHJlc3BvbnNlLnRleHQpKQogICAgcHJpbnQoIlJlc3BvbnNlIGNvZGU6ICIgKyBzdHIocmVzcG9uc2Uuc3RhdHVzX2NvZGUpKQo=
+    commands: []
+    code_origin: https://github.com/mlrun/functions.git#311d1f63775b6968077527fc155dae60dde2a6d8:slack_notify.py
+verbose: false

@@ -1,0 +1,58 @@
+kind: job
+metadata:
+  name: send-email
+  tag: ''
+  hash: 477bee9ee600cbe68251bb36304b9b56580dd0d5
+  project: default
+  labels:
+    author: saarc
+  categories:
+  - notifications
+spec:
+  command: ''
+  args: []
+  image: mlrun/ml-models
+  env: []
+  default_handler: send_email
+  entry_points:
+    send_email:
+      name: send_email
+      doc: Send an email.
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: The function context
+        default: ''
+      - name: sender
+        type: str
+        doc: Sender email address
+        default: ''
+      - name: to
+        type: str
+        doc: Email address of mail recipient
+        default: ''
+      - name: subject
+        type: str
+        doc: Email subject
+        default: ''
+      - name: content
+        type: str
+        doc: Optional mail text
+        default: ''
+      - name: server_addr
+        type: str
+        doc: Address of SMTP server to use. Use format <addr>:<port>
+        default: null
+      - name: attachments
+        type: List[str]
+        doc: List of attachments to add.
+        default: []
+      outputs:
+      - default: ''
+      lineno: 13
+  description: Send Email messages through SMTP server
+  build:
+    functionSourceCode: ZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CgojIEltcG9ydCB0aGUgZW1haWwgbW9kdWxlcyB3ZSdsbCBuZWVkCmltcG9ydCBzbXRwbGliCmZyb20gZW1haWwubWVzc2FnZSBpbXBvcnQgRW1haWxNZXNzYWdlCmltcG9ydCBvcwoKIyBGb3IgZ3Vlc3NpbmcgTUlNRSB0eXBlIGJhc2VkIG9uIGZpbGUgbmFtZSBleHRlbnNpb24KaW1wb3J0IG1pbWV0eXBlcwoKCmRlZiBzZW5kX2VtYWlsKAogICAgY29udGV4dDogTUxDbGllbnRDdHgsCiAgICBzZW5kZXI6IHN0ciwKICAgIHRvOiBzdHIsCiAgICBzdWJqZWN0OiBzdHIsCiAgICBjb250ZW50OiBzdHIgPSAiIiwKICAgIHNlcnZlcl9hZGRyOiBzdHIgPSBOb25lLAogICAgYXR0YWNobWVudHM6IExpc3Rbc3RyXSA9IFtdLAopIC0+IE5vbmU6CiAgICAiIiJTZW5kIGFuIGVtYWlsLgogICAgOnBhcmFtIHNlbmRlcjogU2VuZGVyIGVtYWlsIGFkZHJlc3MKICAgIDpwYXJhbSBjb250ZXh0OiBUaGUgZnVuY3Rpb24gY29udGV4dAogICAgOnBhcmFtIHRvOiBFbWFpbCBhZGRyZXNzIG9mIG1haWwgcmVjaXBpZW50CiAgICA6cGFyYW0gc3ViamVjdDogRW1haWwgc3ViamVjdAogICAgOnBhcmFtIGNvbnRlbnQ6IE9wdGlvbmFsIG1haWwgdGV4dAogICAgOnBhcmFtIHNlcnZlcl9hZGRyOiBBZGRyZXNzIG9mIFNNVFAgc2VydmVyIHRvIHVzZS4gVXNlIGZvcm1hdCA8YWRkcj46PHBvcnQ+CiAgICA6cGFyYW0gYXR0YWNobWVudHM6IExpc3Qgb2YgYXR0YWNobWVudHMgdG8gYWRkLgogICAgIiIiCgogICAgIyBWYWxpZGF0ZSBpbnB1dHMKICAgIGVtYWlsX3VzZXIgPSBjb250ZXh0LmdldF9zZWNyZXQoIlNNVFBfVVNFUiIpCiAgICBlbWFpbF9wYXNzID0gY29udGV4dC5nZXRfc2VjcmV0KCJTTVRQX1BBU1NXT1JEIikKICAgIGlmIGVtYWlsX3VzZXIgaXMgTm9uZSBvciBlbWFpbF9wYXNzIGlzIE5vbmU6CiAgICAgICAgY29udGV4dC5sb2dnZXIuZXJyb3IoIk1pc3Npbmcgc2VuZGVyIGVtYWlsIG9yIHBhc3N3b3JkIC0gY2Fubm90IHNlbmQgZW1haWwuIikKICAgICAgICByZXR1cm4KCiAgICBpZiBzZXJ2ZXJfYWRkciBpcyBOb25lOgogICAgICAgIGNvbnRleHQubG9nZ2VyLmVycm9yKCJTZXJ2ZXIgbm90IHNwZWNpZmllZCAtIGNhbm5vdCBzZW5kIGVtYWlsLiIpCiAgICAgICAgcmV0dXJuCgogICAgbXNnID0gRW1haWxNZXNzYWdlKCkKICAgIG1zZ1siRnJvbSJdID0gc2VuZGVyCiAgICBtc2dbIlN1YmplY3QiXSA9IHN1YmplY3QKICAgIG1zZ1siVG8iXSA9IHRvCiAgICBtc2cuc2V0X2NvbnRlbnQoY29udGVudCkKCiAgICBmb3IgZmlsZW5hbWUgaW4gYXR0YWNobWVudHM6CiAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbyhmIkxvb2tpbmcgYXQgYXR0YWNobWVudDoge2ZpbGVuYW1lfSIpCiAgICAgICAgaWYgbm90IG9zLnBhdGguaXNmaWxlKGZpbGVuYW1lKToKICAgICAgICAgICAgY29udGV4dC5sb2dnZXIud2FybmluZyhmIkZpbGVuYW1lIGRvZXMgbm90IGV4aXN0IHtmaWxlbmFtZX0iKQogICAgICAgICAgICBjb250aW51ZQogICAgICAgICMgR3Vlc3MgdGhlIGNvbnRlbnQgdHlwZSBiYXNlZCBvbiB0aGUgZmlsZSdzIGV4dGVuc2lvbi4gIEVuY29kaW5nCiAgICAgICAgIyB3aWxsIGJlIGlnbm9yZWQsIGFsdGhvdWdoIHdlIHNob3VsZCBjaGVjayBmb3Igc2ltcGxlIHRoaW5ncyBsaWtlCiAgICAgICAgIyBnemlwJ2Qgb3IgY29tcHJlc3NlZCBmaWxlcy4KICAgICAgICBjdHlwZSwgZW5jb2RpbmcgPSBtaW1ldHlwZXMuZ3Vlc3NfdHlwZShmaWxlbmFtZSkKICAgICAgICBpZiBjdHlwZSBpcyBOb25lIG9yIGVuY29kaW5nIGlzIG5vdCBOb25lOgogICAgICAgICAgICAjIE5vIGd1ZXNzIGNvdWxkIGJlIG1hZGUsIG9yIHRoZSBmaWxlIGlzIGVuY29kZWQgKGNvbXByZXNzZWQpLCBzbwogICAgICAgICAgICAjIHVzZSBhIGdlbmVyaWMgYmFnLW9mLWJpdHMgdHlwZS4KICAgICAgICAgICAgY3R5cGUgPSAiYXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtIgogICAgICAgIG1haW50eXBlLCBzdWJ0eXBlID0gY3R5cGUuc3BsaXQoIi8iLCAxKQogICAgICAgIHdpdGggb3BlbihmaWxlbmFtZSwgInJiIikgYXMgZnA6CiAgICAgICAgICAgIG1zZy5hZGRfYXR0YWNobWVudCgKICAgICAgICAgICAgICAgIGZwLnJlYWQoKSwKICAgICAgICAgICAgICAgIG1haW50eXBlPW1haW50eXBlLAogICAgICAgICAgICAgICAgc3VidHlwZT1zdWJ0eXBlLAogICAgICAgICAgICAgICAgZmlsZW5hbWU9b3MucGF0aC5iYXNlbmFtZShmaWxlbmFtZSksCiAgICAgICAgICAgICkKICAgICAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbygKICAgICAgICAgICAgICAgIGYiQWRkZWQgYXR0YWNobWVudDogRmlsZW5hbWU6IHtmaWxlbmFtZX0sIG9mIG1pbWV0eXBlOiB7bWFpbnR5cGV9LCB7c3VidHlwZX0iCiAgICAgICAgICAgICkKCiAgICB0cnk6CiAgICAgICAgcyA9IHNtdHBsaWIuU01UUChob3N0PXNlcnZlcl9hZGRyKQogICAgICAgIHMuc3RhcnR0bHMoKQogICAgICAgIHMubG9naW4oZW1haWxfdXNlciwgZW1haWxfcGFzcykKICAgICAgICBzLnNlbmRfbWVzc2FnZShtc2cpCiAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbygiRW1haWwgc2VudCBzdWNjZXNzZnVsbHkuIikKICAgIGV4Y2VwdCBzbXRwbGliLlNNVFBFeGNlcHRpb24gYXMgZXhwOgogICAgICAgIGNvbnRleHQubG9nZ2VyLmVycm9yKGYiU01UUCBleGNlcHRpb24gY2F1Z2h0IGluIFNNVFAgY29kZToge2V4cH0iKQogICAgZXhjZXB0IENvbm5lY3Rpb25FcnJvciBhcyBjZToKICAgICAgICBjb250ZXh0LmxvZ2dlci5lcnJvcihmIkNvbm5lY3Rpb24gZXJyb3IgY2F1Z2h0IGluIFNNVFAgY29kZToge2NlfSIpCg==
+    commands: []
+    code_origin: https://github.com/AlonMaor14/functions.git#311d1f63775b6968077527fc155dae60dde2a6d8:send_email.py
+verbose: false

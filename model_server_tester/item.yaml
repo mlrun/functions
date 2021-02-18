@@ -16,7 +16,7 @@ name: model-server-tester
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: function.py
+  filename: model_server_tester.py
   handler: model_server_tester
   image: mlrun/mlrun
   kind: job

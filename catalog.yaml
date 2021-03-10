@@ -25,7 +25,7 @@ bert-embeddings:
   kind: remote
   versions:
     latest: bert_embeddings/function.yaml
-churn-test:
+churn-server:
   categories:
   - serving
   - ml
@@ -34,16 +34,26 @@ churn-test:
   kind: remote
   versions:
     latest: churn_server/function.yaml
-cox-hazards:
+concept-drift:
   categories:
-  - training
   - ml
-  description: cox proportional hazards, kaplan meier plots
-  docfile: coxph_trainer/coxph_trainer.ipynb
+  - serve
+  description: Deploy a streaming Concept Drift detector on a labeled stream
+  docfile: concept_drift/concept_drift.ipynb
   kind: job
   versions:
-    latest: coxph_trainer/function.yaml
-cox-test:
+    latest: concept_drift/function.yaml
+concept-drift-streaming:
+  categories:
+  - ml
+  - serve
+  description: Deploy a streaming Concept Drift detector on a labeled stream. the
+    nuclio part of the concept_drift function
+  docfile: concept_drift_streaming/concept_drift_streaming.ipynb
+  kind: remote
+  versions:
+    latest: concept_drift_streaming/function.yaml
+coxph-test:
   categories:
   - ml
   - test
@@ -52,6 +62,15 @@ cox-test:
   kind: job
   versions:
     latest: coxph_test/function.yaml
+coxph-trainer:
+  categories:
+  - training
+  - ml
+  description: cox proportional hazards, kaplan meier plots
+  docfile: coxph_trainer/coxph_trainer.ipynb
+  kind: job
+  versions:
+    latest: coxph_trainer/function.yaml
 describe:
   categories:
   - analysis
@@ -68,6 +87,13 @@ describe-dask:
   kind: job
   versions:
     latest: describe_dask/function.yaml
+describe-spark:
+  categories: []
+  description: ''
+  docfile: describe_spark/describe_spark.ipynb
+  kind: job
+  versions:
+    latest: describe_spark/function.yaml
 feature-perms:
   categories:
   - analysis
@@ -121,6 +147,15 @@ load-dataset:
   kind: job
   versions:
     latest: load_dataset/function.yaml
+model-server:
+  categories:
+  - serving
+  - ml
+  description: generic sklearn model server
+  docfile: model_server/model_server.ipynb
+  kind: remote
+  versions:
+    latest: model_server/function.yaml
 model-server-tester:
   categories:
   - ml
@@ -139,6 +174,22 @@ open-archive:
   kind: job
   versions:
     latest: open_archive/function.yaml
+pandas-profiling-report:
+  categories:
+  - analysis
+  description: Create Pandas Profiling Report from Dataset
+  docfile: pandas_profiling_report/pandas_profiling_report.ipynb
+  kind: job
+  versions:
+    latest: pandas_profiling_report/function.yaml
+project-runner:
+  categories:
+  - utils
+  description: Nuclio based - Cron scheduler for running your MLRun projects
+  docfile: project_runner/project_runner.ipynb
+  kind: remote
+  versions:
+    latest: project_runner/function.yaml
 send-email:
   categories:
   - notifications
@@ -147,7 +198,7 @@ send-email:
   kind: job
   versions:
     latest: send_email/function.yaml
-sentiment-analysis-server:
+sentiment-analysis-serving:
   categories:
   - serving
   - NLP
@@ -167,15 +218,16 @@ sklearn-classifier:
   kind: job
   versions:
     latest: sklearn_classifier/function.yaml
-sklearn-server:
+sklearn-classifier-dask:
   categories:
-  - serving
   - ml
-  description: generic sklearn model server
-  docfile: model_server/model_server.ipynb
-  kind: remote
+  - training
+  - dask
+  description: train any classifier using scikit-learn's API over Dask
+  docfile: sklearn_classifier_dask/sklearn_classifier_dask.ipynb
+  kind: job
   versions:
-    latest: model_server/function.yaml
+    latest: sklearn_classifier_dask/function.yaml
 slack-notify:
   categories:
   - ops
@@ -184,6 +236,13 @@ slack-notify:
   kind: job
   versions:
     latest: slack_notify/function.yaml
+spark-submit:
+  categories: []
+  description: ''
+  docfile: spark_submit/spark_submit.ipynb
+  kind: job
+  versions:
+    latest: spark_submit/function.yaml
 sql-to-file:
   categories:
   - data-prep
@@ -192,31 +251,15 @@ sql-to-file:
   kind: job
   versions:
     latest: sql_to_file/function.yaml
-submit:
-  categories: []
-  description: ''
-  docfile: spark_submit/spark_submit.ipynb
-  kind: job
-  versions:
-    latest: spark_submit/function.yaml
-tensorflow-v1-2layers:
+stream-to-parquet:
   categories:
-  - serving
-  - dl
-  description: tf1 image classification server
-  docfile: tf1_serving/tf1_serving.ipynb
+  - ml
+  - serve
+  description: Saves a stream to Parquet and can lunch drift detection task on it
+  docfile: stream_to_parquet/stream_to_parquet.ipynb
   kind: remote
   versions:
-    latest: tf1_serving/function.yaml
-tensorflow-v2-2layers:
-  categories:
-  - serving
-  - dl
-  description: tf2 image classification server
-  docfile: tf2_serving/tf2_serving.ipynb
-  kind: remote
-  versions:
-    latest: tf2_serving/function.yaml
+    latest: stream_to_parquet/function.yaml
 test-classifier:
   categories:
   - ml
@@ -226,6 +269,52 @@ test-classifier:
   kind: job
   versions:
     latest: test_classifier/function.yaml
+tf1-serving:
+  categories:
+  - serving
+  - dl
+  description: tf1 image classification server
+  docfile: tf1_serving/tf1_serving.ipynb
+  kind: remote
+  versions:
+    latest: tf1_serving/function.yaml
+tf2-serving:
+  categories:
+  - serving
+  - dl
+  description: tf2 image classification server
+  docfile: tf2_serving/tf2_serving.ipynb
+  kind: remote
+  versions:
+    latest: tf2_serving/function.yaml
+v2-model-server:
+  categories:
+  - serving
+  - ml
+  description: generic sklearn model server
+  docfile: v2_model_server/v2_model_server.ipynb
+  kind: serving
+  versions:
+    latest: v2_model_server/function.yaml
+v2-model-tester:
+  categories:
+  - ml
+  - test
+  description: test v2 model servers
+  docfile: v2_model_tester/v2_model_tester.ipynb
+  kind: job
+  versions:
+    latest: v2_model_tester/function.yaml
+virtual-drift:
+  categories:
+  - ml
+  - serve
+  - concept-drift
+  description: Compute drift magnitude between Time-Samples T and U
+  docfile: virtual_drift/virtual_drift.ipynb
+  kind: job
+  versions:
+    latest: virtual_drift/function.yaml
 xgb-custom:
   categories:
   - analysis
@@ -234,13 +323,22 @@ xgb-custom:
   kind: job
   versions:
     latest: xgb_custom/function.yaml
-xgb-test:
+xgb-serving:
   categories:
   - serving
   - ml
   description: xgboost test data classification server
   docfile: xgb_serving/xgb_serving.ipynb
   kind: remote
+  versions:
+    latest: xgb_serving/function.yaml
+xgb-test:
+  categories:
+  - ml
+  - test
+  description: test a classifier using held-out or new data
+  docfile: xgb_test/xgb_test.ipynb
+  kind: job
   versions:
     latest: xgb_test/function.yaml
 xgb-trainer:

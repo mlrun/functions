@@ -1,7 +1,7 @@
 kind: remote
 metadata:
-  name: xgb-test
-  hash: f8a5adf6f36c57093bc5dbd3cb76bd75a046a956
+  name: xgb-serving
+  hash: f80c174652d9e75b2ec04c10a3756bb3b7e8f4d1
   project: default
   labels:
     author: yaronh
@@ -14,7 +14,6 @@ spec:
   args: []
   image: ''
   description: xgboost test data classification server
-  min_replicas: 0
   max_replicas: 4
   env:
   - name: SERVING_MODEL_xgb_serving_v2
@@ -35,9 +34,9 @@ spec:
     kind: nuclio:serving
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from 14-06-2020 by admin
+        nuclio.io/generated_by: function generated from 30-08-2020
       labels: {}
-      name: xgb-test
+      name: xgb-serving
     spec:
       build:
         baseImage: mlrun/ml-models

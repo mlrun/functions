@@ -5,9 +5,11 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import os
 import pandas as pd
+import mlrun
+
 from mlrun.datastore import DataItem
 from mlrun.artifacts import get_model, update_model
-from mlrun.mlutils import eval_model_v2
+from mlrun.mlutils.models import eval_model_v2
 from cloudpickle import load
 from urllib.request import urlopen
 
@@ -20,7 +22,8 @@ def test_classifier(
     plots_dest: str = "",
     model_evaluator = None,
     default_model: str = "model.pkl",
-    predictions_column: str = 'yscore'
+    predictions_column: str = 'yscore',
+    model_update = True
 ) -> None:
     """Test one or more classifier models against held-out dataset
     
@@ -38,6 +41,7 @@ def test_classifier(
     :param model_evaluator:    NOT IMPLEMENTED: specific method to generate eval, passed in as string
                                or available in this folder
     :param predictions_column: column name for the predictions column on the resulted artifact
+    :param model_update:       (True) update model, when running as stand alone no need in update
     """
     xtest = test_set.as_df()
     ytest = xtest.pop(label_column)
@@ -49,7 +53,7 @@ def test_classifier(
         raise Exception("model location likely specified")
     
     extra_data = eval_model_v2(context, xtest, ytest.values, model_obj)
-    if model_obj:
+    if model_obj and model_update == True:
         update_model(models_path, extra_data=extra_data, 
                      metrics=context.results, key_prefix='validation-')
     

@@ -1,7 +1,7 @@
 kind: remote
 metadata:
-  name: sklearn-server
-  hash: c40b8836f05c7cadc9a956d2968488f6399ec835
+  name: model-server
+  hash: a69f8e7d0b5c54aa5a189cdd67bf8fd1e664721b
   project: default
   labels:
     author: yaronh
@@ -14,13 +14,11 @@ spec:
   args: []
   image: ''
   description: generic sklearn model server
-  min_replicas: 0
+  min_replicas: 1
   max_replicas: 4
   env:
   - name: MODEL_CLASS
     value: ClassifierModel
-  - name: ENABLE_EXPLAINER
-    value: 'False'
   config:
     spec.triggers.http:
       kind: http
@@ -30,18 +28,17 @@ spec:
       annotations: {}
   base_spec:
     apiVersion: nuclio.io/v1
-    kind: nuclio:serving
+    kind: serving
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated at 01-05-2020 by admin from /User/functions/model_server/model_server.ipynb
+        nuclio.io/generated_by: function generated from /Users/hediingber/iguazio/misc-workspace/mlrun/functions/model_server/model_server.ipynb
       labels: {}
-      name: sklearn-server
+      name: model-server
     spec:
       build:
         baseImage: mlrun/mlrun
-        commands:
-        - python -m pip install numpy cloudpickle v3io sklearn
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlciBvbiAyMDIwLTA1LTAxIDIwOjE4CgppbXBvcnQgb3MKZnJvbSBjbG91ZHBpY2tsZSBpbXBvcnQgbG9hZAppbXBvcnQgbnVtcHkgYXMgbnAKZnJvbSB0eXBpbmcgaW1wb3J0IExpc3QKZnJvbSBkYXRldGltZSBpbXBvcnQgZGF0ZXRpbWUKaW1wb3J0IG1scnVuCgpjbGFzcyBDbGFzc2lmaWVyTW9kZWwobWxydW4ucnVudGltZXMuTUxNb2RlbFNlcnZlcik6CiAgICBkZWYgbG9hZChzZWxmKToKICAgICAgICAiIiJMb2FkIG1vZGVsIGZyb20gc3RvcmFnZS4iIiIKICAgICAgICBtb2RlbF9maWxlLCBleHRyYV9kYXRhID0gc2VsZi5nZXRfbW9kZWwoJy5wa2wnKQogICAgICAgIHNlbGYubW9kZWwgPSBsb2FkKG9wZW4obW9kZWxfZmlsZSwgJ3JiJykpCgogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keTogZGljdCkgLT4gTGlzdDoKICAgICAgICAiIiJHZW5lcmF0ZSBtb2RlbCBwcmVkaWN0aW9ucyBmcm9tIHNhbXBsZS4KICAgICAgICAKICAgICAgICA6cGFyYW0gYm9keSA6IEEgZGljdCBvZiBvYnNlcnZhdGlvbnMsIGVhY2ggb2Ygd2hpY2ggaXMgYW4gMS1kaW1lbnNpb25hbCBmZWF0dXJlIHZlY3Rvci4KICAgICAgICAgICAgCiAgICAgICAgUmV0dXJucyBtb2RlbCBwcmVkaWN0aW9ucyBhcyBhIGBMaXN0YCwgb25lIGZvciBlYWNoIHJvdyBpbiB0aGUgYGJvZHlgIGlucHV0IGBMaXN0YC4KICAgICAgICAiIiIKICAgICAgICB0cnk6CiAgICAgICAgICAgIGZlYXRzID0gbnAuYXNhcnJheShib2R5WydpbnN0YW5jZXMnXSkKICAgICAgICAgICAgcmVzdWx0OiBucC5uZGFycmF5ID0gc2VsZi5tb2RlbC5wcmVkaWN0KGZlYXRzKQogICAgICAgICAgICByZXNwID0gcmVzdWx0LnRvbGlzdCgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oZiJGYWlsZWQgdG8gcHJlZGljdCB7ZX0iKQogICAgICAgIAogICAgICAgIHJldHVybiByZXNwCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
+        commands: []
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG1scnVuCgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CmZyb20gZGF0ZXRpbWUgaW1wb3J0IGRhdGV0aW1lCmZyb20gc2tsZWFybi5kYXRhc2V0cyBpbXBvcnQgbG9hZF9pcmlzCgppbXBvcnQgd2FybmluZ3MKd2FybmluZ3MuZmlsdGVyd2FybmluZ3MoJ2lnbm9yZScpCgppbXBvcnQgb3MKaW1wb3J0IG51bXB5IGFzIG5wCgpjbGFzcyBDbGFzc2lmaWVyTW9kZWwobWxydW4ucnVudGltZXMuTUxNb2RlbFNlcnZlcik6CiAgICBkZWYgbG9hZChzZWxmKToKICAgICAgICAiIiJMb2FkIG1vZGVsIGZyb20gc3RvcmFnZS4iIiIKICAgICAgICBtb2RlbF9maWxlLCBleHRyYV9kYXRhID0gc2VsZi5nZXRfbW9kZWwoJy5wa2wnKQogICAgICAgIHNlbGYubW9kZWwgPSBsb2FkKG9wZW4obW9kZWxfZmlsZSwgJ3JiJykpCgogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keTogZGljdCkgLT4gTGlzdDoKICAgICAgICAiIiJHZW5lcmF0ZSBtb2RlbCBwcmVkaWN0aW9ucyBmcm9tIHNhbXBsZS4KICAgICAgICAKICAgICAgICA6cGFyYW0gYm9keSA6IEEgZGljdCBvZiBvYnNlcnZhdGlvbnMsIGVhY2ggb2Ygd2hpY2ggaXMgYW4gMS1kaW1lbnNpb25hbCBmZWF0dXJlIHZlY3Rvci4KICAgICAgICAgICAgCiAgICAgICAgUmV0dXJucyBtb2RlbCBwcmVkaWN0aW9ucyBhcyBhIGBMaXN0YCwgb25lIGZvciBlYWNoIHJvdyBpbiB0aGUgYGJvZHlgIGlucHV0IGBMaXN0YC4KICAgICAgICAiIiIKICAgICAgICB0cnk6CiAgICAgICAgICAgIGZlYXRzID0gbnAuYXNhcnJheShib2R5WydpbnN0YW5jZXMnXSkKICAgICAgICAgICAgcmVzdWx0OiBucC5uZGFycmF5ID0gc2VsZi5tb2RlbC5wcmVkaWN0KGZlYXRzKQogICAgICAgICAgICByZXNwID0gcmVzdWx0LnRvbGlzdCgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oZiJGYWlsZWQgdG8gcHJlZGljdCB7ZX0iKQogICAgICAgIAogICAgICAgIHJldHVybiByZXNwCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
         noBaseImagesPull: true
       env:
       - name: MODEL_CLASS
@@ -51,3 +48,5 @@ spec:
       volumes: []
   source: ''
   function_kind: serving
+  build:
+    commands: []

@@ -1,8 +1,8 @@
 kind: serving
 metadata:
-  name: my-server
+  name: sentiment-analysis-serving
   tag: ''
-  hash: e09125a051f58e411c6c13c67922343d6b9ed8d7
+  hash: 32aad0baac67c9b9812f80f0bbf0be27624804e1
   project: default
 spec:
   command: ''
@@ -21,7 +21,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 19
+      lineno: 20
     load:
       name: load
       doc: ''
@@ -30,7 +30,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 30
+      lineno: 31
     predict:
       name: predict
       doc: ''
@@ -41,7 +41,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 37
+      lineno: 38
     init_context:
       name: init_context
       doc: ''
@@ -50,7 +50,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 49
+      lineno: 50
     handler:
       name: handler
       doc: ''
@@ -61,11 +61,17 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 52
+      lineno: 53
   description: ''
   min_replicas: 1
   max_replicas: 4
-  env: []
+  env:
+  - name: V3IO_API
+    value: ''
+  - name: V3IO_USERNAME
+    value: ''
+  - name: V3IO_ACCESS_KEY
+    value: ''
   base_spec:
     apiVersion: nuclio.io/v1
     kind: Function
@@ -73,30 +79,23 @@ spec:
       annotations:
         nuclio.io/generated_by: function generated from /User/myfunctions/functions/sentiment_analysis_serving/bert_sentiment_analysis_serving.ipynb
       labels: {}
-      name: my-server
+      name: sentiment-analysis-serving
     spec:
       build:
         commands: []
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHRvcmNoCmltcG9ydCB0b3JjaC5ubiBhcyBubgpmcm9tIHRyYW5zZm9ybWVycyBpbXBvcnQgQmVydE1vZGVsLCBCZXJ0VG9rZW5pemVyCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzCgpQUkVUUkFJTkVEX01PREVMID0gJ2JlcnQtYmFzZS1jYXNlZCcKdG9rZW5pemVyID0gQmVydFRva2VuaXplci5mcm9tX3ByZXRyYWluZWQoJ2JlcnQtYmFzZS1jYXNlZCcpCgpjbGFzcyBCZXJ0U2VudGltZW50Q2xhc3NpZmllcihubi5Nb2R1bGUpOgogICAgZGVmIF9faW5pdF9fKHNlbGYsIG5fY2xhc3Nlcyk6CiAgICAgICAgc3VwZXIoQmVydFNlbnRpbWVudENsYXNzaWZpZXIsIHNlbGYpLl9faW5pdF9fKCkKICAgICAgICBzZWxmLmJlcnQgPSBCZXJ0TW9kZWwuZnJvbV9wcmV0cmFpbmVkKFBSRVRSQUlORURfTU9ERUwpCiAgICAgICAgc2VsZi5kcm9wb3V0ID0gbm4uRHJvcG91dChwPTAuMikKICAgICAgICBzZWxmLm91dF9saW5lYXIgPSBubi5MaW5lYXIoc2VsZi5iZXJ0LmNvbmZpZy5oaWRkZW5fc2l6ZSwgbl9jbGFzc2VzKQogICAgICAgIHNlbGYuc29mdG1heCA9IG5uLlNvZnRtYXgoZGltPTEpCgogICAgZGVmIGZvcndhcmQoc2VsZiwgaW5wdXRfaWRzLCBhdHRlbnRpb25fbWFzayk6CiAgICAgICAgXywgcG9vbGVkX291dCA9IHNlbGYuYmVydCgKICAgICAgICAgICAgaW5wdXRfaWRzPWlucHV0X2lkcywKICAgICAgICAgICAgYXR0ZW50aW9uX21hc2s9YXR0ZW50aW9uX21hc2sKICAgICAgICApCiAgICAgICAgb3V0ID0gc2VsZi5kcm9wb3V0KHBvb2xlZF9vdXQpCiAgICAgICAgb3V0ID0gc2VsZi5vdXRfbGluZWFyKG91dCkKICAgICAgICByZXR1cm4gc2VsZi5zb2Z0bWF4KG91dCkKCmltcG9ydCBtbHJ1bgpjbGFzcyBTZW50aW1lbnRDbGFzc2lmaWVyU2VydmluZyhtbHJ1bi5zZXJ2aW5nLlYyTW9kZWxTZXJ2ZXIpOgogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgbW9kZWxfZmlsZSwgXyA9IHNlbGYuZ2V0X21vZGVsKCcucHQnKQogICAgICAgIGRldmljZSA9IHRvcmNoLmRldmljZSgnY3VkYTowJykgaWYgdG9yY2guY3VkYS5pc19hdmFpbGFibGUoKSBlbHNlIHRvcmNoLmRldmljZSgnY3B1JykKICAgICAgICBtb2RlbCA9IEJlcnRTZW50aW1lbnRDbGFzc2lmaWVyKG5fY2xhc3Nlcz0zKQogICAgICAgIG1vZGVsLmxvYWRfc3RhdGVfZGljdCh0b3JjaC5sb2FkKG1vZGVsX2ZpbGUsIG1hcF9sb2NhdGlvbj1kZXZpY2UpKQogICAgICAgIG1vZGVsLmV2YWwoKQogICAgICAgIHNlbGYubW9kZWwgPSBtb2RlbAogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keSk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBpbnN0YW5jZXMgPSBib2R5WydpbnB1dHMnXQogICAgICAgICAgICBlbmMgPSB0b2tlbml6ZXIuYmF0Y2hfZW5jb2RlX3BsdXMoaW5zdGFuY2VzLCByZXR1cm5fdGVuc29ycz0ncHQnLCBwYWRfdG9fbWF4X2xlbmd0aD1UcnVlKQogICAgICAgICAgICBvdXRwdXRzID0gc2VsZi5tb2RlbChpbnB1dF9pZHM9ZW5jWydpbnB1dF9pZHMnXSwgYXR0ZW50aW9uX21hc2s9ZW5jWydhdHRlbnRpb25fbWFzayddKQogICAgICAgICAgICBfLCBwcmVkcyA9IHRvcmNoLm1heChvdXRwdXRzLCBkaW09MSkKICAgICAgICAgICAgcmV0dXJuIHByZWRzLmNwdSgpLnRvbGlzdCgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oIkZhaWxlZCB0byBwcmVkaWN0ICVzIiAlIGUpCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nX3YyJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHRvcmNoCmltcG9ydCB0b3JjaC5ubiBhcyBubgpmcm9tIHRyYW5zZm9ybWVycyBpbXBvcnQgQmVydE1vZGVsLCBCZXJ0VG9rZW5pemVyCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzCmltcG9ydCBtbHJ1bgoKUFJFVFJBSU5FRF9NT0RFTCA9ICdiZXJ0LWJhc2UtY2FzZWQnCnRva2VuaXplciA9IEJlcnRUb2tlbml6ZXIuZnJvbV9wcmV0cmFpbmVkKCdiZXJ0LWJhc2UtY2FzZWQnKQoKY2xhc3MgQmVydFNlbnRpbWVudENsYXNzaWZpZXIobm4uTW9kdWxlKToKICAgIGRlZiBfX2luaXRfXyhzZWxmLCBuX2NsYXNzZXMpOgogICAgICAgIHN1cGVyKEJlcnRTZW50aW1lbnRDbGFzc2lmaWVyLCBzZWxmKS5fX2luaXRfXygpCiAgICAgICAgc2VsZi5iZXJ0ID0gQmVydE1vZGVsLmZyb21fcHJldHJhaW5lZChQUkVUUkFJTkVEX01PREVMKQogICAgICAgIHNlbGYuZHJvcG91dCA9IG5uLkRyb3BvdXQocD0wLjIpCiAgICAgICAgc2VsZi5vdXRfbGluZWFyID0gbm4uTGluZWFyKHNlbGYuYmVydC5jb25maWcuaGlkZGVuX3NpemUsIG5fY2xhc3NlcykKICAgICAgICBzZWxmLnNvZnRtYXggPSBubi5Tb2Z0bWF4KGRpbT0xKQoKICAgIGRlZiBmb3J3YXJkKHNlbGYsIGlucHV0X2lkcywgYXR0ZW50aW9uX21hc2spOgogICAgICAgIF8sIHBvb2xlZF9vdXQgPSBzZWxmLmJlcnQoCiAgICAgICAgICAgIGlucHV0X2lkcz1pbnB1dF9pZHMsCiAgICAgICAgICAgIGF0dGVudGlvbl9tYXNrPWF0dGVudGlvbl9tYXNrCiAgICAgICAgKQogICAgICAgIG91dCA9IHNlbGYuZHJvcG91dChwb29sZWRfb3V0KQogICAgICAgIG91dCA9IHNlbGYub3V0X2xpbmVhcihvdXQpCiAgICAgICAgcmV0dXJuIHNlbGYuc29mdG1heChvdXQpCgoKY2xhc3MgU2VudGltZW50Q2xhc3NpZmllclNlcnZpbmcobWxydW4uc2VydmluZy5WMk1vZGVsU2VydmVyKToKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgIG1vZGVsX2ZpbGUsIF8gPSBzZWxmLmdldF9tb2RlbCgnLnB0JykKICAgICAgICBkZXZpY2UgPSB0b3JjaC5kZXZpY2UoJ2N1ZGE6MCcpIGlmIHRvcmNoLmN1ZGEuaXNfYXZhaWxhYmxlKCkgZWxzZSB0b3JjaC5kZXZpY2UoJ2NwdScpCiAgICAgICAgbW9kZWwgPSBCZXJ0U2VudGltZW50Q2xhc3NpZmllcihuX2NsYXNzZXM9MykKICAgICAgICBtb2RlbC5sb2FkX3N0YXRlX2RpY3QodG9yY2gubG9hZChtb2RlbF9maWxlLCBtYXBfbG9jYXRpb249ZGV2aWNlKSkKICAgICAgICBtb2RlbC5ldmFsKCkKICAgICAgICBzZWxmLm1vZGVsID0gbW9kZWwKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGJvZHkpOgogICAgICAgIHRyeToKICAgICAgICAgICAgaW5zdGFuY2VzID0gYm9keVsnaW5wdXRzJ10KICAgICAgICAgICAgZW5jID0gdG9rZW5pemVyLmJhdGNoX2VuY29kZV9wbHVzKGluc3RhbmNlcywgcmV0dXJuX3RlbnNvcnM9J3B0JywgcGFkX3RvX21heF9sZW5ndGg9VHJ1ZSkKICAgICAgICAgICAgb3V0cHV0cyA9IHNlbGYubW9kZWwoaW5wdXRfaWRzPWVuY1snaW5wdXRfaWRzJ10sIGF0dGVudGlvbl9tYXNrPWVuY1snYXR0ZW50aW9uX21hc2snXSkKICAgICAgICAgICAgXywgcHJlZHMgPSB0b3JjaC5tYXgob3V0cHV0cywgZGltPTEpCiAgICAgICAgICAgIHJldHVybiBwcmVkcy5jcHUoKS50b2xpc3QoKQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZToKICAgICAgICAgICAgcmFpc2UgRXhjZXB0aW9uKCJGYWlsZWQgdG8gcHJlZGljdCAlcyIgJSBlKQoKCmZyb20gbWxydW4ucnVudGltZXMgaW1wb3J0IG51Y2xpb19pbml0X2hvb2sKZGVmIGluaXRfY29udGV4dChjb250ZXh0KToKICAgIG51Y2xpb19pbml0X2hvb2soY29udGV4dCwgZ2xvYmFscygpLCAnc2VydmluZ192MicpCgpkZWYgaGFuZGxlcihjb250ZXh0LCBldmVudCk6CiAgICByZXR1cm4gY29udGV4dC5tbHJ1bl9oYW5kbGVyKGNvbnRleHQsIGV2ZW50KQo=
         noBaseImagesPull: true
+        baseImage: mlrun/ml-models
       env: []
       handler: bert_sentiment_analysis_serving:handler
       runtime: python:3.6
       volumes: []
   source: ''
   function_kind: serving_v2
-  graph:
-    kind: router
-    full_event: true
-    routes:
-      model1:
-        kind: task
-        class_name: SentimentClassifierServing
-        class_args:
-          model_path: /User/myfunctions/functions/sentiment_analysis_serving/models/model.pt
-        full_event: true
+  default_class: SentimentClassifierServing
   build:
-    commands: []
-    code_origin: https://github.com/aviaIguazio/functions.git#f4793a335189f69008a55fd0fff3d64c63caf1b3:my_server.ipynb
+    commands:
+    - pip install transformers==3.0.2
+    code_origin: https://github.com/aviaIguazio/functions.git#e43d8057db5aa14ae28884280e6e05cb4f75f0e5:sentiment-analysis-serving.ipynb
   secret_sources: []
 verbose: false

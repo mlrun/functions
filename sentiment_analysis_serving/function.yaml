@@ -1,56 +1,102 @@
-kind: remote
+kind: serving
 metadata:
-  name: sentiment-analysis-serving
-  hash: a4405faff4f4d485c3f141a7abdca67c39b39637
+  name: my-server
+  tag: ''
+  hash: e09125a051f58e411c6c13c67922343d6b9ed8d7
   project: default
-  labels:
-    author: roye
-    framework: pytorch
-  categories:
-  - serving
-  - NLP
-  - BERT
-  - sentiment analysis
 spec:
   command: ''
   args: []
   image: ''
-  description: BERT based sentiment classification model
+  entry_points:
+    forward:
+      name: forward
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: input_ids
+        default: ''
+      - name: attention_mask
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 19
+    load:
+      name: load
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 30
+    predict:
+      name: predict
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: body
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 37
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 49
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: event
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 52
+  description: ''
   min_replicas: 1
-  max_replicas: 1
-  env:
-  - name: MODEL_CLASS
-    value: SentimentClassifierServing
-  config:
-    spec.triggers.http:
-      kind: http
-      maxWorkers: 8
-      attributes:
-        ingresses: {}
-      annotations: {}
+  max_replicas: 4
+  env: []
   base_spec:
     apiVersion: nuclio.io/v1
-    kind: nuclio:serving
+    kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from /User/functions/sentiment_analysis_serving/bert_sentiment_analysis_serving.ipynb
+        nuclio.io/generated_by: function generated from /User/myfunctions/functions/sentiment_analysis_serving/bert_sentiment_analysis_serving.ipynb
       labels: {}
-      name: sentiment-analysis-serving
+      name: my-server
     spec:
       build:
-        baseImage: mlrun/ml-models-gpu
         commands: []
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHRvcmNoCmltcG9ydCB0b3JjaC5ubiBhcyBubgpmcm9tIHRyYW5zZm9ybWVycyBpbXBvcnQgQmVydE1vZGVsLCBCZXJ0VG9rZW5pemVyCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzCgpQUkVUUkFJTkVEX01PREVMID0gJ2JlcnQtYmFzZS1jYXNlZCcKdG9rZW5pemVyID0gQmVydFRva2VuaXplci5mcm9tX3ByZXRyYWluZWQoJ2JlcnQtYmFzZS1jYXNlZCcpCgpjbGFzcyBCZXJ0U2VudGltZW50Q2xhc3NpZmllcihubi5Nb2R1bGUpOgogICAgZGVmIF9faW5pdF9fKHNlbGYsIG5fY2xhc3Nlcyk6CiAgICAgICAgc3VwZXIoQmVydFNlbnRpbWVudENsYXNzaWZpZXIsIHNlbGYpLl9faW5pdF9fKCkKICAgICAgICBzZWxmLmJlcnQgPSBCZXJ0TW9kZWwuZnJvbV9wcmV0cmFpbmVkKFBSRVRSQUlORURfTU9ERUwpCiAgICAgICAgc2VsZi5kcm9wb3V0ID0gbm4uRHJvcG91dChwPTAuMikKICAgICAgICBzZWxmLm91dF9saW5lYXIgPSBubi5MaW5lYXIoc2VsZi5iZXJ0LmNvbmZpZy5oaWRkZW5fc2l6ZSwgbl9jbGFzc2VzKQogICAgICAgIHNlbGYuc29mdG1heCA9IG5uLlNvZnRtYXgoZGltPTEpCgogICAgZGVmIGZvcndhcmQoc2VsZiwgaW5wdXRfaWRzLCBhdHRlbnRpb25fbWFzayk6CiAgICAgICAgXywgcG9vbGVkX291dCA9IHNlbGYuYmVydCgKICAgICAgICAgICAgaW5wdXRfaWRzPWlucHV0X2lkcywKICAgICAgICAgICAgYXR0ZW50aW9uX21hc2s9YXR0ZW50aW9uX21hc2sKICAgICAgICApCiAgICAgICAgb3V0ID0gc2VsZi5kcm9wb3V0KHBvb2xlZF9vdXQpCiAgICAgICAgb3V0ID0gc2VsZi5vdXRfbGluZWFyKG91dCkKICAgICAgICByZXR1cm4gc2VsZi5zb2Z0bWF4KG91dCkKCmltcG9ydCBtbHJ1bgpjbGFzcyBTZW50aW1lbnRDbGFzc2lmaWVyU2VydmluZyhtbHJ1bi5zZXJ2aW5nLlYyTW9kZWxTZXJ2ZXIpOgogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgbW9kZWxfZmlsZSwgXyA9IHNlbGYuZ2V0X21vZGVsKCcucHQnKQogICAgICAgIGRldmljZSA9IHRvcmNoLmRldmljZSgnY3VkYTowJykgaWYgdG9yY2guY3VkYS5pc19hdmFpbGFibGUoKSBlbHNlIHRvcmNoLmRldmljZSgnY3B1JykKICAgICAgICBtb2RlbCA9IEJlcnRTZW50aW1lbnRDbGFzc2lmaWVyKG5fY2xhc3Nlcz0zKQogICAgICAgIG1vZGVsLmxvYWRfc3RhdGVfZGljdCh0b3JjaC5sb2FkKG1vZGVsX2ZpbGUsIG1hcF9sb2NhdGlvbj1kZXZpY2UpKQogICAgICAgIG1vZGVsLmV2YWwoKQogICAgICAgIHNlbGYubW9kZWwgPSBtb2RlbAogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keSk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBpbnN0YW5jZXMgPSBib2R5WydpbnB1dHMnXQogICAgICAgICAgICBlbmMgPSB0b2tlbml6ZXIuYmF0Y2hfZW5jb2RlX3BsdXMoaW5zdGFuY2VzLCByZXR1cm5fdGVuc29ycz0ncHQnLCBwYWRfdG9fbWF4X2xlbmd0aD1UcnVlKQogICAgICAgICAgICBvdXRwdXRzID0gc2VsZi5tb2RlbChpbnB1dF9pZHM9ZW5jWydpbnB1dF9pZHMnXSwgYXR0ZW50aW9uX21hc2s9ZW5jWydhdHRlbnRpb25fbWFzayddKQogICAgICAgICAgICBfLCBwcmVkcyA9IHRvcmNoLm1heChvdXRwdXRzLCBkaW09MSkKICAgICAgICAgICAgcmV0dXJuIHByZWRzLmNwdSgpLnRvbGlzdCgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oIkZhaWxlZCB0byBwcmVkaWN0ICVzIiAlIGUpCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHRvcmNoCmltcG9ydCB0b3JjaC5ubiBhcyBubgpmcm9tIHRyYW5zZm9ybWVycyBpbXBvcnQgQmVydE1vZGVsLCBCZXJ0VG9rZW5pemVyCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzCgpQUkVUUkFJTkVEX01PREVMID0gJ2JlcnQtYmFzZS1jYXNlZCcKdG9rZW5pemVyID0gQmVydFRva2VuaXplci5mcm9tX3ByZXRyYWluZWQoJ2JlcnQtYmFzZS1jYXNlZCcpCgpjbGFzcyBCZXJ0U2VudGltZW50Q2xhc3NpZmllcihubi5Nb2R1bGUpOgogICAgZGVmIF9faW5pdF9fKHNlbGYsIG5fY2xhc3Nlcyk6CiAgICAgICAgc3VwZXIoQmVydFNlbnRpbWVudENsYXNzaWZpZXIsIHNlbGYpLl9faW5pdF9fKCkKICAgICAgICBzZWxmLmJlcnQgPSBCZXJ0TW9kZWwuZnJvbV9wcmV0cmFpbmVkKFBSRVRSQUlORURfTU9ERUwpCiAgICAgICAgc2VsZi5kcm9wb3V0ID0gbm4uRHJvcG91dChwPTAuMikKICAgICAgICBzZWxmLm91dF9saW5lYXIgPSBubi5MaW5lYXIoc2VsZi5iZXJ0LmNvbmZpZy5oaWRkZW5fc2l6ZSwgbl9jbGFzc2VzKQogICAgICAgIHNlbGYuc29mdG1heCA9IG5uLlNvZnRtYXgoZGltPTEpCgogICAgZGVmIGZvcndhcmQoc2VsZiwgaW5wdXRfaWRzLCBhdHRlbnRpb25fbWFzayk6CiAgICAgICAgXywgcG9vbGVkX291dCA9IHNlbGYuYmVydCgKICAgICAgICAgICAgaW5wdXRfaWRzPWlucHV0X2lkcywKICAgICAgICAgICAgYXR0ZW50aW9uX21hc2s9YXR0ZW50aW9uX21hc2sKICAgICAgICApCiAgICAgICAgb3V0ID0gc2VsZi5kcm9wb3V0KHBvb2xlZF9vdXQpCiAgICAgICAgb3V0ID0gc2VsZi5vdXRfbGluZWFyKG91dCkKICAgICAgICByZXR1cm4gc2VsZi5zb2Z0bWF4KG91dCkKCmltcG9ydCBtbHJ1bgpjbGFzcyBTZW50aW1lbnRDbGFzc2lmaWVyU2VydmluZyhtbHJ1bi5zZXJ2aW5nLlYyTW9kZWxTZXJ2ZXIpOgogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgbW9kZWxfZmlsZSwgXyA9IHNlbGYuZ2V0X21vZGVsKCcucHQnKQogICAgICAgIGRldmljZSA9IHRvcmNoLmRldmljZSgnY3VkYTowJykgaWYgdG9yY2guY3VkYS5pc19hdmFpbGFibGUoKSBlbHNlIHRvcmNoLmRldmljZSgnY3B1JykKICAgICAgICBtb2RlbCA9IEJlcnRTZW50aW1lbnRDbGFzc2lmaWVyKG5fY2xhc3Nlcz0zKQogICAgICAgIG1vZGVsLmxvYWRfc3RhdGVfZGljdCh0b3JjaC5sb2FkKG1vZGVsX2ZpbGUsIG1hcF9sb2NhdGlvbj1kZXZpY2UpKQogICAgICAgIG1vZGVsLmV2YWwoKQogICAgICAgIHNlbGYubW9kZWwgPSBtb2RlbAogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keSk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBpbnN0YW5jZXMgPSBib2R5WydpbnB1dHMnXQogICAgICAgICAgICBlbmMgPSB0b2tlbml6ZXIuYmF0Y2hfZW5jb2RlX3BsdXMoaW5zdGFuY2VzLCByZXR1cm5fdGVuc29ycz0ncHQnLCBwYWRfdG9fbWF4X2xlbmd0aD1UcnVlKQogICAgICAgICAgICBvdXRwdXRzID0gc2VsZi5tb2RlbChpbnB1dF9pZHM9ZW5jWydpbnB1dF9pZHMnXSwgYXR0ZW50aW9uX21hc2s9ZW5jWydhdHRlbnRpb25fbWFzayddKQogICAgICAgICAgICBfLCBwcmVkcyA9IHRvcmNoLm1heChvdXRwdXRzLCBkaW09MSkKICAgICAgICAgICAgcmV0dXJuIHByZWRzLmNwdSgpLnRvbGlzdCgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oIkZhaWxlZCB0byBwcmVkaWN0ICVzIiAlIGUpCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nX3YyJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
         noBaseImagesPull: true
-      env:
-      - name: MODEL_CLASS
-        value: SentimentClassifierServing
+      env: []
       handler: bert_sentiment_analysis_serving:handler
-      readiness_timeout: 500
       runtime: python:3.6
       volumes: []
   source: ''
-  function_kind: serving
+  function_kind: serving_v2
+  graph:
+    kind: router
+    full_event: true
+    routes:
+      model1:
+        kind: task
+        class_name: SentimentClassifierServing
+        class_args:
+          model_path: /User/myfunctions/functions/sentiment_analysis_serving/models/model.pt
+        full_event: true
   build:
     commands: []
+    code_origin: https://github.com/aviaIguazio/functions.git#f4793a335189f69008a55fd0fff3d64c63caf1b3:my_server.ipynb
+  secret_sources: []
 verbose: false

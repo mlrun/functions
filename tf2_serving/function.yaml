@@ -15,18 +15,10 @@ spec:
   description: tf2 image classification server
   max_replicas: 4
   env:
-  - name: SERVING_MODEL_cat_vs_dog_tfv2
-    value: tf2/cats_n_dogs.h5
   - name: MODEL_CLASS
     value: TFModel
   - name: ENABLE_EXPLAINER
     value: 'False'
-  - name: IMAGE_HEIGHT
-    value: 128
-  - name: IMAGE_WIDTH
-    value: 128
-  - name: classes_map
-    value: /User/artifacts/categories_map.json
   config:
     spec.triggers.http:
       kind: http

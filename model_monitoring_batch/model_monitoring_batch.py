@@ -323,5 +323,5 @@ class BatchProcessor:
             pass
 
 
-def handler(context: MLClientCtx):
-    BatchProcessor(environ.get("PROJECT_NAME")).run()
+def handler(context: MLClientCtx, project: str):
+    BatchProcessor(project).run()

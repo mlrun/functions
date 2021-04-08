@@ -15,7 +15,7 @@
    X-V3io-Session-Key: <YOUR ACCESS KEY>
    ```
    5. Press `Save & Test` to make sure it works, a confirmation message should appear when this button is pressed
-2. Import the available dashboards `(resource/*.json)` to you Grafana instance
+2. Import the available dashboards `(./dashboards/*)` to you Grafana instance
 3. To allow the system to utilize drift measurement, make sure you supply the train set when logging the model on the 
    training step
    ```

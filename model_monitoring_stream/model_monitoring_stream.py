@@ -5,11 +5,13 @@ from os import environ
 from typing import Dict, List, Set, Optional
 
 import pandas as pd
-from mlrun import config
-from mlrun.api.crud.model_endpoints import parse_store_prefix
-from mlrun.api.schemas.model_endpoints import ModelEndpoint
+from mlrun.config import config
 from mlrun.run import MLClientCtx
 from mlrun.utils import logger
+from mlrun.utils.model_monitoring import (
+    parse_model_endpoint_store_prefix,
+    create_model_endpoint_id,
+)
 from mlrun.utils.v3io_clients import get_v3io_client, get_frames_client
 from nuclio import Event
 from storey import (
@@ -98,11 +100,13 @@ class EventStreamProcessor:
         template = config.model_endpoint_monitoring.store_prefixes.default
 
         kv_path = template.format(project=project, kind="endpoints")
-        _, self.kv_container, self.kv_path = parse_store_prefix(kv_path)
+        _, self.kv_container, self.kv_path = parse_model_endpoint_store_prefix(kv_path)
 
         tsdb_path = template.format(project=project, kind="events")
-        _, self.tsdb_container, path = parse_store_prefix(tsdb_path)
-        self.tsdb_path = f"{self.tsdb_container}/{path}"
+        _, self.tsdb_container, self.tsdb_path = parse_model_endpoint_store_prefix(
+            tsdb_path
+        )
+        self.tsdb_path = f"{self.tsdb_container}/{self.tsdb_path}"
 
         self.parquet_path = template.format(project=project, kind="parquet")
 
@@ -130,8 +134,6 @@ class EventStreamProcessor:
             LAST_REQUEST,
             ERROR_COUNT,
         ]
-
-        # logger.info("Configuration", config=asdict(config))
 
         self._flow = build_flow(
             [
@@ -458,7 +460,7 @@ def enrich_even_details(event) -> Optional[dict]:
     version = event.get(VERSION)
     versioned_model = f"{model}:{version}" if version else model
 
-    endpoint_id = ModelEndpoint.create_endpoint_id(
+    endpoint_id = create_model_endpoint_id(
         function_uri=function_uri, versioned_model=versioned_model,
     )
 

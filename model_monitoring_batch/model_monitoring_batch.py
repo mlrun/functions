@@ -1,7 +1,7 @@
 import json
 from asyncio import get_event_loop
 from collections import defaultdict
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 from os import environ
 from pathlib import Path
 from typing import Optional, List, Dict
@@ -12,40 +12,13 @@ from mlrun.api.crud.model_endpoints import ModelEndpoints
 from mlrun.api.schemas import ModelEndpointList
 from mlrun.data_types.infer import DFDataInfer, InferOptions
 from mlrun.run import MLClientCtx
-from mlrun.utils import logger
+from mlrun.utils import logger, config
+from mlrun.utils.model_monitoring import parse_model_endpoint_store_prefix
 from mlrun.utils.v3io_clients import get_v3io_client
 from sklearn.preprocessing import KBinsDiscretizer
 from v3iofs import V3ioFS
 
 ISO_8061 = "%Y-%m-%d %H:%M:%S.%f"
-
-
-@dataclass
-class Config:
-    container: str
-    v3io_access_key: str
-    v3io_api: str
-    time_format: str
-
-    _environment_override: bool = True
-
-    def __post_init__(self):
-        if self._environment_override:
-            for field in fields(self):
-                if field.name.startswith("_"):
-                    continue
-                val = environ.get(field.name.upper(), self.__dict__[field.name])
-                if isinstance(val, str) and val.startswith("$"):
-                    val = json.loads(val[1:])
-                setattr(self, field.name, val)
-
-
-config = Config(
-    container="projects",
-    v3io_access_key="",
-    v3io_api="",
-    time_format="%Y-%m-%d %H:%M:%S.%f",  # ISO 8061
-)
 
 
 @dataclass
@@ -241,14 +214,22 @@ class VirtualDrift:
 
 
 class BatchProcessor:
-    def __init__(self, project: str):
+    def __init__(self, context: MLClientCtx, project: str):
+        self.context = context
         self.project = project
         self.virtual_drift = VirtualDrift(inf_capping=10)
-        self.batch_path = "{container}/{project}/model-endpoints/parquet".format(
-            container=config.container, project=self.project
+
+        self.parquet_path = config.model_endpoint_monitoring.store_prefixes.default.format(
+            project=self.project, kind="parquet"
         )
 
-        logger.info("Initializing BatchProcessor", batch_path=self.batch_path)
+        kv_path = config.model_endpoint_monitoring.store_prefixes.default.format(
+            project=self.project, kind="endpoints"
+        )
+
+        _, self.kv_container, self.kv_path = parse_model_endpoint_store_prefix(kv_path)
+
+        logger.info("Initializing BatchProcessor", batch_path=self.parquet_path)
 
     def run(self):
 
@@ -261,50 +242,55 @@ class BatchProcessor:
             )
         )
 
+        active_endpoints = set()
+        for endpoint in endpoints.endpoints:
+            if endpoint.spec.active:
+                active_endpoints.add(endpoint.metadata.uid)
+
         v3io = get_v3io_client()
 
-        endpoint_key_dirs = fs.ls(self.batch_path)
+        endpoint_key_dirs = fs.ls(self.parquet_path)
         endpoint_key_dirs = [d["name"] for d in endpoint_key_dirs]
 
         for endpoint_dir in endpoint_key_dirs:
             endpoint_id = endpoint_dir.split("=")[-1]
-
-            year_dirs = fs.ls(endpoint_dir)
-            year_dirs = [d["name"] for d in year_dirs]
-            last_year = sorted(year_dirs, key=lambda k: k.split("=")[-1])[-1]
-
-            month_dirs = fs.ls(last_year)
-            month_dirs = [d["name"] for d in month_dirs]
-            last_month = sorted(month_dirs, key=lambda k: k.split("=")[-1])[-1]
-
-            day_dirs = fs.ls(last_month)
-            day_dirs = [d["name"] for d in day_dirs]
-            last_day = sorted(day_dirs, key=lambda k: k.split("=")[-1])[-1]
-
-            hour_dirs = fs.ls(last_day)
-            hour_dirs = [d["name"] for d in hour_dirs]
-            last_hour = sorted(hour_dirs, key=lambda k: k.split("=")[-1])[-1]
-
-            parquet_files = fs.ls(last_hour)
-            last_parquet = sorted(parquet_files, key=lambda k: k["mtime"])[-1]
-            parquet_name = last_parquet["name"]
-
-            resp = v3io.kv.get(
-                container="projects",
-                table_path=f"{self.project}/model-endpoints/endpoints",
-                key=endpoint_id,
-            )
+            if endpoint_id not in active_endpoints:
+                continue
 
             try:
-                base_stats = json.loads(resp.output.item["feature_stats"])
+                last_year = self.get_last_created_dir(endpoint_dir, fs)
+                last_month = self.get_last_created_dir(last_year, fs)
+                last_day = self.get_last_created_dir(last_month, fs)
+                last_hour = self.get_last_created_dir(last_day, fs)
+
+                parquet_files = fs.ls(last_hour)
+                last_parquet = sorted(parquet_files, key=lambda k: k["mtime"])[-1]
+                parquet_name = last_parquet["name"]
+
+                endpoint_record = v3io.kv.get(
+                    container=self.kv_container,
+                    table_path=self.kv_path,
+                    key=endpoint_id,
+                )
+
+                if not endpoint_record:
+                    self.context.logger.warning(
+                        "Failed to retrieve data", endpoint_id=endpoint_id
+                    )
+                    continue
+
+                endpoint_record = endpoint_record.output.item
+
+                feature_stats = json.loads(endpoint_record["feature_stats"])
+
                 current_stats = self.virtual_drift.parquet_to_stats(parquet_name)
                 drift_result = self.virtual_drift.compute_drift_from_histograms(
-                    base_stats, current_stats
+                    feature_stats, current_stats
                 )
 
                 v3io.kv.update(
-                    container="projects",
-                    table_path=f"{self.project}/model-endpoints/endpoints",
+                    container=self.kv_container,
+                    table_path=self.kv_path,
                     key=endpoint_id,
                     attributes={
                         "current_stats": json.dumps(current_stats),
@@ -312,16 +298,26 @@ class BatchProcessor:
                         "drift_status": "NO_DRIFT",
                     },
                 )
-                logger.info(
+
+                self.context.logger.info(
                     "Done updating drift measures",
                     endpoint_id=endpoint_id,
                     file=parquet_name,
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                self.context.logger.warning(
+                    f"Virtual Drift failed for endpoint {endpoint_id}", exc=e
+                )
 
             pass
 
+    @staticmethod
+    def get_last_created_dir(endpoint_dir, fs):
+        year_dirs = fs.ls(endpoint_dir)
+        year_dirs = [d["name"] for d in year_dirs]
+        last_year = sorted(year_dirs, key=lambda k: k.split("=")[-1])[-1]
+        return last_year
+
 
 def handler(context: MLClientCtx, project: str):
-    BatchProcessor(project).run()
+    BatchProcessor(context, project).run()

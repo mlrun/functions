@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 from datetime import datetime
 from os import environ
-from typing import Dict, List, Set, Optional
+from typing import Dict, List, Set, Optional, Any, Union
 
 import pandas as pd
 from mlrun.config import config
@@ -23,13 +23,12 @@ from storey import (
     MapClass,
     AggregateByKey,
     build_flow,
-    FlatMap,
     WriteToParquet,
     Filter,
     WriteToTSDB,
 )
 from storey.dtypes import SlidingWindows
-from storey.steps import SampleWindow
+from storey.steps import SampleWindow, Flatten
 
 # Constants
 ISO_8061_UTC = "%Y-%m-%d %H:%M:%S.%f%z"
@@ -53,12 +52,14 @@ LAST_REQUEST = "last_request"
 ERROR_COUNT = "error_count"
 ENTITIES = "entities"
 FEATURE_NAMES = "feature_names"
+LABEL_COLUMNS = "label_columns"
 LATENCY = "latency"
 RECORD_TYPE = "record_type"
 FEATURES = "features"
 PREDICTION = "prediction"
 PREDICTIONS = "predictions"
 NAMED_FEATURES = "named_features"
+NAMED_PREDICTIONS = "named_predictions"
 BASE_METRICS = "base_metrics"
 CUSTOM_METRICS = "custom_metrics"
 ENDPOINT_FEATURES = "endpoint_features"
@@ -140,7 +141,7 @@ class EventStreamProcessor:
                 Source(),
                 ProcessEndpointEvent(self.kv_container, self.kv_path),
                 FilterNotNone(),
-                FlattenPredictions(),
+                Flatten(),
                 MapFeatureNames(self.kv_container, self.kv_path),
                 # Branch 1: Aggregate events, count averages and update TSDB and KV
                 [
@@ -307,7 +308,7 @@ class EventStreamProcessor:
 
         endpoint_features = {
             RECORD_TYPE: ENDPOINT_FEATURES,
-            PREDICTION: event[PREDICTION],
+            **event[NAMED_PREDICTIONS],
             **event[NAMED_FEATURES],
             **base_event,
         }
@@ -375,44 +376,54 @@ class ProcessEndpointEvent(MapClass):
         request_id = event.get("request", {}).get("id")
         latency = event.get("microsec")
         features = event.get("request", {}).get("inputs")
-        prediction = event.get("resp", {}).get("outputs")
+        predictions = event.get("resp", {}).get("outputs")
 
-        if not self.is_valid_or_count(timestamp, ["when"]):
+        if not self.is_valid(is_not_none, timestamp, ["when"]):
             return None
 
         if endpoint_id not in self.first_request:
             self.first_request[endpoint_id] = timestamp
         self.last_request[endpoint_id] = timestamp
 
-        if not self.is_valid_or_count(request_id, ["request", "id"]):
+        if not self.is_valid(is_not_none, request_id, ["request", "id"]):
             return None
-        if not self.is_valid_or_count(latency, ["microsec"]):
+        if not self.is_valid(is_not_none, latency, ["microsec"]):
             return None
-        if not self.is_valid_or_count(features, ["request", "inputs"]):
+        if not self.is_valid(is_not_none, features, ["request", "inputs"]):
             return None
-        if not self.is_valid_or_count(prediction, ["resp", "outputs"]):
+        if not self.is_valid(is_not_none, predictions, ["resp", "outputs"]):
             return None
 
-        event = {
-            FUNCTION_URI: function_uri,
-            MODEL: versioned_model,
-            MODEL_CLASS: model_class,
-            TIMESTAMP: timestamp,
-            ENDPOINT_ID: endpoint_id,
-            REQUEST_ID: request_id,
-            LATENCY: latency,
-            FEATURES: features,
-            PREDICTION: prediction,
-            FIRST_REQUEST: self.first_request[endpoint_id],
-            LAST_REQUEST: self.last_request[endpoint_id],
-            ERROR_COUNT: self.error_count[endpoint_id],
-            LABELS: event.get(LABELS, {}),
-            METRICS: event.get(METRICS, {}),
-            ENTITIES: event.get("request", {}).get(ENTITIES, {}),
-            UNPACKED_LABELS: {f"_{k}": v for k, v in event.get(LABELS, {}).items()},
-        }
-
-        return event
+        # Separate each model invocation into sub events
+        events = []
+        for i, (feature, prediction) in enumerate(zip(features, predictions)):
+            if not self.is_valid(
+                is_list_of_numerics, feature, ["request", "inputs", f"[{i}]"]
+            ):
+                return None
+            events.append(
+                {
+                    FUNCTION_URI: function_uri,
+                    MODEL: versioned_model,
+                    MODEL_CLASS: model_class,
+                    TIMESTAMP: timestamp,
+                    ENDPOINT_ID: endpoint_id,
+                    REQUEST_ID: request_id,
+                    LATENCY: latency,
+                    FEATURES: feature,
+                    PREDICTION: prediction,
+                    FIRST_REQUEST: self.first_request[endpoint_id],
+                    LAST_REQUEST: self.last_request[endpoint_id],
+                    ERROR_COUNT: self.error_count[endpoint_id],
+                    LABELS: event.get(LABELS, {}),
+                    METRICS: event.get(METRICS, {}),
+                    ENTITIES: event.get("request", {}).get(ENTITIES, {}),
+                    UNPACKED_LABELS: {
+                        f"_{k}": v for k, v in event.get(LABELS, {}).items()
+                    },
+                }
+            )
+        return events
 
     def resume_state(self, endpoint_id):
         # Make sure process is resumable, if process fails for any reason, be able to pick things up close to where we
@@ -433,11 +444,11 @@ class ProcessEndpointEvent(MapClass):
                     self.error_count[endpoint_id] = error_count
             self.endpoints.add(endpoint_id)
 
-    def is_valid_or_count(self, field: str, dict_path: List[str]):
-        if not is_valid_input(field, dict_path):
-            self.error_count += 1
-            return False
-        return True
+    def is_valid(self, validation_function, field: Any, dict_path: List[str]):
+        if validation_function(field, dict_path):
+            return True
+        self.error_count += 1
+        return False
 
     def handle_errors(self, endpoint_id, event) -> bool:
         if "error" in event:
@@ -450,11 +461,11 @@ class ProcessEndpointEvent(MapClass):
 def enrich_even_details(event) -> Optional[dict]:
     function_uri = event.get(FUNCTION_URI)
 
-    if not is_valid_input(function_uri, [FUNCTION_URI]):
+    if not is_not_none(function_uri, [FUNCTION_URI]):
         return None
 
     model = event.get(MODEL)
-    if not is_valid_input(model, [MODEL]):
+    if not is_not_none(model, [MODEL]):
         return None
 
     version = event.get(VERSION)
@@ -472,25 +483,24 @@ def enrich_even_details(event) -> Optional[dict]:
     return event
 
 
-def is_valid_input(field, dict_path: List[str]):
-    if field is None:
-        logger.error(
-            f"Expected event field is missing: {field} [Event -> {''.join(dict_path)}]"
-        )
-        return False
-    return True
+def is_not_none(field: Any, dict_path: List[str]):
+    if field is not None:
+        return True
+    logger.error(
+        f"Expected event field is missing: {field} [Event -> {''.join(dict_path)}]"
+    )
+    return False
 
 
-class FlattenPredictions(FlatMap):
-    def __init__(self, **kwargs):
-        super().__init__(fn=FlattenPredictions.flatten, **kwargs)
-
-    @staticmethod
-    def flatten(event: Dict):
-        predictions = []
-        for features, prediction in zip(event[FEATURES], event[PREDICTION]):
-            predictions.append(dict(event, features=features, prediction=prediction))
-        return predictions
+def is_list_of_numerics(
+    field: List[Union[int, float, dict, list]], dict_path: List[str]
+):
+    if all(isinstance(x, int) or isinstance(x, float) for x in field):
+        return True
+    logger.error(
+        f"Expected event field is missing: {field} [Event -> {''.join(dict_path)}]"
+    )
+    return False
 
 
 class FilterNotNone(Filter):
@@ -533,6 +543,7 @@ class MapFeatureNames(MapClass):
         self.kv_container = kv_container
         self.kv_path = kv_path
         self.feature_names = {}
+        self.label_columns = {}
 
     def do(self, event: Dict):
         endpoint_id = event[ENDPOINT_ID]
@@ -546,10 +557,13 @@ class MapFeatureNames(MapClass):
             feature_names = endpoint_record.get(FEATURE_NAMES)
             feature_names = json.loads(feature_names) if feature_names else None
 
+            label_columns = endpoint_record.get(LABEL_COLUMNS)
+            label_columns = json.loads(label_columns) if label_columns else None
+
             if not feature_names:
                 logger.warn(
-                    f"Seems like endpoint {event[ENDPOINT_ID]} was not registered, feature names will be "
-                    f"automatically generated"
+                    f"Feature names are not initialized, they will be automatically generated",
+                    endpoint_id=endpoint_id,
                 )
                 feature_names = [f"f{i}" for i, _ in enumerate(event[FEATURES])]
                 get_v3io_client().kv.update(
@@ -559,12 +573,34 @@ class MapFeatureNames(MapClass):
                     attributes={FEATURE_NAMES: json.dumps(feature_names)},
                 )
 
+            if not label_columns:
+                logger.warn(
+                    f"label column names are not initialized, they will be automatically generated",
+                    endpoint_id=endpoint_id,
+                )
+                label_columns = [
+                    f"prediction_{i}" for i, _ in enumerate(event[PREDICTION])
+                ]
+                get_v3io_client().kv.update(
+                    container=self.kv_container,
+                    table_path=self.kv_path,
+                    key=event[ENDPOINT_ID],
+                    attributes={LABEL_COLUMNS: json.dumps(label_columns)},
+                )
+
+            self.label_columns[endpoint_id] = label_columns
             self.feature_names[endpoint_id] = feature_names
 
         feature_names = self.feature_names[endpoint_id]
         features = event[FEATURES]
         event[NAMED_FEATURES] = {
             name: feature for name, feature in zip(feature_names, features)
+        }
+
+        label_columns = self.label_columns[endpoint_id]
+        prediction = event[PREDICTION]
+        event[NAMED_PREDICTIONS] = {
+            name: prediction for name, prediction in zip(label_columns, prediction)
         }
         return event
 

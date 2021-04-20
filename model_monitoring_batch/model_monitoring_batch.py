@@ -1,22 +1,19 @@
 import json
-from asyncio import get_event_loop
 from collections import defaultdict
 from dataclasses import dataclass
-from os import environ
 from pathlib import Path
 from typing import Optional, List, Dict
 
 import numpy as np
 import pandas as pd
-from mlrun.api.crud.model_endpoints import ModelEndpoints
-from mlrun.api.schemas import ModelEndpointList
+from mlrun import get_run_db
+from mlrun import store_manager
 from mlrun.data_types.infer import DFDataInfer, InferOptions
 from mlrun.run import MLClientCtx
 from mlrun.utils import logger, config
 from mlrun.utils.model_monitoring import parse_model_endpoint_store_prefix
 from mlrun.utils.v3io_clients import get_v3io_client
 from sklearn.preprocessing import KBinsDiscretizer
-from v3iofs import V3ioFS
 
 ISO_8061 = "%Y-%m-%d %H:%M:%S.%f"
 
@@ -99,7 +96,6 @@ class VirtualDrift:
         label_col: Optional[str] = None,
         feature_weights: Optional[List[float]] = None,
         inf_capping: Optional[float] = 10,
-        kld_zero_scaling: Optional[float] = 0.001,
     ):
         self.prediction_col = prediction_col
         self.label_col = label_col
@@ -112,9 +108,9 @@ class VirtualDrift:
             "kld": KullbackLeiblerDivergence,
         }
 
-    def yaml_to_histogram(self, histogram_yaml):
+    def dict_to_histogram(self, histogram_dict):
         histograms = {}
-        for feature, stats in histogram_yaml.items():
+        for feature, stats in histogram_dict.items():
             histograms[feature] = stats["hist"][0]
 
         # Get features value counts
@@ -140,12 +136,11 @@ class VirtualDrift:
             }
         return drift_measures
 
-    def compute_drift_from_histograms(self, base_histogram_yaml, latest_histogram_yaml):
-
-        # Process histogram yamls to Dataframe of the histograms
+    def compute_drift_from_histograms(self, feature_stats, current_stats):
+        # Process histogram dictionaries to Dataframe of the histograms
         # with Feature histogram as cols
-        base_histogram = self.yaml_to_histogram(base_histogram_yaml)
-        latest_histogram = self.yaml_to_histogram(latest_histogram_yaml)
+        base_histogram = self.dict_to_histogram(feature_stats)
+        latest_histogram = self.dict_to_histogram(current_stats)
 
         # Verify all the features exist between datasets
         base_features = set(base_histogram.columns)
@@ -229,73 +224,102 @@ class BatchProcessor:
 
         _, self.kv_container, self.kv_path = parse_model_endpoint_store_prefix(kv_path)
 
+        stream_path = config.model_endpoint_monitoring.store_prefixes.default.format(
+            project=self.project, kind="log_stream"
+        )
+
+        _, self.stream_container, self.stream_path = parse_model_endpoint_store_prefix(
+            stream_path
+        )
+
+        self.default_possible_drift_threshold = (
+            config.model_endpoint_monitoring.drift_thresholds.default.possible_drift
+        )
+        self.default_drift_detected_threshold = (
+            config.model_endpoint_monitoring.drift_thresholds.default.drift_detected
+        )
+
+        self.db = get_run_db()
+        self.v3io = get_v3io_client()
+
         logger.info("Initializing BatchProcessor", batch_path=self.parquet_path)
+
+    def post_init(self):
+        try:
+            self.v3io.stream.create(
+                container=self.stream_container, stream_path=self.stream_path
+            )
+        except Exception as e:
+            self.context.logger.error(
+                "Failed to initialize log stream",
+                container=self.stream_container,
+                stream_path=self.stream_path,
+                exc=e,
+            )
 
     def run(self):
 
-        fs = V3ioFS(v3io_api=config.v3io_api, v3io_access_key=config.v3io_access_key,)
-        loop = get_event_loop()
-
-        endpoints: ModelEndpointList = loop.run_until_complete(
-            ModelEndpoints.list_endpoints(
-                access_key=environ.get("V3IO_ACCESS_KEY"), project=self.project
-            )
-        )
+        try:
+            endpoints = self.db.list_endpoints(self.project)
+        except Exception as e:
+            self.context.logger.error("Failed to list endpoints", exc=e)
+            return
 
         active_endpoints = set()
         for endpoint in endpoints.endpoints:
             if endpoint.spec.active:
                 active_endpoints.add(endpoint.metadata.uid)
 
-        v3io = get_v3io_client()
+        store, _ = store_manager.get_or_create_store(self.parquet_path)
+        fs = store.get_filesystem(silent=False)
 
-        endpoint_key_dirs = fs.ls(self.parquet_path)
-        endpoint_key_dirs = [d["name"] for d in endpoint_key_dirs]
-
-        for endpoint_dir in endpoint_key_dirs:
+        for endpoint_dir in fs.ls(self.parquet_path):
             endpoint_id = endpoint_dir.split("=")[-1]
             if endpoint_id not in active_endpoints:
                 continue
 
             try:
-                last_year = self.get_last_created_dir(endpoint_dir, fs)
-                last_month = self.get_last_created_dir(last_year, fs)
-                last_day = self.get_last_created_dir(last_month, fs)
-                last_hour = self.get_last_created_dir(last_day, fs)
+                last_year = self.get_last_created_dir(fs, endpoint_dir)
+                last_month = self.get_last_created_dir(fs, last_year)
+                last_day = self.get_last_created_dir(fs, last_month)
+                last_hour = self.get_last_created_dir(fs, last_day)
 
                 parquet_files = fs.ls(last_hour)
                 last_parquet = sorted(parquet_files, key=lambda k: k["mtime"])[-1]
                 parquet_name = last_parquet["name"]
 
-                endpoint_record = v3io.kv.get(
-                    container=self.kv_container,
-                    table_path=self.kv_path,
-                    key=endpoint_id,
+                endpoint = self.db.get_endpoint(
+                    project=self.project, endpoint_id=endpoint_id
                 )
 
-                if not endpoint_record:
-                    self.context.logger.warning(
-                        "Failed to retrieve data", endpoint_id=endpoint_id
-                    )
-                    continue
+                current_stats = self.virtual_drift.parquet_to_stats(
+                    parquet_path=parquet_name
+                )
 
-                endpoint_record = endpoint_record.output.item
-
-                feature_stats = json.loads(endpoint_record["feature_stats"])
-
-                current_stats = self.virtual_drift.parquet_to_stats(parquet_name)
                 drift_result = self.virtual_drift.compute_drift_from_histograms(
-                    feature_stats, current_stats
+                    feature_stats=endpoint.status.feature_stats,
+                    current_stats=current_stats,
                 )
 
-                v3io.kv.update(
+                drift_status = self.check_for_drift(
+                    drift_result=drift_result, endpoint=endpoint
+                )
+
+                if drift_status == "POSSIBLE_DRIFT" or drift_status == "DRIFT_DETECTED":
+                    self.v3io.stream.put_records(
+                        container=self.stream_container,
+                        stream_path=self.stream_path,
+                        records=[{"drift_status": drift_status, **drift_result}],
+                    )
+
+                self.v3io.kv.update(
                     container=self.kv_container,
                     table_path=self.kv_path,
                     key=endpoint_id,
                     attributes={
                         "current_stats": json.dumps(current_stats),
                         "drift_measures": json.dumps(drift_result),
-                        "drift_status": "NO_DRIFT",
+                        "drift_status": drift_status,
                     },
                 )
 
@@ -306,18 +330,40 @@ class BatchProcessor:
                 )
             except Exception as e:
                 self.context.logger.warning(
-                    f"Virtual Drift failed for endpoint {endpoint_id}", exc=e
+                    f"Virtual Drift failed for endpoint", endpoint_id=endpoint_id, exc=e
                 )
 
-            pass
+    def check_for_drift(self, drift_result, endpoint):
+        tvd_mean = drift_result.get("tvd", {}).get("total_mean")
+        hellinger_mean = drift_result.get("hellinger", {}).get("total_mean")
+
+        drift_mean = 0.0
+        if tvd_mean and hellinger_mean:
+            drift_mean = (tvd_mean + hellinger_mean) / 2
+
+        possible_drift = endpoint.spec.monitor_configuration.get(
+            "possible_drift", self.default_possible_drift_threshold
+        )
+        drift_detected = endpoint.spec.monitor_configuration.get(
+            "possible_drift", self.default_drift_detected_threshold
+        )
+
+        drift_status = "NO_DRIFT"
+        if drift_mean >= drift_detected:
+            drift_status = "DRIFT_DETECTED"
+        elif drift_mean >= possible_drift:
+            drift_status = "POSSIBLE_DRIFT"
+
+        return drift_status
 
     @staticmethod
-    def get_last_created_dir(endpoint_dir, fs):
-        year_dirs = fs.ls(endpoint_dir)
-        year_dirs = [d["name"] for d in year_dirs]
-        last_year = sorted(year_dirs, key=lambda k: k.split("=")[-1])[-1]
-        return last_year
+    def get_last_created_dir(fs, endpoint_dir):
+        dirs = fs.ls(endpoint_dir)
+        last_dir = sorted(dirs, key=lambda k: k.split("=")[-1])[-1]
+        return last_dir
 
 
 def handler(context: MLClientCtx, project: str):
-    BatchProcessor(context, project).run()
+    batch_processor = BatchProcessor(context, project)
+    batch_processor.post_init()
+    batch_processor.run()

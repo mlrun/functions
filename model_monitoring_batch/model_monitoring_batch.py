@@ -1,7 +1,6 @@
 import json
 from collections import defaultdict
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Optional, List, Dict
 
 import numpy as np
@@ -12,10 +11,10 @@ from mlrun.data_types.infer import DFDataInfer, InferOptions
 from mlrun.run import MLClientCtx
 from mlrun.utils import logger, config
 from mlrun.utils.model_monitoring import parse_model_endpoint_store_prefix
-from mlrun.utils.v3io_clients import get_v3io_client
+from mlrun.utils.v3io_clients import get_v3io_client, get_frames_client
 from sklearn.preprocessing import KBinsDiscretizer
 
-ISO_8061 = "%Y-%m-%d %H:%M:%S.%f"
+TIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f%z"
 
 
 @dataclass
@@ -199,14 +198,6 @@ class VirtualDrift:
 
         return drift_result
 
-    @staticmethod
-    def parquet_to_stats(parquet_path: Path):
-        df = pd.read_parquet(parquet_path)
-        df = list(df["named_features"])
-        df = pd.DataFrame(df)
-        latest_stats = DFDataInfer.get_stats(df, InferOptions.Histogram)
-        return latest_stats
-
 
 class BatchProcessor:
     def __init__(self, context: MLClientCtx, project: str):
@@ -214,20 +205,20 @@ class BatchProcessor:
         self.project = project
         self.virtual_drift = VirtualDrift(inf_capping=10)
 
-        self.parquet_path = config.model_endpoint_monitoring.store_prefixes.default.format(
-            project=self.project, kind="parquet"
-        )
+        template = config.model_endpoint_monitoring.store_prefixes.default
 
-        kv_path = config.model_endpoint_monitoring.store_prefixes.default.format(
-            project=self.project, kind="endpoints"
-        )
+        self.parquet_path = template.format(project=self.project, kind="parquet")
 
+        kv_path = template.format(project=self.project, kind="endpoints")
         _, self.kv_container, self.kv_path = parse_model_endpoint_store_prefix(kv_path)
 
-        stream_path = config.model_endpoint_monitoring.store_prefixes.default.format(
-            project=self.project, kind="log_stream"
+        tsdb_path = template.format(project=project, kind="events")
+        _, self.tsdb_container, self.tsdb_path = parse_model_endpoint_store_prefix(
+            tsdb_path
         )
+        #         self.tsdb_path = f"{self.tsdb_container}/{self.tsdb_path}"
 
+        stream_path = template.format(project=self.project, kind="log_stream")
         _, self.stream_container, self.stream_path = parse_model_endpoint_store_prefix(
             stream_path
         )
@@ -241,28 +232,29 @@ class BatchProcessor:
 
         self.db = get_run_db()
         self.v3io = get_v3io_client()
+        self.frames = get_frames_client(container=self.tsdb_container)
 
-        logger.info("Initializing BatchProcessor", batch_path=self.parquet_path)
+        logger.info("Initializing BatchProcessor", parquet_path=self.parquet_path)
 
     def post_init(self):
         try:
             self.v3io.stream.create(
-                container=self.stream_container, stream_path=self.stream_path
-            )
-        except Exception as e:
-            self.context.logger.error(
-                "Failed to initialize log stream",
                 container=self.stream_container,
                 stream_path=self.stream_path,
-                exc=e,
+                shard_count=1,
             )
+        except Exception as e:
+            if "ResourceInUseException" in str(e):
+                logger.error("Stream already exsits...")
+            else:
+                raise e
 
     def run(self):
 
         try:
             endpoints = self.db.list_endpoints(self.project)
         except Exception as e:
-            self.context.logger.error("Failed to list endpoints", exc=e)
+            logger.error("Failed to list endpoints", exc=e)
             return
 
         active_endpoints = set()
@@ -270,11 +262,12 @@ class BatchProcessor:
             if endpoint.spec.active:
                 active_endpoints.add(endpoint.metadata.uid)
 
-        store, _ = store_manager.get_or_create_store(self.parquet_path)
+        store, sub = store_manager.get_or_create_store(self.parquet_path)
+        prefix = self.parquet_path.replace(sub, "")
         fs = store.get_filesystem(silent=False)
 
-        for endpoint_dir in fs.ls(self.parquet_path):
-            endpoint_id = endpoint_dir.split("=")[-1]
+        for endpoint_dir in fs.ls(sub):
+            endpoint_id = endpoint_dir["name"].split("=")[-1]
             if endpoint_id not in active_endpoints:
                 continue
 
@@ -284,16 +277,25 @@ class BatchProcessor:
                 last_day = self.get_last_created_dir(fs, last_month)
                 last_hour = self.get_last_created_dir(fs, last_day)
 
-                parquet_files = fs.ls(last_hour)
+                parquet_files = fs.ls(last_hour["name"])
                 last_parquet = sorted(parquet_files, key=lambda k: k["mtime"])[-1]
                 parquet_name = last_parquet["name"]
+                full_path = f"{prefix}{parquet_name}"
+
+                logger.info(f"Now processing {full_path}")
 
                 endpoint = self.db.get_endpoint(
                     project=self.project, endpoint_id=endpoint_id
                 )
 
-                current_stats = self.virtual_drift.parquet_to_stats(
-                    parquet_path=parquet_name
+                df = pd.read_parquet(full_path)
+                timestamp = df["timestamp"].iloc[-1]
+
+                named_features_df = list(df["named_features"])
+                named_features_df = pd.DataFrame(named_features_df)
+
+                current_stats = DFDataInfer.get_stats(
+                    df=named_features_df, options=InferOptions.Histogram
                 )
 
                 drift_result = self.virtual_drift.compute_drift_from_histograms(
@@ -301,8 +303,17 @@ class BatchProcessor:
                     current_stats=current_stats,
                 )
 
-                drift_status = self.check_for_drift(
+                logger.info("Drift result", drift_result=drift_result)
+
+                drift_status, drift_measure = self.check_for_drift(
                     drift_result=drift_result, endpoint=endpoint
+                )
+
+                logger.info(
+                    "Drift status",
+                    endpoint_id=endpoint_id,
+                    drift_status=drift_status,
+                    drift_measure=drift_measure,
                 )
 
                 if drift_status == "POSSIBLE_DRIFT" or drift_status == "DRIFT_DETECTED":
@@ -323,28 +334,41 @@ class BatchProcessor:
                     },
                 )
 
-                self.context.logger.info(
-                    "Done updating drift measures",
-                    endpoint_id=endpoint_id,
-                    file=parquet_name,
-                )
-            except Exception as e:
-                self.context.logger.warning(
-                    f"Virtual Drift failed for endpoint", endpoint_id=endpoint_id, exc=e
+                tsdb_drift_measures = {
+                    "endpoint_id": endpoint_id,
+                    "timestamp": pd.to_datetime(timestamp, format=TIME_FORMAT),
+                    "record_type": "drift_measures",
+                    "tvd_mean": drift_result["tvd_mean"],
+                    "kld_mean": drift_result["kld_mean"],
+                    "hellinger_mean": drift_result["hellinger_mean"],
+                }
+
+                self.frames.write(
+                    backend="tsdb",
+                    table=self.tsdb_path,
+                    dfs=pd.DataFrame.from_dict([tsdb_drift_measures]),
+                    index_cols=["timestamp", "endpoint_id", "record_type"],
                 )
 
+                logger.info(f"Done updating drift measures {full_path}")
+
+            except Exception as e:
+                logger.error(e)
+
     def check_for_drift(self, drift_result, endpoint):
-        tvd_mean = drift_result.get("tvd", {}).get("total_mean")
-        hellinger_mean = drift_result.get("hellinger", {}).get("total_mean")
+        tvd_mean = drift_result.get("tvd_mean")
+        hellinger_mean = drift_result.get("hellinger_mean")
 
         drift_mean = 0.0
         if tvd_mean and hellinger_mean:
             drift_mean = (tvd_mean + hellinger_mean) / 2
 
-        possible_drift = endpoint.spec.monitor_configuration.get(
+        monitor_configuration = endpoint.spec.monitor_configuration or {}
+
+        possible_drift = monitor_configuration.get(
             "possible_drift", self.default_possible_drift_threshold
         )
-        drift_detected = endpoint.spec.monitor_configuration.get(
+        drift_detected = monitor_configuration.get(
             "possible_drift", self.default_drift_detected_threshold
         )
 
@@ -354,16 +378,10 @@ class BatchProcessor:
         elif drift_mean >= possible_drift:
             drift_status = "POSSIBLE_DRIFT"
 
-        return drift_status
+        return drift_status, drift_mean
 
     @staticmethod
     def get_last_created_dir(fs, endpoint_dir):
-        dirs = fs.ls(endpoint_dir)
-        last_dir = sorted(dirs, key=lambda k: k.split("=")[-1])[-1]
+        dirs = fs.ls(endpoint_dir["name"])
+        last_dir = sorted(dirs, key=lambda k: k["name"].split("=")[-1])[-1]
         return last_dir
-
-
-def handler(context: MLClientCtx, project: str):
-    batch_processor = BatchProcessor(context, project)
-    batch_processor.post_init()
-    batch_processor.run()

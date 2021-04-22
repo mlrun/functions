@@ -25,7 +25,7 @@ from storey import (
     build_flow,
     WriteToParquet,
     Filter,
-    WriteToTSDB,
+    WriteToTSDB, FlatMap,
 )
 from storey.dtypes import SlidingWindows
 from storey.steps import SampleWindow, Flatten
@@ -141,7 +141,7 @@ class EventStreamProcessor:
                 Source(),
                 ProcessEndpointEvent(self.kv_container, self.kv_path),
                 FilterNotNone(),
-                Flatten(),
+                FlatMap(lambda x: x),
                 MapFeatureNames(self.kv_container, self.kv_path),
                 # Branch 1: Aggregate events, count averages and update TSDB and KV
                 [
@@ -394,6 +394,8 @@ class ProcessEndpointEvent(MapClass):
         if not self.is_valid(is_not_none, predictions, ["resp", "outputs"]):
             return None
 
+        unpacked_labels = {f"_{k}": v for k, v in event.get(LABELS, {}).items()}
+
         # Separate each model invocation into sub events
         events = []
         for i, (feature, prediction) in enumerate(zip(features, predictions)):
@@ -401,6 +403,10 @@ class ProcessEndpointEvent(MapClass):
                 is_list_of_numerics, feature, ["request", "inputs", f"[{i}]"]
             ):
                 return None
+
+            if not isinstance(prediction, list):
+                prediction = [prediction]
+
             events.append(
                 {
                     FUNCTION_URI: function_uri,
@@ -418,9 +424,7 @@ class ProcessEndpointEvent(MapClass):
                     LABELS: event.get(LABELS, {}),
                     METRICS: event.get(METRICS, {}),
                     ENTITIES: event.get("request", {}).get(ENTITIES, {}),
-                    UNPACKED_LABELS: {
-                        f"_{k}": v for k, v in event.get(LABELS, {}).items()
-                    },
+                    UNPACKED_LABELS: unpacked_labels,
                 }
             )
         return events
@@ -579,7 +583,7 @@ class MapFeatureNames(MapClass):
                     endpoint_id=endpoint_id,
                 )
                 label_columns = [
-                    f"prediction_{i}" for i, _ in enumerate(event[PREDICTION])
+                    f"p{i}" for i, _ in enumerate(event[PREDICTION])
                 ]
                 get_v3io_client().kv.update(
                     container=self.kv_container,

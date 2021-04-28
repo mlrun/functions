@@ -1,0 +1,87 @@
+kind: serving
+metadata:
+  name: v2-model-server
+  tag: ''
+  hash: 4fbb642d560a8410e4a096979da51fa5f1c75099
+  project: default
+  labels:
+    author: yaronh
+    framework: sklearn
+  categories:
+  - serving
+  - ml
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  entry_points:
+    load:
+      name: load
+      doc: load and initialize the model and/or other elements
+      parameters:
+      - name: self
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 13
+    predict:
+      name: predict
+      doc: Generate model predictions from sample.
+      parameters:
+      - name: self
+        default: ''
+      - name: body
+        type: dict
+        default: ''
+      outputs:
+      - default: ''
+        type: List
+      lineno: 18
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 33
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: event
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 36
+  description: generic sklearn model server
+  min_replicas: 1
+  max_replicas: 4
+  env: []
+  base_spec:
+    apiVersion: nuclio.io/v1
+    kind: Function
+    metadata:
+      name: v2-model-server
+      labels: {}
+      annotations:
+        nuclio.io/generated_by: function generated from v2_model_server.py
+    spec:
+      runtime: python:3.6
+      handler: v2_model_server:handler
+      env: []
+      volumes: []
+      build:
+        commands: []
+        noBaseImagesPull: true
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG1scnVuCgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CmltcG9ydCBudW1weSBhcyBucAoKaW1wb3J0IHdhcm5pbmdzIAp3YXJuaW5ncy5maWx0ZXJ3YXJuaW5ncygnaWdub3JlJykKCmNsYXNzIENsYXNzaWZpZXJNb2RlbChtbHJ1bi5zZXJ2aW5nLlYyTW9kZWxTZXJ2ZXIpOgogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgIiIibG9hZCBhbmQgaW5pdGlhbGl6ZSB0aGUgbW9kZWwgYW5kL29yIG90aGVyIGVsZW1lbnRzIiIiCiAgICAgICAgbW9kZWxfZmlsZSwgZXh0cmFfZGF0YSA9IHNlbGYuZ2V0X21vZGVsKCcucGtsJykKICAgICAgICBzZWxmLm1vZGVsID0gbG9hZChvcGVuKG1vZGVsX2ZpbGUsICdyYicpKQoKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGJvZHk6IGRpY3QpIC0+IExpc3Q6CiAgICAgICAgIiIiR2VuZXJhdGUgbW9kZWwgcHJlZGljdGlvbnMgZnJvbSBzYW1wbGUuIiIiCiAgICAgICAgZmVhdHMgPSBucC5hc2FycmF5KGJvZHlbJ2lucHV0cyddKQogICAgICAgIHJlc3VsdDogbnAubmRhcnJheSA9IHNlbGYubW9kZWwucHJlZGljdChmZWF0cykKICAgICAgICByZXR1cm4gcmVzdWx0LnRvbGlzdCgpCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nX3YyJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCgpmcm9tIG1scnVuLnJ1bnRpbWVzIGltcG9ydCBudWNsaW9faW5pdF9ob29rCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBudWNsaW9faW5pdF9ob29rKGNvbnRleHQsIGdsb2JhbHMoKSwgJ3NlcnZpbmdfdjInKQoKZGVmIGhhbmRsZXIoY29udGV4dCwgZXZlbnQpOgogICAgcmV0dXJuIGNvbnRleHQubWxydW5faGFuZGxlcihjb250ZXh0LCBldmVudCkK
+  source: ''
+  function_kind: serving_v2
+  default_class: ClassifierModel
+  build:
+    commands: []
+    code_origin: https://github.com/mlrun/functions.git#3d819d3a8e2fb3bcaa2eb2485809b25a85d75dc7:v2_model_server.py
+verbose: false

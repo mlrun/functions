@@ -3,6 +3,7 @@
 import mlrun
 
 import warnings
+
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import os
@@ -24,6 +25,7 @@ from typing import List
 
 pd.set_option("display.float_format", lambda x: "%.2f" % x)
 
+
 def summarize(
     context,
     dask_key: str = "dask_key",
@@ -36,7 +38,7 @@ def summarize(
     dask_client=None,
 ) -> None:
     """Summarize a table
-    
+
     Connects to dask client through the function context, or through an optional
     user-supplied scheduler.
 
@@ -54,40 +56,46 @@ def summarize(
     elif dask_client:
         client = dask_client
     else:
-        raise ValueError('dask client was not provided')
-        
+        raise ValueError("dask client was not provided")
+
     if dask_key in client.datasets:
         table = client.get_dataset(dask_key)
     elif dataset:
         table = dataset.as_df(df_module=dd)
     else:
-        context.logger.info(f"only these datasets are available {client.datasets} in client {client}")
+        context.logger.info(
+            f"only these datasets are available {client.datasets} in client {client}"
+        )
         raise Exception("dataset not found on dask cluster")
     header = table.columns.values
-    
+
     gcf_clear(plt)
     table = table.compute()
-    snsplt = sns.pairplot(table, hue=label_column, diag_kws={'bw': 1.5})
-    context.log_artifact(PlotArtifact('histograms',  body=plt.gcf()), 
-                         local_path=f"{plots_dest}/hist.html")
+    snsplt = sns.pairplot(table, hue=label_column, diag_kws={"bw": 1.5})
+    context.log_artifact(
+        PlotArtifact("histograms", body=plt.gcf()), local_path=f"{plots_dest}/hist.html"
+    )
 
-    gcf_clear(plt)   
+    gcf_clear(plt)
     labels = table.pop(label_column)
     if not class_labels:
         class_labels = labels.unique()
     class_balance_model = ClassBalance(labels=class_labels)
-    class_balance_model.fit(labels)   
-    scale_pos_weight = class_balance_model.support_[0]/class_balance_model.support_[1]
+    class_balance_model.fit(labels)
+    scale_pos_weight = class_balance_model.support_[0] / class_balance_model.support_[1]
     context.log_result("scale_pos_weight", f"{scale_pos_weight:0.2f}")
-    context.log_artifact(PlotArtifact("imbalance", body=plt.gcf()), 
-                         local_path=f"{plots_dest}/imbalance.html")
-    
+    context.log_artifact(
+        PlotArtifact("imbalance", body=plt.gcf()),
+        local_path=f"{plots_dest}/imbalance.html",
+    )
+
     gcf_clear(plt)
     tblcorr = table.corr()
     ax = plt.axes()
     sns.heatmap(tblcorr, ax=ax, annot=False, cmap=plt.cm.Reds)
     ax.set_title("features correlation")
-    context.log_artifact(PlotArtifact("correlation",  body=plt.gcf()), 
-                         local_path=f"{plots_dest}/corr.html")
+    context.log_artifact(
+        PlotArtifact("correlation", body=plt.gcf()),
+        local_path=f"{plots_dest}/corr.html",
+    )
     gcf_clear(plt)
-

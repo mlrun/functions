@@ -216,11 +216,21 @@ class BatchProcessor:
         _, self.tsdb_container, self.tsdb_path = parse_model_endpoint_store_prefix(
             tsdb_path
         )
-        #         self.tsdb_path = f"{self.tsdb_container}/{self.tsdb_path}"
 
         stream_path = template.format(project=self.project, kind="log_stream")
         _, self.stream_container, self.stream_path = parse_model_endpoint_store_prefix(
             stream_path
+        )
+
+        logger.info(
+            "Initializing BatchProcessor",
+            parquet_path=self.parquet_path,
+            kv_container=self.kv_container,
+            kv_path=self.kv_path,
+            tsdb_container=self.tsdb_container,
+            tsdb_path=self.tsdb_path,
+            stream_container=self.stream_container,
+            stream_path=self.stream_path,
         )
 
         self.default_possible_drift_threshold = (
@@ -232,9 +242,9 @@ class BatchProcessor:
 
         self.db = get_run_db()
         self.v3io = get_v3io_client()
-        self.frames = get_frames_client(container=self.tsdb_container)
-
-        logger.info("Initializing BatchProcessor", parquet_path=self.parquet_path)
+        self.frames = get_frames_client(
+            address=config.v3io_framesd, container=self.tsdb_container
+        )
 
     def post_init(self):
         try:
@@ -385,3 +395,9 @@ class BatchProcessor:
         dirs = fs.ls(endpoint_dir["name"])
         last_dir = sorted(dirs, key=lambda k: k["name"].split("=")[-1])[-1]
         return last_dir
+
+
+def handler(context: MLClientCtx, project: str):
+    batch_processor = BatchProcessor(context, project)
+    batch_processor.post_init()
+    batch_processor.run()

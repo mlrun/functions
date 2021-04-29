@@ -25,10 +25,11 @@ from storey import (
     build_flow,
     WriteToParquet,
     Filter,
-    WriteToTSDB, FlatMap,
+    WriteToTSDB,
+    FlatMap,
 )
 from storey.dtypes import SlidingWindows
-from storey.steps import SampleWindow, Flatten
+from storey.steps import SampleWindow
 
 # Constants
 ISO_8061_UTC = "%Y-%m-%d %H:%M:%S.%f%z"
@@ -96,7 +97,7 @@ class EventStreamProcessor:
         self.aggregate_avg_windows = aggregate_avg_windows or ["5m", "1h"]
         self.aggregate_avg_period = aggregate_avg_period
         self.v3io_access_key = v3io_access_key or environ.get("V3IO_ACCESS_KEY")
-        self.v3io_framesd = v3io_framesd or environ.get("V3IO_FRAMESD")
+        self.v3io_framesd = v3io_framesd or config.v3io_framesd
 
         template = config.model_endpoint_monitoring.store_prefixes.default
 
@@ -246,6 +247,7 @@ class EventStreamProcessor:
                     Map(self.process_before_parquet),
                     WriteToParquet(
                         path=self.parquet_path,
+                        partition_cols=["$key", "$year", "$month", "$day", "$hour"],
                         infer_columns_from_data=True,
                         # Settings for _Batching
                         max_events=self.parquet_batching_max_events,
@@ -582,9 +584,7 @@ class MapFeatureNames(MapClass):
                     f"label column names are not initialized, they will be automatically generated",
                     endpoint_id=endpoint_id,
                 )
-                label_columns = [
-                    f"p{i}" for i, _ in enumerate(event[PREDICTION])
-                ]
+                label_columns = [f"p{i}" for i, _ in enumerate(event[PREDICTION])]
                 get_v3io_client().kv.update(
                     container=self.kv_container,
                     table_path=self.kv_path,

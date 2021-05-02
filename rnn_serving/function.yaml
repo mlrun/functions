@@ -1,0 +1,55 @@
+kind: remote
+metadata:
+  name: rnn-serving
+  hash: 634dcee1dbc3be80dcadf9755ac1fcf6d52c438e
+  project: default
+  labels:
+    author: Daniel
+    framework: tensorflow, keras
+  categories:
+  - RNN
+  - Stocks
+  - Predictions
+spec:
+  command: ''
+  args: []
+  image: ''
+  description: RNN based stock prediction
+  min_replicas: 1
+  max_replicas: 1
+  env:
+  - name: MODEL_CLASS
+    value: RNN_Model_Serving
+  config:
+    spec.triggers.http:
+      kind: http
+      maxWorkers: 8
+      attributes:
+        ingresses: {}
+      annotations: {}
+  base_spec:
+    apiVersion: nuclio.io/v1
+    kind: serving
+    metadata:
+      annotations:
+        nuclio.io/generated_by: function generated from /User/test/demos/stock-analysis/code/08-stock-price-prediction-model-serving.ipynb
+      labels: {}
+      name: rnn-serving
+    spec:
+      build:
+        baseImage: mlrun/mlrun
+        commands:
+        - python -m pip install torch==1.6.0
+        - python -m pip install tensorflow
+        - python -m pip install keras
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHBhbmRhcyBhcyBwZApmcm9tIG1scnVuIGltcG9ydCBNTENsaWVudEN0eAppbXBvcnQgb3MKaW1wb3J0IG1scnVuCmltcG9ydCBudW1weSBhcyBucAppbXBvcnQga2VyYXMKaW1wb3J0IGpzb24KCmNsYXNzIFJOTl9Nb2RlbF9TZXJ2aW5nKG1scnVuLnNlcnZpbmcuVjJNb2RlbFNlcnZlcik6CiAgICBkZWYgX19pbml0X18oc2VsZixuYW1lOnN0ciwgbW9kZWxfZGlyOnN0cik6CiAgICAgICAgc2VsZi5tb2RlbF9kaXIgPSBtb2RlbF9kaXIKICAgICAgICBzdXBlcigpLl9faW5pdF9fKG5hbWUsIG1vZGVsX2RpcikKICAgICAgICAKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgICIiImxvYWQgYW5kIGluaXRpYWxpemUgdGhlIG1vZGVsIGFuZC9vciBvdGhlciBlbGVtZW50cyIiIgogICAgICAgIG1vZGVsX2ZpbGUsZXh0cmFfZGF0YSA9IHNlbGYuZ2V0X21vZGVsKHN1ZmZpeCA9ICIuaDUiKQogICAgICAgIHNlbGYubW9kZWwgPSBrZXJhcy5tb2RlbHMubG9hZF9tb2RlbChtb2RlbF9maWxlKQogICAgICAgIAogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keSk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICAiIiJHZW5lcmF0ZSBtb2RlbCBwcmVkaWN0aW9ucyBmcm9tIHNhbXBsZS4iIiIKICAgICAgICAgICAgZmVhdHMgPSBucC5hc2FycmF5KGJvZHlbJ2lucHV0cyddKQogICAgICAgICAgICByZXN1bHQgPSBzZWxmLm1vZGVsLnByZWRpY3QoZmVhdHMpCiAgICAgICAgICAgIHJlc3VsdCA9IGpzb24uZHVtcHMocmVzdWx0LnRvbGlzdCgpKQogICAgICAgICAgICByZXR1cm4gcmVzdWx0CiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oIkZhaWxlZCB0byBwcmVkaWN0ICVzIiAlIGUpCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
+        noBaseImagesPull: true
+      env: []
+      handler: 08-stock-price-prediction-model-serving:handler
+      runtime: python:3.6
+      volumes: []
+  source: ''
+  function_kind: serving
+  build:
+    commands: []
+verbose: false

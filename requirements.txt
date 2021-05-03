@@ -2,3 +2,4 @@ mlrun
 pipenv
 pytest
 wget
+pygit2

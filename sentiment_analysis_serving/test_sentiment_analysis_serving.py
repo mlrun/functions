@@ -1,7 +1,6 @@
 import os
 import wget
-from build import handler
-from mlrun import import_function, code_to_function
+from mlrun import import_function
 import os.path
 from os import path
 import mlrun
@@ -20,10 +19,6 @@ def download_pretrained_model(path):
     os.makedirs(saved_models_directory, exist_ok=1)
     model_filepath = os.path.join(saved_models_directory, os.path.basename(model_location))
     wget.download(model_location, model_filepath)
-
-
-def test_build():
-    handler()
 
 
 def test_local_sentiment_analysis_serving():

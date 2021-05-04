@@ -2,7 +2,7 @@ apiVersion: v1
 categories: []         # List of category names
 description: ''        # Short description
 doc: ''                # Path to README.md if exists
-example: ''            # Path to notebook
+example: ''            # Path to examole notebook
 generationDate: ''     # Automatically generated ISO8086 datetime
 icon: ''               # Path to icon file
 labels: {}             # Key values label pairs

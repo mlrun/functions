@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Callable
+from typing import Optional, Callable, Union
 
 
 class PathIterator:
@@ -13,19 +13,24 @@ class PathIterator:
 
     def __init__(
         self,
-        root: str,
+        root: Union[str, Path],
         rule: Optional[Callable[[Path], bool]] = None,
         recursive: bool = False,
         absolute: bool = True,
+        as_path: bool = False,
     ) -> None:
         self.root = Path(root)
         self.absolute = absolute
         self.rule = rule or (lambda _: True)
         self.recursive = recursive
+        self.as_path = as_path
 
     def __iter__(self):
         iterator = self.root.rglob("*") if self.recursive else self.root.iterdir()
         for path in iterator:
             if self.rule(path):
-                path = str(path.resolve()) if self.absolute else str(path)
-                yield path
+                path = path.resolve() if self.absolute else path
+                if self.as_path:
+                    yield path
+                else:
+                    yield str(path)

@@ -1,11 +1,31 @@
 import subprocess
-from optparse import OptionParser
 from pathlib import Path
 from typing import List
 
+import click
 import yaml
 
-from path_iterator import PathIterator
+from common.helpers import is_item_dir
+from common.path_iterator import PathIterator
+
+
+@click.command()
+@click.option("-r", "--root-directory", default=".", help="Path to root directory")
+@click.option("-s", "--suite", help="Type of suite to run [py/ipynb/examples]")
+def test_suite(root_directory: str, suite: str):
+    if not suite:
+        click.echo("-s/--suite is required")
+        exit(1)
+
+    if suite == "py":
+        test_py(root_directory, clean=True)
+    elif suite == "ipynb":
+        test_ipynb(root_directory)
+    elif suite == "examples":
+        test_example(root_directory)
+    else:
+        click.echo(f"Suite {suite} is unsupported")
+        exit(1)
 
 
 def test_py(root_dir=".", clean=False):
@@ -93,10 +113,6 @@ def clean(root_dir="."):
         clean_pipenv(directory)
 
 
-def is_item_dir(path: Path) -> bool:
-    return path.is_dir() and (path / "item.yaml").exists()
-
-
 def is_test_notebook(path: Path) -> bool:
     return (
         path.is_file() and path.name.startswith("test") and path.name.endswith(".ipynb")
@@ -178,22 +194,4 @@ def get_item_yaml_requirements(directory: str):
 
 
 if __name__ == "__main__":
-    parser = OptionParser()
-    parser.add_option("-r", "--root-directory", help="Path to root directory")
-    parser.add_option("-s", "--suite", help="Type of suite to run [py/ipynb/examples]")
-    options, args = parser.parse_args()
-
-    root_directory = options.root_directory or "."
-    suite = options.suite
-
-    if not suite:
-        parser.error("-s/--suite is required")
-
-    if suite == "py":
-        test_py(root_directory, clean=True)
-    elif suite == "ipynb":
-        test_ipynb(root_directory)
-    elif suite == "examples":
-        test_example(root_directory)
-    else:
-        ValueError(f"Suite {suite} is unsupported")
+    test_suite()

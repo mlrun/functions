@@ -44,6 +44,17 @@ def build_docs(source_dir: str, target_dir: str):
 
     build_catalog_json(target_dir)
 
+    write_change_log(target_dir / "README.md", change_log)
+
+
+def write_change_log(readme: Path, change_log: ChangeLog):
+    content = open(readme, "r").read()
+    with open(readme, "w") as f:
+        if change_log.changes_available:
+            compiled_change_log = change_log.compile()
+            f.write(compiled_change_log)
+        f.write(content)
+
 
 def copy_static_resources(target_dir, temp_docs):
     target_static = target_dir / "_static"

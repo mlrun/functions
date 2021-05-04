@@ -1,0 +1,57 @@
+name: Marketplace generator
+
+on:
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build-marketplace:
+    name: Build marketplace
+    runs-on: ubuntu-latest
+
+    steps:
+      # Source
+      - name: Checkout current repo
+        uses: actions/checkout@v2
+        with:
+          path: functions
+      # Target
+      - name: Checkout Marketplace
+        uses: actions/checkout@v2
+        with:
+          repository: https://github.com/mlrun/functions-marketplace.git
+          path: functions-marketplace
+      # Log git directories
+      - name: Show information about directories
+        run: |
+          echo "Listing functions..."
+          ll functions
+          echo "Listing marketplace..."
+          ll functions-marketplace
+      # Install python
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      # Install tool dependencies
+      - name: Install Collagen's requirements.txt
+        uses: py-actions/py-dependency-install@v2
+        with:
+          update-pip: "true"
+          path: "functions/requirements.txt"
+      # Execute build-docs
+      - name: Build marketplace docs
+        run: |
+          python functions/functions.py build-docs -s ./functions -t ./functions-marketplace
+      # Create branch
+      - name: Publish marketplace release
+        env:
+          GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN }}
+        run: |
+          cd functions-marketplace
+          git config user.name "github-ci"
+          branch_name = marketplace-doc-gen-$(git rev-parse --short "$GITHUB_SHA")
+          git checkout -b $branch_name
+          git add -A && git commit -m "Doc build"
+          git push --set-upstream origin $branch_name

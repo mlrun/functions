@@ -16,14 +16,26 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install Python dependencies
-      uses: py-actions/py-dependency-install@v2
-
-    - name: Extract git branch
-      id: git_info
-      run: |
-        echo "::set-output name=branch::$(echo ${GITHUB_BASE_REF#refs/heads/})"
-
-    - name: Run python tests
-      run: make test-py
+      # Source
+      - name: Checkout current repo
+        uses: actions/checkout@v2
+        with:
+          path: functions
+      # Install python
+      - name: Install python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+      # Install dependencies
+      - name: Install requirements.txt
+        uses: py-actions/py-dependency-install@v2
+        with:
+          update-pip: "true"
+          path: "functions/requirements.txt"
+      # Run tests
+      - name: Run python tests
+        run: |
+          python functions/functions.py test-suite -r ./functions -s py
+      - name: Run ipynb tests
+          run: |
+            python functions/functions.py test-suite -r ./functions -s ipynb

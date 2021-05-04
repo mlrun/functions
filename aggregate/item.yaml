@@ -19,6 +19,6 @@ spec:
   handler: aggregate
   image: mlrun/ml-models
   kind: job
-  requirements: []
+  requirements: ['mlrun','pandas']
 url: ''
 version: 0.0.1

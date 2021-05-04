@@ -23,6 +23,6 @@ spec:
   handler: handler
   image: mlrun/ml-model
   kind: serving
-  requirements:
+  requirements: ['mlrun','transformers','torch']
 url: ''
 version: 0.0.1

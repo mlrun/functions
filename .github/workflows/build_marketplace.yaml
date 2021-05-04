@@ -1,7 +1,8 @@
 name: Marketplace generator
 
 on:
-  pull_request:
+  # Run CI also on push to master
+  push:
     branches:
     - master
 

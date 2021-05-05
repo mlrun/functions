@@ -41,7 +41,7 @@ jobs:
           python functions/functions.py build-docs -s ./functions -t ./marketplace -c $CHANNEL
       - name: Publish marketplace release
         env:
-          GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V2 }}
           USERNAME: Michaelliv
           REPO_PATH: marketplace
           BASE_REPO: mlrun

@@ -1,4 +1,4 @@
-name: Marketplace generator
+name: Marketplace Generator
 
 on:
   # Run CI also on push to master
@@ -13,6 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Extract branch and timestamp
+        shell: bash
+        id: push_info
+        run: |
+          echo "##[set-output name=branch_name;]$(echo ${GITHUB_REF#refs/heads/})"
+          echo "##[set-output name=time_stamp;]$(echo ${GITHUB_REF#refs/heads/})"
       - name: Checkout current repo
         uses: actions/checkout@v2
         with:
@@ -22,10 +28,6 @@ jobs:
         with:
           repository: mlrun/marketplace
           path: marketplace
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
       - name: Install python
         uses: actions/setup-python@v2
         with:
@@ -37,14 +39,15 @@ jobs:
           path: "functions/requirements.txt"
       - name: Build marketplace docs
         run: |
-          python functions/functions.py build-docs -s ./functions -t ./marketplace -c ${{ steps.extract_branch.outputs.branch }}
+          python functions/functions.py build-docs -s ./functions -t ./marketplace -c ${{ steps.push_info.outputs.branch_name }}
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN }}
         run: |
           cd marketplace
           git config user.name "github-ci"
-          branch_name = marketplace-doc-gen-$(git rev-parse --short "$GITHUB_SHA")
-          git checkout -b $branch_name
-          git add -A && git commit -m "Doc build"
-          git push --set-upstream origin $branch_name
+          branch='marketplace-doc-gen-${{ steps.push_info.outputs.branch_name }}-${{ steps.push_info.outputs.time_stamp }}'
+          echo $branch
+          git checkout -b $branch
+          git add -A && git commit -m "Automated build"
+          git push --set-upstream origin $branch

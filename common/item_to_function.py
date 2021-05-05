@@ -56,7 +56,7 @@ def item_to_function(item_path: str, output_path: Optional[str] = None):
     if not output_path.parent.exists():
         output_path.mkdir()
 
-    function_object.export(target=output_path.absolute())
+    function_object.export(target=str(output_path.resolve()))
 
 
 if __name__ == "__main__":

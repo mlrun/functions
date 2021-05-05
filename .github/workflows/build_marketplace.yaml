@@ -1,7 +1,6 @@
 name: Marketplace Generator
 
 on:
-  # Run CI also on push to master
   push:
     branches:
       - development

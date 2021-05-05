@@ -42,7 +42,7 @@ def item_to_function(item_path: str, output_path: Optional[str] = None):
         description=item_yaml.get("description", ""),
         requirements=item_yaml.get("spec", {}).get("requirements"),
         categories=item_yaml.get("categories", []),
-        labels=item_yaml.get("labels", {}),
+        labels=item_yaml.get("labels", {})
     )
 
     if output_path is None:

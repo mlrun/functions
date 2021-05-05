@@ -13,7 +13,6 @@
 
 import re
 import sys
-import sphinx_rtd_theme  # noqa
 
 sys.path.insert(0, "{{sphinx_docs_target}}")
 
@@ -42,7 +41,6 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
-    "sphinx_copybutton",
     "sphinx_togglebutton",
 ]
 

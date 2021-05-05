@@ -5,23 +5,16 @@ from typing import Optional
 import click
 from mlrun import code_to_function
 from yaml import full_load
-import os
 
 
 @click.command()
-@click.option("-i", "--item_path", help="Path to item.yaml file")
-@click.option("-o", "--output_path", help="Output path for function.yaml")
-def item_to_function(item_path: str = ".", output_path: Optional[str] = None):
+@click.option(
+    "-i", "--item-path", help="Path to item.yaml file or a directory containing one"
+)
+@click.option("-o", "--output-path", help="Path to code_to_function output")
+def item_to_function(item_path: str, output_path: Optional[str] = None):
+    item_path = Path(item_path)
 
-    parser = OptionParser()
-    parser.add_option("-i", "--item_path", help="Path to item.yaml file")
-    parser.add_option("-o", "--output_path", help="Output path for function.yaml")
-    parser.parse_args()
-    #item_to_function(item_path=options.item_path, output_path=options.output_path)
-
-    #item_path = Path(item_path)
-    cwd = os.getcwd()
-    item_path = Path(os.path.join(cwd, item_path))
     if item_path.is_dir():
         if (item_path / "item.yaml").exists():
             item_path = item_path / "item.yaml"
@@ -33,6 +26,7 @@ def item_to_function(item_path: str = ".", output_path: Optional[str] = None):
     item_yaml = full_load(open(item_path, "r"))
 
     filename = item_yaml.get("spec", {}).get("filename")
+
     code_output = ""
     if filename.endswith(".ipynb"):
         code_output = Path(filename)
@@ -54,7 +48,7 @@ def item_to_function(item_path: str = ".", output_path: Optional[str] = None):
     if output_path is None:
         return function_object
 
-    output_path = Path(os.path.join(cwd, output_path))
+    output_path = Path(output_path)
 
     if output_path.is_dir():
         output_path = output_path / "function.yaml"
@@ -62,7 +56,7 @@ def item_to_function(item_path: str = ".", output_path: Optional[str] = None):
     if not output_path.parent.exists():
         output_path.mkdir()
 
-    function_object.export(target=str(output_path.absolute()))
+    function_object.export(target=str(output_path.resolve()))
 
 
 if __name__ == "__main__":

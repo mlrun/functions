@@ -1,7 +1,6 @@
 import json
 import shutil
 import uuid
-from os import environ
 from pathlib import Path
 from typing import Union
 
@@ -17,16 +16,23 @@ from common.path_iterator import PathIterator
 
 
 @click.command()
-@click.option("-s", "--source-dir", help="Directory path to the marketplace source")
-@click.option("-t", "--target-dir", help="Directory path to output marketplace")
-def build_docs(source_dir: str, target_dir: str):
-    root_base = f"/tmp/{uuid.uuid4().hex}"
+@click.option("-s", "--source-dir", help="Path to the source directory")
+@click.option("-t", "--target-dir", help="Path to output directory")
+@click.option(
+    "-T", "--temp-dir", default="/tmp", help="Path to intermediate build directory"
+)
+@click.option("-c", "--channel", default="master", help="Name of build channel")
+def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
+    root_base = Path(temp_dir) / uuid.uuid4().hex
+    temp_root = root_base / "functions"
+    temp_docs = root_base / "docs"
+    target_dir = Path(target_dir)
+    target_channel = target_dir / channel
 
-    temp_root = Path(environ.get("TEMP_PROJECT_ROOT", f"{root_base}/functions"))
     temp_root.mkdir(parents=True)
-
-    temp_docs = Path(environ.get("TEMP_DOCS_ROOT", f"{root_base}/docs"))
     temp_docs.mkdir(parents=True)
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target_channel.mkdir(parents=True, exist_ok=True)
 
     click.echo(f"Temporary working directory: {root_base}")
 
@@ -35,19 +41,17 @@ def build_docs(source_dir: str, target_dir: str):
     patch_temp_docs(source_dir, temp_docs, temp_root)
     render_html_files(temp_docs)
 
-    target_dir = Path(target_dir)
-
     change_log = ChangeLog()
-
-    patch_item_html_source(change_log, source_dir, target_dir, temp_docs)
     copy_static_resources(target_dir, temp_docs)
 
-    build_catalog_json(target_dir)
+    patch_item_html_source(change_log, source_dir, target_channel, temp_docs)
+    build_catalog_json(target_channel)
 
     write_change_log(target_dir / "README.md", change_log)
 
 
 def write_change_log(readme: Path, change_log: ChangeLog):
+    readme.touch(exist_ok=True)
     content = open(readme, "r").read()
     with open(readme, "w") as f:
         if change_log.changes_available:
@@ -120,10 +124,10 @@ def update_or_create_item(
     example_html_name = f"{source_dir.stem}_example.html"
 
     source_html = build_path / source_html_name
-    update_html_resource_paths(source_html, relative_path="../../")
+    update_html_resource_paths(source_html, relative_path="../../../")
 
     example_html = build_path / example_html_name
-    update_html_resource_paths(example_html, relative_path="../../")
+    update_html_resource_paths(example_html, relative_path="../../../")
 
     # If its the first source is encountered, copy source to target
     if target_dir.exists():
@@ -135,11 +139,13 @@ def update_or_create_item(
     shutil.copytree(source_dir, target_latest)
     shutil.copytree(source_dir, target_version)
 
-    shutil.copy(source_html, target_latest / source_html_name)
-    shutil.copy(source_html, target_version / source_html_name)
+    if source_html.exists():
+        shutil.copy(source_html, target_latest / source_html_name)
+        shutil.copy(source_html, target_version / source_html_name)
 
-    shutil.copy(example_html, target_latest / example_html_name)
-    shutil.copy(example_html, target_version / example_html_name)
+    if example_html.exists():
+        shutil.copy(example_html, target_latest / example_html_name)
+        shutil.copy(example_html, target_version / example_html_name)
 
 
 def update_html_resource_paths(html_path: Path, relative_path: str):
@@ -147,14 +153,12 @@ def update_html_resource_paths(html_path: Path, relative_path: str):
         with open(html_path, "r") as html:
             parsed = BeautifulSoup(html.read(), features="html.parser")
 
-        # Update css links
         nodes = parsed.find_all(
             lambda node: node.name == "link" and "_static" in node.get("href", "")
         )
         for node in nodes:
             node["href"] = f"{relative_path}{node['href']}"
 
-        # Update js scripts
         nodes = parsed.find_all(
             lambda node: node.name == "script"
             and node.get("src", "").startswith("_static")
@@ -199,6 +203,9 @@ def build_temp_project(source_dir, temp_root):
     click.echo("Building temporary project...")
     for directory in PathIterator(root=source_dir, rule=is_item_dir):
         directory = Path(directory)
+
+        (directory / "__init__.py").touch()
+
         with open(directory / "item.yaml", "r") as f:
             item = yaml.full_load(f)
 
@@ -208,8 +215,6 @@ def build_temp_project(source_dir, temp_root):
         temp_dir.mkdir(parents=True, exist_ok=True)
 
         shutil.copy(py_file, temp_dir / py_file.name)
-
-        open(temp_dir / "__init__.py", "a")
 
 
 def build_temp_docs(temp_docs, temp_root):

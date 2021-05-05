@@ -19,4 +19,5 @@ bs4~=0.0.1
 beautifulsoup4~=4.9.3
 sphinx~=3.5.4
 nuclio-jupyter
-
+myst_nb
+sphinx_book_theme

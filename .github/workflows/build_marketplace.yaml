@@ -22,7 +22,7 @@ jobs:
       - name: Checkout Marketplace
         uses: actions/checkout@v2
         with:
-          repository: mlrun/functions-marketplace.git
+          repository: mlrun/functions-marketplace
           path: functions-marketplace
       - name: Extract branch name
         shell: bash

@@ -18,7 +18,7 @@ jobs:
         id: push_info
         run: |
           echo "##[set-output name=branch_name;]$(echo ${GITHUB_REF#refs/heads/})"
-          echo "##[set-output name=time_stamp;]$(echo ${GITHUB_REF#refs/heads/})"
+          echo "##[set-output name=time_stamp;]$(echo ${date +'%Y-%m-%d-%H-%M')"
       - name: Checkout current repo
         uses: actions/checkout@v2
         with:

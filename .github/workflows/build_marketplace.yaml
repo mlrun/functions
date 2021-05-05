@@ -10,6 +10,7 @@ on:
 jobs:
   build-marketplace:
     name: Build marketplace
+    if: github.repository == 'mlrun/functions'
     runs-on: ubuntu-latest
 
     steps:

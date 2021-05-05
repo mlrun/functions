@@ -18,6 +18,5 @@ joblib~=1.0.1
 bs4~=0.0.1
 beautifulsoup4~=4.9.3
 sphinx~=3.5.4
-sphinx_rtd_theme
 nuclio-jupyter
-
+myst_nb

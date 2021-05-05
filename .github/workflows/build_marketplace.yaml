@@ -13,12 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Source
       - name: Checkout current repo
         uses: actions/checkout@v2
         with:
           path: functions
-      # Target
       - name: Checkout Marketplace
         uses: actions/checkout@v2
         with:
@@ -28,22 +26,18 @@ jobs:
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
-      # Install python
       - name: Install python
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      # Install tool dependencies
-      - name: Install Collagen's requirements.txt
+      - name: Install Requirements
         uses: py-actions/py-dependency-install@v2
         with:
           update-pip: "true"
           path: "functions/requirements.txt"
-      # Execute build-docs
       - name: Build marketplace docs
         run: |
           python functions/functions.py build-docs -s ./functions -t ./marketplace -c ${{ steps.extract_branch.outputs.branch }}
-      # Create branch
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN }}

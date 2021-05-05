@@ -8,16 +8,11 @@ from yaml import full_load
 
 
 @click.command()
-@click.option("-i", "--item", help="Path to item.yaml file")
-@click.option("-o", "--output", help="Output path for function.yaml")
-def item_to_function(item_path: str = ".", output_path: Optional[str] = None):
-
-    parser = OptionParser()
-    parser.add_option("-i", "--item", help="Path to item.yaml file")
-    parser.add_option("-o", "--output", help="Output path for function.yaml")
-    options, args = parser.parse_args()
-    item_to_function(item_path=options.item, output_path=options.output)
-
+@click.option(
+    "-i", "--item-path", help="Path to item.yaml file or a directory containing one"
+)
+@click.option("-o", "--output-path", help="Path to code_to_function output")
+def item_to_function(item_path: str, output_path: Optional[str] = None):
     item_path = Path(item_path)
 
     if item_path.is_dir():

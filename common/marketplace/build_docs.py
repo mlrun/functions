@@ -1,7 +1,6 @@
 import json
 import shutil
 import uuid
-from os import environ
 from pathlib import Path
 from typing import Union
 
@@ -17,16 +16,21 @@ from common.path_iterator import PathIterator
 
 
 @click.command()
-@click.option("-s", "--source-dir", help="Directory path to the marketplace source")
-@click.option("-t", "--target-dir", help="Directory path to output marketplace")
-def build_docs(source_dir: str, target_dir: str):
-    root_base = f"/tmp/{uuid.uuid4().hex}"
+@click.option("-s", "--source-dir", help="Path to the source directory")
+@click.option("-t", "--target-dir", help="Path to output directory")
+@click.option(
+    "-T", "--temp-dir", default="/tmp", help="Path to intermediate build directory"
+)
+@click.option("-c", "--channel", default="master", help="Name of build channel")
+def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
+    root_base = Path(temp_dir) / uuid.uuid4().hex
+    temp_root = root_base / "functions"
+    temp_docs = root_base / "docs"
+    target_dir = Path(target_dir) / channel
 
-    temp_root = Path(environ.get("TEMP_PROJECT_ROOT", f"{root_base}/functions"))
     temp_root.mkdir(parents=True)
-
-    temp_docs = Path(environ.get("TEMP_DOCS_ROOT", f"{root_base}/docs"))
     temp_docs.mkdir(parents=True)
+    target_dir.mkdir(parents=True, exist_ok=True)
 
     click.echo(f"Temporary working directory: {root_base}")
 
@@ -35,10 +39,7 @@ def build_docs(source_dir: str, target_dir: str):
     patch_temp_docs(source_dir, temp_docs, temp_root)
     render_html_files(temp_docs)
 
-    target_dir = Path(target_dir)
-
     change_log = ChangeLog()
-
     patch_item_html_source(change_log, source_dir, target_dir, temp_docs)
     copy_static_resources(target_dir, temp_docs)
 
@@ -48,6 +49,7 @@ def build_docs(source_dir: str, target_dir: str):
 
 
 def write_change_log(readme: Path, change_log: ChangeLog):
+    readme.touch(exist_ok=True)
     content = open(readme, "r").read()
     with open(readme, "w") as f:
         if change_log.changes_available:

@@ -26,7 +26,10 @@ def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
     root_base = Path(temp_dir) / uuid.uuid4().hex
     temp_root = root_base / "functions"
     temp_docs = root_base / "docs"
-    target_dir = Path(target_dir)
+
+    source_dir = Path(source_dir).resolve()
+    target_dir = Path(target_dir).resolve()
+
     target_channel = target_dir / channel
 
     temp_root.mkdir(parents=True)
@@ -44,7 +47,7 @@ def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
     change_log = ChangeLog()
     copy_static_resources(target_dir, temp_docs)
 
-    patch_item_html_source(change_log, source_dir, target_channel, temp_docs)
+    update_or_create_items(change_log, source_dir, target_channel, temp_docs)
     build_catalog_json(target_channel)
 
     write_change_log(target_dir / "README.md", change_log)
@@ -67,8 +70,8 @@ def copy_static_resources(target_dir, temp_docs):
         shutil.copytree(temp_docs / "_build/_static", target_static)
 
 
-def patch_item_html_source(change_log, source_dir, target_dir, temp_docs):
-    click.echo("Patching item html source...")
+def update_or_create_items(change_log, source_dir, target_dir, temp_docs):
+    click.echo("Creating items...")
     for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
         update_or_create_item(directory, target_dir, temp_docs, change_log)
 
@@ -201,11 +204,7 @@ def patch_temp_docs(source_dir, temp_docs, temp_root):
 
 def build_temp_project(source_dir, temp_root):
     click.echo("Building temporary project...")
-    for directory in PathIterator(root=source_dir, rule=is_item_dir):
-        directory = Path(directory)
-
-        (directory / "__init__.py").touch()
-
+    for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
         with open(directory / "item.yaml", "r") as f:
             item = yaml.full_load(f)
 
@@ -214,6 +213,7 @@ def build_temp_project(source_dir, temp_root):
         temp_dir = temp_root / directory.name
         temp_dir.mkdir(parents=True, exist_ok=True)
 
+        (temp_dir / "__init__.py").touch()
         shutil.copy(py_file, temp_dir / py_file.name)
 
 

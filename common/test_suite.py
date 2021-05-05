@@ -11,7 +11,7 @@ from common.path_iterator import PathIterator
 
 @click.command()
 @click.option("-r", "--root-directory", default=".", help="Path to root directory")
-@click.option("-s", "--suite", help="Type of suite to run [py/ipynb/examples]")
+@click.option("-s", "--suite", help="Type of suite to run [py/ipynb/examples/items]")
 def test_suite(root_directory: str, suite: str):
     if not suite:
         click.echo("-s/--suite is required")
@@ -23,6 +23,8 @@ def test_suite(root_directory: str, suite: str):
         test_ipynb(root_directory)
     elif suite == "examples":
         test_example(root_directory)
+    elif suite == "items":
+        test_item_files(root_directory)
     else:
         click.echo(f"Suite {suite} is unsupported")
         exit(1)
@@ -106,6 +108,33 @@ def test_example(root_dir="."):
         #         print_std(run_papermill)
         #         exit(run_papermill.returncode)
         #     exit(0)
+
+
+def test_item_files(root_dir="."):
+    for directory in PathIterator(root=root_dir, rule=is_item_dir, as_path=True):
+
+        item_path = directory / "item.yaml"
+
+        if not item_path.exists():
+            continue
+
+        with open(item_path, "r") as f:
+            item = yaml.full_load(f)
+
+        if item.get("spec")["filename"]:
+            implementation_file = directory / item.get("spec")["filename"]
+            if not implementation_file.exists():
+                raise FileNotFoundError(implementation_file)
+
+        if item["example"]:
+            example_file = directory / item["example"]
+            if not example_file.exists():
+                raise FileNotFoundError(example_file)
+
+        if item["doc"]:
+            doc_file = directory / item["doc"]
+            if not doc_file.exists():
+                raise FileNotFoundError(doc_file)
 
 
 def clean(root_dir="."):

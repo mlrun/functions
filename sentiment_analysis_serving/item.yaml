@@ -19,7 +19,7 @@ name: sentiment-analysis-serving
 org: Iguazio
 platformVersion: 3.0.0
 spec:
-  filename: sentiment_analysis_serving/sentiment_analysis_serving.py
+  filename: sentiment_analysis_serving.py
   handler: handler
   image: mlrun/ml-model
   kind: serving

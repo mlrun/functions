@@ -35,5 +35,6 @@ jobs:
       # Run tests
       - name: Run python tests
         run: |
+          python functions/functions.py test-suite -r ./functions -s items
           python functions/functions.py test-suite -r ./functions -s py
           python functions/functions.py test-suite -r ./functions -s ipynb

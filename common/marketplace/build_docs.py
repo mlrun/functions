@@ -137,11 +137,13 @@ def update_or_create_item(
     shutil.copytree(source_dir, target_latest)
     shutil.copytree(source_dir, target_version)
 
-    shutil.copy(source_html, target_latest / source_html_name)
-    shutil.copy(source_html, target_version / source_html_name)
+    if source_html.exists():
+        shutil.copy(source_html, target_latest / source_html_name)
+        shutil.copy(source_html, target_version / source_html_name)
 
-    shutil.copy(example_html, target_latest / example_html_name)
-    shutil.copy(example_html, target_version / example_html_name)
+    if example_html.exists():
+        shutil.copy(example_html, target_latest / example_html_name)
+        shutil.copy(example_html, target_version / example_html_name)
 
 
 def update_html_resource_paths(html_path: Path, relative_path: str):

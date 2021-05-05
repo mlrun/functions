@@ -201,6 +201,9 @@ def build_temp_project(source_dir, temp_root):
     click.echo("Building temporary project...")
     for directory in PathIterator(root=source_dir, rule=is_item_dir):
         directory = Path(directory)
+
+        (directory / "__init__.py").touch()
+
         with open(directory / "item.yaml", "r") as f:
             item = yaml.full_load(f)
 
@@ -210,8 +213,6 @@ def build_temp_project(source_dir, temp_root):
         temp_dir.mkdir(parents=True, exist_ok=True)
 
         shutil.copy(py_file, temp_dir / py_file.name)
-
-        open(temp_dir / "__init__.py", "a")
 
 
 def build_temp_docs(temp_docs, temp_root):

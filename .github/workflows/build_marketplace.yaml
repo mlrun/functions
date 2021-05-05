@@ -45,7 +45,7 @@ jobs:
           USERNAME: Michaelliv
           REPO_PATH: marketplace
           BASE_REPO: mlrun
-          BASE_BRANCH: main
+          BASE_BRANCH: master
         run: |
           cd marketplace
 
@@ -60,7 +60,7 @@ jobs:
               exit 1;
           };
 
-          git config --local user.name "github-worflow[bot]"
+          git config --local user.name $USERNAME
 
           echo "Checking out [$BRANCH_NAME]..."
           git checkout -b $BRANCH_NAME

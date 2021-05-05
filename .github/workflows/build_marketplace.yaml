@@ -35,22 +35,28 @@ jobs:
           update-pip: "true"
           path: "functions/requirements.txt"
       - name: Build marketplace docs
+        env:
+          CHANNEL: ${{ steps.branch.outputs.branch }}
         run: |
-          python functions/functions.py build-docs -s ./functions -t ./marketplace -c ${{ steps.branch.outputs.branch }}
+          python functions/functions.py build-docs -s ./functions -t ./marketplace -c $CHANNEL
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN }}
+          USERNAME: Michaelliv
+          REPO_PATH: marketplace
+          BASE_REPO: mlrun
+          BASE_BRANCH: main
         run: |
           cd marketplace
 
           COMMIT_SHA=$(git rev-parse --short "$GITHUB_SHA")
           BRANCH_NAME=marketplace-doc-gen-$COMMIT_SHA
-          REMOTE=***github.com/$USERNAME/$REPO_PATH.git
+          REMOTE=https://$USERNAME:$GITHUB_TOKEN@github.com/$BASE_REPO/$REPO_PATH.git
 
           echo "Validating environment params...";
 
           [ -z "${GITHUB_TOKEN}" ] && {
-              echo 'Missing input "GITHUB_TOKEN: ***".';
+              echo 'Missing input "GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}".';
               exit 1;
           };
 
@@ -66,4 +72,4 @@ jobs:
           git push $REMOTE $BRANCH_NAME
 
           echo "Submiting pull request..."
-          gh pr create --title "Marketplace update from $BRANCH_NAME" --body "github-workflow" --base $BASE_BRANCH --head $BRANCH_NAME --repo $USERNAME/$REPO_PATH
+          gh pr create --title "Marketplace update from $BRANCH_NAME" --body "github-workflow" --base $BASE_BRANCH --head $BRANCH_NAME --repo $BASE_REPO/$REPO_PATH

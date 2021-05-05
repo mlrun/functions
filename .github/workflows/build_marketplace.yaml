@@ -38,6 +38,9 @@ jobs:
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
         run: |
+          cd marketplace
+          git pull
+          cd ..
           python functions/functions.py build-docs -s ./functions -t ./marketplace -c $CHANNEL
       - name: Publish marketplace release
         env:

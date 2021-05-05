@@ -21,7 +21,7 @@ jobs:
       - name: Checkout Marketplace
         uses: actions/checkout@v2
         with:
-          repository: https://github.com/mlrun/functions-marketplace.git
+          repository: mlrun/functions-marketplace.git
           path: functions-marketplace
       # Log git directories
       - name: Show information about directories

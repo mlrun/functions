@@ -26,11 +26,13 @@ def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
     root_base = Path(temp_dir) / uuid.uuid4().hex
     temp_root = root_base / "functions"
     temp_docs = root_base / "docs"
-    target_dir = Path(target_dir) / channel
+    target_dir = Path(target_dir)
+    target_channel = target_dir / channel
 
     temp_root.mkdir(parents=True)
     temp_docs.mkdir(parents=True)
     target_dir.mkdir(parents=True, exist_ok=True)
+    target_channel.mkdir(parents=True, exist_ok=True)
 
     click.echo(f"Temporary working directory: {root_base}")
 
@@ -40,10 +42,10 @@ def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
     render_html_files(temp_docs)
 
     change_log = ChangeLog()
-    patch_item_html_source(change_log, source_dir, target_dir, temp_docs)
     copy_static_resources(target_dir, temp_docs)
 
-    build_catalog_json(target_dir)
+    patch_item_html_source(change_log, source_dir, target_channel, temp_docs)
+    build_catalog_json(target_channel)
 
     write_change_log(target_dir / "README.md", change_log)
 
@@ -122,10 +124,10 @@ def update_or_create_item(
     example_html_name = f"{source_dir.stem}_example.html"
 
     source_html = build_path / source_html_name
-    update_html_resource_paths(source_html, relative_path="../../")
+    update_html_resource_paths(source_html, relative_path="../../../")
 
     example_html = build_path / example_html_name
-    update_html_resource_paths(example_html, relative_path="../../")
+    update_html_resource_paths(example_html, relative_path="../../../")
 
     # If its the first source is encountered, copy source to target
     if target_dir.exists():
@@ -151,14 +153,12 @@ def update_html_resource_paths(html_path: Path, relative_path: str):
         with open(html_path, "r") as html:
             parsed = BeautifulSoup(html.read(), features="html.parser")
 
-        # Update css links
         nodes = parsed.find_all(
             lambda node: node.name == "link" and "_static" in node.get("href", "")
         )
         for node in nodes:
             node["href"] = f"{relative_path}{node['href']}"
 
-        # Update js scripts
         nodes = parsed.find_all(
             lambda node: node.name == "script"
             and node.get("src", "").startswith("_static")

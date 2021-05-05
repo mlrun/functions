@@ -28,13 +28,6 @@ jobs:
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
-      # Log Information
-      - name: Show information about directories
-        run: |
-          echo "Listing functions..."
-          ll functions
-          echo "Listing marketplace..."
-          ll functions-marketplace
       # Install python
       - name: Install python
         uses: actions/setup-python@v2

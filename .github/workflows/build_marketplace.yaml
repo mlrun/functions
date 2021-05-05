@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Get branch name
         id: branch
-        run: echo "::set-output name=date::$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})"
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M')"
@@ -39,14 +39,14 @@ jobs:
           path: "functions/requirements.txt"
       - name: Build marketplace docs
         run: |
-          python functions/functions.py build-docs -s ./functions -t ./marketplace -c ${{ steps.branch.outputs.name }}
+          python functions/functions.py build-docs -s ./functions -t ./marketplace -c ${{ steps.branch.outputs.branch }}
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN }}
         run: |
           cd marketplace
           git config user.name "github-ci"
-          branch='marketplace-doc-gen-${{ steps.push_info.outputs.branch_name }}-${{ steps.date.outputs.date }}'
+          branch='marketplace-doc-gen-${{ steps.branch.outputs.branch }}-${{ steps.date.outputs.date }}'
           echo $branch
           git checkout -b $branch
           git add -A && git commit -m "Automated build"

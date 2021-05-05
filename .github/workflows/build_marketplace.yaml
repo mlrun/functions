@@ -4,7 +4,8 @@ on:
   # Run CI also on push to master
   push:
     branches:
-    - master
+      - development
+      - master
 
 jobs:
   build-marketplace:
@@ -23,7 +24,11 @@ jobs:
         with:
           repository: https://github.com/mlrun/functions-marketplace.git
           path: functions-marketplace
-      # Log git directories
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+      # Log Information
       - name: Show information about directories
         run: |
           echo "Listing functions..."
@@ -44,7 +49,7 @@ jobs:
       # Execute build-docs
       - name: Build marketplace docs
         run: |
-          python functions/functions.py build-docs -s ./functions -t ./functions-marketplace
+          python functions/functions.py build-docs -s ./functions -t ./functions-marketplace -c ${{ steps.extract_branch.outputs.branch }}
       # Create branch
       - name: Publish marketplace release
         env:

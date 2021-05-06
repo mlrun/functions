@@ -15,10 +15,10 @@ name: describe
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: describe.py
+  filename: describe/describe.py
   handler: summarize
   image: mlrun/ml-models
   kind: job
-  requirements:
+  requirements: ['mlrun', 'scikitplot' ]
 url: ''
 version: 0.0.1

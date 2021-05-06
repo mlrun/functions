@@ -25,7 +25,7 @@ def summarize(
     class_labels: List[str] = [],
     plot_hist: bool = True,
     plots_dest: str = "plots",
-    update_dataset = False,
+    update_dataset=False,
 ) -> None:
     """Summarize a table
 

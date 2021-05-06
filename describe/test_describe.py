@@ -7,6 +7,7 @@ import shutil
 DATA_URL = 'https://s3.wasabisys.com/iguazio/data/iris/iris_dataset.csv'
 PLOTS_PATH ='plots'
 
+
 def _validate_paths(paths: {}):
     base_folder = PLOTS_PATH
     for path in paths:

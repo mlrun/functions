@@ -15,6 +15,12 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
+      - name: test cd
+        run: |
+          mkdir test
+          cd test
+      - name: test cd2
+        run: pwd
       # Source
       - name: Checkout current repo
         uses: actions/checkout@v2

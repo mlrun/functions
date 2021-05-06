@@ -29,13 +29,13 @@ jobs:
       - name: Install requirements
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r functions/requirements.txt
       - name: Run item validation
-        run: python functions.py test-suite -r . -s items
+        run: python functions/functions.py test-suite -r . -s items
       - name: Run py tests
-        run: python functions.py test-suite -r . -s py
+        run: python functions/functions.py test-suite -r . -s py
       - name: Run ipynb tests
-        run: python functions.py test-suite -r . -s ipynb
+        run: python functions/functions.py test-suite -r . -s ipynb
 
   build-marketplace:
     name: Build marketplace

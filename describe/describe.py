@@ -3,7 +3,6 @@
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -17,6 +16,7 @@ from mlrun.mlutils.plots import gcf_clear
 from typing import List
 
 pd.set_option("display.float_format", lambda x: "%.2f" % x)
+
 
 def summarize(
     context: MLClientCtx,

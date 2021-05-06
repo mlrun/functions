@@ -26,11 +26,12 @@ jobs:
         with:
           python-version: 3.7
       # Install dependencies
-      - name: Install requirements.txt
-        uses: py-actions/py-dependency-install@v2
-        with:
-          update-pip: "true"
-          path: "functions/requirements.txt"
+      - name: Install requirements
+        run: |
+          pip install --upgrade pip
+          pip install pipenv
+          cd functions
+          pipenv install --ignore-lock
       # Run tests
       - name: Run python tests
         run: |
@@ -61,11 +62,13 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Install Requirements
-        uses: py-actions/py-dependency-install@v2
-        with:
-          update-pip: "true"
-          path: "functions/requirements.txt"
+      - name: Install requirements
+        run: |
+          pip install --upgrade pip
+          pip install pipenv
+          cd functions
+          pipenv install --ignore-lock
+          cd ..
       - name: Build marketplace docs
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}

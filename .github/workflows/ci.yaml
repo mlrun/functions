@@ -26,21 +26,17 @@ jobs:
         with:
           python-version: 3.7
       # Install dependencies
-      - name: Install requirements
+      - name: Install requirements, run tests
         run: |
+          cd functions
           pip install --upgrade pip
-          pip install pipenv
-          cd functions
-          pipenv install --skip-lock
-          cd ..
-      # Run tests
-      - name: Run python tests
-        run: |
-          cd functions
-          pipenv shell
+          pip install -r requirements.txt
           python functions.py test-suite -r . -s items
           python functions.py test-suite -r . -s py
           python functions.py test-suite -r . -s ipynb
+      - name: Print info
+        run: |
+          pwd
 
   build-marketplace:
     name: Build marketplace
@@ -67,20 +63,17 @@ jobs:
           python-version: 3.7
       - name: Install requirements
         run: |
+          cd /functions
           pip install --upgrade pip
-          pip install pipenv
-          cd functions
-          pipenv install --skip-lock
-          cd ..
+          pip install -r requirements.txt
       - name: Build marketplace docs
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
         run: |
-          cd marketplace
+          cd /marketplace
           git pull
-          cd ../functions
-          pipenv shell
-          python functions.py build-docs -s . -t ../marketplace -c $CHANNEL
+          cd ..
+          python functions/functions.py build-docs -s . -t marketplace -c $CHANNEL
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V2 }}

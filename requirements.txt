@@ -1,0 +1,10 @@
+sphinx
+bs4
+myst-nb
+mlrun
+sphinx-book-theme
+jinja2
+pyyaml
+click
+pipenv
+nuclio-jupyter

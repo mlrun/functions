@@ -31,7 +31,7 @@ jobs:
           pip install --upgrade pip
           pip install pipenv
           cd functions
-          pipenv install --ignore-lock
+          pipenv install --skip-lock
       # Run tests
       - name: Run python tests
         run: |
@@ -67,7 +67,7 @@ jobs:
           pip install --upgrade pip
           pip install pipenv
           cd functions
-          pipenv install --ignore-lock
+          pipenv install --skip-lock
           cd ..
       - name: Build marketplace docs
         env:

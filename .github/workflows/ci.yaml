@@ -32,12 +32,15 @@ jobs:
           pip install pipenv
           cd functions
           pipenv install --skip-lock
+          cd ..
       # Run tests
       - name: Run python tests
         run: |
-          python functions/functions.py test-suite -r ./functions -s items
-          python functions/functions.py test-suite -r ./functions -s py
-          python functions/functions.py test-suite -r ./functions -s ipynb
+          cd functions
+          pipenv shell
+          python functions.py test-suite -r . -s items
+          python functions.py test-suite -r . -s py
+          python functions.py test-suite -r . -s ipynb
 
   build-marketplace:
     name: Build marketplace
@@ -75,8 +78,9 @@ jobs:
         run: |
           cd marketplace
           git pull
-          cd ..
-          python functions/functions.py build-docs -s ./functions -t ./marketplace -c $CHANNEL
+          cd ../functions
+          pipenv shell
+          python functions.py build-docs -s . -t ../marketplace -c $CHANNEL
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V2 }}

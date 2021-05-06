@@ -26,16 +26,23 @@ jobs:
         with:
           python-version: 3.7
       # Install dependencies
+      - uses: actions/cache@v1
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - name: Install requirements
         run: |
           pip install --upgrade pip
           pip install -r functions/requirements.txt
       - name: Run item validation
-        run: python functions/functions.py test-suite -r . -s items
+        run: python functions/functions.py test-suite -r functions -s items
       - name: Run py tests
-        run: python functions/functions.py test-suite -r . -s py
+        run: python functions/functions.py test-suite -r functions -s py
       - name: Run ipynb tests
-        run: python functions/functions.py test-suite -r . -s ipynb
+        run: python functions/functions.py test-suite -r functions -s ipynb
 
   build-marketplace:
     name: Build marketplace

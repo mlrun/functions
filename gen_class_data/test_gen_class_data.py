@@ -8,7 +8,7 @@ def test_gen_class_data():
                           handler="gen_class_data",
                           kind="job",
                           )
-    fn.run(params= {
+    fn.run(params={
             "n_samples": 10_000,
             "m_features": 5,
             "k_classes": 2,

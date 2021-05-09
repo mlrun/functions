@@ -19,6 +19,6 @@ spec:
   handler: gen_outliers
   image: mlrun/mlrun
   kind: job
-  requirements: ['mlrun','pandas','typing','xgboost']
+  requirements: ['mlrun','pandas','typing','xgboost','matplotlib']
 url: ''
 version: 0.0.1

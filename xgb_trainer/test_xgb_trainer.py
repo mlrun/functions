@@ -4,7 +4,7 @@ import os
 
 def get_class_data():
     fn = code_to_function(name='test_gen_class_data',
-                          filename= os.path.dirname(os.path.dirname(__file__)) + "\gen_class_data\gen_class_data.py",
+                          filename= os.path.dirname(os.path.dirname(__file__)) + "/gen_class_data/gen_class_data.py",
                           handler="gen_class_data",
                           kind="job",
                           )

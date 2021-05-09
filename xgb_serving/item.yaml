@@ -19,6 +19,6 @@ spec:
   handler: XGBoostModel
   image: mlrun/mlrun
   kind: job
-  requirements: ['mlrun','pandas','typing','xgboost','cloudpickle']
+  requirements: ['mlrun','pandas','typing','xgboost','cloudpickle',"pygit2"]
 url: ''
 version: 0.0.1

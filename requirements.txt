@@ -1,4 +1,4 @@
-mlrun
+mlrun~=0.6.0
 pipenv
 
 jinja2~=2.11.3

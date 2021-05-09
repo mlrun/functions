@@ -39,9 +39,8 @@ def xgb_trainer():
 def set_mlrun_hub_url():
     xgb_trainer()
     branch = Repository('.').head.shorthand
-    hub_url = "https://raw.githubusercontent.com/mlrun/functions/{}/sentiment_analysis_serving/function.yaml".format(
+    hub_url = "https://raw.githubusercontent.com/mlrun/functions/{}/xgb_serving/function.yaml".format(
         branch)
-    hub_url = "https://raw.githubusercontent.com/daniels290813/functions/development/xgb_serving/function.yaml"
     mlrun.mlconf.hub_url = hub_url
 
 

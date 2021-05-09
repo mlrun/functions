@@ -8,9 +8,8 @@ from pygit2 import Repository
 
 def set_mlrun_hub_url():
     branch = Repository('.').head.shorthand
-    hub_url = "https://raw.githubusercontent.com/mlrun/functions/{}/sentiment_analysis_serving/function.yaml".format(
+    hub_url = "https://raw.githubusercontent.com/mlrun/functions/{}/rnn_serving/function.yaml".format(
         branch)
-    hub_url = 'https://raw.githubusercontent.com/daniels290813/functions/development/rnn_serving/function.yaml'
     mlrun.mlconf.hub_url = hub_url
 
 def download_pretrained_model(model_path):
@@ -21,6 +20,7 @@ def download_pretrained_model(model_path):
     os.makedirs(saved_models_directory, exist_ok=1)
     model_filepath = os.path.join(saved_models_directory, os.path.basename(model_location))
     wget.download(model_location, model_filepath)
+
 
 def test_rnn_serving():
     set_mlrun_hub_url()

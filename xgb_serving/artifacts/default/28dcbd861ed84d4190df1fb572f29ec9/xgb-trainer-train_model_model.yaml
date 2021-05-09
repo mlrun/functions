@@ -1,0 +1,20 @@
+key: model
+kind: model
+iter: 0
+tree: 28dcbd861ed84d4190df1fb572f29ec9
+target_path: models/
+hash: cb9dd47b51a515b0344297271133d5f556cb1beb
+size: 240955
+db_key: xgb-trainer-train_model_model
+model_file: model.pkl
+framework: ''
+producer:
+  name: xgb-trainer-train_model
+  kind: run
+  uri: default/28dcbd861ed84d4190df1fb572f29ec9
+  owner: daniels
+sources:
+- name: dataset
+  path: classifier-data.csv
+project: default
+updated: '2021-05-09T12:09:36.551553+00:00'

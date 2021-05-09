@@ -1,0 +1,93 @@
+kind: run
+metadata:
+  name: test-xgb-test-xgb_test
+  uid: 63c20f603ab041b4bb39a5c3c349ba23
+  iteration: 0
+  project: default
+  labels:
+    kind: ''
+    owner: daniels
+    host: LAP-DANIELS
+  annotations: {}
+spec:
+  function: default/test-xgb-test@956a8007d83d6ad8390de88260c2a32f540b9c44
+  log_level: info
+  parameters:
+    label_column: labels
+    plots_dest: plots/xgb_test
+  outputs: []
+  output_path: ''
+  inputs:
+    test_set: classifier-data.csv
+    models_path: C:\Users\daniels\PycharmProjects\functions\xgb_test/models/model.pkl
+  hyperparams: {}
+  hyper_param_options: {}
+  data_stores: []
+status:
+  state: completed
+  results:
+    accuracy: 0.9656
+    test-error: 0.0344
+    rocauc: 0.9850800418049069
+    brier_score: 0.030492313806775233
+    f1-score: 0.9653365578395808
+    precision_score: 0.9743694060211554
+    recall_score: 0.9564696485623003
+  start_time: '2021-05-09T11:45:15.914881+00:00'
+  last_update: '2021-05-09T11:45:16.777918+00:00'
+  artifacts:
+  - key: probability-calibration
+    kind: plot
+    iter: 0
+    tree: 63c20f603ab041b4bb39a5c3c349ba23
+    target_path: plots/probability-calibration.html
+    hash: a7d5b6a10a9528d6cb38689c86b6242c9d9ab39e
+    description: probability calibration plot
+    viewer: chart
+    format: html
+    size: 49222
+    db_key: ''
+  - key: confusion-matrix
+    kind: plot
+    iter: 0
+    tree: 63c20f603ab041b4bb39a5c3c349ba23
+    target_path: plots/confusion-matrix.html
+    hash: 1d5c710c99b3bceb57c96b4148d5a2c4e3930aaf
+    description: Confusion Matrix - Normalized Plot
+    viewer: chart
+    format: html
+    size: 18805
+    db_key: ''
+  - key: feature-importances
+    kind: plot
+    iter: 0
+    tree: 63c20f603ab041b4bb39a5c3c349ba23
+    target_path: plots/feature-importances.html
+    hash: 2a0f4bb4d716b788c4995c9ff4165a106921049a
+    description: Feature Importances
+    viewer: chart
+    format: html
+    size: 18081
+    db_key: ''
+  - key: precision-recall-binary
+    kind: plot
+    iter: 0
+    tree: 63c20f603ab041b4bb39a5c3c349ba23
+    target_path: plots/precision-recall-binary.html
+    hash: f4f2b94ca09c5da29fc4e462e09a1c7c13e9b456
+    description: Binary Precision Recall
+    viewer: chart
+    format: html
+    size: 37477
+    db_key: ''
+  - key: roc-binary
+    kind: plot
+    iter: 0
+    tree: 63c20f603ab041b4bb39a5c3c349ba23
+    target_path: plots/roc-binary.html
+    hash: bfcd1a2413e62063b8a4c6e6f4e07195e2663368
+    description: Binary ROC Curve
+    viewer: chart
+    format: html
+    size: 37269
+    db_key: ''

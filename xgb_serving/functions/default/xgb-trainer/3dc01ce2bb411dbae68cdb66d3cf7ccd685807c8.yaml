@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 3dc01ce2bb411dbae68cdb66d3cf7ccd685807c8
+  updated: 2021-05-09 12:08:11.565292+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmpu1zrognu.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 283f039214cfcfccff27707742ef2433b6f29e2c
+  updated: 2021-05-09 12:29:33.457823+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmptxpb_n6c.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

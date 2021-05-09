@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 5c9f8a397721d938206fde7cc150e670441fd165
+  updated: 2021-05-09 11:44:33.783939+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmpyim66heh.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 167f7724322c9213e6423fe33bca35c78549eb15
+  updated: 2021-05-09 12:09:35.176460+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmpotv1ybyq.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

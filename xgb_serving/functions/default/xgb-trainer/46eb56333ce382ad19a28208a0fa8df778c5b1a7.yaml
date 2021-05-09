@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 46eb56333ce382ad19a28208a0fa8df778c5b1a7
+  updated: 2021-05-09 12:17:01.902341+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmpssbd550h.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

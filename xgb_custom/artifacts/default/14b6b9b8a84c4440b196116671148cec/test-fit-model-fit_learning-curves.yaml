@@ -1,0 +1,21 @@
+key: learning-curves
+kind: plot
+iter: 0
+tree: 14b6b9b8a84c4440b196116671148cec
+src_path: plots/learning-curves.html
+target_path: plots/learning-curves.html
+hash: 703917531b335cb9e057e1a5c0c66a38456425c3
+viewer: chart
+format: html
+size: 51429
+db_key: test-fit-model-fit_learning-curves
+producer:
+  name: test-fit-model-fit
+  kind: run
+  uri: default/14b6b9b8a84c4440b196116671148cec
+  owner: daniels
+sources:
+- name: dataset
+  path: xgb_custom.parquet
+project: default
+updated: '2021-05-09T13:09:40.611341+00:00'

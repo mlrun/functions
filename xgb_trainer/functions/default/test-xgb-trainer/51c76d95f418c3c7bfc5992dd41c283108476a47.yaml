@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: test-xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 51c76d95f418c3c7bfc5992dd41c283108476a47
+  updated: 2021-05-09 11:00:14.775227+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmpgqeuxprt.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

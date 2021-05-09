@@ -1,0 +1,21 @@
+key: mutual_info_classif
+kind: plot
+iter: 0
+tree: cfca8ccef2e54717b1492b4d590076a3
+src_path: plots\feature_selection\mutual_info_classif.html
+target_path: C:\Users\daniels\PycharmProjects\functions\feature_selection\artifacts/plots\feature_selection\mutual_info_classif.html
+hash: 22d93b26f13ae457175375e2c8724e5c12924f26
+viewer: chart
+format: html
+size: 18485
+db_key: task-feature-selection_mutual_info_classif
+producer:
+  name: task-feature-selection
+  kind: run
+  uri: default/cfca8ccef2e54717b1492b4d590076a3
+  owner: daniels
+sources:
+- name: df_artifact
+  path: data/metrics.pq
+project: default
+updated: '2021-05-09T13:13:59.390008+00:00'

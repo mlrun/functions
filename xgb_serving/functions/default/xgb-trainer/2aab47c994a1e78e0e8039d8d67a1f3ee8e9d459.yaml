@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 2aab47c994a1e78e0e8039d8d67a1f3ee8e9d459
+  updated: 2021-05-09 12:24:03.362448+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmpfrs3teqr.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

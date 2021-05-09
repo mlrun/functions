@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 7ecdd867f56203135423052af9fc50d1b8388059
+  updated: 2021-05-09 12:11:45.816458+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmp1rxe1p2i.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

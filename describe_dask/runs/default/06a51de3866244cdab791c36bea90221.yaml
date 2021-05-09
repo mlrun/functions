@@ -1,0 +1,32 @@
+kind: run
+metadata:
+  name: task-describe
+  uid: 06a51de3866244cdab791c36bea90221
+  iteration: 0
+  project: default
+  labels:
+    kind: handler
+    owner: daniels
+    host: LAP-DANIELS
+  annotations: {}
+spec:
+  function: ''
+  log_level: info
+  parameters:
+    update_dataset: true
+    label_column: label
+    dask_function: db://default/dask_tests
+  outputs: []
+  output_path: ''
+  inputs:
+    table: https://s3.wasabisys.com/iguazio/data/iris/iris_dataset.csv
+  hyperparams: {}
+  hyper_param_options: {}
+  data_stores: []
+status:
+  state: error
+  results: {}
+  start_time: '2021-05-09T11:06:47.911587+00:00'
+  last_update: '2021-05-09T11:06:47.924876+00:00'
+  error: Function not found default/dask_tests:latest
+  artifacts: []

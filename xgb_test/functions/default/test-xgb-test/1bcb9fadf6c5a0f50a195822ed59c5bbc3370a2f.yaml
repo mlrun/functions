@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: test-xgb-test
+  tag: ''
+  project: default
+  categories: []
+  hash: 1bcb9fadf6c5a0f50a195822ed59c5bbc3370a2f
+  updated: 2021-05-09 11:51:50.006295+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmpg4u_yz0y.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

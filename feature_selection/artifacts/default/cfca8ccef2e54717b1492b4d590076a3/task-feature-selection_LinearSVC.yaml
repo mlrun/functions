@@ -1,0 +1,21 @@
+key: LinearSVC
+kind: plot
+iter: 0
+tree: cfca8ccef2e54717b1492b4d590076a3
+src_path: plots\feature_selection\LinearSVC.html
+target_path: C:\Users\daniels\PycharmProjects\functions\feature_selection\artifacts/plots\feature_selection\LinearSVC.html
+hash: 381a3fc6e0ec428970b096744203deca5a25f99f
+viewer: chart
+format: html
+size: 18097
+db_key: task-feature-selection_LinearSVC
+producer:
+  name: task-feature-selection
+  kind: run
+  uri: default/cfca8ccef2e54717b1492b4d590076a3
+  owner: daniels
+sources:
+- name: df_artifact
+  path: data/metrics.pq
+project: default
+updated: '2021-05-09T13:14:00.921025+00:00'

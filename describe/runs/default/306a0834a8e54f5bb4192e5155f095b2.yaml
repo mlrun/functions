@@ -1,0 +1,106 @@
+kind: run
+metadata:
+  name: task-describe
+  uid: 306a0834a8e54f5bb4192e5155f095b2
+  iteration: 0
+  project: default
+  labels:
+    kind: handler
+    owner: daniels
+    host: LAP-DANIELS
+  annotations: {}
+spec:
+  function: ''
+  log_level: info
+  parameters:
+    update_dataset: true
+    label_column: label
+  outputs: []
+  output_path: ''
+  inputs:
+    table: https://s3.wasabisys.com/iguazio/data/iris/iris_dataset.csv
+  hyperparams: {}
+  hyper_param_options: {}
+  data_stores: []
+status:
+  state: completed
+  results: {}
+  start_time: '2021-05-09T12:52:13.344628+00:00'
+  last_update: '2021-05-09T12:52:19.503126+00:00'
+  artifacts:
+  - key: histograms
+    kind: plot
+    iter: 0
+    tree: 306a0834a8e54f5bb4192e5155f095b2
+    src_path: plots/hist.html
+    target_path: plots/hist.html
+    hash: b03f309a6fb72f1c5f8f76f018fe42dd1c14b669
+    viewer: chart
+    format: html
+    size: 344927
+    db_key: ''
+  - key: violin
+    kind: plot
+    iter: 0
+    tree: 306a0834a8e54f5bb4192e5155f095b2
+    src_path: plots/violin.html
+    target_path: plots/violin.html
+    hash: 07dfc2a469c3fa513f9f7bab5641317deb9b1ef0
+    description: Violin Plot
+    viewer: chart
+    format: html
+    size: 86500
+    db_key: ''
+  - key: imbalance
+    kind: plot
+    iter: 0
+    tree: 306a0834a8e54f5bb4192e5155f095b2
+    src_path: plots/imbalance.html
+    target_path: plots/imbalance.html
+    hash: 408b54dc7eca61dcf78db892b4e4a3b070c4c1a1
+    viewer: chart
+    format: html
+    size: 21613
+    db_key: task-describe_imbalance
+  - key: imbalance-weights-vec
+    kind: table
+    iter: 0
+    tree: 306a0834a8e54f5bb4192e5155f095b2
+    src_path: plots/imbalance-weights-vec.csv
+    target_path: plots/imbalance-weights-vec.csv
+    hash: 2ff32c581f5083a034007cdb51f33da8da2e4d0f
+    format: csv
+    size: 72
+    db_key: ''
+    header:
+    - index
+    - weights
+  - key: correlation-matrix
+    kind: table
+    iter: 0
+    tree: 306a0834a8e54f5bb4192e5155f095b2
+    src_path: plots/correlation-matrix.csv
+    target_path: plots/correlation-matrix.csv
+    hash: 153ad019c4ca842291811399f1badf214832447e
+    viewer: table
+    format: csv
+    size: 393
+    db_key: ''
+    header:
+    - index
+    - sepal length (cm)
+    - sepal width (cm)
+    - petal length (cm)
+    - petal width (cm)
+  - key: correlation
+    kind: plot
+    iter: 0
+    tree: 306a0834a8e54f5bb4192e5155f095b2
+    src_path: plots/corr.html
+    target_path: plots/corr.html
+    hash: 920af0c658f759e91e6d1e5de840906b7b34ba0a
+    description: Correlation Matrix
+    viewer: chart
+    format: html
+    size: 26080
+    db_key: ''

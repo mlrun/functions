@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 0afbcd244c5f8a7597e68a12a0d32ea9d5875f12
+  updated: 2021-05-09 12:29:54.906906+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmpw2lnqul9.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

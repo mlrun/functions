@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: test-xgb-test
+  tag: ''
+  project: default
+  categories: []
+  hash: 3dba2a1f6d88abc072233568b3a6aeccdc2bf493
+  updated: 2021-05-09 12:13:56.769079+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmpnn6rokl0.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: {}

@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: test-xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 1e1a721194ad4374c5af43618ee1b5c852c3ecc0
+  updated: 2021-05-09 10:59:29.272637+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmp3xsj19zs.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: test-xgb-test
+  tag: ''
+  project: default
+  categories: []
+  hash: 9f7bc858f81751bf71195ee0a5890c5dca8a0ac6
+  updated: 2021-05-09 11:44:35.200544+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmprtgxo3g1.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

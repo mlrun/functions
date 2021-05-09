@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: test-xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 7e309139bf5a6749aab26f207f0b3de7acef3c21
+  updated: 2021-05-09 11:52:23.290484+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmpqo_bz77i.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: {}

@@ -1,0 +1,21 @@
+key: imbalance
+kind: plot
+iter: 0
+tree: bfc14fb5fab0442dba1c7b114c2b752d
+src_path: plots/imbalance.html
+target_path: plots/imbalance.html
+hash: 408b54dc7eca61dcf78db892b4e4a3b070c4c1a1
+viewer: chart
+format: html
+size: 21613
+db_key: task-describe_imbalance
+producer:
+  name: task-describe
+  kind: run
+  uri: default/bfc14fb5fab0442dba1c7b114c2b752d
+  owner: daniels
+sources:
+- name: table
+  path: https://s3.wasabisys.com/iguazio/data/iris/iris_dataset.csv
+project: default
+updated: '2021-05-09T12:45:38.775983+00:00'

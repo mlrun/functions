@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: test-xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 57b893514f25f446ada51a3797abdc9cefdd8fe4
+  updated: 2021-05-09 11:19:40.247509+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmp8wogvek2.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

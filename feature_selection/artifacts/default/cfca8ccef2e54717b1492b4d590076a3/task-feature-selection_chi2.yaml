@@ -1,0 +1,21 @@
+key: chi2
+kind: plot
+iter: 0
+tree: cfca8ccef2e54717b1492b4d590076a3
+src_path: plots\feature_selection\chi2.html
+target_path: C:\Users\daniels\PycharmProjects\functions\feature_selection\artifacts/plots\feature_selection\chi2.html
+hash: bc7db05215e79157838ecc3bcf5697b12ec90e5d
+viewer: chart
+format: html
+size: 25319
+db_key: task-feature-selection_chi2
+producer:
+  name: task-feature-selection
+  kind: run
+  uri: default/cfca8ccef2e54717b1492b4d590076a3
+  owner: daniels
+sources:
+- name: df_artifact
+  path: data/metrics.pq
+project: default
+updated: '2021-05-09T13:13:59.795336+00:00'

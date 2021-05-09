@@ -1,0 +1,17 @@
+kind: ''
+metadata:
+  name: xgb-trainer
+  tag: ''
+  project: default
+  categories: []
+  hash: 91c652ef6d12ca0c189dc1b536ebd90ce42ad27e
+  updated: 2021-05-09 12:13:25.089479+00:00
+spec:
+  command: C:\Users\daniels\AppData\Local\Temp\tmpxqkv7kll.py
+  args: []
+  image: ''
+  build:
+    commands: []
+  description: ''
+verbose: false
+status: null

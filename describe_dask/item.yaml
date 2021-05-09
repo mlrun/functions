@@ -3,22 +3,22 @@ categories:
 - analysis
 description: describe and visualizes dataset stats
 doc: ''
-example: describe.ipynb
-generationDate: '2021-02-13 11:28:47.408604'
+example: describe_dask.ipynb
+generationDate: '2021-02-13 11:28:47.571511'
 icon: ''
 labels:
-  author: 'Iguazio'
+  author: Iguazio
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.5.4
-name: describe
+name: describe-dask
 org: Iguazio
 platformVersion: 2.10.0
 spec:
-  filename: describe.py
+  filename: describe_dask.py
   handler: summarize
   image: mlrun/ml-models
   kind: job
-  requirements: ['mlrun', 'scikit-plot', 'wget','seaborn']
+  requirements: ['mlrun','dask','yellowbrick','seaborn']
 url: ''
 version: 0.0.1

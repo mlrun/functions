@@ -51,7 +51,7 @@ def test_py(root_dir=".", clean=False):
         if clean:
             clean_pipenv(directory)
 
-        exit(run_tests.returncode)
+    exit(run_tests.returncode)
 
 
 def test_ipynb(root_dir=".", clean=False):

@@ -20,6 +20,6 @@ spec:
   handler: feature_selection/feature_selection
   image: mlrun/ml-models
   kind: job
-  requirements: ['mlrun', 'sklearn']
+  requirements: ['mlrun', 'sklearn','matplotlib']
 url: ''
 version: 0.0.1

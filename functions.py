@@ -1,10 +1,10 @@
 import click
 
-from common.create_legacy_catalog import create_legacy_catalog
-from common.item_to_function import item_to_function
-from common.marketplace.build_docs import build_docs
-from common.new_item import new_item
-from common.test_suite import test_suite
+from cli.create_legacy_catalog import create_legacy_catalog
+from cli.item_to_function import item_to_function
+from cli.marketplace.build_docs import build_docs
+from cli.new_item import new_item
+from cli.test_suite import test_suite
 
 
 @click.group()

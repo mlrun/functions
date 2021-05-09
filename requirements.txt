@@ -1,8 +1,8 @@
 sphinx
-bs4
 myst-nb
-mlrun
 sphinx-book-theme
+bs4
+mlrun
 jinja2
 pyyaml
 click

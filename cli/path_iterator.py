@@ -3,8 +3,8 @@ from typing import Optional, Callable, Union
 
 
 class PathIterator:
-    """ Creates a file paths iterator on a given root path
-    
+    """Creates a file paths iterator on a given root path
+
     :param root: Root directory
     :param rule: A function returning a boolean that is used to indicate filtering
     :param recursive: If true, will iterate all files recursively, False by default

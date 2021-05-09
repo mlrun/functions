@@ -1,12 +1,17 @@
 import subprocess
 from pathlib import Path
-from typing import List
 
 import click
 import yaml
 
-from common.helpers import is_item_dir
-from common.path_iterator import PathIterator
+from cli.helpers import (
+    is_item_dir,
+    install_pipenv,
+    install_python,
+    install_requirements,
+    get_item_yaml_requirements,
+)
+from cli.path_iterator import PathIterator
 
 
 @click.command()
@@ -18,9 +23,9 @@ def test_suite(root_directory: str, suite: str):
         exit(1)
 
     if suite == "py":
-        test_py(root_directory, clean=False)
+        test_py(root_directory, clean=True)
     elif suite == "ipynb":
-        test_ipynb(root_directory)
+        test_ipynb(root_directory, clean=True)
     elif suite == "examples":
         test_example(root_directory)
     elif suite == "items":
@@ -216,12 +221,6 @@ def is_example_notebook(path: Path) -> bool:
     )
 
 
-def exit_on_non_zero_return(completed_process: subprocess.CompletedProcess):
-    if completed_process.returncode != 0:
-        print_std(completed_process)
-        exit(completed_process.returncode)
-
-
 def print_std(subprocess_result):
     print()
     print("==================== stdout ====================")
@@ -239,49 +238,6 @@ def clean_pipenv(directory: str):
         pip_file.unlink()
     if pip_lock.exists():
         pip_lock.unlink()
-
-
-def install_python(directory: str):
-    print(f"Installing python for {directory}...")
-    python_install: subprocess.CompletedProcess = subprocess.run(
-        f"pipenv --python 3.7",
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=directory,
-        shell=True,
-    )
-    exit_on_non_zero_return(python_install)
-
-
-def install_pipenv():
-    print("Installing pipenv...")
-    pipenv_install: subprocess.CompletedProcess = subprocess.run(
-        "pip install pipenv", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
-    )
-    exit_on_non_zero_return(pipenv_install)
-
-
-def install_requirements(directory: str, requirements: List[str]):
-    if not requirements:
-        print(f"No requirements found for {directory}...")
-        return
-
-    print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
-    requirements_install: subprocess.CompletedProcess = subprocess.run(
-        f"pipenv install --skip-lock {' '.join(requirements)}",
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        shell=True,
-        cwd=directory,
-    )
-
-    exit_on_non_zero_return(requirements_install)
-
-
-def get_item_yaml_requirements(directory: str):
-    with open(f"{directory}/item.yaml", "r") as f:
-        item = yaml.full_load(f)
-    return item.get("spec", {}).get("requirements", [])
 
 
 if __name__ == "__main__":

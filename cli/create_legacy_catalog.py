@@ -6,8 +6,8 @@ import click as click
 import yaml
 from mlrun import import_function
 
-from common.helpers import PROJECT_ROOT
-from common.path_iterator import PathIterator
+from cli.helpers import PROJECT_ROOT
+from cli.path_iterator import PathIterator
 
 
 @click.command()

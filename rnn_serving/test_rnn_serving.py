@@ -32,4 +32,4 @@ def test_rnn_serving():
     fn = import_function('hub://rnn_serving')
     fn.add_model('mymodel', model_path=model, class_name='RNN_Model_Serving')
     # create an emulator (mock server) from the function configuration)
-    # server = fn.to_mock_server()
+    server = fn.to_mock_server()

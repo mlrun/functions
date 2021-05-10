@@ -14,7 +14,7 @@ def get_class_data():
         "k_classes": 2,
         "weight": [0.5, 0.5],
         "sk_params": {"n_informative": 2},
-        "file_ext": "csv"}, local=True,artifact_path="./")
+        "file_ext": "csv"}, local=True,artifact_path="./artifacts/inputs")
 
 
 def test_xgb_trainer():
@@ -31,6 +31,7 @@ def test_xgb_trainer():
         "CLASS_booster": "gbtree",
         "FIT_verbose": 0,
         "label_column": "labels"},
-        local=True, inputs={"dataset": 'classifier-data.csv'})
+        local=True, inputs={"dataset": './artifacts/inputs/classifier-data.csv'})
 
+    assert(os.path.exists(os.getcwd() + "/models/model.pkl"))
 

@@ -2,6 +2,7 @@ from mlrun import code_to_function, import_function
 import os
 from pygit2 import Repository
 import mlrun
+import pandas as pd
 
 
 def get_class_data():
@@ -16,7 +17,7 @@ def get_class_data():
         "k_classes": 2,
         "weight": [0.5, 0.5],
         "sk_params": {"n_informative": 2},
-        "file_ext": "csv"}, local=True,artifact_path="./")
+        "file_ext": "csv"}, local=True,artifact_path="./artifacts/inputs")
 
 
 def xgb_trainer():
@@ -33,7 +34,7 @@ def xgb_trainer():
         "CLASS_booster": "gbtree",
         "FIT_verbose": 0,
         "label_column": "labels"},
-        local=True, inputs={"dataset": 'classifier-data.csv'})
+        local=True, inputs={"dataset": './artifacts/inputs/classifier-data.csv'})
 
 
 def set_mlrun_hub_url():
@@ -45,9 +46,13 @@ def set_mlrun_hub_url():
 
 
 def test_xgb_serving():
-    # DATA_PATH = "classifier-data.csv"
     model = os.getcwd() + "/models/model.pkl"
     set_mlrun_hub_url()
     fn = import_function('hub://xgb_serving')
     fn.add_model('mymodel', model_path=model, class_name='XGBoostModel')
-    # server = fn.to_mock_server()
+    server = fn.to_mock_server()
+
+    # Testing the model
+    xtest = pd.read_csv('./artifacts/inputs/classifier-data.csv')
+    preds = server.predict({"instances": xtest.values[:10, :-1].tolist()})
+    assert(preds == [1, 0, 0, 0, 0, 0, 1, 1, 0, 1])

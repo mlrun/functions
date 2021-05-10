@@ -14,7 +14,7 @@ def get_class_data():
         "k_classes": 2,
         "weight": [0.5, 0.5],
         "sk_params": {"n_informative": 2},
-        "file_ext": "csv"}, local=True,artifact_path="./")
+        "file_ext": "csv"}, local=True,artifact_path="./artifacts/inputs")
 
 
 def xgb_trainer():
@@ -31,12 +31,9 @@ def xgb_trainer():
         "CLASS_booster": "gbtree",
         "FIT_verbose": 0,
         "label_column": "labels"},
-        local=True, inputs={"dataset": 'classifier-data.csv'})
+        local=True, inputs={"dataset": './artifacts/inputs/classifier-data.csv'})
 
 def test_xgb_test():
-    DATA_PATH = "classifier-data.csv"
-    MODELS_PATH = os.getcwd() + "/models/model.pkl"
-
     xgb_trainer()
     fn = code_to_function(name='test_xgb_test',
                           filename=os.path.dirname(os.path.dirname(__file__)) + "/xgb_test/xgb_test.py",
@@ -46,5 +43,7 @@ def test_xgb_test():
     fn.run(params={
         "label_column": "labels",
         "plots_dest": "plots/xgb_test"},
-        local=True, inputs={"test_set": DATA_PATH,
-                            "models_path": MODELS_PATH})
+        local=True, inputs={"test_set": "./artifacts/inputs/classifier-data.csv",
+                            "models_path": os.getcwd() + "/models/model.pkl"})
+
+    assert(os.path.exists(os.getcwd() + "/models/model.pkl"))

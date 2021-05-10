@@ -36,3 +36,4 @@ def test_run_local_aggregate():
            )
     assert Path(AGGREGATE_PATH).is_file()
     _delete_outputs({ARTIFACTS_PATH, RUNS_PATH, SCHEDULES_PATH})
+

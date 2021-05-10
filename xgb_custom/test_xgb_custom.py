@@ -16,7 +16,7 @@ def test_xgb_custom():
                           handler="fit",
                           kind="job",
                           )
-    fit_run = fn.run(params={"num_boost_round" : 40,
+    fit_run = fn.run(params={"num_boost_round": 40,
                      "verbose_eval": False,
                      "XGB_max_depth": 2,
                      "XGB_subsample": 0.9, 'test_set_key': './artifacts/inputs/test-set'},

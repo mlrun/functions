@@ -33,7 +33,8 @@ def xgb_trainer():
         "CLASS_objective": "binary:logistic",
         "CLASS_booster": "gbtree",
         "FIT_verbose": 0,
-        "label_column": "labels"},
+        "label_column": "labels",
+        "test_set": "./artifacts/test-set"},
         local=True, inputs={"dataset": './artifacts/inputs/classifier-data.csv'})
 
 

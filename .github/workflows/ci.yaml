@@ -26,17 +26,26 @@ jobs:
         with:
           python-version: 3.7
       # Install dependencies
-      - name: Install requirements.txt
-        uses: py-actions/py-dependency-install@v2
+      - uses: actions/cache@v1
+        id: cache
         with:
-          update-pip: "true"
-          path: "functions/requirements.txt"
-      # Run tests
-      - name: Run python tests
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install requirements
         run: |
-          python functions/functions.py test-suite -r ./functions -s items
-          python functions/functions.py test-suite -r ./functions -s py
-          python functions/functions.py test-suite -r ./functions -s ipynb
+          pip install --upgrade pip
+          pip install -r functions/requirements.txt
+      - name: Run item validation
+        run: python functions/functions.py test-suite -r functions -s items
+      - name: Run py tests
+        run: python functions/functions.py test-suite -r functions -s py
+      - name: Run ipynb tests
+        run: python functions/functions.py test-suite -r functions -s ipynb
+      - name: Clean
+        run: |
+          rm -rf functions
 
   build-marketplace:
     name: Build marketplace
@@ -61,19 +70,19 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Install Requirements
-        uses: py-actions/py-dependency-install@v2
-        with:
-          update-pip: "true"
-          path: "functions/requirements.txt"
+      - name: Install requirements
+        run: |
+          cd /functions
+          pip install --upgrade pip
+          pip install -r requirements.txt
       - name: Build marketplace docs
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
         run: |
-          cd marketplace
+          cd /marketplace
           git pull
           cd ..
-          python functions/functions.py build-docs -s ./functions -t ./marketplace -c $CHANNEL
+          python functions/functions.py build-docs -s . -t marketplace -c $CHANNEL
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V2 }}

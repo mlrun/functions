@@ -1,8 +1,9 @@
 import json
 import shutil
+import subprocess
 import uuid
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional, Set
 
 import click
 import yaml
@@ -10,9 +11,14 @@ from bs4 import BeautifulSoup
 from sphinx.cmd.build import main as sphinx_build_cmd
 from sphinx.ext.apidoc import main as sphinx_apidoc_cmd
 
-from common.helpers import is_item_dir, render_jinja_file, PROJECT_ROOT
-from common.marketplace.changelog import ChangeLog
-from common.path_iterator import PathIterator
+from cli.helpers import (
+    is_item_dir,
+    render_jinja_file,
+    PROJECT_ROOT,
+    get_item_yaml_requirements,
+)
+from cli.marketplace.changelog import ChangeLog
+from cli.path_iterator import PathIterator
 
 
 @click.command()
@@ -39,9 +45,12 @@ def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
 
     click.echo(f"Temporary working directory: {root_base}")
 
+    requirements = collect_temp_requirements(source_dir)
+    sphinx_quickstart(temp_docs, requirements)
+
     build_temp_project(source_dir, temp_root)
     build_temp_docs(temp_docs, temp_root)
-    patch_temp_docs(source_dir, temp_docs, temp_root)
+    patch_temp_docs(source_dir, temp_docs)
     render_html_files(temp_docs)
 
     change_log = ChangeLog()
@@ -179,8 +188,9 @@ def render_html_files(temp_docs):
     sphinx_build_cmd(cmd.split(" "))
 
 
-def patch_temp_docs(source_dir, temp_docs, temp_root):
+def patch_temp_docs(source_dir, temp_docs):
     click.echo("Patching temporary docs...")
+
     for directory in PathIterator(root=source_dir, rule=is_item_dir):
         directory = Path(directory)
         with open(directory / "item.yaml", "r") as f:
@@ -188,18 +198,6 @@ def patch_temp_docs(source_dir, temp_docs, temp_root):
 
         example_file = directory / item["example"]
         shutil.copy(example_file, temp_docs / f"{directory.name}_example.ipynb")
-
-    conf_py_target = temp_docs / "conf.py"
-    conf_py_target.unlink()
-
-    render_jinja_file(
-        template_path=PROJECT_ROOT / "common" / "marketplace" / "conf.template",
-        output_path=conf_py_target,
-        data={
-            "sphinx_docs_target": temp_root,
-            "repository_url": "https://github.com/mlrun/marketplace",
-        },
-    )
 
 
 def build_temp_project(source_dir, temp_root):
@@ -217,9 +215,53 @@ def build_temp_project(source_dir, temp_root):
         shutil.copy(py_file, temp_dir / py_file.name)
 
 
+def collect_temp_requirements(source_dir) -> Set[str]:
+    click.echo("Collecting temporary requirements...")
+    requirements = set()
+    for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
+        item_requirements = get_item_yaml_requirements(directory)
+        for item_requirement in item_requirements:
+            requirements.add(item_requirement)
+    return requirements
+
+
+def sphinx_quickstart(
+    temp_root: Union[str, Path], requirements: Optional[Set[str]] = None
+):
+    click.echo("Running Sphinx quickstart...")
+
+    requirements_install: subprocess.CompletedProcess = subprocess.run(
+        f"sphinx-quickstart --no-sep -p Marketplace -a Iguazio -l en -r '' {temp_root}",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=True,
+    )
+
+    requirements = requirements or ""
+    if requirements:
+        requirements = '", "'.join(requirements)
+        requirements = f'"{requirements}"'
+
+    conf_py_target = temp_root / "conf.py"
+    conf_py_target.unlink()
+
+    render_jinja_file(
+        template_path=PROJECT_ROOT / "cli" / "marketplace" / "conf.template",
+        output_path=conf_py_target,
+        data={
+            "sphinx_docs_target": temp_root,
+            "repository_url": "https://github.com/mlrun/marketplace",
+            "mock_imports": requirements,
+        },
+    )
+
+
 def build_temp_docs(temp_docs, temp_root):
+    click.echo("Running Sphinx autodoc...")
+
     cmd = f"-F -o {temp_docs} {temp_root}"
     click.echo(f"Building temporary sphinx docs... [sphinx-apidoc {cmd}]")
+
     sphinx_apidoc_cmd(cmd.split(" "))
 
 

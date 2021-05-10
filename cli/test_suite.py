@@ -1,12 +1,17 @@
 import subprocess
 from pathlib import Path
-from typing import List
 
 import click
 import yaml
 
-from common.helpers import is_item_dir
-from common.path_iterator import PathIterator
+from cli.helpers import (
+    is_item_dir,
+    install_pipenv,
+    install_python,
+    install_requirements,
+    get_item_yaml_requirements,
+)
+from cli.path_iterator import PathIterator
 
 
 @click.command()
@@ -20,7 +25,7 @@ def test_suite(root_directory: str, suite: str):
     if suite == "py":
         test_py(root_directory, clean=True)
     elif suite == "ipynb":
-        test_ipynb(root_directory)
+        test_ipynb(root_directory, clean=True)
     elif suite == "examples":
         test_example(root_directory)
     elif suite == "items":
@@ -31,19 +36,43 @@ def test_suite(root_directory: str, suite: str):
 
 
 def test_py(root_dir=".", clean=False):
+    click.echo("Collecting items...")
+
+    item_iterator = PathIterator(root=root_dir, rule=is_item_dir, as_path=True)
+    testable_items = []
+
+    for item_dir in item_iterator:
+        testable = any(
+            (
+                i.name.startswith("test_") and i.name.endswith(".py")
+                for i in item_dir.iterdir()
+            )
+        )
+        if testable:
+            testable_items.append(item_dir)
+
+    click.echo(f"Found {len(testable_items)} testable items...")
+
+    if not testable_items:
+        exit(0)
+
     install_pipenv()
 
-    for directory in PathIterator(root=root_dir, rule=is_item_dir):
-        # install_python(directory)
+    for directory in testable_items:
+        directory = directory.resolve()
+
+        install_python(directory)
         item_requirements = get_item_yaml_requirements(directory)
         install_requirements(directory, ["pytest"] + item_requirements)
 
         print(f"Running tests for {directory}...")
+
         run_tests: subprocess.CompletedProcess = subprocess.run(
-            ["pipenv", "run", "python", "-m", "pytest"],
+            f"cd {directory} ; pipenv run python -m pytest",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             cwd=directory,
+            shell=True,
         )
 
         print_std(run_tests)
@@ -51,10 +80,31 @@ def test_py(root_dir=".", clean=False):
         if clean:
             clean_pipenv(directory)
 
-        exit(run_tests.returncode)
+        if run_tests.returncode != 0:
+            exit(run_tests.returncode)
 
 
 def test_ipynb(root_dir=".", clean=False):
+    click.echo("Collecting items...")
+
+    item_iterator = PathIterator(root=root_dir, rule=is_item_dir, as_path=True)
+    testable_items = []
+
+    for item_dir in item_iterator:
+        testable = any(
+            (
+                i.name.startswith("test_") and i.name.endswith(".ipynb")
+                for i in item_dir.iterdir()
+            )
+        )
+        if testable:
+            testable_items.append(item_dir)
+
+    click.echo(f"Found {len(testable_items)} testable items...")
+
+    if not testable_items:
+        exit(0)
+
     install_pipenv()
 
     for directory in PathIterator(root=root_dir, rule=is_item_dir):
@@ -62,7 +112,7 @@ def test_ipynb(root_dir=".", clean=False):
         if not notebooks:
             continue
 
-        # install_python(directory)
+        install_python(directory)
         item_requirements = get_item_yaml_requirements(directory)
         install_requirements(directory, ["papermill", "jupyter"] + item_requirements)
 
@@ -111,30 +161,46 @@ def test_example(root_dir="."):
 
 
 def test_item_files(root_dir="."):
-    for directory in PathIterator(root=root_dir, rule=is_item_dir, as_path=True):
+    click.echo("Collecting items...")
 
-        item_path = directory / "item.yaml"
+    item_iterator = PathIterator(root=root_dir, rule=is_item_dir, as_path=True)
+    items = [i / "item.yaml" for i in item_iterator]
 
-        if not item_path.exists():
-            continue
+    click.echo(f"Found {len(items)} items...")
 
-        with open(item_path, "r") as f:
-            item = yaml.full_load(f)
+    error = False
+    for item_path in items:
+        try:
+            directory = item_path.parent
 
-        if item.get("spec")["filename"]:
-            implementation_file = directory / item.get("spec")["filename"]
-            if not implementation_file.exists():
-                raise FileNotFoundError(implementation_file)
+            with open(item_path, "r") as f:
+                item = yaml.full_load(f)
 
-        if item["example"]:
-            example_file = directory / item["example"]
-            if not example_file.exists():
-                raise FileNotFoundError(example_file)
+            if item.get("spec")["filename"]:
+                implementation_file = directory / item.get("spec")["filename"]
+                if not implementation_file.exists():
+                    raise FileNotFoundError(implementation_file)
 
-        if item["doc"]:
-            doc_file = directory / item["doc"]
-            if not doc_file.exists():
-                raise FileNotFoundError(doc_file)
+            if item["example"]:
+                example_file = directory / item["example"]
+                if not example_file.exists():
+                    raise FileNotFoundError(example_file)
+
+            if item["doc"]:
+                doc_file = directory / item["doc"]
+                if not doc_file.exists():
+                    raise FileNotFoundError(doc_file)
+
+            click.secho(f"{item_path} ", nl=False)
+            click.secho(f"[Passed]", fg="green")
+        except FileNotFoundError as e:
+            error = True
+            click.secho(f"{item_path} ", nl=False)
+            click.secho(f"[Failed]:", fg="red")
+            click.echo(str(e))
+
+    if error:
+        exit(1)
 
 
 def clean(root_dir="."):
@@ -156,12 +222,6 @@ def is_example_notebook(path: Path) -> bool:
     )
 
 
-def exit_on_non_zero_return(completed_process: subprocess.CompletedProcess):
-    if completed_process.returncode != 0:
-        print_std(completed_process)
-        exit(completed_process.returncode)
-
-
 def print_std(subprocess_result):
     print()
     print("==================== stdout ====================")
@@ -179,47 +239,6 @@ def clean_pipenv(directory: str):
         pip_file.unlink()
     if pip_lock.exists():
         pip_lock.unlink()
-
-
-def install_python(directory: str):
-    print(f"Installing python for {directory}...")
-    python_install: subprocess.CompletedProcess = subprocess.run(
-        ["pipenv", "--python", "3.7"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=directory,
-    )
-    exit_on_non_zero_return(python_install)
-
-
-def install_pipenv():
-    print("Installing pipenv...")
-    pipenv_install: subprocess.CompletedProcess = subprocess.run(
-        ["pip", "install", "pipenv"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    exit_on_non_zero_return(pipenv_install)
-
-
-def install_requirements(directory: str, requirements: List[str]):
-    if not requirements:
-        print(f"No requirements found for {directory}...")
-        return
-
-    print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
-    requirements_install: subprocess.CompletedProcess = subprocess.run(
-        ["pipenv", "install", "--skip-lock"] + requirements,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=directory,
-    )
-
-    exit_on_non_zero_return(requirements_install)
-
-
-def get_item_yaml_requirements(directory: str):
-    with open(f"{directory}/item.yaml", "r") as f:
-        item = yaml.full_load(f)
-    return item.get("spec", {}).get("requirements", [])
 
 
 if __name__ == "__main__":

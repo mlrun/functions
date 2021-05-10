@@ -101,6 +101,8 @@ html_favicon = "{{html_favicon}}"
 
 jupyter_execute_notebooks = "off"
 
+autodoc_mock_imports = [{{mock_imports}}]
+
 # -- Extension configuration -------------------------------------------------
 {% raw %}
 def copy_doc(src, dest, title=""):

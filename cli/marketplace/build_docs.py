@@ -3,7 +3,7 @@ import shutil
 import subprocess
 import uuid
 from pathlib import Path
-from typing import Union, Optional, List, Set
+from typing import Union, Optional, Set
 
 import click
 import yaml
@@ -198,19 +198,6 @@ def patch_temp_docs(source_dir, temp_docs):
 
         example_file = directory / item["example"]
         shutil.copy(example_file, temp_docs / f"{directory.name}_example.ipynb")
-
-    # conf_py_target = temp_docs / "conf.py"
-    # conf_py_target.unlink()
-    #
-    # render_jinja_file(
-    #     template_path=PROJECT_ROOT / "cli" / "marketplace" / "conf.template",
-    #     output_path=conf_py_target,
-    #     data={
-    #         "sphinx_docs_target": temp_root,
-    #         "repository_url": "https://github.com/mlrun/marketplace",
-    #         "mock_imports": mock_imports,
-    #     },
-    # )
 
 
 def build_temp_project(source_dir, temp_root):

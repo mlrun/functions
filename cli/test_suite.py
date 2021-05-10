@@ -80,7 +80,8 @@ def test_py(root_dir=".", clean=False):
         if clean:
             clean_pipenv(directory)
 
-        exit(run_tests.returncode)
+        if run_tests.returncode != 0:
+            exit(run_tests.returncode)
 
 
 def test_ipynb(root_dir=".", clean=False):

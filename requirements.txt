@@ -9,4 +9,3 @@ click
 pipenv
 nuclio-jupyter
 myst_nb
-sphinx_book_theme

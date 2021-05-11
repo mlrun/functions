@@ -79,7 +79,6 @@ def test_py(root_dir=".", clean=False):
 
         if clean:
             clean_pipenv(directory)
-
         if run_tests.returncode != 0:
             exit(run_tests.returncode)
 

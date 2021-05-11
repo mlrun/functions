@@ -17,8 +17,8 @@ platformVersion: 3.0.0
 spec:
   filename: rnn_serving.py
   handler: RNN_Model_Serving
-  image: mlrun/mlrun
-  kind: job
-  requirements: ['mlrun','keras','tensorflow','wget',"pygit2"]
+  image: mlrun/ml-model
+  kind: serving
+  requirements: ['mlrun==0.6.2','keras','tensorflow','wget',"pygit2"]
 url: ''
 version: 0.0.1

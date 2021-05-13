@@ -1,0 +1,24 @@
+apiVersion: v1
+categories:
+- model-testing
+description: simulate data with outliers.
+doc: ''
+example: xgb_custom.ipynb
+generationDate: ''
+icon: ''
+labels:
+  author: Daniel
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.6.2
+name: xgb_custom
+org: Iguazio
+platformVersion: 3.0.0
+spec:
+  filename: xgb_custom.py
+  handler: gen_outliers
+  image: mlrun/mlrun
+  kind: job
+  requirements: ['mlrun','pandas','typing','xgboost','matplotlib']
+url: ''
+version: 0.0.1

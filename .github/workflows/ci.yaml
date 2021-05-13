@@ -82,7 +82,7 @@ jobs:
           cd marketplace
           git pull
           cd ..
-          python functions/functions.py build-docs -s . -t marketplace -c $CHANNEL
+          python functions/functions.py build-docs -s . -t marketplace -c $CHANNEL -v
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V2 }}

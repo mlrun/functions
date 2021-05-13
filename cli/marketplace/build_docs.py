@@ -20,6 +20,8 @@ from cli.helpers import (
 from cli.marketplace.changelog import ChangeLog
 from cli.path_iterator import PathIterator
 
+_verbose = False
+
 
 @click.command()
 @click.option("-s", "--source-dir", help="Path to the source directory")
@@ -28,7 +30,19 @@ from cli.path_iterator import PathIterator
     "-T", "--temp-dir", default="/tmp", help="Path to intermediate build directory"
 )
 @click.option("-c", "--channel", default="master", help="Name of build channel")
-def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
+@click.option(
+    "-v",
+    "--verbose",
+    is_flag=True,
+    default=False,
+    help="When this flag is set, the process will output extra information",
+)
+def build_docs(
+    source_dir: str, target_dir: str, temp_dir: str, channel: str, verbose: bool
+):
+    global _verbose
+    _verbose = verbose
+
     root_base = Path(temp_dir) / uuid.uuid4().hex
     temp_root = root_base / "functions"
     temp_docs = root_base / "docs"
@@ -45,13 +59,23 @@ def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
 
     click.echo(f"Temporary working directory: {root_base}")
 
+    if _verbose:
+        click.echo("\n\n -- Current marketplace structure:")
+        print_file_tree(target_channel)
+        click.echo("\n\n")
+
     requirements = collect_temp_requirements(source_dir)
     sphinx_quickstart(temp_docs, requirements)
 
     build_temp_project(source_dir, temp_root)
-    build_temp_docs(temp_docs, temp_root)
+    build_temp_docs(temp_root, temp_docs)
     patch_temp_docs(source_dir, temp_docs)
     render_html_files(temp_docs)
+
+    if _verbose:
+        click.echo("\n\n -- Temporary project structure:")
+        print_file_tree(temp_root)
+        click.echo("\n\n")
 
     change_log = ChangeLog()
     copy_static_resources(target_dir, temp_docs)
@@ -59,7 +83,26 @@ def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
     update_or_create_items(change_log, source_dir, target_channel, temp_docs)
     build_catalog_json(target_channel)
 
+    if _verbose:
+        click.echo("\n\n -- Resulting marketplace structure:")
+        print_file_tree(target_channel)
+        click.echo("\n\n")
+
     write_change_log(target_dir / "README.md", change_log)
+
+
+def print_file_tree(path):
+    path = Path(path)
+    lines = ["---------------------------------", f"\t{path.resolve()}"]
+    for file in path.iterdir():
+        lines.append("\t|")
+        lines.append(f"\t|__ {file.name}")
+        if file.is_dir():
+            for sub_path in file.iterdir():
+                lines.append("\t|\t|")
+                lines.append(f"\t|\t|__ {sub_path.name}")
+    lines.append("---------------------------------")
+    click.echo("\n".join(lines))
 
 
 def write_change_log(readme: Path, change_log: ChangeLog):
@@ -256,7 +299,7 @@ def sphinx_quickstart(
     )
 
 
-def build_temp_docs(temp_docs, temp_root):
+def build_temp_docs(temp_root, temp_docs):
     click.echo("Running Sphinx autodoc...")
 
     cmd = f"-F -o {temp_docs} {temp_root}"

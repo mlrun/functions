@@ -60,9 +60,7 @@ def build_docs(
     click.echo(f"Temporary working directory: {root_base}")
 
     if _verbose:
-        click.echo("\n\n -- Current marketplace structure:")
-        print_file_tree(target_channel)
-        click.echo("\n\n")
+        print_file_tree("Current marketplace structure", target_channel)
 
     requirements = collect_temp_requirements(source_dir)
     sphinx_quickstart(temp_docs, requirements)
@@ -70,12 +68,11 @@ def build_docs(
     build_temp_project(source_dir, temp_root)
     build_temp_docs(temp_root, temp_docs)
     patch_temp_docs(source_dir, temp_docs)
-    render_html_files(temp_docs)
 
     if _verbose:
-        click.echo("\n\n -- Temporary project structure:")
-        print_file_tree(temp_root)
-        click.echo("\n\n")
+        print_file_tree("Temporary project structure", temp_root)
+
+    render_html_files(temp_docs)
 
     change_log = ChangeLog()
     copy_static_resources(target_dir, temp_docs)
@@ -84,14 +81,13 @@ def build_docs(
     build_catalog_json(target_channel)
 
     if _verbose:
-        click.echo("\n\n -- Resulting marketplace structure:")
-        print_file_tree(target_channel)
-        click.echo("\n\n")
+        print_file_tree("Resulting marketplace structure", target_channel)
 
     write_change_log(target_dir / "README.md", change_log)
 
 
-def print_file_tree(path):
+def print_file_tree(title: str, path: Union[str, Path]):
+    click.echo(f"\n\n -- {title}:")
     path = Path(path)
     lines = ["---------------------------------", f"\t{path.resolve()}"]
     for file in path.iterdir():
@@ -103,6 +99,7 @@ def print_file_tree(path):
                 lines.append(f"\t|\t|__ {sub_path.name}")
     lines.append("---------------------------------")
     click.echo("\n".join(lines))
+    click.echo("\n\n")
 
 
 def write_change_log(readme: Path, change_log: ChangeLog):
@@ -273,7 +270,7 @@ def sphinx_quickstart(
 ):
     click.echo("Running Sphinx quickstart...")
 
-    requirements_install: subprocess.CompletedProcess = subprocess.run(
+    subprocess.CompletedProcess = subprocess.run(
         f"sphinx-quickstart --no-sep -p Marketplace -a Iguazio -l en -r '' {temp_root}",
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

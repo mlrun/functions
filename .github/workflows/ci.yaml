@@ -72,14 +72,14 @@ jobs:
           python-version: 3.7
       - name: Install requirements
         run: |
-          cd /functions
+          cd functions
           pip install --upgrade pip
           pip install -r requirements.txt
       - name: Build marketplace docs
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
         run: |
-          cd /marketplace
+          cd marketplace
           git pull
           cd ..
           python functions/functions.py build-docs -s . -t marketplace -c $CHANNEL

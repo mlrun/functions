@@ -243,6 +243,10 @@ def patch_temp_docs(source_dir, temp_docs):
 def build_temp_project(source_dir, temp_root):
     click.echo("[Temporary project] Starting to build project...")
 
+    if _verbose:
+        click.echo(f"Source dir: {source_dir}")
+        click.echo(f"Temp root: {temp_root}")
+
     item_count = 0
     for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
         if _verbose:
@@ -261,7 +265,7 @@ def build_temp_project(source_dir, temp_root):
         shutil.copy(py_file, temp_dir / py_file.name)
 
     if _verbose:
-        click.echo(f"[Temporary project] Done project (item count: {item_count})...")
+        click.echo(f"[Temporary project] Done project (item count: {item_count})")
 
 
 def collect_temp_requirements(source_dir) -> Set[str]:
@@ -275,7 +279,7 @@ def collect_temp_requirements(source_dir) -> Set[str]:
 
     if _verbose:
         click.echo(
-            f"[Temporary project] Done requirements ({', '.join(requirements)})..."
+            f"[Temporary project] Done requirements ({', '.join(requirements)})"
         )
 
     return requirements
@@ -311,16 +315,18 @@ def sphinx_quickstart(
         },
     )
 
-    click.echo("[Sphinx] Done quickstart...")
+    click.echo("[Sphinx] Done quickstart")
 
 
 def build_temp_docs(temp_root, temp_docs):
-    click.echo("Running Sphinx autodoc...")
+    click.echo("[Sphinx] Running autodoc...")
 
     cmd = f"-F -o {temp_docs} {temp_root}"
     click.echo(f"Building temporary sphinx docs... [sphinx-apidoc {cmd}]")
 
     sphinx_apidoc_cmd(cmd.split(" "))
+
+    click.echo("[Sphinx] Done autodoc")
 
 
 if __name__ == "__main__":

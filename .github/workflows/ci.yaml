@@ -51,7 +51,7 @@ jobs:
     name: Build marketplace
     if: github.repository == 'mlrun/functions' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-    needs: tests
+#    needs: tests
 
     steps:
       - name: Get branch name

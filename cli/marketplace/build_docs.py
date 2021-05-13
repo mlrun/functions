@@ -57,6 +57,9 @@ def build_docs(
     target_dir.mkdir(parents=True, exist_ok=True)
     target_channel.mkdir(parents=True, exist_ok=True)
 
+    if _verbose:
+        print_file_tree("Source project structure", source_dir)
+
     click.echo(f"Temporary working directory: {root_base}")
 
     if _verbose:

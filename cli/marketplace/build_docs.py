@@ -241,8 +241,14 @@ def patch_temp_docs(source_dir, temp_docs):
 
 
 def build_temp_project(source_dir, temp_root):
-    click.echo("Building temporary project...")
+    click.echo("[Temporary project] Starting to build project...")
+
+    item_count = 0
     for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
+        if _verbose:
+            item_count += 1
+            click.echo(f"[Temporary project] Now processing: {directory / 'item.yaml'}")
+
         with open(directory / "item.yaml", "r") as f:
             item = yaml.full_load(f)
 
@@ -254,23 +260,33 @@ def build_temp_project(source_dir, temp_root):
         (temp_dir / "__init__.py").touch()
         shutil.copy(py_file, temp_dir / py_file.name)
 
+    if _verbose:
+        click.echo(f"[Temporary project] Done project (item count: {item_count})...")
+
 
 def collect_temp_requirements(source_dir) -> Set[str]:
-    click.echo("Collecting temporary requirements...")
+    click.echo("[Temporary project] Starting to collect requirements...")
     requirements = set()
+
     for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
         item_requirements = get_item_yaml_requirements(directory)
         for item_requirement in item_requirements:
             requirements.add(item_requirement)
+
+    if _verbose:
+        click.echo(
+            f"[Temporary project] Done requirements ({', '.join(requirements)})..."
+        )
+
     return requirements
 
 
 def sphinx_quickstart(
     temp_root: Union[str, Path], requirements: Optional[Set[str]] = None
 ):
-    click.echo("Running Sphinx quickstart...")
+    click.echo("[Sphinx] Running quickstart...")
 
-    subprocess.CompletedProcess = subprocess.run(
+    subprocess.run(
         f"sphinx-quickstart --no-sep -p Marketplace -a Iguazio -l en -r '' {temp_root}",
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -294,6 +310,8 @@ def sphinx_quickstart(
             "mock_imports": requirements,
         },
     )
+
+    click.echo("[Sphinx] Done quickstart...")
 
 
 def build_temp_docs(temp_root, temp_docs):

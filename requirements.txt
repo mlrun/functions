@@ -1,3 +1,4 @@
+wheel
 sphinx
 myst-nb
 sphinx-book-theme
@@ -9,4 +10,3 @@ click
 pipenv
 nuclio-jupyter
 myst_nb
-wheel

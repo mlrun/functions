@@ -3,6 +3,7 @@
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -17,7 +18,6 @@ from typing import List
 
 pd.set_option("display.float_format", lambda x: "%.2f" % x)
 
-
 def summarize(
     context: MLClientCtx,
     table: DataItem,
@@ -25,7 +25,7 @@ def summarize(
     class_labels: List[str] = [],
     plot_hist: bool = True,
     plots_dest: str = "plots",
-    update_dataset=False,
+    update_dataset = False,
 ) -> None:
     """Summarize a table
 

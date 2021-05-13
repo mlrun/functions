@@ -3,17 +3,28 @@
 import warnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
+import json
 import os
 
-from cloudpickle import dumps
+from cloudpickle import dumps, load, dump
+
+from sklearn import metrics
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.preprocessing import label_binarize
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+
 from typing import List
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
+from mlrun.artifacts import PlotArtifact
 from mlrun.mlutils.data import get_sample, get_splits
 from mlrun.mlutils.models import gen_sklearn_model, eval_model_v2
 from mlrun.utils.helpers import create_class
-from mlrun.artifacts.model import ModelArtifact
+
 
 def train_model(
     context: MLClientCtx,
@@ -72,9 +83,8 @@ def train_model(
     
     (xtrain, ytrain), (xvalid, yvalid), (xtest, ytest) =         get_splits(raw, labels, 3, test_size, 1-train_val_split, random_state)
     
-    test_set = pd.concat([xtest, ytest.to_frame()], axis=1)
     context.log_dataset(test_set_key, 
-                        df=test_set,
+                        df=pd.concat([xtest, ytest.to_frame()], axis=1),
                         format=file_ext, index=False, 
                         labels={"data-type": "held-out"},
                         artifact_path=context.artifact_subpath('data'))
@@ -100,24 +110,11 @@ def train_model(
         eval_metrics = eval_model_v2(context, xvalid, yvalid, model,
                                      plots_artifact_path=plots_path)
         
-    kwargs = {}
-    if "algorithm" in ModelArtifact._dict_fields:
-        kwargs["training_set"] = test_set
-        kwargs["label_column"] = label_column
-        split = model_pkg_class.rsplit('.', 1)
-        if split and len(split) == 2:
-            kwargs["algorithm"] = split[1]
-
-        if dataset.meta and dataset.meta.kind == "FeatureVector":
-            kwargs["feature_vector"] = dataset.meta.uri
-
     context.set_label('class', model_pkg_class)
     context.log_model("model", body=dumps(model),
                       artifact_path=artifact_path,
                       extra_data=eval_metrics, 
                       model_file="model.pkl",
                       metrics=context.results,
-                      labels={"class": model_pkg_class},
-                      framework='sklearn',
-                      **kwargs)
+                      labels={"class": model_pkg_class})
 

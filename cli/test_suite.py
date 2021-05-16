@@ -1,5 +1,9 @@
 import subprocess
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from pathlib import Path
+from subprocess import CompletedProcess
+from typing import List, Union, Optional
 
 import click
 import yaml
@@ -17,217 +21,512 @@ from cli.path_iterator import PathIterator
 @click.command()
 @click.option("-r", "--root-directory", default=".", help="Path to root directory")
 @click.option("-s", "--suite", help="Type of suite to run [py/ipynb/examples/items]")
-def test_suite(root_directory: str, suite: str):
+@click.option(
+    "-f",
+    "--stop-on-failure",
+    is_flag=True,
+    default=False,
+    help="When true, test suite will stop running after the first test ran",
+)
+def test_suite(root_directory: str, suite: str, stop_on_failure: bool):
     if not suite:
         click.echo("-s/--suite is required")
         exit(1)
 
     if suite == "py":
-        test_py(root_directory, clean=True)
+        TestPY(stop_on_failure=stop_on_failure, clean_env_artifacts=True)._run(
+            root_directory
+        )
     elif suite == "ipynb":
-        test_ipynb(root_directory, clean=True)
+        TestIPYNB(stop_on_failure=stop_on_failure, clean_env_artifacts=True)._run(
+            root_directory
+        )
     elif suite == "examples":
         test_example(root_directory)
     elif suite == "items":
-        test_item_files(root_directory)
+        TestItemYamls(stop_on_failure=stop_on_failure)
     else:
         click.echo(f"Suite {suite} is unsupported")
         exit(1)
 
 
-def test_py(root_dir=".", clean=False):
-    click.echo("Collecting items...")
+def test_example(root_dir="."):
+    # install_pipenv()
+    #
+    # for directory in PathIterator(root=root_dir, rule=is_item_dir):
+    #     notebooks = [n for n in PathIterator(root=directory, rule=is_test_notebook)]
+    #     if not notebooks:
+    #         continue
+    #
+    #     # install_python(directory)
+    #     item_requirements = get_item_yaml_requirements(directory)
+    #     install_requirements(directory, ["papermill", "jupyter"] + item_requirements)
+    #
+    #     # for notebook in notebooks:
+    #     #     print(f"Running tests for {notebook}...")
+    #     #     run_papermill: CompletedProcess = subprocess.run(
+    #     #         ["pipenv", "run", "papermill", notebook, "-"],
+    #     #         stdout=subprocess.PIPE,
+    #     #         stderr=subprocess.PIPE,
+    #     #         cwd=directory,
+    #     #     )
+    #     #     if run_papermill.returncode != 0:
+    #     #         print_std(run_papermill)
+    #     #         exit(run_papermill.returncode)
+    #     #     exit(0)
+    pass
 
-    item_iterator = PathIterator(root=root_dir, rule=is_item_dir, as_path=True)
-    testable_items = []
 
-    for item_dir in item_iterator:
-        testable = any(
-            (
-                i.name.startswith("test_") and i.name.endswith(".py")
-                for i in item_dir.iterdir()
-            )
-        )
-        if testable:
-            testable_items.append(item_dir)
+@dataclass
+class TestResult:
+    status: str
+    status_code: Optional[int]
+    meta_data: dict = field(default_factory=dict)
 
-    click.echo(f"Found {len(testable_items)} testable items...")
+    @classmethod
+    def passed(
+        cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
+    ):
+        return cls(status="Passed", status_code=status_code, meta_data=meta_data)
 
-    if not testable_items:
+    @classmethod
+    def failed(
+        cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
+    ):
+        return cls(status="Failed", status_code=status_code, meta_data=meta_data)
+
+    @classmethod
+    def ignored(
+        cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
+    ):
+        return cls(status="Ignored", status_code=status_code, meta_data=meta_data)
+
+
+class TestSuite(ABC):
+    def __init__(self, stop_on_failure: bool = True):
+        self.stop_on_failure = stop_on_failure
+        self.test_results = []
+
+    @abstractmethod
+    def discover(self, path: Union[str, Path]) -> List[str]:
+        pass
+
+    @abstractmethod
+    def run(self, path: Union[str, Path]) -> TestResult:
+        pass
+
+    @abstractmethod
+    def before_run(self):
+        pass
+
+    @abstractmethod
+    def after_run(self):
+        pass
+
+    @abstractmethod
+    def before_each(self, path: Union[str, Path]):
+        pass
+
+    @abstractmethod
+    def after_each(self, path: Union[str, Path], test_result: TestResult):
+        pass
+
+    def _run(self, path: Union[str, Path]):
+        discovered = self.discover(path)
+        self.before_run()
+        for directory in discovered:
+            self.before_each(directory)
+            result = self.run(directory)
+            self.test_results.append(result)
+            self.after_each(directory, result)
+        self.after_run()
         exit(0)
 
-    install_pipenv()
 
-    for directory in testable_items:
-        directory = directory.resolve()
+class TestPY(TestSuite):
+    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True):
+        super().__init__(stop_on_failure)
+        self.clean_env_artifacts = clean_env_artifacts
+        self.results = []
 
-        install_python(directory)
-        item_requirements = get_item_yaml_requirements(directory)
-        install_requirements(directory, ["pytest"] + item_requirements)
+    def discover(self, path: Union[str, Path]) -> List[str]:
+        path = Path(path)
+        testables = []
 
-        print(f"Running tests for {directory}...")
+        # Handle single test file
+        if (path / "item.yaml").exists():
+            for inner_file in path.iterdir():
+                if self.is_test_py(inner_file):
+                    testables.append(str(path.resolve()))
+                    break
+            if testables:
+                click.echo("Found testable directory...")
+        # Handle multiple directories
+        else:
+            item_iterator = PathIterator(root=path, rule=is_item_dir, as_path=True)
+            for inner_dir in item_iterator:
+                # Iterate individual files in each directory
+                for inner_file in inner_dir.iterdir():
+                    if self.is_test_py(inner_file):
+                        testables.append(str(inner_dir.resolve()))
+                        break
+            click.echo(f"Found {len(testables)} testable items...")
 
-        run_tests: subprocess.CompletedProcess = subprocess.run(
-            f"cd {directory} ; pipenv run python -m pytest",
+        if not testables:
+            click.echo(
+                "No tests found, make sure your test file names are structures as 'test_*.py')"
+            )
+            exit(0)
+
+        return testables
+
+    def before_run(self):
+        install_pipenv()
+
+    def before_each(self, path: Union[str, Path]):
+        pass
+
+    def run(self, path: Union[str, Path]):
+        install_python(path)
+        item_requirements = get_item_yaml_requirements(path)
+        install_requirements(path, ["pytest"] + item_requirements)
+        click.echo(f"Running tests for {path}...")
+        completed_process: CompletedProcess = subprocess.run(
+            f"cd {path} ; pipenv run python -m pytest",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=directory,
+            cwd=path,
             shell=True,
         )
 
-        print_std(run_tests)
+        meta_data = {"completed_process": completed_process, "test_path": path}
 
-        if clean:
-            clean_pipenv(directory)
-        if run_tests.returncode != 0:
-            exit(run_tests.returncode)
+        if completed_process.returncode == 0:
+            return TestResult.passed(status_code=0, meta_data=meta_data)
 
-
-def test_ipynb(root_dir=".", clean=False):
-    click.echo("Collecting items...")
-
-    item_iterator = PathIterator(root=root_dir, rule=is_item_dir, as_path=True)
-    testable_items = []
-
-    for item_dir in item_iterator:
-        testable = any(
-            (
-                i.name.startswith("test_") and i.name.endswith(".ipynb")
-                for i in item_dir.iterdir()
-            )
+        return TestResult.failed(
+            status_code=completed_process.returncode,
+            meta_data=meta_data,
         )
-        if testable:
-            testable_items.append(item_dir)
 
-    click.echo(f"Found {len(testable_items)} testable items...")
+    def after_each(self, path: Union[str, Path], test_result: TestResult):
+        if self.clean_env_artifacts:
+            clean_pipenv(path)
 
-    if not testable_items:
-        exit(0)
+        if self.stop_on_failure:
+            if test_result.status == "Failed":
+                complete_subprocess: CompletedProcess = test_result.meta_data[
+                    "complete_subprocess"
+                ]
+                click.echo(f"{path} [Failed]")
+                click.echo("==================== stdout ====================")
+                click.echo(complete_subprocess.stdout.decode("utf-8"))
+                click.echo("==================== stderr ====================")
+                click.echo(complete_subprocess.stderr.decode("utf-8"))
+                exit(test_result.status_code)
 
-    install_pipenv()
+    def after_run(self):
+        failed_tests = []
+        passed_tests = []
+        ignored_tests = []
 
-    for directory in PathIterator(root=root_dir, rule=is_item_dir):
-        notebooks = [n for n in PathIterator(root=directory, rule=is_test_notebook)]
-        if not notebooks:
-            continue
+        for test_result in self.test_results:
+            if test_result.status == "Failed":
+                failed_tests.append(test_result)
+            elif test_result.status == "Passed":
+                passed_tests.append(test_result)
+            elif test_result.status == "Ignored":
+                ignored_tests.append(ignored_tests)
+            else:
+                click.echo(f"Unsupported test status detected: {test_result.status}")
 
-        install_python(directory)
-        item_requirements = get_item_yaml_requirements(directory)
-        install_requirements(directory, ["papermill", "jupyter"] + item_requirements)
+        click.echo(f"Passed: {len(passed_tests)}")
+        click.echo(f"Failed: {len(failed_tests)}")
+        click.echo(f"Ignored: {len(ignored_tests)}")
 
-        for notebook in notebooks:
-            print(f"Running tests for {notebook}...")
-            run_papermill: subprocess.CompletedProcess = subprocess.run(
-                ["pipenv", "run", "papermill", notebook, "-"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                cwd=directory,
+        for passed_test in passed_tests:
+            test_path = passed_test.meta_data["test_path"]
+            click.echo(f"{test_path} [Passed]")
+
+        for ignore_test in ignored_tests:
+            test_path = ignore_test.meta_data["test_path"]
+            click.echo(f"{test_path} [Ignored]")
+
+        for failed_test in failed_tests:
+            test_path = failed_test.meta_data["test_path"]
+            process = failed_test.meta_data["completed_process"]
+            click.echo(f"{test_path} [Failed]")
+            click.echo("==================== stdout ====================")
+            click.echo(process.stdout.decode("utf-8"))
+            click.echo("==================== stderr ====================")
+            click.echo(process.stderr.decode("utf-8"))
+            click.echo("\n")
+
+        if failed_tests:
+            exit(1)
+
+    @staticmethod
+    def is_test_py(path: Union[str, Path]) -> bool:
+        return (
+            path.is_file()
+            and path.name.startswith("test_")
+            and path.name.endswith(".py")
+        )
+
+
+class TestIPYNB(TestSuite):
+    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True):
+        super().__init__(stop_on_failure)
+        self.clean_env_artifacts = clean_env_artifacts
+        self.results = []
+
+    def discover(self, path: Union[str, Path]) -> List[str]:
+        path = Path(path)
+        testables = []
+
+        # Handle single test directory
+        if (path / "item.yaml").exists():
+            for inner_file in path.iterdir():
+                if self.is_test_ipynb(inner_file):
+                    testables.append(str(inner_file.resolve()))
+            if testables:
+                click.echo("Found testable directory...")
+        # Handle multiple directories
+        else:
+            item_iterator = PathIterator(root=path, rule=is_item_dir, as_path=True)
+            for inner_dir in item_iterator:
+                # Iterate individual files in each directory
+                for inner_file in inner_dir.iterdir():
+                    if self.is_test_ipynb(inner_file):
+                        testables.append(str(inner_file.resolve()))
+            click.echo(f"Found {len(testables)} testable items...")
+
+        if not testables:
+            click.echo(
+                "No tests found, make sure your test file names are structures as 'test_*.py')"
             )
-            if run_papermill.returncode != 0:
-                print_std(run_papermill)
-                exit(run_papermill.returncode)
+            exit(0)
 
-        if clean:
-            clean_pipenv(directory)
+        return testables
 
-        exit(0)
+    def before_run(self):
+        install_pipenv()
+
+    def before_each(self, path: Union[str, Path]):
+        pass
+
+    def run(self, path: Union[str, Path]) -> TestResult:
+        install_python(path)
+        item_requirements = get_item_yaml_requirements(path)
+        install_requirements(path, ["papermill", "jupyter"] + item_requirements)
+
+        click.echo(f"Running tests for {path}...")
+        completed_process: CompletedProcess = subprocess.run(
+            f"cd {path.parent.resolve()} ; pipenv run papermill {path.name} -",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=path,
+            shell=True,
+        )
+
+        meta_data = {"completed_process": completed_process, "test_path": path}
+
+        if completed_process.returncode == 0:
+            return TestResult.passed(status_code=0, meta_data=meta_data)
+
+        return TestResult.failed(
+            status_code=completed_process.returncode,
+            meta_data=meta_data,
+        )
+
+    def after_run(self):
+        failed_tests = []
+        passed_tests = []
+        ignored_tests = []
+
+        for test_result in self.test_results:
+            if test_result.status == "Failed":
+                failed_tests.append(test_result)
+            elif test_result.status == "Passed":
+                passed_tests.append(test_result)
+            elif test_result.status == "Ignored":
+                ignored_tests.append(ignored_tests)
+            else:
+                click.echo(f"Unsupported test status detected: {test_result.status}")
+
+        click.echo(f"Passed: {len(passed_tests)}")
+        click.echo(f"Failed: {len(failed_tests)}")
+        click.echo(f"Ignored: {len(ignored_tests)}")
+
+        for passed_test in passed_tests:
+            test_path = passed_test.meta_data["test_path"]
+            click.echo(f"{test_path} [Passed]")
+
+        for ignore_test in ignored_tests:
+            test_path = ignore_test.meta_data["test_path"]
+            click.echo(f"{test_path} [Ignored]")
+
+        for failed_test in failed_tests:
+            test_path = failed_test.meta_data["test_path"]
+            process = failed_test.meta_data["completed_process"]
+            click.echo(f"{test_path} [Failed]")
+            click.echo("==================== stdout ====================")
+            click.echo(process.stdout.decode("utf-8"))
+            click.echo("==================== stderr ====================")
+            click.echo(process.stderr.decode("utf-8"))
+            click.echo("\n")
+
+        if failed_tests:
+            exit(1)
+
+    def after_each(self, path: Union[str, Path], test_result: TestResult):
+        if self.clean_env_artifacts:
+            clean_pipenv(path)
+
+        if self.stop_on_failure:
+            if test_result.status == "Failed":
+                complete_subprocess: CompletedProcess = test_result.meta_data[
+                    "complete_subprocess"
+                ]
+                click.echo(f"{path} [Failed]")
+                click.echo("==================== stdout ====================")
+                click.echo(complete_subprocess.stdout.decode("utf-8"))
+                click.echo("==================== stderr ====================")
+                click.echo(complete_subprocess.stderr.decode("utf-8"))
+                exit(test_result.status_code)
+
+    def _run(self, path: Union[str, Path]):
+        super()._run(path)
+
+    @staticmethod
+    def is_test_ipynb(path: Path):
+        return (
+            path.is_file()
+            and path.name.startswith("test_")
+            and path.name.endswith(".py")
+        )
 
 
-def test_example(root_dir="."):
-    install_pipenv()
+class TestItemYamls(TestSuite):
+    def __init__(self, stop_on_failure: bool = True):
+        super().__init__(stop_on_failure)
 
-    for directory in PathIterator(root=root_dir, rule=is_item_dir):
-        notebooks = [n for n in PathIterator(root=directory, rule=is_test_notebook)]
-        if not notebooks:
-            continue
+    def discover(self, path: Union[str, Path]) -> List[str]:
+        path = Path(path)
+        testables = []
 
-        # install_python(directory)
-        item_requirements = get_item_yaml_requirements(directory)
-        install_requirements(directory, ["papermill", "jupyter"] + item_requirements)
+        # Handle single test directory
+        if (path / "item.yaml").exists():
+            testables.append(str((path / "item.yaml").resolve()))
+            if testables:
+                click.echo("Found testable directory...")
+        # Handle multiple directories
+        else:
+            item_iterator = PathIterator(root=path, rule=is_item_dir, as_path=True)
+            for item_dir in item_iterator:
+                testables.append(str((item_dir / "item.yaml").resolve()))
+            click.echo(f"Found {len(testables)} testable items...")
 
-        # for notebook in notebooks:
-        #     print(f"Running tests for {notebook}...")
-        #     run_papermill: subprocess.CompletedProcess = subprocess.run(
-        #         ["pipenv", "run", "papermill", notebook, "-"],
-        #         stdout=subprocess.PIPE,
-        #         stderr=subprocess.PIPE,
-        #         cwd=directory,
-        #     )
-        #     if run_papermill.returncode != 0:
-        #         print_std(run_papermill)
-        #         exit(run_papermill.returncode)
-        #     exit(0)
+        if not testables:
+            click.echo(
+                "No tests found, make sure your test file names are structures as 'test_*.py')"
+            )
+            exit(0)
 
+        return testables
 
-def test_item_files(root_dir="."):
-    click.echo("Collecting items...")
+    def run(self, path: Union[str, Path]) -> TestResult:
+        path = Path(path)
+        item = yaml.full_load(open(path, "r"))
+        directory = path.parent
 
-    item_iterator = PathIterator(root=root_dir, rule=is_item_dir, as_path=True)
-    items = [i / "item.yaml" for i in item_iterator]
+        if item.get("spec")["filename"]:
+            implementation_file = directory / item.get("spec")["filename"]
+            if not implementation_file.exists():
+                return TestResult.failed(
+                    status_code=1,
+                    meta_data={
+                        "message": f"Item.spec.filename ({implementation_file}) not found",
+                        "test_path": path,
+                    },
+                )
+        if item["example"]:
+            example_file = directory / item["example"]
+            if not example_file.exists():
+                return TestResult.failed(
+                    status_code=1,
+                    meta_data={
+                        "message": f"Item.example ({example_file}) not found",
+                        "test_path": path,
+                    },
+                )
 
-    click.echo(f"Found {len(items)} items...")
+        if item["doc"]:
+            doc_file = directory / item["doc"]
+            if not doc_file.exists():
+                return TestResult.failed(
+                    status_code=1,
+                    meta_data={
+                        "message": f"Item.doc ({doc_file}) not found",
+                        "test_path": path,
+                    },
+                )
 
-    error = False
-    for item_path in items:
-        try:
-            directory = item_path.parent
+        return TestResult.passed(
+            status_code=0,
+            meta_data={"message": f"Valid item {path}", "test_path": path},
+        )
 
-            with open(item_path, "r") as f:
-                item = yaml.full_load(f)
+    def before_run(self):
+        pass
 
-            if item.get("spec")["filename"]:
-                implementation_file = directory / item.get("spec")["filename"]
-                if not implementation_file.exists():
-                    raise FileNotFoundError(implementation_file)
+    def after_run(self):
+        failed_tests = []
+        passed_tests = []
+        ignored_tests = []
 
-            if item["example"]:
-                example_file = directory / item["example"]
-                if not example_file.exists():
-                    raise FileNotFoundError(example_file)
+        for test_result in self.test_results:
+            if test_result.status == "Failed":
+                failed_tests.append(test_result)
+            elif test_result.status == "Passed":
+                passed_tests.append(test_result)
+            elif test_result.status == "Ignored":
+                ignored_tests.append(ignored_tests)
+            else:
+                click.echo(f"Unsupported test status detected: {test_result.status}")
 
-            if item["doc"]:
-                doc_file = directory / item["doc"]
-                if not doc_file.exists():
-                    raise FileNotFoundError(doc_file)
+        click.echo(f"Passed: {len(passed_tests)}")
+        click.echo(f"Failed: {len(failed_tests)}")
+        click.echo(f"Ignored: {len(ignored_tests)}")
 
-            click.secho(f"{item_path} ", nl=False)
-            click.secho(f"[Passed]", fg="green")
-        except FileNotFoundError as e:
-            error = True
-            click.secho(f"{item_path} ", nl=False)
-            click.secho(f"[Failed]:", fg="red")
-            click.echo(str(e))
+        for passed_test in passed_tests:
+            test_path = passed_test.meta_data["test_path"]
+            click.echo(f"{test_path} [Passed]")
 
-    if error:
-        exit(1)
+        for ignore_test in ignored_tests:
+            test_path = ignore_test.meta_data["test_path"]
+            click.echo(f"{test_path} [Ignored]")
 
+        for failed_test in failed_tests:
+            test_path = failed_test.meta_data["test_path"]
+            click.echo(f"{test_path} [Failed]")
 
-def clean(root_dir="."):
-    for directory in PathIterator(root=root_dir, rule=is_item_dir):
-        clean_pipenv(directory)
+        if failed_tests:
+            exit(1)
 
+    def before_each(self, path: Union[str, Path]):
+        pass
 
-def is_test_notebook(path: Path) -> bool:
-    return (
-        path.is_file() and path.name.startswith("test") and path.name.endswith(".ipynb")
-    )
+    def after_each(self, path: Union[str, Path], test_result: TestResult):
+        if self.stop_on_failure:
+            if test_result.status == "Failed":
+                message = test_result.meta_data["message"]
+                click.echo(f"{path} [Failed]")
+                click.echo(f"Error: {message}")
+                exit(1)
 
-
-def is_example_notebook(path: Path) -> bool:
-    return (
-        path.is_file()
-        and not path.name.startswith("test")
-        and path.name.endswith(".ipynb")
-    )
-
-
-def print_std(subprocess_result):
-    print()
-    print("==================== stdout ====================")
-    print(subprocess_result.stdout.decode("utf-8"))
-    print("==================== stderr ====================")
-    print(subprocess_result.stderr.decode("utf-8"))
-    print()
+    def _run(self, path: Union[str, Path]):
+        super()._run(path)
 
 
 def clean_pipenv(directory: str):

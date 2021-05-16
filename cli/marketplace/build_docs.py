@@ -20,6 +20,8 @@ from cli.helpers import (
 from cli.marketplace.changelog import ChangeLog
 from cli.path_iterator import PathIterator
 
+_verbose = False
+
 
 @click.command()
 @click.option("-s", "--source-dir", help="Path to the source directory")
@@ -28,7 +30,19 @@ from cli.path_iterator import PathIterator
     "-T", "--temp-dir", default="/tmp", help="Path to intermediate build directory"
 )
 @click.option("-c", "--channel", default="master", help="Name of build channel")
-def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
+@click.option(
+    "-v",
+    "--verbose",
+    is_flag=True,
+    default=False,
+    help="When this flag is set, the process will output extra information",
+)
+def build_docs(
+    source_dir: str, target_dir: str, temp_dir: str, channel: str, verbose: bool
+):
+    global _verbose
+    _verbose = verbose
+
     root_base = Path(temp_dir) / uuid.uuid4().hex
     temp_root = root_base / "functions"
     temp_docs = root_base / "docs"
@@ -43,14 +57,24 @@ def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
     target_dir.mkdir(parents=True, exist_ok=True)
     target_channel.mkdir(parents=True, exist_ok=True)
 
+    if _verbose:
+        print_file_tree("Source project structure", source_dir)
+
     click.echo(f"Temporary working directory: {root_base}")
+
+    if _verbose:
+        print_file_tree("Current marketplace structure", target_channel)
 
     requirements = collect_temp_requirements(source_dir)
     sphinx_quickstart(temp_docs, requirements)
 
     build_temp_project(source_dir, temp_root)
-    build_temp_docs(temp_docs, temp_root)
+    build_temp_docs(temp_root, temp_docs)
     patch_temp_docs(source_dir, temp_docs)
+
+    if _verbose:
+        print_file_tree("Temporary project structure", temp_root)
+
     render_html_files(temp_docs)
 
     change_log = ChangeLog()
@@ -59,7 +83,26 @@ def build_docs(source_dir: str, target_dir: str, temp_dir: str, channel: str):
     update_or_create_items(change_log, source_dir, target_channel, temp_docs)
     build_catalog_json(target_channel)
 
+    if _verbose:
+        print_file_tree("Resulting marketplace structure", target_channel)
+
     write_change_log(target_dir / "README.md", change_log)
+
+
+def print_file_tree(title: str, path: Union[str, Path]):
+    click.echo(f"\n\n -- {title}:")
+    path = Path(path)
+    lines = ["---------------------------------", f"\t{path.resolve()}"]
+    for file in path.iterdir():
+        lines.append("\t|")
+        lines.append(f"\t|__ {file.name}")
+        if file.is_dir():
+            for sub_path in file.iterdir():
+                lines.append("\t|\t|")
+                lines.append(f"\t|\t|__ {sub_path.name}")
+    lines.append("---------------------------------")
+    click.echo("\n".join(lines))
+    click.echo("\n\n")
 
 
 def write_change_log(readme: Path, change_log: ChangeLog):
@@ -201,8 +244,18 @@ def patch_temp_docs(source_dir, temp_docs):
 
 
 def build_temp_project(source_dir, temp_root):
-    click.echo("Building temporary project...")
+    click.echo("[Temporary project] Starting to build project...")
+
+    if _verbose:
+        click.echo(f"Source dir: {source_dir}")
+        click.echo(f"Temp root: {temp_root}")
+
+    item_count = 0
     for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
+        if _verbose:
+            item_count += 1
+            click.echo(f"[Temporary project] Now processing: {directory / 'item.yaml'}")
+
         with open(directory / "item.yaml", "r") as f:
             item = yaml.full_load(f)
 
@@ -214,23 +267,33 @@ def build_temp_project(source_dir, temp_root):
         (temp_dir / "__init__.py").touch()
         shutil.copy(py_file, temp_dir / py_file.name)
 
+    if _verbose:
+        click.echo(f"[Temporary project] Done project (item count: {item_count})")
+
 
 def collect_temp_requirements(source_dir) -> Set[str]:
-    click.echo("Collecting temporary requirements...")
+    click.echo("[Temporary project] Starting to collect requirements...")
     requirements = set()
+
     for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
         item_requirements = get_item_yaml_requirements(directory)
         for item_requirement in item_requirements:
             requirements.add(item_requirement)
+
+    if _verbose:
+        click.echo(
+            f"[Temporary project] Done requirements ({', '.join(requirements)})"
+        )
+
     return requirements
 
 
 def sphinx_quickstart(
     temp_root: Union[str, Path], requirements: Optional[Set[str]] = None
 ):
-    click.echo("Running Sphinx quickstart...")
+    click.echo("[Sphinx] Running quickstart...")
 
-    requirements_install: subprocess.CompletedProcess = subprocess.run(
+    subprocess.run(
         f"sphinx-quickstart --no-sep -p Marketplace -a Iguazio -l en -r '' {temp_root}",
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -255,14 +318,18 @@ def sphinx_quickstart(
         },
     )
 
+    click.echo("[Sphinx] Done quickstart")
 
-def build_temp_docs(temp_docs, temp_root):
-    click.echo("Running Sphinx autodoc...")
+
+def build_temp_docs(temp_root, temp_docs):
+    click.echo("[Sphinx] Running autodoc...")
 
     cmd = f"-F -o {temp_docs} {temp_root}"
     click.echo(f"Building temporary sphinx docs... [sphinx-apidoc {cmd}]")
 
     sphinx_apidoc_cmd(cmd.split(" "))
+
+    click.echo("[Sphinx] Done autodoc")
 
 
 if __name__ == "__main__":

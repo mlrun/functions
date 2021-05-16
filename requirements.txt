@@ -1,3 +1,4 @@
+wheel
 sphinx
 myst-nb
 sphinx-book-theme

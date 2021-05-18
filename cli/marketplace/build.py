@@ -164,7 +164,7 @@ def write_index_html(marketplace_root: Union[str, Path]):
 
         source_name = source_dir.name
         for channel_dir in source_dir.iterdir():
-            if channel_dir.is_file():
+            if channel_dir.is_file() or channel_dir.name.startswith("."):
                 continue
 
             channel_name = channel_dir.name

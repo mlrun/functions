@@ -159,7 +159,7 @@ def write_index_html(marketplace_root: Union[str, Path]):
     items = []
     item_num = 0
     for source_dir in marketplace_root.iterdir():
-        if source_dir.is_file():
+        if source_dir.is_file() or source_dir.name.startswith("."):
             continue
 
         source_name = source_dir.name

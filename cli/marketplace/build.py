@@ -124,6 +124,7 @@ def build_marketplace(
     if _verbose:
         print_file_tree("Resulting marketplace structure", marketplace_dir)
 
+    write_index_html(marketplace_root)
     write_change_log(marketplace_root / "README.md", change_log)
 
 
@@ -143,14 +144,67 @@ def print_file_tree(title: str, path: Union[str, Path]):
     click.echo("\n\n")
 
 
-def write_change_log(readme: Path, change_log: ChangeLog):
-    readme.touch(exist_ok=True)
-    content = open(readme, "r").read()
-    with open(readme, "w") as f:
+def write_change_log(readme_path: Path, change_log: ChangeLog):
+    readme_path.touch(exist_ok=True)
+    content = open(readme_path, "r").read()
+    with open(readme_path, "w") as f:
         if change_log.changes_available:
             compiled_change_log = change_log.compile()
             f.write(compiled_change_log)
         f.write(content)
+
+
+def write_index_html(marketplace_root: Union[str, Path]):
+    marketplace_root = Path(marketplace_root)
+    items = []
+    item_num = 0
+    for source_dir in marketplace_root.iterdir():
+        if source_dir.is_file():
+            continue
+
+        source_name = source_dir.name
+        for channel_dir in source_dir.iterdir():
+            if channel_dir.is_file():
+                continue
+
+            channel_name = channel_dir.name
+
+            catalog_path = channel_dir / "catalog.json"
+            catalog = json.load(open(catalog_path))
+
+            for item_name, item in catalog.items():
+                item_num += 1
+                remote_base_url = (
+                    Path(source_name) / channel_name / item_name / "latest"
+                )
+                latest = item["latest"]
+                version = latest["version"]
+                generation_date = latest["generationDate"]
+                file_name = latest["spec"]["filename"].split(".")[0]
+                file_url = remote_base_url / f"{file_name}.html"
+                example_url = remote_base_url / f"{file_name}_example.html"
+                items.append(
+                    {
+                        "item_num": item_num,
+                        "source_name": source_name,
+                        "channel_name": channel_name,
+                        "item_name": item_name,
+                        "version": version,
+                        "generation_date": generation_date,
+                        "file_url": file_url,
+                        "example_url": example_url,
+                    }
+                )
+
+    if items:
+        index_path = marketplace_root / "index.html"
+        if index_path.exists():
+            index_path.unlink()
+        render_jinja_file(
+            template_path=PROJECT_ROOT / "cli" / "marketplace" / "index.template",
+            output_path=index_path,
+            data={"items": items},
+        )
 
 
 def copy_static_resources(marketplace_dir, temp_docs):

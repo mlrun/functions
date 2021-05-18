@@ -25,7 +25,13 @@ _verbose = False
 
 @click.command()
 @click.option("-s", "--source-dir", help="Path to the source directory")
-@click.option("-t", "--target-dir", help="Path to output directory")
+@click.option(
+    "-sn",
+    "--source-name",
+    default="",
+    help="Name of source, if not provided, name of source directory will be used instead",
+)
+@click.option("-m", "--marketplace-dir", help="Path to marketplace directory")
 @click.option(
     "-T", "--temp-dir", default="/tmp", help="Path to intermediate build directory"
 )
@@ -37,33 +43,65 @@ _verbose = False
     default=False,
     help="When this flag is set, the process will output extra information",
 )
-def build_docs(
-    source_dir: str, target_dir: str, temp_dir: str, channel: str, verbose: bool
+def build_marketplace_cli(
+    source_dir: str,
+    source_name: str,
+    marketplace_dir: str,
+    temp_dir: str,
+    channel: str,
+    verbose: bool,
 ):
+    build_marketplace(
+        source_dir,
+        source_name,
+        marketplace_dir,
+        temp_dir,
+        channel,
+        verbose,
+    )
+
+
+def build_marketplace(
+    source_dir: str,
+    source_name: str,
+    marketplace_dir: str,
+    temp_dir: str,
+    channel: str,
+    verbose: bool,
+):
+    """Main entry point to marketplace building
+
+    :param source_dir: Path to the source directory to build the marketplace from
+    :param source_name: Name of source, if not provided, name of source directory will be used instead
+    :param marketplace_dir: Path to marketplace directory
+    :param temp_dir: Path to intermediate directory, used to build marketplace resources,
+    if not provided '/tmp/<random_uuid>' will be used
+    :param channel: The name of the marketplace channel to write to
+    :param verbose: When True, additional debug information will be written to stdout
+    """
     global _verbose
     _verbose = verbose
 
+    # The root of the temporary project
     root_base = Path(temp_dir) / uuid.uuid4().hex
     temp_root = root_base / "functions"
     temp_docs = root_base / "docs"
 
-    source_dir = Path(source_dir).resolve()
-    target_dir = Path(target_dir).resolve()
+    click.echo(f"Temporary working directory: {root_base}")
 
-    target_channel = target_dir / channel
+    # The source directory of the marketplace
+    source_dir = Path(source_dir).resolve()
+    # The target directory of the marketplace
+    marketplace_root = Path(marketplace_dir).resolve()
+    marketplace_dir = marketplace_root / (source_name or source_dir.name) / channel
 
     temp_root.mkdir(parents=True)
     temp_docs.mkdir(parents=True)
-    target_dir.mkdir(parents=True, exist_ok=True)
-    target_channel.mkdir(parents=True, exist_ok=True)
+    marketplace_dir.mkdir(parents=True, exist_ok=True)
 
     if _verbose:
         print_file_tree("Source project structure", source_dir)
-
-    click.echo(f"Temporary working directory: {root_base}")
-
-    if _verbose:
-        print_file_tree("Current marketplace structure", target_channel)
+        print_file_tree("Current marketplace structure", marketplace_dir)
 
     requirements = collect_temp_requirements(source_dir)
     sphinx_quickstart(temp_docs, requirements)
@@ -78,15 +116,16 @@ def build_docs(
     render_html_files(temp_docs)
 
     change_log = ChangeLog()
-    copy_static_resources(target_dir, temp_docs)
+    copy_static_resources(marketplace_dir, temp_docs)
 
-    update_or_create_items(change_log, source_dir, target_channel, temp_docs)
-    build_catalog_json(target_channel)
+    update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log)
+    build_catalog_json(marketplace_dir)
 
     if _verbose:
-        print_file_tree("Resulting marketplace structure", target_channel)
+        print_file_tree("Resulting marketplace structure", marketplace_dir)
 
-    write_change_log(target_dir / "README.md", change_log)
+    write_index_html(marketplace_root)
+    write_change_log(marketplace_root / "README.md", change_log)
 
 
 def print_file_tree(title: str, path: Union[str, Path]):
@@ -105,27 +144,80 @@ def print_file_tree(title: str, path: Union[str, Path]):
     click.echo("\n\n")
 
 
-def write_change_log(readme: Path, change_log: ChangeLog):
-    readme.touch(exist_ok=True)
-    content = open(readme, "r").read()
-    with open(readme, "w") as f:
+def write_change_log(readme_path: Path, change_log: ChangeLog):
+    readme_path.touch(exist_ok=True)
+    content = open(readme_path, "r").read()
+    with open(readme_path, "w") as f:
         if change_log.changes_available:
             compiled_change_log = change_log.compile()
             f.write(compiled_change_log)
         f.write(content)
 
 
-def copy_static_resources(target_dir, temp_docs):
-    target_static = target_dir / "_static"
-    if not target_static.exists():
+def write_index_html(marketplace_root: Union[str, Path]):
+    marketplace_root = Path(marketplace_root)
+    items = []
+    item_num = 0
+    for source_dir in marketplace_root.iterdir():
+        if source_dir.is_file():
+            continue
+
+        source_name = source_dir.name
+        for channel_dir in source_dir.iterdir():
+            if channel_dir.is_file():
+                continue
+
+            channel_name = channel_dir.name
+
+            catalog_path = channel_dir / "catalog.json"
+            catalog = json.load(open(catalog_path))
+
+            for item_name, item in catalog.items():
+                item_num += 1
+                remote_base_url = (
+                    Path(source_name) / channel_name / item_name / "latest"
+                )
+                latest = item["latest"]
+                version = latest["version"]
+                generation_date = latest["generationDate"]
+                file_name = latest["spec"]["filename"].split(".")[0]
+                file_url = remote_base_url / f"{file_name}.html"
+                example_url = remote_base_url / f"{file_name}_example.html"
+                items.append(
+                    {
+                        "item_num": item_num,
+                        "source_name": source_name,
+                        "channel_name": channel_name,
+                        "item_name": item_name,
+                        "version": version,
+                        "generation_date": generation_date,
+                        "file_url": file_url,
+                        "example_url": example_url,
+                    }
+                )
+
+    if items:
+        index_path = marketplace_root / "index.html"
+        if index_path.exists():
+            index_path.unlink()
+        render_jinja_file(
+            template_path=PROJECT_ROOT / "cli" / "marketplace" / "index.template",
+            output_path=index_path,
+            data={"items": items},
+        )
+
+
+def copy_static_resources(marketplace_dir, temp_docs):
+    marketplace_static = marketplace_dir / "_static"
+    if not marketplace_static.exists():
         click.echo("Copying static resources...")
-        shutil.copytree(temp_docs / "_build/_static", target_static)
+        shutil.copytree(temp_docs / "_build/_static", marketplace_static)
 
 
-def update_or_create_items(change_log, source_dir, target_dir, temp_docs):
+def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
     click.echo("Creating items...")
-    for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
-        update_or_create_item(directory, target_dir, temp_docs, change_log)
+    for item_dir in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
+        update_or_create_item(item_dir, marketplace_dir, temp_docs, change_log)
 
 
 def build_catalog_json(target_dir: Union[str, Path]):
@@ -160,39 +252,39 @@ def build_catalog_json(target_dir: Union[str, Path]):
 
 
 def update_or_create_item(
-    source_dir: Path, target: Path, temp_docs: Path, change_log: ChangeLog
+    item_dir: Path, marketplace_dir: Path, temp_docs: Path, change_log: ChangeLog
 ):
     # Copy source directories to target directories, if target already has the directory, archive previous version
-    source_yaml = yaml.full_load(open(source_dir / "item.yaml", "r"))
-    source_version = source_yaml["version"]
+    item_yaml = yaml.full_load(open(item_dir / "item.yaml", "r"))
+    source_version = item_yaml["version"]
 
-    target_dir = target / source_dir.stem
-    target_latest = target_dir / "latest"
-    target_version = target_dir / source_version
+    marketplace_item = marketplace_dir / item_dir.stem
+    target_latest = marketplace_item / "latest"
+    target_version = marketplace_item / source_version
 
     if target_version.exists():
         click.echo("Source version already exists in target directory!")
         return
 
     build_path = temp_docs / "_build"
-    source_html_name = f"{source_dir.stem}.html"
-    example_html_name = f"{source_dir.stem}_example.html"
+    source_html_name = f"{item_dir.stem}.html"
+    example_html_name = f"{item_dir.stem}_example.html"
 
     source_html = build_path / source_html_name
-    update_html_resource_paths(source_html, relative_path="../../../")
+    update_html_resource_paths(source_html, relative_path="../../")
 
     example_html = build_path / example_html_name
-    update_html_resource_paths(example_html, relative_path="../../../")
+    update_html_resource_paths(example_html, relative_path="../../")
 
     # If its the first source is encountered, copy source to target
-    if target_dir.exists():
+    if marketplace_item.exists():
         shutil.rmtree(target_latest)
-        change_log.update_item(source_dir.stem, source_version, target_version.name)
+        change_log.update_item(item_dir.stem, source_version, target_version.name)
     else:
-        change_log.new_item(source_dir.stem, source_version)
+        change_log.new_item(item_dir.stem, source_version)
 
-    shutil.copytree(source_dir, target_latest)
-    shutil.copytree(source_dir, target_version)
+    shutil.copytree(item_dir, target_latest)
+    shutil.copytree(item_dir, target_version)
 
     if source_html.exists():
         shutil.copy(source_html, target_latest / source_html_name)
@@ -281,9 +373,7 @@ def collect_temp_requirements(source_dir) -> Set[str]:
             requirements.add(item_requirement)
 
     if _verbose:
-        click.echo(
-            f"[Temporary project] Done requirements ({', '.join(requirements)})"
-        )
+        click.echo(f"[Temporary project] Done requirements ({', '.join(requirements)})")
 
     return requirements
 
@@ -333,4 +423,4 @@ def build_temp_docs(temp_root, temp_docs):
 
 
 if __name__ == "__main__":
-    build_docs()
+    build_marketplace_cli()

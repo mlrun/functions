@@ -153,14 +153,14 @@ model-monitoring-batch:
   docfile: /home/michaell/projects/functions/model_monitoring_batch/model_monitoring_batch.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/model_monitoring_batch/model_monitoring_batch.yaml
+    latest: /home/michaell/projects/functions/model_monitoring_batch/function.yaml
 model-monitoring-stream:
   categories: []
   description: ''
   docfile: /home/michaell/projects/functions/model_monitoring_stream/model_monitoring_stream.ipynb
   kind: remote
   versions:
-    latest: /home/michaell/projects/functions/model_monitoring_stream/model_monitoring_stream.yaml
+    latest: /home/michaell/projects/functions/model_monitoring_stream/function.yaml
 model-server:
   categories:
   - serving

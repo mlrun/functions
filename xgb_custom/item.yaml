@@ -4,7 +4,7 @@ categories:
 description: simulate data with outliers.
 doc: ''
 example: xgb_custom.ipynb
-generationDate: ''
+generationDate: 2021-05-19:23-13
 icon: ''
 labels:
   author: Daniel
@@ -12,13 +12,12 @@ maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.6.2
 name: xgb_custom
-org: Iguazio
 platformVersion: 3.0.0
 spec:
   filename: xgb_custom.py
   handler: gen_outliers
   image: mlrun/mlrun
   kind: job
-  requirements: ['mlrun','pandas','typing','xgboost','matplotlib']
+  requirements: []
 url: ''
 version: 0.0.1

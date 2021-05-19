@@ -1,0 +1,21 @@
+apiVersion: v1
+categories: []
+description: ''
+doc: ''
+example: model_monitoring_stream.ipynb
+generationDate: 2021-05-19:23-13
+icon: ''
+labels: {}
+maintainers: []
+marketplaceType: ''
+mlrunVersion: ''
+name: model-monitoring-stream
+platformVersion: ''
+spec:
+  filename: model_monitoring_stream.py
+  handler: handler
+  image: mlrun/mlrun
+  kind: remote
+  requirements: []
+url: ''
+version: 0.0.1

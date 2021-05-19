@@ -5,7 +5,7 @@ categories:
 description: retrieve remote archive, open and save as parquet
 doc: ''
 example: arc_to_parquet.ipynb
-generationDate: '2021-02-13 11:28:47.396240'
+generationDate: 2021-05-19:22-04
 icon: ''
 labels:
   author: yjb
@@ -13,13 +13,12 @@ maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.5.4
 name: arc-to-parquet
-org: Iguazio
 platformVersion: 2.10.0
 spec:
   filename: arc_to_parquet.py
   handler: arc_to_parquet
   image: mlrun/ml-base
   kind: job
-  requirements: ['mlrun','pandas','pyarrow']
+  requirements: []
 url: ''
 version: 0.0.1

@@ -4,7 +4,7 @@ categories:
 description: Rolling aggregation over Metrics and Lables according to specifications
 doc: ''
 example: aggregate.ipynb
-generationDate: 2021-05-19:22-04
+generationDate: 2021-05-19:22-31
 icon: ''
 labels:
   author: avia

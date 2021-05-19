@@ -4,7 +4,7 @@ categories:
 description: describe and visualizes dataset stats
 doc: ''
 example: describe_dask.ipynb
-generationDate: '2021-02-13 11:28:47.571511'
+generationDate: 2021-05-19:22-41
 icon: ''
 labels:
   author: Iguazio
@@ -12,13 +12,15 @@ maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.5.4
 name: describe-dask
-org: Iguazio
 platformVersion: 2.10.0
 spec:
   filename: describe_dask.py
   handler: summarize
   image: mlrun/ml-models
   kind: job
-  requirements: ['mlrun','dask','yellowbrick','seaborn','scikit-plot']
+  requirements:
+  - mlrun
+  - dask
+  - yellowbrick
 url: ''
 version: 0.0.1

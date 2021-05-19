@@ -18,9 +18,6 @@ spec:
   handler: summarize
   image: mlrun/ml-models
   kind: job
-  requirements:
-  - mlrun
-  - scikit-plot
-  - wget
+  requirements: []
 url: ''
 version: 0.0.1

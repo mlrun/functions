@@ -4,7 +4,7 @@ categories:
 description: Create a binary classification sample dataset and save.
 doc: ''
 example: gen_class_data.ipynb
-generationDate: ''
+generationDate: 2021-05-19:22-41
 icon: ''
 labels:
   author: Daniel
@@ -12,13 +12,12 @@ maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.6.2
 name: gen_class_data
-org: Iguazio
 platformVersion: 3.0.0
 spec:
   filename: gen_class_data.py
   handler: gen_class_data
   image: mlrun/mlrun
   kind: job
-  requirements: ['mlrun','pandas','typing','sklearn']
+  requirements: []
 url: ''
 version: 0.0.1

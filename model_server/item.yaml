@@ -1,0 +1,25 @@
+apiVersion: v1
+categories:
+- serving
+- ml
+description: generic sklearn model server
+doc: ''
+example: model_server.ipynb
+generationDate: 2021-05-19:23-13
+icon: ''
+labels:
+  author: yaronh
+  framework: sklearn
+maintainers: []
+marketplaceType: ''
+mlrunVersion: ''
+name: model-server
+platformVersion: ''
+spec:
+  filename: ''
+  handler: handler
+  image: mlrun/mlrun
+  kind: remote
+  requirements: []
+url: ''
+version: 0.0.1

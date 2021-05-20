@@ -1,0 +1,23 @@
+apiVersion: v1
+categories:
+- data-prep
+description: SQL To File - Ingest data using SQL query
+doc: ''
+example: sql_to_file.ipynb
+generationDate: 2021-05-19:23-13
+icon: ''
+labels:
+  author: adih
+maintainers: []
+marketplaceType: ''
+mlrunVersion: ''
+name: sql-to-file
+platformVersion: ''
+spec:
+  filename: ''
+  handler: sql_to_file
+  image: mlrun/mlrun
+  kind: job
+  requirements: []
+url: ''
+version: 0.0.1

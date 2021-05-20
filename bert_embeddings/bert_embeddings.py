@@ -1,8 +1,8 @@
-from transformers import BertModel, BertTokenizer
-import torch
-from typing import Union, List
 import json
 import pickle
+
+import torch
+from transformers import BertModel, BertTokenizer
 
 
 def init_context(context):

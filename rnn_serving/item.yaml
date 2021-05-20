@@ -4,21 +4,25 @@ categories:
 description: deploy an rnn based stock analysis model server.
 doc: ''
 example: rnn_serving.ipynb
-generationDate: ''
+generationDate: 2021-05-19:23-13
 icon: ''
 labels:
   author: Daniel
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.6.2
-name: rnn_serving
-org: Iguazio
-platformVersion: 3.0.0
+mlrunVersion: ''
+name: rnn-serving
+platformVersion: ''
 spec:
   filename: rnn_serving.py
-  handler: RNN_Model_Serving
+  handler: handler
   image: mlrun/ml-model
   kind: serving
-  requirements: ['mlrun==0.6.2','keras','tensorflow','wget',"pygit2"]
+  requirements:
+  - mlrun==0.6.2
+  - keras
+  - tensorflow
+  - wget
+  - pygit2
 url: ''
 version: 0.0.1

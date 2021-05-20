@@ -6,7 +6,7 @@ categories:
 description: Get BERT based embeddings for given text
 doc: ''
 example: bert_embeddings.ipynb
-generationDate: '2021-02-13 11:28:47.759006'
+generationDate: 2021-05-19:22-04
 icon: ''
 labels:
   framework: pytorch
@@ -14,13 +14,14 @@ maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.5.4
 name: bert-embeddings
-org: Iguazio
 platformVersion: 2.10.0
 spec:
   filename: bert_embeddings.py
-  handler: ''
+  handler: handler
   image: ''
   kind: nuclio
-  requirements: ['torch==1.6.0','transformers==3.0.1','nuclio']
+  requirements:
+  - torch==1.6.0
+  - transformers==3.0.1
 url: ''
 version: 0.0.1

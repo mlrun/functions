@@ -1,0 +1,4 @@
+mlrun
+torch
+wget
+pygit2

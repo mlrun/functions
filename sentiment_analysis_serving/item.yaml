@@ -7,7 +7,7 @@ categories:
 description: BERT based sentiment classification model
 doc: ''
 example: bert_sentiment_analysis_serving.ipynb
-generationDate: '2021-04-21 06:17:16.921852'
+generationDate: 2021-05-19:23-13
 icon: ''
 labels:
   author: avia
@@ -16,13 +16,13 @@ maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.6.0
 name: sentiment-analysis-serving
-org: Iguazio
 platformVersion: 3.0.0
 spec:
   filename: sentiment_analysis_serving.py
   handler: handler
-  image: mlrun/ml-model
+  image: mlrun/ml-models
   kind: serving
-  requirements: ['mlrun','transformers','torch','wget','pygit2']
+  requirements:
+  - transformers==3.0.2
 url: ''
 version: 0.0.1

@@ -4,7 +4,7 @@ categories:
 description: Rolling aggregation over Metrics and Lables according to specifications
 doc: ''
 example: aggregate.ipynb
-generationDate: '2021-02-13 11:28:47.287600'
+generationDate: 2021-05-19:22-31
 icon: ''
 labels:
   author: avia
@@ -12,13 +12,12 @@ maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.6.2
 name: aggregate
-org: Iguazio
 platformVersion: 3.0.0
 spec:
   filename: aggregate.py
   handler: aggregate
   image: mlrun/ml-models
   kind: job
-  requirements: ['mlrun','pandas']
+  requirements: []
 url: ''
 version: 0.0.1

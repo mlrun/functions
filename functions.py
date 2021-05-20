@@ -5,7 +5,7 @@ from cli.item_to_function import item_to_function
 from cli.marketplace.build import build_marketplace_cli
 from cli.new_item import new_item
 from cli.test_suite import test_suite
-
+from cli.function_to_item import function_to_item_cli
 
 @click.group()
 def cli():
@@ -14,6 +14,7 @@ def cli():
 
 cli.add_command(new_item)
 cli.add_command(item_to_function, name="update-function-yaml")
+cli.add_command(function_to_item_cli, name="function-to-item")
 cli.add_command(test_suite, name="run-tests")
 cli.add_command(build_marketplace_cli, name="build-marketplace")
 cli.add_command(create_legacy_catalog)

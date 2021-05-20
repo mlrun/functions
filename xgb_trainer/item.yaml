@@ -4,7 +4,7 @@ categories:
 description: train an xgboost model.
 doc: ''
 example: xgb_trainer.ipynb
-generationDate: ''
+generationDate: 2021-05-19:23-13
 icon: ''
 labels:
   author: Daniel
@@ -12,13 +12,12 @@ maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.6.2
 name: xgb_trainer
-org: Iguazio
 platformVersion: 3.0.0
 spec:
   filename: xgb_trainer.py
   handler: train_model
   image: mlrun/mlrun
   kind: job
-  requirements: ['mlrun','pandas','typing','xgboost','matplotlib','scikit-plot']
+  requirements: []
 url: ''
 version: 0.0.1

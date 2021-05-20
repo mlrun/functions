@@ -1,0 +1,5 @@
+mlrun==0.6.2
+keras
+tensorflow
+wget
+pygit2

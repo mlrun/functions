@@ -30,20 +30,20 @@ def item_to_function(item_path: str, output_path: Optional[str] = None, root_dir
                     output_file_path = inner_file_dir + "/" + "gen_function.yaml"
                     print(inner_file_dir)
                     try:
-                        item_to_function_from_path(str(inner_file), output_file_path)
+                        item_to_function_from_path(str(inner_file_dir), output_file_path)
                     except Exception:
                         print("failed to generate yaml for {}".format(str(inner_dir)))
 
 
-
-
-
 def item_to_function_from_path(item_path: str, output_path: Optional[str] = None):
-    item_path = Path(item_path)
 
+    item_path = Path(item_path)
+    base_path = ""
     if item_path.is_dir():
         if (item_path / "item.yaml").exists():
+            base_path = str(item_path)
             item_path = item_path / "item.yaml"
+
         else:
             raise FileNotFoundError(f"{item_path} does not contain a item.yaml file")
     elif not item_path.exists():
@@ -57,10 +57,12 @@ def item_to_function_from_path(item_path: str, output_path: Optional[str] = None
     if filename.endswith(".ipynb"):
         code_output = Path(filename)
         code_output = code_output.parent / f"{code_output.stem}.py"
+    code_file_name = get_filename(base_path, item_yaml)
 
+    #print("item path: {} , output_path: {} , filename: {} ,base_path : {}".format(item_path,output_path,filename,base_path))
     function_object = code_to_function(
         name=item_yaml["name"],
-        filename=item_yaml.get("spec", {}).get("filename"),
+        filename=code_file_name,
         handler=item_yaml.get("spec", {}).get("handler"),
         kind=item_yaml.get("spec", {}).get("kind"),
         code_output=code_output,
@@ -84,6 +86,14 @@ def item_to_function_from_path(item_path: str, output_path: Optional[str] = None
 
     function_object.export(target=str(output_path.resolve()))
 
+
+def get_filename(base_path, item_yaml):
+    filename = item_yaml.get("spec", {}).get("filename")
+    if filename is '':
+        filename = base_path + "/" + item_yaml.get("example")
+    else:
+        filename = base_path + "/" + item_yaml.get("spec", {}).get("filename")
+    return filename
 
 if __name__ == "__main__":
     item_to_function()

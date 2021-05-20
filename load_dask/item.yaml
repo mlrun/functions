@@ -15,7 +15,7 @@ mlrunVersion: ''
 name: load-dask
 platformVersion: ''
 spec:
-  filename: ''
+  filename: load_dask.py
   handler: load_dask
   image: mlrun/ml-models
   kind: dask

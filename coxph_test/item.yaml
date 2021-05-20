@@ -16,7 +16,7 @@ mlrunVersion: ''
 name: coxph-test
 platformVersion: ''
 spec:
-  filename: ''
+  filename: coxph_test.py
   handler: cox_test
   image: mlrun/ml-models
   kind: job

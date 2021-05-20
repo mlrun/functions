@@ -18,11 +18,7 @@ spec:
   handler: handler
   image: mlrun/ml-model
   kind: serving
-  requirements:
-  - mlrun==0.6.2
-  - keras
-  - tensorflow
-  - wget
-  - pygit2
+  requirements: []
+
 url: ''
 version: 0.0.1

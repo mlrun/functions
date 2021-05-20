@@ -74,8 +74,6 @@ spec:
     spark_submit:
       name: spark_submit
       doc: 'spark_submit function
-
-
         submiting spark via shell'
       parameters:
       - name: context

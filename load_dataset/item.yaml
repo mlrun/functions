@@ -3,7 +3,7 @@ categories:
 - data-source
 - ml
 description: load a toy dataset from scikit-learn
-doc: ''
+doc: README.md
 example: load_dataset.ipynb
 generationDate: 2021-05-19:23-13
 icon: ''
@@ -16,7 +16,7 @@ mlrunVersion: ''
 name: load-dataset
 platformVersion: ''
 spec:
-  filename: ''
+  filename: load_dataset.py
   handler: load_dataset
   image: mlrun/ml-models
   kind: job

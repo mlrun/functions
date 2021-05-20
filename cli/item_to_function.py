@@ -31,12 +31,11 @@ def item_to_function(item_path: str, output_path: Optional[str] = None, root_dir
                     print(inner_file_dir)
                     try:
                         item_to_function_from_path(str(inner_file_dir), output_file_path)
-                    except Exception:
+                    except Exception :
                         print("failed to generate yaml for {}".format(str(inner_dir)))
 
 
 def item_to_function_from_path(item_path: str, output_path: Optional[str] = None):
-
     item_path = Path(item_path)
     base_path = ""
     if item_path.is_dir():
@@ -59,7 +58,6 @@ def item_to_function_from_path(item_path: str, output_path: Optional[str] = None
         code_output = code_output.parent / f"{code_output.stem}.py"
     code_file_name = get_filename(base_path, item_yaml)
 
-    #print("item path: {} , output_path: {} , filename: {} ,base_path : {}".format(item_path,output_path,filename,base_path))
     function_object = code_to_function(
         name=item_yaml["name"],
         filename=code_file_name,
@@ -94,6 +92,7 @@ def get_filename(base_path, item_yaml):
     else:
         filename = base_path + "/" + item_yaml.get("spec", {}).get("filename")
     return filename
+
 
 if __name__ == "__main__":
     item_to_function()

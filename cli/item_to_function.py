@@ -1,9 +1,13 @@
 from pathlib import Path
 from typing import Optional
-
+import os
 import click
 from mlrun import code_to_function
 from yaml import full_load
+from cli.path_iterator import PathIterator
+from cli.helpers import (
+    is_item_dir
+)
 
 
 @click.command()
@@ -11,7 +15,30 @@ from yaml import full_load
     "-i", "--item-path", help="Path to item.yaml file or a directory containing one"
 )
 @click.option("-o", "--output-path", help="Path to code_to_function output")
-def item_to_function(item_path: str, output_path: Optional[str] = None):
+@click.option("-r", "--root-directory", help="Path to root directory containing multiple functions")
+def item_to_function(item_path: str, output_path: Optional[str] = None, root_directory: Optional[str] = None):
+    if root_directory is None:
+        item_to_function_from_path(item_path, output_path)
+    else:
+        item_iterator = PathIterator(root=root_directory, rule=is_item_dir, as_path=True)
+
+        for inner_dir in item_iterator:
+            # Iterate individual files in each directory
+            for inner_file in inner_dir.iterdir():
+                if inner_file.is_file() and inner_file.name == 'item.yaml':
+                    inner_file_dir = os.path.dirname(str(inner_file))
+                    output_file_path = inner_file_dir + "/" + "gen_function.yaml"
+                    print(inner_file_dir)
+                    try:
+                        item_to_function_from_path(str(inner_file), output_file_path)
+                    except Exception:
+                        print("failed to generate yaml for {}".format(str(inner_dir)))
+
+
+
+
+
+def item_to_function_from_path(item_path: str, output_path: Optional[str] = None):
     item_path = Path(item_path)
 
     if item_path.is_dir():

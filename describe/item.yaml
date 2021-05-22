@@ -3,7 +3,7 @@ categories:
 - analysis
 description: describe and visualizes dataset stats
 doc: ''
-example: ''
+example: describe.ipynb
 generationDate: 2021-05-19:22-41
 icon: ''
 labels:
@@ -14,7 +14,7 @@ mlrunVersion: 0.5.4
 name: describe
 platformVersion: 2.10.0
 spec:
-  filename: describe.ipynb
+  filename: ''
   handler: summarize
   image: mlrun/mlrun
   kind: job

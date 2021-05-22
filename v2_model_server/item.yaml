@@ -16,7 +16,7 @@ mlrunVersion: ''
 name: v2-model-server
 platformVersion: ''
 spec:
-  filename: v2_model_server.ipynb
+  filename: ''
   handler: handler
   image: mlrun/mlrun
   kind: serving

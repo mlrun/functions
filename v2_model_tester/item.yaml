@@ -4,7 +4,7 @@ categories:
 - test
 description: test v2 model servers
 doc: ''
-example: ''
+example: v2_model_tester.ipynb
 generationDate: 2021-05-19:23-13
 icon: ''
 labels:
@@ -15,7 +15,7 @@ mlrunVersion: ''
 name: v2-model-tester
 platformVersion: ''
 spec:
-  filename: v2_model_tester.ipynb
+  filename: ''
   handler: model_server_tester
   image: mlrun/mlrun
   kind: job

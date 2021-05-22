@@ -4,7 +4,7 @@ categories:
 - dl
 description: tf2 image classification server
 doc: ''
-example: tf2_serving.ipynb
+example: ''
 generationDate: 2021-05-19:23-13
 icon: ''
 labels:
@@ -15,7 +15,7 @@ mlrunVersion: ''
 name: tf2-serving
 platformVersion: ''
 spec:
-  filename: ''
+  filename: tf2_serving.ipynb
   handler: handler
   image: mlrun/mlrun
   kind: remote

@@ -2,8 +2,8 @@ kind: job
 metadata:
   name: virtual-drift
   tag: ''
-  hash: ff3fdcac5c9493f2110768d996448a8bc3f87198
-  project: ''
+  hash: 153b4862e5325f3cf23ea5a0458f6c10ff05f307
+  project: default
   labels:
     author: orz
   categories:
@@ -16,89 +16,10 @@ spec:
   image: mlrun/ml-models
   env: []
   default_handler: drift_magnitude
-  entry_points:
-    to_observations:
-      name: to_observations
-      doc: ''
-      parameters:
-      - name: context
-      - name: t
-      - name: u
-      - name: key
-      outputs: []
-      lineno: 15
-    tvd:
-      name: tvd
-      doc: ''
-      parameters:
-      - name: t
-      - name: u
-      outputs: []
-      lineno: 32
-    helinger:
-      name: helinger
-      doc: ''
-      parameters:
-      - name: t
-      - name: u
-      outputs: []
-      lineno: 35
-    kl_divergence:
-      name: kl_divergence
-      doc: ''
-      parameters:
-      - name: t
-      - name: u
-      outputs: []
-      lineno: 38
-    all_metrics:
-      name: all_metrics
-      doc: ''
-      parameters:
-      - name: t
-      - name: u
-      outputs: []
-      lineno: 43
-    drift_magnitude:
-      name: drift_magnitude
-      doc: "Drift magnitude metrics\n   Computes drift magnitude metrics between base\
-        \ dataset t and dataset u.\n   Metrics:\n    - TVD (Total Variation Distance)\n\
-        \    - Helinger\n    - KL Divergence"
-      parameters:
-      - name: context
-        doc: MLRun context
-      - name: t
-        doc: Base dataset for the drift metrics
-      - name: u
-        doc: Test dataset for the drift metrics
-      - name: label_col
-        doc: Label colum in t and u
-      - name: prediction_col
-        doc: Predictions column in t and u
-      - name: discretizers
-        type: dict
-      - name: n_bins
-        doc: Number of bins to be used for histrogram creation from continuous variables
-        default: 5
-      - name: stream_name
-        type: str
-        doc: Output stream to push metrics to
-        default: some_stream
-      - name: results_tsdb_container
-        type: str
-        doc: TSDB table container to push metrics to
-        default: bigdata
-      - name: results_tsdb_table
-        type: str
-        doc: TSDB table to push metrics to
-        default: concept_drift/drift_magnitude
-      outputs: []
-      lineno: 46
   description: Compute drift magnitude between Time-Samples T and U
   build:
     functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG9zCmltcG9ydCBwYW5kYXMgYXMgcGQKaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCBzY2lweSBhcyBzcAppbXBvcnQgcGlja2xlCmltcG9ydCBkYXRldGltZQoKaW1wb3J0IHYzaW9fZnJhbWVzIGFzIHYzZgoKaW1wb3J0IG1hdHBsb3RsaWIucHlwbG90IGFzIHBsdApmcm9tIHNrbGVhcm4ucHJlcHJvY2Vzc2luZyBpbXBvcnQgS0JpbnNEaXNjcmV0aXplcgoKZGVmIHRvX29ic2VydmF0aW9ucyhjb250ZXh0LCB0LCB1LCBrZXkpOgogICAgdCA9IHQuYXBwbHkobGFtYmRhIHJvdzogZiJ7J18nLmpvaW4oW3N0cihyb3dbdmFsXSkgZm9yIHZhbCBpbiB0LmNvbHVtbnNdKX0iLCBheGlzPTEpLnZhbHVlX2NvdW50cygpLnNvcnRfaW5kZXgoKQogICAgdSA9IHUuYXBwbHkobGFtYmRhIHJvdzogZiJ7J18nLmpvaW4oW3N0cihyb3dbdmFsXSkgZm9yIHZhbCBpbiB1LmNvbHVtbnNdKX0iLCBheGlzPTEpLnZhbHVlX2NvdW50cygpLnNvcnRfaW5kZXgoKQoKICAgIGpvaW5lZF91bmlxdWVzID0gcGQuRGF0YUZyYW1lKFt0LCB1XSkuVC5maWxsbmEoMCkuc29ydF9pbmRleCgpCiAgICBqb2luZWRfdW5pcXVlcy5jb2x1bW5zID0gWyd0JywgJ3UnXQoKICAgIHRfb2JzID0gam9pbmVkX3VuaXF1ZXMubG9jWzosICd0J10KICAgIHVfb2JzID0gam9pbmVkX3VuaXF1ZXMubG9jWzosICd1J10KCiAgICB0X3BkZiA9IHRfb2JzL3Rfb2JzLnN1bSgpCiAgICB1X3BkZiA9IHVfb2JzL3Vfb2JzLnN1bSgpCgogICAgY29udGV4dC5sb2dfZGF0YXNldChmJ3trZXl9X3RfcGRmJywgcGQuRGF0YUZyYW1lKHRfcGRmKSwgZm9ybWF0PSdwYXJxdWV0JykKICAgIGNvbnRleHQubG9nX2RhdGFzZXQoZid7a2V5fV91X3BkZicsIHBkLkRhdGFGcmFtZSh1X3BkZiksIGZvcm1hdD0ncGFycXVldCcpCiAgICByZXR1cm4gdF9wZGYsIHVfcGRmCgpkZWYgdHZkKHQsIHUpOgogICAgcmV0dXJuIHN1bShhYnModCAtIHUpKSAvIDIKCmRlZiBoZWxpbmdlcih0LCB1KToKICAgIHJldHVybiAobnAuc3FydChucC5zdW0obnAucG93ZXIobnAuc3FydCh0KSAtIG5wLnNxcnQodSksIDIpKSkpL25wLnNxcnQoMikKCmRlZiBrbF9kaXZlcmdlbmNlKHQsIHUpOgogICAgdF91ID0gbnAuc3VtKG5wLndoZXJlKHQgIT0gMCwgdCAqIG5wLmxvZyh0IC8gdSksIDApKQogICAgdV90ID0gbnAuc3VtKG5wLndoZXJlKHUgIT0gMCwgdSAqIG5wLmxvZyh1IC8gdCksIDApKQogICAgcmV0dXJuIHRfdSArIHVfdAoKZGVmIGFsbF9tZXRyaWNzKHQsIHUpOgogICAgcmV0dXJuIHR2ZCh0LCB1KSwgaGVsaW5nZXIodCwgdSksIGtsX2RpdmVyZ2VuY2UodCwgdSkKCmRlZiBkcmlmdF9tYWduaXR1ZGUoY29udGV4dCwgdDogcGQuRGF0YUZyYW1lLCB1OiBwZC5EYXRhRnJhbWUsIAogICAgICAgICBsYWJlbF9jb2w9Tm9uZSwgcHJlZGljdGlvbl9jb2w9Tm9uZSwgCiAgICAgICAgIGRpc2NyZXRpemVyczogZGljdCA9IE5vbmUsIG5fYmlucz01LAogICAgICAgICBzdHJlYW1fbmFtZTogc3RyID0gJ3NvbWVfc3RyZWFtJywKICAgICAgICAgcmVzdWx0c190c2RiX2NvbnRhaW5lcjogc3RyID0gJ2JpZ2RhdGEnLAogICAgICAgICByZXN1bHRzX3RzZGJfdGFibGU6IHN0ciA9ICdjb25jZXB0X2RyaWZ0L2RyaWZ0X21hZ25pdHVkZScpOgogICAgIiIiRHJpZnQgbWFnbml0dWRlIG1ldHJpY3MKICAgICAgIENvbXB1dGVzIGRyaWZ0IG1hZ25pdHVkZSBtZXRyaWNzIGJldHdlZW4gYmFzZSBkYXRhc2V0IHQgYW5kIGRhdGFzZXQgdS4KICAgICAgIE1ldHJpY3M6CiAgICAgICAgLSBUVkQgKFRvdGFsIFZhcmlhdGlvbiBEaXN0YW5jZSkKICAgICAgICAtIEhlbGluZ2VyCiAgICAgICAgLSBLTCBEaXZlcmdlbmNlCiAgICAgICAgCiAgICA6cGFyYW0gY29udGV4dDogTUxSdW4gY29udGV4dAogICAgOnBhcmFtIHQ6IEJhc2UgZGF0YXNldCBmb3IgdGhlIGRyaWZ0IG1ldHJpY3MKICAgIDpwYXJhbSB1OiBUZXN0IGRhdGFzZXQgZm9yIHRoZSBkcmlmdCBtZXRyaWNzCiAgICA6cGFyYW0gbGFiZWxfY29sOiBMYWJlbCBjb2x1bSBpbiB0IGFuZCB1CiAgICA6cGFyYW0gcHJlZGljdGlvbl9jb2w6IFByZWRpY3Rpb25zIGNvbHVtbiBpbiB0IGFuZCB1CiAgICA6cGFyYW0gZGlzY3JpdGl6ZXJzOiBEaWN0aW9uYXJ5IG9mIGRpY3NyaXRpemVycyBmb3IgdGhlIGZlYXR1cmVzIGlmIGF2YWlsYWJsZQogICAgICAgICAgICAgICAgICAgICAgICAgKENyZWF0ZWQgYXV0b21hdGljYWxseSBpZiBub3QgcHJvdmlkZWQpCiAgICA6cGFyYW0gbl9iaW5zOiBOdW1iZXIgb2YgYmlucyB0byBiZSB1c2VkIGZvciBoaXN0cm9ncmFtIGNyZWF0aW9uIGZyb20gY29udGludW91cyB2YXJpYWJsZXMKICAgIDpwYXJhbSBzdHJlYW1fbmFtZTogT3V0cHV0IHN0cmVhbSB0byBwdXNoIG1ldHJpY3MgdG8KICAgIDpwYXJhbSByZXN1bHRzX3RzZGJfY29udGFpbmVyOiBUU0RCIHRhYmxlIGNvbnRhaW5lciB0byBwdXNoIG1ldHJpY3MgdG8KICAgIDpwYXJhbSByZXN1bHRzX3RzZGJfdGFibGU6IFRTREIgdGFibGUgdG8gcHVzaCBtZXRyaWNzIHRvCiAgICAiIiIKICAgIAogICAgdjNpb19jbGllbnQgPSB2M2YuQ2xpZW50KCdmcmFtZXNkOjgwODEnLCBjb250YWluZXI9cmVzdWx0c190c2RiX2NvbnRhaW5lcikKICAgIHRyeToKICAgICAgICB2M2lvX2NsaWVudC5jcmVhdGUoJ3RzZGInLCByZXN1bHRzX3RzZGJfdGFibGUsIGlmX2V4aXN0cz0xLCByYXRlPScxL3MnKQogICAgZXhjZXB0OgogICAgICAgIHYzaW9fY2xpZW50LmNyZWF0ZSgndHNkYicsIHJlc3VsdHNfdHNkYl90YWJsZSwgaWZfZXhpc3RzPTEsIGF0dHJzPXsncmF0ZSc6ICcxL3MnfSkKICAgIAogICAgZGZfdCA9IHQuYXNfZGYoKQogICAgZGZfdSA9IHUuYXNfZGYoKQogICAgCiAgICAKICAgIGRyb3BfY29sdW1ucyA9IFtdCiAgICBpZiBsYWJlbF9jb2wgaXMgbm90IE5vbmU6CiAgICAgICAgZHJvcF9jb2x1bW5zLmFwcGVuZChsYWJlbF9jb2wpCiAgICBpZiBwcmVkaWN0aW9uX2NvbCBpcyBub3QgTm9uZToKICAgICAgICBkcm9wX2NvbHVtbnMuYXBwZW5kKHByZWRpY3Rpb25fY29sKQogICAgCiAgICAKICAgIGNvbnRpbnVvdXNfZmVhdHVyZXMgPSBkZl90LnNlbGVjdF9kdHlwZXMoWydmbG9hdCddKQogICAgaWYgZGlzY3JldGl6ZXJzIGlzIE5vbmU6CiAgICAgICAgZGlzY3JldGl6ZXJzID0ge30KICAgICAgICBmb3IgZmVhdHVyZSBpbiBjb250aW51b3VzX2ZlYXR1cmVzLmNvbHVtbnM6CiAgICAgICAgICAgIGNvbnRleHQubG9nZ2VyLmluZm8oZidGaXR0aW5nIGRpc2NyZXRpemVyIGZvciB7ZmVhdHVyZX0nKQogICAgICAgICAgICBkaXNjcmV0aXplciA9IEtCaW5zRGlzY3JldGl6ZXIobl9iaW5zPW5fYmlucywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGVuY29kZT0nb3JkaW5hbCcsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJhdGVneT0ndW5pZm9ybScpCgogICAgICAgICAgICBkaXNjcmV0aXplci5maXQoY29udGludW91c19mZWF0dXJlcy5sb2NbOiwgZmVhdHVyZV0udmFsdWVzLnJlc2hhcGUoLTEsIDEpKQogICAgICAgICAgICBkaXNjcmV0aXplcnNbZmVhdHVyZV0gPSBkaXNjcmV0aXplcgogICAgb3MubWFrZWRpcnMoY29udGV4dC5hcnRpZmFjdF9wYXRoLCBleGlzdF9vaz1UcnVlKQogICAgZGlzY3JldGl6ZXJzX3BhdGggPSBvcy5wYXRoLmFic3BhdGgoZid7Y29udGV4dC5hcnRpZmFjdF9wYXRofS9kaXNjcml0aXplci5wa2wnKQogICAgd2l0aCBvcGVuKGRpc2NyZXRpemVyc19wYXRoLCAnd2InKSBhcyBmOgogICAgICAgIHBpY2tsZS5kdW1wKGRpc2NyZXRpemVycywgZikKICAgIGNvbnRleHQubG9nX2FydGlmYWN0KCdkaXNjcml0aXplcnMnLCB0YXJnZXRfcGF0aD1kaXNjcmV0aXplcnNfcGF0aCkKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oJ0Rpc2NyZXRpemluZyBmZWF0dWVycycpCiAgICBmb3IgZmVhdHVyZSwgZGlzY3JldGl6ZXIgaW4gZGlzY3JldGl6ZXJzLml0ZW1zKCk6CiAgICAgICAgZGZfdFtmZWF0dXJlXSA9IGRpc2NyZXRpemVyLnRyYW5zZm9ybShkZl90LmxvY1s6LCBmZWF0dXJlXS52YWx1ZXMucmVzaGFwZSgtMSwgMSkpCiAgICAgICAgZGZfdVtmZWF0dXJlXSA9IGRpc2NyZXRpemVyLnRyYW5zZm9ybShkZl91LmxvY1s6LCBmZWF0dXJlXS52YWx1ZXMucmVzaGFwZSgtMSwgMSkpCiAgICAgICAgZGZfdFtmZWF0dXJlXSA9IGRmX3RbZmVhdHVyZV0uYXN0eXBlKCdpbnQnKQogICAgICAgIGRmX3VbZmVhdHVyZV0gPSBkZl91W2ZlYXR1cmVdLmFzdHlwZSgnaW50JykKICAgIGNvbnRleHQubG9nX2RhdGFzZXQoJ3RfZGlzY3JldGUnLCBkZl90LCBmb3JtYXQ9J3BhcnF1ZXQnKQogICAgY29udGV4dC5sb2dfZGF0YXNldCgndV9kaXNjcmV0ZScsIGRmX3UsIGZvcm1hdD0ncGFycXVldCcpCiAgICAKICAgIAogICAgY29udGV4dC5sb2dnZXIuaW5mbygnQ29tcHV0ZSBwcmlvciBtZXRyaWNzJykKICAgIAogICAgcmVzdWx0cyA9IHt9CiAgICB0X3ByaW9yLCB1X3ByaW9yID0gdG9fb2JzZXJ2YXRpb25zKGNvbnRleHQsIGRmX3QuZHJvcChkcm9wX2NvbHVtbnMsIGF4aXM9MSksIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkZl91LmRyb3AoZHJvcF9jb2x1bW5zLCBheGlzPTEpLCAnZmVhdHVyZXMnKQogICAgcmVzdWx0c1sncHJpb3JfdHZkJ10sIHJlc3VsdHNbJ3ByaW9yX2hlbGluZ2VyJ10sIHJlc3VsdHNbJ3ByaW9yX2tsZCddID0gYWxsX21ldHJpY3ModF9wcmlvciwgdV9wcmlvcikKICAgIAogICAgaWYgcHJlZGljdGlvbl9jb2wgaXMgbm90IE5vbmU6CiAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbygnQ29tcHV0ZSBwcmVkaWN0aW9uIG1ldHJpY3MnKQogICAgICAgIHRfcHJlZGljdGlvbnMgPSBwZC5EYXRhRnJhbWUoZGZfdC5sb2NbOiwgcHJlZGljdGlvbl9jb2xdKQogICAgICAgIHVfcHJlZGljdGlvbnMgPSBwZC5EYXRhRnJhbWUoZGZfdS5sb2NbOiwgcHJlZGljdGlvbl9jb2xdKQogICAgICAgIHRfY2xhc3MsIHVfY2xhc3MgPSB0b19vYnNlcnZhdGlvbnMoY29udGV4dCwgdF9wcmVkaWN0aW9ucywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVfcHJlZGljdGlvbnMsICdwcmVkaWN0aW9uJykKICAgICAgICByZXN1bHRzWydwcmVkaWN0aW9uX3NoaWZ0X3R2ZCddLCByZXN1bHRzWydwcmVkaWN0aW9uX3NoaWZ0X2hlbGluZ2VyJ10sIHJlc3VsdHNbJ3ByZWRpY3Rpb25fc2hpZnRfa2xkJ10gPSBhbGxfbWV0cmljcyh0X2NsYXNzLCB1X2NsYXNzKQogICAgICAgIAogICAgaWYgbGFiZWxfY29sIGlzIG5vdCBOb25lOgogICAgICAgIGNvbnRleHQubG9nZ2VyLmluZm8oJ0NvbXB1dGUgY2xhc3MgbWV0cmljcycpCiAgICAgICAgdF9sYWJlbHMgPSBwZC5EYXRhRnJhbWUoZGZfdC5sb2NbOiwgbGFiZWxfY29sXSkKICAgICAgICB1X2xhYmVscyA9IHBkLkRhdGFGcmFtZShkZl91LmxvY1s6LCBsYWJlbF9jb2xdKQogICAgICAgIHRfY2xhc3MsIHVfY2xhc3MgPSB0b19vYnNlcnZhdGlvbnMoY29udGV4dCwgdF9sYWJlbHMsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1X2xhYmVscywgJ2NsYXNzJykKICAgICAgICByZXN1bHRzWydjbGFzc19zaGlmdF90dmQnXSwgcmVzdWx0c1snY2xhc3Nfc2hpZnRfaGVsaW5nZXInXSwgcmVzdWx0c1snY2xhc3Nfc2hpZnRfa2xkJ10gPSBhbGxfbWV0cmljcyh0X2NsYXNzLCB1X2NsYXNzKQogICAgCiAgICBmb3Iga2V5LCB2YWx1ZSBpbiByZXN1bHRzLml0ZW1zKCk6CiAgICAgICAgaWYgdmFsdWUgPT0gZmxvYXQoJ2luZicpOgogICAgICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYndmFsdWU6IHt2YWx1ZX0nKQogICAgICAgICAgICByZXN1bHRzW2tleV09MTAKICAgIGZvciBrZXksIHJlc3VsdCBpbiByZXN1bHRzLml0ZW1zKCk6CiAgICAgICAgY29udGV4dC5sb2dfcmVzdWx0KGtleSwgcm91bmQocmVzdWx0LCAzKSkKICAgICAgICAKICAgIG5vdyA9IHBkLnRvX2RhdGV0aW1lKHN0cihkYXRldGltZS5kYXRldGltZS5ub3coKSkpCiAgICBub3cKICAgIAogICAgcmVzdWx0c1sndGltZXN0YW1wJ10gPSBwZC50b19kYXRldGltZShzdHIoKGRhdGV0aW1lLmRhdGV0aW1lLm5vdygpKSkpCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYiVGltZXN0YW1wOiB7cmVzdWx0c1sndGltZXN0YW1wJ119IikKICAgIHJlc3VsdHNbJ3N0cmVhbSddID0gc3RyZWFtX25hbWUKICAgIHJlc3VsdHNfZGYgPSBwZC5EYXRhRnJhbWUoZGF0YT1bbGlzdChyZXN1bHRzLnZhbHVlcygpKV0sCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbHVtbnM9bGlzdChyZXN1bHRzLmtleXMoKSkpCiAgICByZXN1bHRzX2RmID0gcmVzdWx0c19kZi5zZXRfaW5kZXgoWyd0aW1lc3RhbXAnLCAnc3RyZWFtJ10pCiAgICB2M2lvX2NsaWVudC53cml0ZSgndHNkYicsIHJlc3VsdHNfdHNkYl90YWJsZSwgZGZzPXJlc3VsdHNfZGYpCgo=
     commands:
-    - pip install v3io_frames
-    - pip install scikit-learn
-    - pip install scipy
-    code_origin: https://github.com/mlrun/functions#a354e13467498fae115c7a2bc3e5365842af21bd:virtual_drift.ipynb
+    - python -m pip install scikit-learn scipy v3io_frames
+    code_origin: https://github.com/Michaelliv/functions.git#e2dc23a9ef8c04ba4220dcb7ea227424069cf193:/home/michaell/projects/functions/virtual_drift/virtual_drift.ipynb
+verbose: false

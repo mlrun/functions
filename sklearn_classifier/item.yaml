@@ -4,7 +4,7 @@ categories:
 - training
 description: train any classifier using scikit-learn's API
 doc: ''
-example: sklearn_classifier.ipynb
+example: ''
 generationDate: 2021-05-19:23-13
 icon: ''
 labels:
@@ -16,9 +16,9 @@ mlrunVersion: ''
 name: sklearn-classifier
 platformVersion: ''
 spec:
-  filename: sklearn-classifier.py
+  filename: sklearn_classifier.ipynb
   handler: train_model
-  image: mlrun/ml-models
+  image: mlrun/mlrun
   kind: job
   requirements: []
 url: ''

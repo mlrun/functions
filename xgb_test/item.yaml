@@ -3,21 +3,22 @@ categories:
 - model-test
 description: Test one or more classifier models against held-out dataset.
 doc: ''
-example: xgb_test.ipynb
+example: ''
 generationDate: 2021-05-19:23-13
 icon: ''
 labels:
   author: Daniel
+  framework: xgboost
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.6.2
 name: xgb_test
 platformVersion: 3.0.0
 spec:
-  filename: xgb_test.py
+  filename: xgb_test.ipynb
   handler: xgb_test
-  image: mlrun/mlrun
+  image: mlrun/ml-models
   kind: job
-  requirements: ['mlrun','pandas','typing','xgboost','cloudpickle','matplotlib']
+  requirements: []
 url: ''
 version: 0.0.1

@@ -31,7 +31,7 @@ churn-server:
   - ml
   description: churn classification and predictor
   docfile: /home/michaell/projects/functions/churn_server/churn_server.ipynb
-  kind: remote
+  kind: serving
   versions:
     latest: /home/michaell/projects/functions/churn_server/function.yaml
 concept-drift:
@@ -57,7 +57,7 @@ coxph-test:
   categories:
   - ml
   - test
-  description: test cox proportional hazards model
+  description: Test cox proportional hazards model
   docfile: /home/michaell/projects/functions/coxph_test/coxph_test.ipynb
   kind: job
   versions:
@@ -113,9 +113,8 @@ feature-selection:
     latest: /home/michaell/projects/functions/feature_selection/function.yaml
 gen-class-data:
   categories:
-  - simulators
-  - ml
-  description: simulate classification data using scikit-learn
+  - data-prep
+  description: Create a binary classification sample dataset and save.
   docfile: /home/michaell/projects/functions/gen_class_data/gen_class_data.ipynb
   kind: job
   versions:
@@ -124,7 +123,7 @@ github-utils:
   categories:
   - notifications
   - utils
-  description: add comments to github pull requests
+  description: add comments to github pull request
   docfile: /home/michaell/projects/functions/github_utils/github_utils.ipynb
   kind: job
   versions:
@@ -206,12 +205,10 @@ project-runner:
     latest: /home/michaell/projects/functions/project_runner/function.yaml
 rnn-serving:
   categories:
-  - RNN
-  - Stocks
-  - Predictions
-  description: RNN based stock prediction
+  - model-serving
+  description: deploy an rnn based stock analysis model server.
   docfile: /home/michaell/projects/functions/rnn_serving/rnn_serving.ipynb
-  kind: remote
+  kind: serving
   versions:
     latest: /home/michaell/projects/functions/rnn_serving/function.yaml
 send-email:
@@ -223,8 +220,12 @@ send-email:
   versions:
     latest: /home/michaell/projects/functions/send_email/function.yaml
 sentiment-analysis-serving:
-  categories: []
-  description: ''
+  categories:
+  - serving
+  - NLP
+  - BERT
+  - sentiment analysis
+  description: BERT based sentiment classification model
   docfile: /home/michaell/projects/functions/sentiment_analysis_serving/sentiment_analysis_serving.ipynb
   kind: serving
   versions:
@@ -346,8 +347,8 @@ virtual-drift:
     latest: /home/michaell/projects/functions/virtual_drift/function.yaml
 xgb-custom:
   categories:
-  - analysis
-  description: train an xgboost model using the low-level api
+  - model-testing
+  description: simulate data with outliers.
   docfile: /home/michaell/projects/functions/xgb_custom/xgb_custom.ipynb
   kind: job
   versions:
@@ -363,19 +364,16 @@ xgb-serving:
     latest: /home/michaell/projects/functions/xgb_serving/function.yaml
 xgb-test:
   categories:
-  - ml
-  - test
-  description: test a classifier using held-out or new data
+  - model-test
+  description: Test one or more classifier models against held-out dataset.
   docfile: /home/michaell/projects/functions/xgb_test/xgb_test.ipynb
   kind: job
   versions:
     latest: /home/michaell/projects/functions/xgb_test/function.yaml
 xgb-trainer:
   categories:
-  - training
-  - ml
-  - experimental
-  description: train multiple model types using xgboost
+  - model-prep
+  description: train an xgboost model.
   docfile: /home/michaell/projects/functions/xgb_trainer/xgb_trainer.ipynb
   kind: job
   versions:

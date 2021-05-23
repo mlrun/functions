@@ -116,6 +116,7 @@ jobs:
           git config -l | grep 'http\..*\.extraheader' | cut -d= -f1 | xargs -L1 git config --unset-all
 
           echo "Pushing [$BRANCH_NAME] to remote [$REMOTE]"
+          git pull
           git push $REMOTE $BRANCH_NAME
 
           echo "Submiting pull request..."

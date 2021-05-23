@@ -3,7 +3,7 @@ categories:
 - ml
 - test
 description: test a classifier using held-out or new data
-doc: ''
+doc: README.md
 example: test_classifier.ipynb
 generationDate: 2021-05-19:23-13
 icon: ''
@@ -18,7 +18,7 @@ platformVersion: ''
 spec:
   filename: ''
   handler: test_classifier
-  image: mlrun/ml-models
+  image: mlrun/mlrun
   kind: job
   requirements: []
 url: ''

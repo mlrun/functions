@@ -1,23 +1,19 @@
 apiVersion: v1
-categories:
-- ml
-- training
-description: train any classifier using scikit-learn's API
+categories: []
+description: ''
 doc: ''
-example: sklearn_classifier.ipynb
+example: spark_submit.ipynb
 generationDate: 2021-05-19:23-13
 icon: ''
-labels:
-  author: yjb
-  framework: sklearn
+labels: {}
 maintainers: []
 marketplaceType: ''
 mlrunVersion: ''
-name: sklearn-classifier
+name: spark-submit
 platformVersion: ''
 spec:
   filename: ''
-  handler: train_model
+  handler: spark_submit
   image: mlrun/mlrun
   kind: job
   requirements: []

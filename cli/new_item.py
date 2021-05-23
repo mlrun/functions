@@ -41,7 +41,9 @@ spec:
   image: ''            # Base image name
   kind: ''             # Function kind
   requirements: []     # List of Pythonic library requirements
-url: ''                # ???
+  customFields: {{}}   # Custom spec fields
+  env: []              # Spec environment params
+url: ''
 version: 0.0.1         # Function version, should follow standard semantic versioning schema
 """
         )

@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: test-classifier
   tag: ''
-  hash: 08575a4998657c5c3994c907495a2adac80af48e
+  hash: 5e936225c0a9bceaa228d21096d65526661c4ce6
   project: default
   labels:
     author: yjb
@@ -16,58 +16,9 @@ spec:
   image: mlrun/mlrun
   env: []
   default_handler: test_classifier
-  entry_points:
-    test_classifier:
-      name: test_classifier
-      doc: "Test one or more classifier models against held-out dataset\n\nUsing held-out\
-        \ test features, evaluates the peformance of the estimated model\n\nCan be\
-        \ part of a kubeflow pipeline as a test step that is run post EDA and \ntraining/validation\
-        \ cycles"
-      parameters:
-      - name: context
-        doc: the function context
-        default: ''
-      - name: models_path
-        type: DataItem
-        doc: artifact models representing a file or a folder
-        default: ''
-      - name: test_set
-        type: DataItem
-        doc: test features and labels
-        default: ''
-      - name: label_column
-        type: str
-        doc: column name for ground truth labels
-        default: ''
-      - name: score_method
-        type: str
-        doc: for multiclass classification
-        default: micro
-      - name: plots_dest
-        type: str
-        doc: dir for test plots
-        default: ''
-      - name: model_evaluator
-        doc: 'NOT IMPLEMENTED: specific method to generate eval, passed in as string
-          or available in this folder'
-        default: null
-      - name: default_model
-        type: str
-        default: model.pkl
-      - name: predictions_column
-        type: str
-        doc: column name for the predictions column on the resulted artifact
-        default: yscore
-      - name: model_update
-        doc: (True) update model, when running as stand alone no need in update
-        default: true
-      outputs:
-      - default: ''
-      lineno: 15
   description: test a classifier using held-out or new data
   build:
     functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHdhcm5pbmdzCndhcm5pbmdzLmZpbHRlcndhcm5pbmdzKCdpZ25vcmUnKQoKaW1wb3J0IG9zCmltcG9ydCBwYW5kYXMgYXMgcGQKCmZyb20gbWxydW4uZGF0YXN0b3JlIGltcG9ydCBEYXRhSXRlbQpmcm9tIG1scnVuLmFydGlmYWN0cyBpbXBvcnQgZ2V0X21vZGVsLCB1cGRhdGVfbW9kZWwKZnJvbSBtbHJ1bi5tbHV0aWxzLm1vZGVscyBpbXBvcnQgZXZhbF9tb2RlbF92Mgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmZyb20gdXJsbGliLnJlcXVlc3QgaW1wb3J0IHVybG9wZW4KCmRlZiB0ZXN0X2NsYXNzaWZpZXIoCiAgICBjb250ZXh0LAogICAgbW9kZWxzX3BhdGg6IERhdGFJdGVtLCAKICAgIHRlc3Rfc2V0OiBEYXRhSXRlbSwKICAgIGxhYmVsX2NvbHVtbjogc3RyLAogICAgc2NvcmVfbWV0aG9kOiBzdHIgPSAnbWljcm8nLAogICAgcGxvdHNfZGVzdDogc3RyID0gIiIsCiAgICBtb2RlbF9ldmFsdWF0b3IgPSBOb25lLAogICAgZGVmYXVsdF9tb2RlbDogc3RyID0gIm1vZGVsLnBrbCIsCiAgICBwcmVkaWN0aW9uc19jb2x1bW46IHN0ciA9ICd5c2NvcmUnLAogICAgbW9kZWxfdXBkYXRlID0gVHJ1ZQopIC0+IE5vbmU6CiAgICAiIiJUZXN0IG9uZSBvciBtb3JlIGNsYXNzaWZpZXIgbW9kZWxzIGFnYWluc3QgaGVsZC1vdXQgZGF0YXNldAogICAgCiAgICBVc2luZyBoZWxkLW91dCB0ZXN0IGZlYXR1cmVzLCBldmFsdWF0ZXMgdGhlIHBlZm9ybWFuY2Ugb2YgdGhlIGVzdGltYXRlZCBtb2RlbAogICAgCiAgICBDYW4gYmUgcGFydCBvZiBhIGt1YmVmbG93IHBpcGVsaW5lIGFzIGEgdGVzdCBzdGVwIHRoYXQgaXMgcnVuIHBvc3QgRURBIGFuZCAKICAgIHRyYWluaW5nL3ZhbGlkYXRpb24gY3ljbGVzCiAgICAKICAgIDpwYXJhbSBjb250ZXh0OiAgICAgICAgICAgIHRoZSBmdW5jdGlvbiBjb250ZXh0CiAgICA6cGFyYW0gbW9kZWxzX3BhdGg6ICAgICAgICBhcnRpZmFjdCBtb2RlbHMgcmVwcmVzZW50aW5nIGEgZmlsZSBvciBhIGZvbGRlcgogICAgOnBhcmFtIHRlc3Rfc2V0OiAgICAgICAgICAgdGVzdCBmZWF0dXJlcyBhbmQgbGFiZWxzCiAgICA6cGFyYW0gbGFiZWxfY29sdW1uOiAgICAgICBjb2x1bW4gbmFtZSBmb3IgZ3JvdW5kIHRydXRoIGxhYmVscwogICAgOnBhcmFtIHNjb3JlX21ldGhvZDogICAgICAgZm9yIG11bHRpY2xhc3MgY2xhc3NpZmljYXRpb24KICAgIDpwYXJhbSBwbG90c19kZXN0OiAgICAgICAgIGRpciBmb3IgdGVzdCBwbG90cwogICAgOnBhcmFtIG1vZGVsX2V2YWx1YXRvcjogICAgTk9UIElNUExFTUVOVEVEOiBzcGVjaWZpYyBtZXRob2QgdG8gZ2VuZXJhdGUgZXZhbCwgcGFzc2VkIGluIGFzIHN0cmluZwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgb3IgYXZhaWxhYmxlIGluIHRoaXMgZm9sZGVyCiAgICA6cGFyYW0gcHJlZGljdGlvbnNfY29sdW1uOiBjb2x1bW4gbmFtZSBmb3IgdGhlIHByZWRpY3Rpb25zIGNvbHVtbiBvbiB0aGUgcmVzdWx0ZWQgYXJ0aWZhY3QKICAgIDpwYXJhbSBtb2RlbF91cGRhdGU6ICAgICAgIChUcnVlKSB1cGRhdGUgbW9kZWwsIHdoZW4gcnVubmluZyBhcyBzdGFuZCBhbG9uZSBubyBuZWVkIGluIHVwZGF0ZQogICAgIiIiCiAgICB4dGVzdCA9IHRlc3Rfc2V0LmFzX2RmKCkKICAgIHl0ZXN0ID0geHRlc3QucG9wKGxhYmVsX2NvbHVtbikKICAgIAogICAgdHJ5OgogICAgICAgIG1vZGVsX2ZpbGUsIG1vZGVsX29iaiwgXyA9IGdldF9tb2RlbChtb2RlbHNfcGF0aCwgc3VmZml4PScucGtsJykKICAgICAgICBtb2RlbF9vYmogPSBsb2FkKG9wZW4obW9kZWxfZmlsZSwgInJiIikpCiAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGE6CiAgICAgICAgcmFpc2UgRXhjZXB0aW9uKCJtb2RlbCBsb2NhdGlvbiBsaWtlbHkgc3BlY2lmaWVkIikKICAgIAogICAgZXh0cmFfZGF0YSA9IGV2YWxfbW9kZWxfdjIoY29udGV4dCwgeHRlc3QsIHl0ZXN0LnZhbHVlcywgbW9kZWxfb2JqKQogICAgaWYgbW9kZWxfb2JqIGFuZCBtb2RlbF91cGRhdGUgPT0gVHJ1ZToKICAgICAgICB1cGRhdGVfbW9kZWwobW9kZWxzX3BhdGgsIGV4dHJhX2RhdGE9ZXh0cmFfZGF0YSwgCiAgICAgICAgICAgICAgICAgICAgIG1ldHJpY3M9Y29udGV4dC5yZXN1bHRzLCBrZXlfcHJlZml4PSd2YWxpZGF0aW9uLScpCiAgICAKICAgIHlfaGF0ID0gbW9kZWxfb2JqLnByZWRpY3QoeHRlc3QpCiAgICBpZiB5X2hhdC5uZGltID09IDEgb3IgeV9oYXQuc2hhcGVbMV0gPT0gMToKICAgICAgICBzY29yZV9uYW1lcyA9IFtwcmVkaWN0aW9uc19jb2x1bW5dCiAgICBlbHNlOgogICAgICAgIHNjb3JlX25hbWVzID0gW2Yie3ByZWRpY3Rpb25zX2NvbHVtbn1fIiArIHN0cih4KSBmb3IgeCBpbiByYW5nZSh5X2hhdC5zaGFwZVsxXSldCgogICAgZGYgPSBwZC5jb25jYXQoW3h0ZXN0LCB5dGVzdCwgcGQuRGF0YUZyYW1lKHlfaGF0LCBjb2x1bW5zPXNjb3JlX25hbWVzKV0sIGF4aXM9MSkKICAgIGNvbnRleHQubG9nX2RhdGFzZXQoInRlc3Rfc2V0X3ByZWRzIiwgZGY9ZGYsIGZvcm1hdD0icGFycXVldCIsIGluZGV4PUZhbHNlKQoK
     commands: []
-    code_origin: test_classifier.ipynb
-  affinity: null
+    code_origin: https://github.com/Michaelliv/functions.git#bac01aa6aec18fbf685b4583dde8679d2465767c:/home/michaell/projects/functions/test_classifier/test_classifier.ipynb
 verbose: false

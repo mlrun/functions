@@ -15,7 +15,7 @@ mlrunVersion: ''
 name: v2-model-tester
 platformVersion: ''
 spec:
-  filename: v2-model-tester.py
+  filename: ''
   handler: model_server_tester
   image: mlrun/mlrun
   kind: job

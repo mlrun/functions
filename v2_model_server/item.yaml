@@ -16,10 +16,12 @@ mlrunVersion: ''
 name: v2-model-server
 platformVersion: ''
 spec:
-  filename: v2-model-server.py
+  filename: ''
   handler: handler
   image: mlrun/mlrun
   kind: serving
   requirements: []
+  customFields:
+    default_class: ClassifierModel
 url: ''
 version: 0.0.1

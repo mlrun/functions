@@ -2,10 +2,10 @@ kind: job
 metadata:
   name: coxph-test
   tag: ''
-  hash: b7622aae3641fffe36d72e57c97fbb22f14a165d
-  project: ''
+  hash: cace156008e8943d6433820f884a0b6f71002dca
+  project: default
   labels:
-    author: yjb
+    author: Iguazio
     framework: survival
   categories:
   - ml
@@ -16,41 +16,9 @@ spec:
   image: mlrun/ml-models
   env: []
   default_handler: cox_test
-  entry_points:
-    cox_test:
-      name: cox_test
-      doc: "Test one or more classifier models against held-out dataset\n\nUsing held-out\
-        \ test features, evaluates the peformance of the estimated model\n\nCan be\
-        \ part of a kubeflow pipeline as a test step that is run post EDA and \ntraining/validation\
-        \ cycles"
-      parameters:
-      - name: context
-        doc: the function context
-        default: ''
-      - name: models_path
-        type: DataItem
-        default: ''
-      - name: test_set
-        type: DataItem
-        doc: test features and labels
-        default: ''
-      - name: label_column
-        type: str
-        doc: column name for ground truth labels
-        default: ''
-      - name: plots_dest
-        type: str
-        doc: dir for test plots
-        default: plots
-      - name: model_evaluator
-        doc: 'WIP: specific method to generate eval, passed in as string or available
-          in this folder'
-        default: null
-      outputs:
-      - default: ''
-      lineno: 13
-  description: test cox proportional hazards model
+  description: Test cox proportional hazards model
   build:
     functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHdhcm5pbmdzCndhcm5pbmdzLnNpbXBsZWZpbHRlcihhY3Rpb249Imlnbm9yZSIsIGNhdGVnb3J5PUZ1dHVyZVdhcm5pbmcpCgppbXBvcnQgb3MKaW1wb3J0IHBhbmRhcyBhcyBwZApmcm9tIG1scnVuLmRhdGFzdG9yZSBpbXBvcnQgRGF0YUl0ZW0KZnJvbSBtbHJ1bi5hcnRpZmFjdHMgaW1wb3J0IGdldF9tb2RlbApmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmZyb20gbWxydW4ubWx1dGlscy5tb2RlbHMgaW1wb3J0IGV2YWxfY2xhc3NfbW9kZWwKCmRlZiBjb3hfdGVzdCgKICAgIGNvbnRleHQsCiAgICBtb2RlbHNfcGF0aDogRGF0YUl0ZW0sIAogICAgdGVzdF9zZXQ6IERhdGFJdGVtLAogICAgbGFiZWxfY29sdW1uOiBzdHIsCiAgICBwbG90c19kZXN0OiBzdHIgPSAicGxvdHMiLAogICAgbW9kZWxfZXZhbHVhdG9yID0gTm9uZQopIC0+IE5vbmU6CiAgICAiIiJUZXN0IG9uZSBvciBtb3JlIGNsYXNzaWZpZXIgbW9kZWxzIGFnYWluc3QgaGVsZC1vdXQgZGF0YXNldAogICAgCiAgICBVc2luZyBoZWxkLW91dCB0ZXN0IGZlYXR1cmVzLCBldmFsdWF0ZXMgdGhlIHBlZm9ybWFuY2Ugb2YgdGhlIGVzdGltYXRlZCBtb2RlbAogICAgCiAgICBDYW4gYmUgcGFydCBvZiBhIGt1YmVmbG93IHBpcGVsaW5lIGFzIGEgdGVzdCBzdGVwIHRoYXQgaXMgcnVuIHBvc3QgRURBIGFuZCAKICAgIHRyYWluaW5nL3ZhbGlkYXRpb24gY3ljbGVzCiAgICAKICAgIDpwYXJhbSBjb250ZXh0OiAgICAgICAgIHRoZSBmdW5jdGlvbiBjb250ZXh0CiAgICA6cGFyYW0gbW9kZWxfZmlsZTogICAgICBtb2RlbCBhcnRpZmFjdCB0byBiZSB0ZXN0ZWQKICAgIDpwYXJhbSB0ZXN0X3NldDogICAgICAgIHRlc3QgZmVhdHVyZXMgYW5kIGxhYmVscwogICAgOnBhcmFtIGxhYmVsX2NvbHVtbjogICAgY29sdW1uIG5hbWUgZm9yIGdyb3VuZCB0cnV0aCBsYWJlbHMKICAgIDpwYXJhbSBzY29yZV9tZXRob2Q6ICAgIGZvciBtdWx0aWNsYXNzIGNsYXNzaWZpY2F0aW9uCiAgICA6cGFyYW0gcGxvdHNfZGVzdDogICAgICBkaXIgZm9yIHRlc3QgcGxvdHMKICAgIDpwYXJhbSBtb2RlbF9ldmFsdWF0b3I6IFdJUDogc3BlY2lmaWMgbWV0aG9kIHRvIGdlbmVyYXRlIGV2YWwsIHBhc3NlZCBpbiBhcyBzdHJpbmcKICAgICAgICAgICAgICAgICAgICAgICAgICAgIG9yIGF2YWlsYWJsZSBpbiB0aGlzIGZvbGRlcgogICAgIiIiICAKICAgIHh0ZXN0ID0gdGVzdF9zZXQuYXNfZGYoKQogICAgeXRlc3QgPSB4dGVzdC5wb3AobGFiZWxfY29sdW1uKQogICAgCiAgICBtb2RlbF9maWxlLCBtb2RlbF9vYmosIF8gPSBnZXRfbW9kZWwobW9kZWxzX3BhdGgudXJsLCBzdWZmaXg9Jy5wa2wnKQogICAgbW9kZWxfb2JqID0gbG9hZChvcGVuKHN0cihtb2RlbF9maWxlKSwgInJiIikpCgogICAgdHJ5OgogICAgICAgIGlmIG5vdCBtb2RlbF9ldmFsdWF0b3I6CiAgICAgICAgICAgIGV2YWxfbWV0cmljcyA9IGV2YWxfY2xhc3NfbW9kZWwoY29udGV4dCwgeHRlc3QsIHl0ZXN0LCBtb2RlbF9vYmopCgogICAgICAgIG1vZGVsX3Bsb3RzID0gZXZhbF9tZXRyaWNzLnBvcCgicGxvdHMiKQogICAgICAgIG1vZGVsX3RhYmxlcyA9IGV2YWxfbWV0cmljcy5wb3AoInRhYmxlcyIpCiAgICAgICAgZm9yIHBsb3QgaW4gbW9kZWxfcGxvdHM6CiAgICAgICAgICAgIGNvbnRleHQubG9nX2FydGlmYWN0KHBsb3QsIGxvY2FsX3BhdGg9ZiJ7cGxvdHNfZGVzdH0ve3Bsb3Qua2V5fS5odG1sIikKICAgICAgICBmb3IgdGJsIGluIG1vZGVsX3RhYmxlczoKICAgICAgICAgICAgY29udGV4dC5sb2dfYXJ0aWZhY3QodGJsLCBsb2NhbF9wYXRoPWYie3Bsb3RzX2Rlc3R9L3twbG90LmtleX0uY3N2IikKCiAgICAgICAgY29udGV4dC5sb2dfcmVzdWx0cyhldmFsX21ldHJpY3MpCiAgICBleGNlcHQ6CiAgICAgICAgY29udGV4dC5sb2dfZGF0YXNldCgiY294LXRlc3Qtc3VtbWFyeSIsIGRmPW1vZGVsX29iai5zdW1tYXJ5LCBpbmRleD1UcnVlLCBmb3JtYXQ9ImNzdiIpCiAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbygiY294IHRlc3RlciBub3QgaW1wbGVtZW50ZWQiKQoK
     commands: []
-    code_origin: git@github.com:mlrun/functions.git#be078749c9a28db208e19b6097afd547a22f7a4a:coxph_test.ipynb
+    code_origin: https://github.com/Michaelliv/functions.git#88f24825277e64484a2c5a6f2448309911c755ae:/home/michaell/projects/functions/coxph_test/coxph_test.ipynb
+verbose: false

@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: v2-model-server
   tag: ''
-  hash: 829231d43948d3c115730e0d344e1af67f126251
+  hash: a259fbddae6509a5a0435a1653531e70b908942f
   project: default
   labels:
     author: yaronh
@@ -13,7 +13,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: ''
+  image: mlrun/mlrun
   description: generic sklearn model server
   min_replicas: 1
   max_replicas: 4
@@ -23,7 +23,7 @@ spec:
     kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from /User/functions/v2_model_server/v2_model_server.ipynb
+        nuclio.io/generated_by: function generated from /home/michaell/projects/functions/v2_model_server/v2_model_server.ipynb
       labels: {}
       name: v2-model-server
     spec:
@@ -41,5 +41,5 @@ spec:
   default_class: ClassifierModel
   build:
     commands: []
-    code_origin: https://github.com/mlrun/functions.git#0c898f600dc2ad9fa77279fedbe0f7170a39b488:v2-model-server.ipynb
+    code_origin: https://github.com/Michaelliv/functions.git#b6d661b4f8ad3f3a632a5024f679a4babbb04395:/home/michaell/projects/functions/v2_model_server/v2_model_server.ipynb
 verbose: false

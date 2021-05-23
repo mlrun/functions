@@ -2,8 +2,8 @@ kind: job
 metadata:
   name: send-email
   tag: ''
-  hash: 4632b6e73371ab5f889a5e6f4b98a99ab278ca7c
-  project: ''
+  hash: 36935dd05acd17e04613e0794426e8bb02e470b1
+  project: default
   labels:
     author: saarc
   categories:
@@ -14,36 +14,9 @@ spec:
   image: mlrun/ml-models
   env: []
   default_handler: send_email
-  entry_points:
-    send_email:
-      name: send_email
-      doc: Send an email.
-      parameters:
-      - name: context
-        type: MLClientCtx
-        doc: The function context
-      - name: sender
-        type: str
-        doc: Sender email address
-      - name: to
-        type: str
-        doc: Email address of mail recipient
-      - name: subject
-        type: str
-        doc: Email subject
-      - name: content
-        type: str
-        doc: Optional mail text
-      - name: server_addr
-        type: str
-        doc: Address of SMTP server to use. Use format <addr>:<port>
-      - name: attachments
-        type: List[str]
-        doc: List of attachments to add.
-      outputs: []
-      lineno: 12
   description: Send Email messages through SMTP server
   build:
     functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CgppbXBvcnQgc210cGxpYgpmcm9tIGVtYWlsLm1lc3NhZ2UgaW1wb3J0IEVtYWlsTWVzc2FnZQppbXBvcnQgb3MKCmltcG9ydCBtaW1ldHlwZXMKCmRlZiBzZW5kX2VtYWlsKAogICAgY29udGV4dDogTUxDbGllbnRDdHgsCiAgICBzZW5kZXI6IHN0ciwKICAgIHRvOiBzdHIsCiAgICBzdWJqZWN0OiBzdHIsCiAgICBjb250ZW50OiBzdHIgPSAiIiwKICAgIHNlcnZlcl9hZGRyOiBzdHIgPSBOb25lLAogICAgYXR0YWNobWVudHM6IExpc3Rbc3RyXSA9IFtdCikgLT4gTm9uZToKICAgICIiIlNlbmQgYW4gZW1haWwuCiAgICA6cGFyYW0gc2VuZGVyOiBTZW5kZXIgZW1haWwgYWRkcmVzcwogICAgOnBhcmFtIGNvbnRleHQ6IFRoZSBmdW5jdGlvbiBjb250ZXh0CiAgICA6cGFyYW0gdG86IEVtYWlsIGFkZHJlc3Mgb2YgbWFpbCByZWNpcGllbnQKICAgIDpwYXJhbSBzdWJqZWN0OiBFbWFpbCBzdWJqZWN0CiAgICA6cGFyYW0gY29udGVudDogT3B0aW9uYWwgbWFpbCB0ZXh0CiAgICA6cGFyYW0gc2VydmVyX2FkZHI6IEFkZHJlc3Mgb2YgU01UUCBzZXJ2ZXIgdG8gdXNlLiBVc2UgZm9ybWF0IDxhZGRyPjo8cG9ydD4KICAgIDpwYXJhbSBhdHRhY2htZW50czogTGlzdCBvZiBhdHRhY2htZW50cyB0byBhZGQuCiAgICAiIiIKCiAgICBlbWFpbF91c2VyID0gY29udGV4dC5nZXRfc2VjcmV0KCJTTVRQX1VTRVIiKQogICAgZW1haWxfcGFzcyA9IGNvbnRleHQuZ2V0X3NlY3JldCgiU01UUF9QQVNTV09SRCIpCiAgICBpZiBlbWFpbF91c2VyIGlzIE5vbmUgb3IgZW1haWxfcGFzcyBpcyBOb25lOgogICAgICAgIGNvbnRleHQubG9nZ2VyLmVycm9yKCJNaXNzaW5nIHNlbmRlciBlbWFpbCBvciBwYXNzd29yZCAtIGNhbm5vdCBzZW5kIGVtYWlsLiIpCiAgICAgICAgcmV0dXJuCgogICAgaWYgc2VydmVyX2FkZHIgaXMgTm9uZToKICAgICAgICBjb250ZXh0LmxvZ2dlci5lcnJvcigiU2VydmVyIG5vdCBzcGVjaWZpZWQgLSBjYW5ub3Qgc2VuZCBlbWFpbC4iKQogICAgICAgIHJldHVybgogICAgICAgIAogICAgbXNnID0gRW1haWxNZXNzYWdlKCkKICAgIG1zZ1snRnJvbSddID0gc2VuZGVyCiAgICBtc2dbJ1N1YmplY3QnXSA9IHN1YmplY3QKICAgIG1zZ1snVG8nXSA9IHRvCiAgICBtc2cuc2V0X2NvbnRlbnQoY29udGVudCkgICAKCiAgICBmb3IgZmlsZW5hbWUgaW4gYXR0YWNobWVudHM6CiAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbyhmJ0xvb2tpbmcgYXQgYXR0YWNobWVudDoge2ZpbGVuYW1lfScpCiAgICAgICAgaWYgbm90IG9zLnBhdGguaXNmaWxlKGZpbGVuYW1lKToKICAgICAgICAgICAgY29udGV4dC5sb2dnZXIud2FybmluZyhmJ0ZpbGVuYW1lIGRvZXMgbm90IGV4aXN0IHtmaWxlbmFtZX0nKQogICAgICAgICAgICBjb250aW51ZQogICAgICAgIGN0eXBlLCBlbmNvZGluZyA9IG1pbWV0eXBlcy5ndWVzc190eXBlKGZpbGVuYW1lKQogICAgICAgIGlmIGN0eXBlIGlzIE5vbmUgb3IgZW5jb2RpbmcgaXMgbm90IE5vbmU6CiAgICAgICAgICAgIGN0eXBlID0gJ2FwcGxpY2F0aW9uL29jdGV0LXN0cmVhbScKICAgICAgICBtYWludHlwZSwgc3VidHlwZSA9IGN0eXBlLnNwbGl0KCcvJywgMSkKICAgICAgICB3aXRoIG9wZW4oZmlsZW5hbWUsJ3JiJykgYXMgZnA6CiAgICAgICAgICAgIG1zZy5hZGRfYXR0YWNobWVudChmcC5yZWFkKCksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBtYWludHlwZT1tYWludHlwZSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN1YnR5cGU9c3VidHlwZSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZpbGVuYW1lPW9zLnBhdGguYmFzZW5hbWUoZmlsZW5hbWUpKQogICAgICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYnQWRkZWQgYXR0YWNobWVudDogRmlsZW5hbWU6IHtmaWxlbmFtZX0sIG9mIG1pbWV0eXBlOiB7bWFpbnR5cGV9LCB7c3VidHlwZX0nKQogICAgCiAgICB0cnk6CiAgICAgICAgcyA9IHNtdHBsaWIuU01UUChob3N0PXNlcnZlcl9hZGRyKQogICAgICAgIHMuc3RhcnR0bHMoKQogICAgICAgIHMubG9naW4oZW1haWxfdXNlcixlbWFpbF9wYXNzKQogICAgICAgIHMuc2VuZF9tZXNzYWdlKG1zZykKICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCdFbWFpbCBzZW50IHN1Y2Nlc3NmdWxseS4nKQogICAgZXhjZXB0IHNtdHBsaWIuU01UUEV4Y2VwdGlvbiBhcyBleHA6CiAgICAgICAgY29udGV4dC5sb2dnZXIuZXJyb3IoZidTTVRQIGV4Y2VwdGlvbiBjYXVnaHQgaW4gU01UUCBjb2RlOiB7ZXhwfScpCiAgICBleGNlcHQgQ29ubmVjdGlvbkVycm9yIGFzIGNlOgogICAgICAgIGNvbnRleHQubG9nZ2VyLmVycm9yKGYnQ29ubmVjdGlvbiBlcnJvciBjYXVnaHQgaW4gU01UUCBjb2RlOiB7Y2V9JykKCg==
     commands: []
-    code_origin: send_email.ipynb
+    code_origin: https://github.com/Michaelliv/functions.git#b6d661b4f8ad3f3a632a5024f679a4babbb04395:/home/michaell/projects/functions/send_email/send_email.ipynb
+verbose: false

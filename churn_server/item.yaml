@@ -8,6 +8,7 @@ example: churn_server.ipynb
 generationDate: 2021-05-19:22-04
 icon: ''
 labels:
+  author: Iguazio
   framework: churn
 maintainers: []
 marketplaceType: ''
@@ -15,10 +16,14 @@ mlrunVersion: ''
 name: churn-server
 platformVersion: ''
 spec:
-  filename: churn_server.py
+  filename: ''
   handler: handler
   image: mlrun/ml-models
-  kind: remote
+  kind: serving
   requirements: []
+  env:
+    ENABLE_EXPLAINER: 'False'
+  customFields:
+    default_class: ChurnModel
 url: ''
 version: 0.0.1

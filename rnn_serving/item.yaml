@@ -19,6 +19,5 @@ spec:
   image: mlrun/ml-model
   kind: serving
   requirements: []
-
 url: ''
 version: 0.0.1

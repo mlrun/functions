@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: describe-dask
   tag: ''
-  hash: bcb9280775f5d3afbbe888d18ebaf43993fc1eb0
+  hash: ae67ad987825e935468fcc8f21d6d13532d11ba9
   project: default
   labels:
     author: Iguazio
@@ -14,57 +14,9 @@ spec:
   image: mlrun/ml-models
   env: []
   default_handler: summarize
-  entry_points:
-    summarize:
-      name: summarize
-      doc: 'Summarize a table
-
-
-        Connects to dask client through the function context, or through an optional
-
-        user-supplied scheduler.'
-      parameters:
-      - name: context
-        doc: the function context
-        default: ''
-      - name: dask_key
-        type: str
-        doc: key of dataframe in dask client "datasets" attribute
-        default: dask_key
-      - name: dataset
-        type: DataItem
-        default: null
-      - name: label_column
-        type: str
-        doc: ground truth column label
-        default: label
-      - name: class_labels
-        type: List[str]
-        doc: label for each class in tables and plots
-        default: []
-      - name: plot_hist
-        type: bool
-        doc: (True) set this to False for large tables
-        default: true
-      - name: plots_dest
-        type: str
-        doc: destination folder of summary plots (relative to artifact_path)
-        default: plots
-      - name: dask_function
-        type: str
-        doc: dask function url (db://..)
-        default: null
-      - name: dask_client
-        doc: dask client object
-        default: null
-      outputs:
-      - default: ''
-      lineno: 15
   description: describe and visualizes dataset stats
   build:
     functionSourceCode: aW1wb3J0IG1scnVuCmltcG9ydCB3YXJuaW5ncwp3YXJuaW5ncy5zaW1wbGVmaWx0ZXIoYWN0aW9uPSJpZ25vcmUiLCBjYXRlZ29yeT1GdXR1cmVXYXJuaW5nKQppbXBvcnQgcGFuZGFzIGFzIHBkCmltcG9ydCBtYXRwbG90bGliLnB5cGxvdCBhcyBwbHQKaW1wb3J0IHNlYWJvcm4gYXMgc25zCmltcG9ydCBkYXNrLmRhdGFmcmFtZSBhcyBkZApmcm9tIG1scnVuLmFydGlmYWN0cyBpbXBvcnQgUGxvdEFydGlmYWN0LCBUYWJsZUFydGlmYWN0CmZyb20gbWxydW4ubWx1dGlscy5wbG90cyBpbXBvcnQgZ2NmX2NsZWFyCmZyb20geWVsbG93YnJpY2sgaW1wb3J0IENsYXNzQmFsYW5jZQpmcm9tIHR5cGluZyBpbXBvcnQgTGlzdAoKcGQuc2V0X29wdGlvbigiZGlzcGxheS5mbG9hdF9mb3JtYXQiLCBsYW1iZGEgeDogIiUuMmYiICUgeCkKCmRlZiBzdW1tYXJpemUoCiAgICBjb250ZXh0LAogICAgZGFza19rZXk6IHN0ciA9ICJkYXNrX2tleSIsCiAgICBkYXRhc2V0OiBtbHJ1bi5EYXRhSXRlbSA9IE5vbmUsCiAgICBsYWJlbF9jb2x1bW46IHN0ciA9ICJsYWJlbCIsCiAgICBjbGFzc19sYWJlbHM6IExpc3Rbc3RyXSA9IFtdLAogICAgcGxvdF9oaXN0OiBib29sID0gVHJ1ZSwKICAgIHBsb3RzX2Rlc3Q6IHN0ciA9ICJwbG90cyIsCiAgICBkYXNrX2Z1bmN0aW9uOiBzdHIgPSBOb25lLAogICAgZGFza19jbGllbnQ9Tm9uZSwKKSAtPiBOb25lOgogICAgIiIiU3VtbWFyaXplIGEgdGFibGUKICAgIAogICAgQ29ubmVjdHMgdG8gZGFzayBjbGllbnQgdGhyb3VnaCB0aGUgZnVuY3Rpb24gY29udGV4dCwgb3IgdGhyb3VnaCBhbiBvcHRpb25hbAogICAgdXNlci1zdXBwbGllZCBzY2hlZHVsZXIuCgogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgICAgdGhlIGZ1bmN0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBkYXNrX2tleTogICAgICAgIGtleSBvZiBkYXRhZnJhbWUgaW4gZGFzayBjbGllbnQgImRhdGFzZXRzIiBhdHRyaWJ1dGUKICAgIDpwYXJhbSBsYWJlbF9jb2x1bW46ICAgIGdyb3VuZCB0cnV0aCBjb2x1bW4gbGFiZWwKICAgIDpwYXJhbSBjbGFzc19sYWJlbHM6ICAgIGxhYmVsIGZvciBlYWNoIGNsYXNzIGluIHRhYmxlcyBhbmQgcGxvdHMKICAgIDpwYXJhbSBwbG90X2hpc3Q6ICAgICAgIChUcnVlKSBzZXQgdGhpcyB0byBGYWxzZSBmb3IgbGFyZ2UgdGFibGVzCiAgICA6cGFyYW0gcGxvdHNfZGVzdDogICAgICBkZXN0aW5hdGlvbiBmb2xkZXIgb2Ygc3VtbWFyeSBwbG90cyAocmVsYXRpdmUgdG8gYXJ0aWZhY3RfcGF0aCkKICAgIDpwYXJhbSBkYXNrX2Z1bmN0aW9uOiAgIGRhc2sgZnVuY3Rpb24gdXJsIChkYjovLy4uKQogICAgOnBhcmFtIGRhc2tfY2xpZW50OiAgICAgZGFzayBjbGllbnQgb2JqZWN0CiAgICAiIiIKICAgIGlmIGRhc2tfZnVuY3Rpb246CiAgICAgICAgY2xpZW50ID0gbWxydW4uaW1wb3J0X2Z1bmN0aW9uKGRhc2tfZnVuY3Rpb24pLmNsaWVudAogICAgZWxpZiBkYXNrX2NsaWVudDoKICAgICAgICBjbGllbnQgPSBkYXNrX2NsaWVudAogICAgZWxzZToKICAgICAgICByYWlzZSBWYWx1ZUVycm9yKCdkYXNrIGNsaWVudCB3YXMgbm90IHByb3ZpZGVkJykKICAgICAgICAKICAgIGlmIGRhc2tfa2V5IGluIGNsaWVudC5kYXRhc2V0czoKICAgICAgICB0YWJsZSA9IGNsaWVudC5nZXRfZGF0YXNldChkYXNrX2tleSkKICAgIGVsaWYgZGF0YXNldDoKICAgICAgICB0YWJsZSA9IGRhdGFzZXQuYXNfZGYoZGZfbW9kdWxlPWRkKQogICAgZWxzZToKICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYib25seSB0aGVzZSBkYXRhc2V0cyBhcmUgYXZhaWxhYmxlIHtjbGllbnQuZGF0YXNldHN9IGluIGNsaWVudCB7Y2xpZW50fSIpCiAgICAgICAgcmFpc2UgRXhjZXB0aW9uKCJkYXRhc2V0IG5vdCBmb3VuZCBvbiBkYXNrIGNsdXN0ZXIiKQogICAgaGVhZGVyID0gdGFibGUuY29sdW1ucy52YWx1ZXMKICAgIAogICAgZ2NmX2NsZWFyKHBsdCkKICAgIHRhYmxlID0gdGFibGUuY29tcHV0ZSgpCiAgICBzbnNwbHQgPSBzbnMucGFpcnBsb3QodGFibGUsIGh1ZT1sYWJlbF9jb2x1bW4sIGRpYWdfa3dzPXsnYncnOiAxLjV9KQogICAgY29udGV4dC5sb2dfYXJ0aWZhY3QoUGxvdEFydGlmYWN0KCdoaXN0b2dyYW1zJywgIGJvZHk9cGx0LmdjZigpKSwgCiAgICAgICAgICAgICAgICAgICAgICAgICBsb2NhbF9wYXRoPWYie3Bsb3RzX2Rlc3R9L2hpc3QuaHRtbCIpCgogICAgZ2NmX2NsZWFyKHBsdCkgICAKICAgIGxhYmVscyA9IHRhYmxlLnBvcChsYWJlbF9jb2x1bW4pCiAgICBpZiBub3QgY2xhc3NfbGFiZWxzOgogICAgICAgIGNsYXNzX2xhYmVscyA9IGxhYmVscy51bmlxdWUoKQogICAgY2xhc3NfYmFsYW5jZV9tb2RlbCA9IENsYXNzQmFsYW5jZShsYWJlbHM9Y2xhc3NfbGFiZWxzKQogICAgY2xhc3NfYmFsYW5jZV9tb2RlbC5maXQobGFiZWxzKSAgIAogICAgc2NhbGVfcG9zX3dlaWdodCA9IGNsYXNzX2JhbGFuY2VfbW9kZWwuc3VwcG9ydF9bMF0vY2xhc3NfYmFsYW5jZV9tb2RlbC5zdXBwb3J0X1sxXQogICAgY29udGV4dC5sb2dfcmVzdWx0KCJzY2FsZV9wb3Nfd2VpZ2h0IiwgZiJ7c2NhbGVfcG9zX3dlaWdodDowLjJmfSIpCiAgICBjb250ZXh0LmxvZ19hcnRpZmFjdChQbG90QXJ0aWZhY3QoImltYmFsYW5jZSIsIGJvZHk9cGx0LmdjZigpKSwgCiAgICAgICAgICAgICAgICAgICAgICAgICBsb2NhbF9wYXRoPWYie3Bsb3RzX2Rlc3R9L2ltYmFsYW5jZS5odG1sIikKICAgIAogICAgZ2NmX2NsZWFyKHBsdCkKICAgIHRibGNvcnIgPSB0YWJsZS5jb3JyKCkKICAgIGF4ID0gcGx0LmF4ZXMoKQogICAgc25zLmhlYXRtYXAodGJsY29yciwgYXg9YXgsIGFubm90PUZhbHNlLCBjbWFwPXBsdC5jbS5SZWRzKQogICAgYXguc2V0X3RpdGxlKCJmZWF0dXJlcyBjb3JyZWxhdGlvbiIpCiAgICBjb250ZXh0LmxvZ19hcnRpZmFjdChQbG90QXJ0aWZhY3QoImNvcnJlbGF0aW9uIiwgIGJvZHk9cGx0LmdjZigpKSwgCiAgICAgICAgICAgICAgICAgICAgICAgICBsb2NhbF9wYXRoPWYie3Bsb3RzX2Rlc3R9L2NvcnIuaHRtbCIpCiAgICBnY2ZfY2xlYXIocGx0KQoK
-    commands:
-    - python -m pip install mlrun dask yellowbrick
-    code_origin: http://github.com/aviaIguazio/functions.git#6c56c90bcfa4d5f52076b40e7c06a78ed0c017d4:describe_dask/describe_dask.py
-  affinity: null
+    commands: []
+    code_origin: https://github.com/Michaelliv/functions.git#b6d661b4f8ad3f3a632a5024f679a4babbb04395:/home/michaell/projects/functions/describe_dask/describe_dask.py
 verbose: false

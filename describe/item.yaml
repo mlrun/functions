@@ -14,13 +14,10 @@ mlrunVersion: 0.5.4
 name: describe
 platformVersion: 2.10.0
 spec:
-  filename: describe.py
+  filename: ''
   handler: summarize
-  image: mlrun/ml-models
+  image: mlrun/mlrun
   kind: job
-  requirements:
-  - mlrun
-  - scikit-plot
-  - wget
+  requirements: []
 url: ''
 version: 0.0.1

@@ -195,4 +195,4 @@ def get_requirements(function_yaml: dict):
 
 
 if __name__ == "__main__":
-    function_to_item("/home/michaell/projects/functions")
+    function_to_item_cli()

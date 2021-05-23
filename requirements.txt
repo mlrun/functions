@@ -10,3 +10,5 @@ click
 pipenv
 nuclio-jupyter
 myst_nb
+black
+isort

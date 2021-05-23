@@ -225,7 +225,7 @@ send-email:
 sentiment-analysis-serving:
   categories: []
   description: ''
-  docfile: /home/michaell/projects/functions/sentiment_analysis_serving/bert_sentiment_analysis_serving.ipynb
+  docfile: /home/michaell/projects/functions/sentiment_analysis_serving/sentiment_analysis_serving.ipynb
   kind: serving
   versions:
     latest: /home/michaell/projects/functions/sentiment_analysis_serving/function.yaml

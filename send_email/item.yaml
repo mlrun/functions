@@ -3,7 +3,7 @@ categories:
 - notifications
 description: Send Email messages through SMTP server
 doc: ''
-example: ''
+example: send_email.ipynb
 generationDate: 2021-05-19:23-13
 icon: ''
 labels:
@@ -14,7 +14,7 @@ mlrunVersion: ''
 name: send-email
 platformVersion: ''
 spec:
-  filename: send_email.ipynb
+  filename: ''
   handler: send_email
   image: mlrun/ml-models
   kind: job

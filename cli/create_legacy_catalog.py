@@ -76,17 +76,22 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 ## Functions
 """
 
-    with open(root_dir / "README.md", 'w') as fp:
+    with open(root_dir / "README.md", "w") as fp:
         fp.write(mdheader)
         rows = []
         for k, v in catalog.items():
-            kind = v['kind']
-            if kind == 'remote':
-                kind = 'nuclio'
-            row = [f"[{k}]({v['docfile']})", kind, v['description'], ', '.join(v['categories'] or [])]
+            kind = v["kind"]
+            if kind == "remote":
+                kind = "nuclio"
+            row = [
+                f"[{k}]({v['docfile']})",
+                kind,
+                v["description"],
+                ", ".join(v["categories"] or []),
+            ]
             rows.append(row)
 
-        text = gen_md_table(['function', 'kind', 'description', 'categories'], rows)
+        text = gen_md_table(["function", "kind", "description", "categories"], rows)
         fp.write(text)
 
 
@@ -95,16 +100,12 @@ def gen_md_table(header, rows=None):
 
     def gen_list(items=None):
         items = [] if items is None else items
-        out = '|'
+        out = "|"
         for i in items:
-            out += ' {} |'.format(i)
+            out += " {} |".format(i)
         return out
 
-    out = gen_list(header) + '\n' + gen_list(len(header) * ['---']) + '\n'
+    out = gen_list(header) + "\n" + gen_list(len(header) * ["---"]) + "\n"
     for r in rows:
-        out += gen_list(r) + '\n'
+        out += gen_list(r) + "\n"
     return out
-
-
-
-

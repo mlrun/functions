@@ -2,8 +2,8 @@ kind: remote
 metadata:
   name: project-runner
   tag: ''
-  hash: b7888996aa9a7833972928fa06fa238f674099b3
-  project: ''
+  hash: 74f47b8096ca42b0f1dcfcd6c521bd5942f96132
+  project: default
   labels:
     author: orz
   categories:
@@ -11,43 +11,17 @@ metadata:
 spec:
   command: ''
   args: []
-  image: ''
-  entry_points:
-    init_context:
-      name: init_context
-      doc: ''
-      parameters:
-      - name: context
-      outputs: []
-      lineno: 8
-    handler:
-      name: handler
-      doc: "Imports the latest project version and runs the \nspecified workflow"
-      parameters:
-      - name: context
-      - name: event
-      outputs: []
-      lineno: 11
+  image: mlrun/mlrun
   description: Nuclio based - Cron scheduler for running your MLRun projects
   min_replicas: 1
-  max_replicas: 1
+  max_replicas: 4
   env: []
-  base_spec:
-    apiVersion: nuclio.io/v1
-    kind: Function
-    metadata:
-      annotations:
-        nuclio.io/generated_by: function generated from 02-07-2020 by admin
-      labels: {}
-      name: project-runner
-    spec:
-      build:
-        baseImage: mlrun/mlrun
-        commands: []
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSBtbHJ1biBpbXBvcnQgbG9hZF9wcm9qZWN0CmZyb20gbWxydW4gaW1wb3J0IG1sY29uZgppbXBvcnQganNvbgppbXBvcnQgb3MKCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBzZXRhdHRyKGNvbnRleHQsICdodWJfdXJsJywgb3MuZ2V0ZW52KCdodWJfdXJsJywgTm9uZSkpCgpkZWYgaGFuZGxlcihjb250ZXh0LCBldmVudCk6CiAgICAiIiJJbXBvcnRzIHRoZSBsYXRlc3QgcHJvamVjdCB2ZXJzaW9uIGFuZCBydW5zIHRoZSAKICAgIHNwZWNpZmllZCB3b3JrZmxvdwogICAgIiIiCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCdQdWxsaW5nIHByb2plY3QgYW5kIHdvcmtmbG93IGRldGFpbHMnKQogICAgaWYgaXNpbnN0YW5jZShldmVudC5ib2R5LCBkaWN0KToKICAgICAgICBkZXRhaWxzID0gZXZlbnQuYm9keQogICAgZWxzZToKICAgICAgICBkZXRhaWxzID0ganNvbi5sb2FkcyhldmVudC5ib2R5KQogICAgY29udGV4dC5sb2dnZXIuaW5mbyhkZXRhaWxzKQogICAgcHJvamVjdF91cmwgPSBkZXRhaWxzWydwcm9qZWN0X3VybCddCiAgICB3b3JrZmxvdyA9IGRldGFpbHNbJ3dvcmtmbG93J10KICAgIGFydGlmYWN0X3BhdGggPSBkZXRhaWxzLmdldCgnYXJ0aWZhY3RfcGF0aCcsIG9zLmVudmlyb24uZ2V0KCdhcnRpZmFjdF9wYXRoJywgTm9uZSkpCiAgICBodWJfdXJsID0gZGV0YWlscy5nZXQoJ2h1Yl91cmwnLCBjb250ZXh0Lmh1Yl91cmwpCgogICAgaWYgaHViX3VybDoKICAgICAgICBtbGNvbmYuaHViX3VybCA9IGh1Yl91cmwKCiAgICBwcm9qZWN0PSBsb2FkX3Byb2plY3Qob3MucGF0aC5hYnNwYXRoKCcuL2xvYWRlZF9wcm9qZWN0JyksIHVybD1wcm9qZWN0X3VybCkKICAgIHByb2plY3QucnVuKG5hbWU9d29ya2Zsb3csCiAgICAgICAgICAgICAgICBhcmd1bWVudHM9e30sCiAgICAgICAgICAgICAgICBhcnRpZmFjdF9wYXRoPWFydGlmYWN0X3BhdGgsCiAgICAgICAgICAgICAgICB3YXRjaD1GYWxzZSkKCg==
-        noBaseImagesPull: true
-      env: []
-      handler: project_runner:handler
-      runtime: python:3.6
-      volumes: []
+  base_spec: ''
   source: ''
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSBtbHJ1biBpbXBvcnQgbG9hZF9wcm9qZWN0CmZyb20gbWxydW4gaW1wb3J0IG1sY29uZgppbXBvcnQganNvbgppbXBvcnQgb3MKCmRlZiBpbml0X2NvbnRleHQoY29udGV4dCk6CiAgICBzZXRhdHRyKGNvbnRleHQsICdodWJfdXJsJywgb3MuZ2V0ZW52KCdodWJfdXJsJywgTm9uZSkpCgpkZWYgaGFuZGxlcihjb250ZXh0LCBldmVudCk6CiAgICAiIiJJbXBvcnRzIHRoZSBsYXRlc3QgcHJvamVjdCB2ZXJzaW9uIGFuZCBydW5zIHRoZSAKICAgIHNwZWNpZmllZCB3b3JrZmxvdwogICAgIiIiCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCdQdWxsaW5nIHByb2plY3QgYW5kIHdvcmtmbG93IGRldGFpbHMnKQogICAgaWYgaXNpbnN0YW5jZShldmVudC5ib2R5LCBkaWN0KToKICAgICAgICBkZXRhaWxzID0gZXZlbnQuYm9keQogICAgZWxzZToKICAgICAgICBkZXRhaWxzID0ganNvbi5sb2FkcyhldmVudC5ib2R5KQogICAgY29udGV4dC5sb2dnZXIuaW5mbyhkZXRhaWxzKQogICAgcHJvamVjdF91cmwgPSBkZXRhaWxzWydwcm9qZWN0X3VybCddCiAgICB3b3JrZmxvdyA9IGRldGFpbHNbJ3dvcmtmbG93J10KICAgIGFydGlmYWN0X3BhdGggPSBkZXRhaWxzLmdldCgnYXJ0aWZhY3RfcGF0aCcsIG9zLmVudmlyb24uZ2V0KCdhcnRpZmFjdF9wYXRoJywgTm9uZSkpCiAgICBodWJfdXJsID0gZGV0YWlscy5nZXQoJ2h1Yl91cmwnLCBjb250ZXh0Lmh1Yl91cmwpCgogICAgaWYgaHViX3VybDoKICAgICAgICBtbGNvbmYuaHViX3VybCA9IGh1Yl91cmwKCiAgICBwcm9qZWN0PSBsb2FkX3Byb2plY3Qob3MucGF0aC5hYnNwYXRoKCcuL2xvYWRlZF9wcm9qZWN0JyksIHVybD1wcm9qZWN0X3VybCkKICAgIHByb2plY3QucnVuKG5hbWU9d29ya2Zsb3csCiAgICAgICAgICAgICAgICBhcmd1bWVudHM9e30sCiAgICAgICAgICAgICAgICBhcnRpZmFjdF9wYXRoPWFydGlmYWN0X3BhdGgsCiAgICAgICAgICAgICAgICB3YXRjaD1GYWxzZSkKCg==
+    base_image: mlrun/mlrun
+    commands: []
+    code_origin: https://github.com/Michaelliv/functions.git#b6d661b4f8ad3f3a632a5024f679a4babbb04395:/home/michaell/projects/functions/project_runner/project_runner.ipynb
+  default_handler: handler
+verbose: false

@@ -450,8 +450,4 @@ def build_temp_docs(temp_root, temp_docs):
 
 
 if __name__ == "__main__":
-    build_marketplace(
-        "/home/michaell/projects/functions",
-        "/home/michaell/projects/tmp_marketplace",
-    )
-    # build_marketplace_cli()
+    build_marketplace_cli()

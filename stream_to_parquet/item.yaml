@@ -4,7 +4,7 @@ categories:
 - serve
 description: Saves a stream to Parquet and can lunch drift detection task on it
 doc: ''
-example: ''
+example: stream_to_parquet.ipynb
 generationDate: 2021-05-19:23-13
 icon: ''
 labels:
@@ -15,7 +15,7 @@ mlrunVersion: ''
 name: stream-to-parquet
 platformVersion: ''
 spec:
-  filename: stream_to_parquet.ipynb
+  filename: ''
   handler: handler
   image: mlrun/ml-models
   kind: remote

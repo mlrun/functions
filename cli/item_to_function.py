@@ -119,9 +119,7 @@ def create_function_yaml(
     if env:
         setattr(function_object.spec, "env", [])
     for key, value in env.items():
-        function_object.spec.env.append(
-            {"name": key, "value": value}
-        )
+        function_object.spec.env.append({"name": key, "value": value})
         setattr(function_object.spec, key, value)
 
     if output_path is None:

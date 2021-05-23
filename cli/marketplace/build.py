@@ -351,13 +351,15 @@ def build_temp_project(source_dir, temp_root):
         with open(directory / "item.yaml", "r") as f:
             item = yaml.full_load(f)
 
-        py_file = directory / item.get("spec")["filename"]
+        filename = item.get("spec")["filename"]
+        if filename:
+            py_file = directory / filename
+            temp_dir = temp_root / directory.name
+            temp_dir.mkdir(parents=True, exist_ok=True)
 
-        temp_dir = temp_root / directory.name
-        temp_dir.mkdir(parents=True, exist_ok=True)
-
-        (temp_dir / "__init__.py").touch()
-        shutil.copy(py_file, temp_dir / py_file.name)
+            (temp_dir / "__init__.py").touch()
+            temp_file = temp_dir / py_file.name
+            shutil.copy(py_file, temp_file)
 
     if _verbose:
         click.echo(f"[Temporary project] Done project (item count: {item_count})")
@@ -423,4 +425,5 @@ def build_temp_docs(temp_root, temp_docs):
 
 
 if __name__ == "__main__":
+    # build_marketplace("")
     build_marketplace_cli()

@@ -17,11 +17,6 @@ class BertSentimentClassifier(nn.Module):
         self.softmax = nn.Softmax(dim=1)
 
     def forward(self, input_ids, attention_mask):
-        """
-        :param input_ids:
-        :param attention_mask:
-        :return:
-        """
         _, pooled_out = self.bert(
             input_ids=input_ids,
             attention_mask=attention_mask
@@ -38,7 +33,6 @@ class SentimentClassifierServing(mlrun.serving.V2ModelServer):
     def load(self):
         """
         load bert model into class
-        :return: model
         """
         model_file, _ = self.get_model('.pt')
         device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
@@ -51,7 +45,6 @@ class SentimentClassifierServing(mlrun.serving.V2ModelServer):
         """
         predict function
         :param body: set of inputs for bert model to predict from
-        :return: list of sentiment predictions
         """
         try:
             instances = body['inputs']

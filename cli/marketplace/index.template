@@ -37,8 +37,16 @@
                 <td>{{item["channel_name"]}}</td>
                 <td>{{item["version"]}}</td>
                 <td>{{item["generation_date"]}}</td>
-                <td><a href={{item["file_url"]}}>Link</a></td>
-                <td><a href={{item["example_url"]}}>Link</a></td>
+                {% if item["file_url"] %}
+                    <td><a href={{item["file_url"]}}>Link</a></td>
+                {% else %}
+                    <td>--</td>
+                {% endif %}
+                {% if item["example_url"] %}
+                    <td><a href={{item["example_url"]}}>Link</a></td>
+                {% else %}
+                    <td>--</td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>

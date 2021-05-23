@@ -2,3 +2,4 @@ mlrun
 torch
 wget
 pygit2
+transformers

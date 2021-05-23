@@ -1,4 +1,4 @@
-mlrun==0.6.2
+mlrun
 keras
 tensorflow
 wget

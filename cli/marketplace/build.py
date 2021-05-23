@@ -53,8 +53,8 @@ def build_marketplace_cli(
 ):
     build_marketplace(
         source_dir,
-        source_name,
         marketplace_dir,
+        source_name,
         temp_dir,
         channel,
         verbose,
@@ -63,17 +63,17 @@ def build_marketplace_cli(
 
 def build_marketplace(
     source_dir: str,
-    source_name: str,
     marketplace_dir: str,
-    temp_dir: str,
-    channel: str,
-    verbose: bool,
+    source_name: Optional[str] = None,
+    temp_dir: str = "/tmp",
+    channel: str = "development",
+    verbose: bool = False,
 ):
     """Main entry point to marketplace building
 
     :param source_dir: Path to the source directory to build the marketplace from
-    :param source_name: Name of source, if not provided, name of source directory will be used instead
     :param marketplace_dir: Path to marketplace directory
+    :param source_name: Name of source, if not provided, name of source directory will be used instead
     :param temp_dir: Path to intermediate directory, used to build marketplace resources,
     if not provided '/tmp/<random_uuid>' will be used
     :param channel: The name of the marketplace channel to write to
@@ -180,9 +180,19 @@ def write_index_html(marketplace_root: Union[str, Path]):
                 latest = item["latest"]
                 version = latest["version"]
                 generation_date = latest["generationDate"]
-                file_name = latest["spec"]["filename"].split(".")[0]
-                file_url = remote_base_url / f"{file_name}.html"
-                example_url = remote_base_url / f"{file_name}_example.html"
+
+                file_name = latest.get("spec", {})["filename"].split(".")[0]
+                file_url = remote_base_url / f"{file_name}.html" if file_name else None
+
+                example = latest.get("example").split(".")[0]
+                example_url = (
+                    remote_base_url / f"{example}_example.html" if example else None
+                )
+
+                item_name = item_name.replace("-", "_").split("_")
+                item_name = map(lambda word: word.capitalize(), item_name)
+                item_name = " ".join(item_name)
+
                 items.append(
                     {
                         "item_num": item_num,
@@ -332,7 +342,12 @@ def patch_temp_docs(source_dir, temp_docs):
             item = yaml.full_load(f)
 
         example_file = directory / item["example"]
-        shutil.copy(example_file, temp_docs / f"{directory.name}_example.ipynb")
+        if example_file:
+            example_file = Path(example_file)
+            shutil.copy(
+                example_file,
+                temp_docs / f"{directory.name}_example{example_file.suffix}",
+            )
 
 
 def build_temp_project(source_dir, temp_root):
@@ -352,12 +367,12 @@ def build_temp_project(source_dir, temp_root):
             item = yaml.full_load(f)
 
         filename = item.get("spec")["filename"]
+        temp_dir = temp_root / directory.name
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        (temp_dir / "__init__.py").touch()
+
         if filename:
             py_file = directory / filename
-            temp_dir = temp_root / directory.name
-            temp_dir.mkdir(parents=True, exist_ok=True)
-
-            (temp_dir / "__init__.py").touch()
             temp_file = temp_dir / py_file.name
             shutil.copy(py_file, temp_file)
 
@@ -373,6 +388,16 @@ def collect_temp_requirements(source_dir) -> Set[str]:
         item_requirements = get_item_yaml_requirements(directory)
         for item_requirement in item_requirements:
             requirements.add(item_requirement)
+        requirements_txt = directory / "requirements.txt"
+        if requirements_txt.exists():
+            with open(requirements_txt, "r") as f:
+                lines = f.read().split("\n")
+                for line in filter(lambda l: l, lines):
+                    requirements.add(line)
+
+    parsed = set()
+    for req in requirements:
+        parsed.add(req.split("==")[0])
 
     if _verbose:
         click.echo(f"[Temporary project] Done requirements ({', '.join(requirements)})")
@@ -425,5 +450,4 @@ def build_temp_docs(temp_root, temp_docs):
 
 
 if __name__ == "__main__":
-    # build_marketplace("")
     build_marketplace_cli()

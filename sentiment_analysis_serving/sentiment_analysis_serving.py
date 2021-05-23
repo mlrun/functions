@@ -27,9 +27,6 @@ class BertSentimentClassifier(nn.Module):
 
 
 class SentimentClassifierServing(mlrun.serving.V2ModelServer):
-    def __init__(self):
-        self.model = self.load()
-
     def load(self):
         """
         load bert model into class

@@ -16,7 +16,7 @@ mlrunVersion: ''
 name: concept-drift
 platformVersion: ''
 spec:
-  filename: concept_drift.ipynb
+  filename: ''
   handler: concept_drift_deployer
   image: mlrun/ml-models
   kind: job

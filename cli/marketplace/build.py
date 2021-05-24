@@ -193,27 +193,40 @@ def write_index_html(marketplace_root: Union[str, Path]):
                 item_name = map(lambda word: word.capitalize(), item_name)
                 item_name = " ".join(item_name)
 
-                items.append(
-                    {
-                        "item_num": item_num,
-                        "source_name": source_name,
-                        "channel_name": channel_name,
-                        "item_name": item_name,
-                        "version": version,
-                        "generation_date": generation_date,
-                        "file_url": file_url,
-                        "example_url": example_url,
-                    }
-                )
+                categories = latest.get("categories", [])
+                categories = ", ".join(categories)
+
+                item_yaml = remote_base_url / "item.yaml"
+                function_yaml = remote_base_url / "function.yaml"
+                row = {
+                    "id": item_num,
+                    "source_name": source_name,
+                    "channel_name": channel_name,
+                    "name": item_name,
+                    "description": latest.get("description", ""),
+                    "version": version,
+                    "generation_date": generation_date,
+                    "item_yaml": str(item_yaml),
+                    "function_yaml": str(function_yaml),
+                    "categories": categories,
+                }
+                if file_url:
+                    row["file_url"] = str(file_url)
+                if example_url:
+                    row["example_url"] = str(example_url)
+                items.append(row)
 
     if items:
+
         index_path = marketplace_root / "index.html"
+
         if index_path.exists():
             index_path.unlink()
+
         render_jinja_file(
             template_path=PROJECT_ROOT / "cli" / "marketplace" / "index.template",
             output_path=index_path,
-            data={"items": items},
+            data={"table_json": json.dumps(items)},
         )
 
 

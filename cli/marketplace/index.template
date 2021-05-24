@@ -6,51 +6,114 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap CSS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
         integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="_static/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/snackbarjs/1.1.0/snackbar.min.js"
+        integrity="sha512-Knad2JJvcddGNKm03ySDgeTKXQfBjH0XPrFqUyzM0BuJhKkVfLzoOK5Ii9jsLmbZTXM8YNqn42suHyIEbQXboQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.9.3/dist/js/tabulator.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+        integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https:////cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        .tabulator-col-title {
+            text-align: center !important;
+        }
+    </style>
     <title>Marketplace</title>
 </head>
 
 <body>
-    <table class="table table-dark">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Source</th>
-                <th scope="col">Channel</th>
-                <th scope="col">Version</th>
-                <th scope="col">Generation Date</th>
-                <th scope="col">Docs URL</th>
-                <th scope="col">Example URL</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in items %}
-            <tr>
-                <th scope="row">{{item["item_num"]}}</th>
-                <td>{{item["item_name"]}}</td>
-                <td>{{item["source_name"]}}</td>
-                <td>{{item["channel_name"]}}</td>
-                <td>{{item["version"]}}</td>
-                <td>{{item["generation_date"]}}</td>
-                {% if item["file_url"] %}
-                    <td><a href={{item["file_url"]}}>Link</a></td>
-                {% else %}
-                    <td>--</td>
-                {% endif %}
-                {% if item["example_url"] %}
-                    <td><a href={{item["example_url"]}}>Link</a></td>
-                {% else %}
-                    <td>--</td>
-                {% endif %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div id="table"></div>
+    <script>
+        var tabledata = {{table_json}};
+
+        var functionYamlFormatter = function (cell, formatterParams, onRendered) {
+            let value = cell.getValue();
+            if (value) {
+                return `<a href=${value}>View</a> <i class="fa fa-clipboard ml-3" onclick=onClickClipboard("${value.split("/")[2]}")></i>`;
+            } else {
+                return "";
+            }
+        };
+
+        var onClickClipboard = function (hubUrl) {
+            if (hubUrl) {
+                let text = "from mlrun import import_funtion\n\nfn = import_function('hub://{" + hubUrl + "}')";
+                navigator.clipboard.writeText(text).then(function () {
+                    toastr.success('Function copied to clipboard!');
+                }, function (err) {
+                });
+            }
+        }
+
+        var table = new Tabulator("#table", {
+            data: tabledata,
+            layout: "fitColumns",
+            responsiveLayout: "hide",
+            tooltips: true,
+            cellHozAlign: "center",
+            columns: [
+                { title: "#", field: "id", width: 50 },
+                { title: "Name", field: "name", headerFilter: true },
+                { title: "Description", field: "description", headerFilter: true },
+                { title: "Categories", field: "categories", headerFilter: true },
+                { title: "Channel", field: "channel_name" },
+                { title: "Version", field: "version" },
+                {
+                    title: "Last Updated", field: "generation_date",
+                    formatter: "datetimediff", formatterParams: {
+                        inputFormat: "YYYY-MM-DD:hh-mm",
+                        humanize: true,
+                        invalidPlaceholder: "(invalid date)",
+                    }
+                },
+                {
+                    title: "Documentation",
+                    field: "file_url",
+                    headerSort: false,
+                    formatter: "link",
+                    formatterParams: {
+                        label: (cell) => { return (cell._cell.value === undefined ? '' : 'View'); },
+                        target: "_blank"
+                    },
+                },
+                {
+                    title: "Example Notebook",
+                    field: "example_url",
+                    headerSort: false,
+                    formatter: "link",
+                    formatterParams: {
+                        label: (cell) => { return (cell._cell.value === undefined ? '' : 'View'); },
+                        target: "_blank"
+                    },
+                },
+                {
+                    title: "Spec",
+                    field: "item_yaml",
+                    headerSort: false,
+                    formatter: "link",
+                    formatterParams: {
+                        label: (cell) => { return (cell._cell.value === undefined ? '' : 'View'); },
+                        target: "_blank"
+                    },
+                },
+                {
+                    title: "function.yaml",
+                    field: "function_yaml",
+                    headerSort: false,
+                    formatter: functionYamlFormatter,
+                },
+            ]
+        });
+    </script>
 </body>
 
 </html>

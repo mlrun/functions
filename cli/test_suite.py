@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from subprocess import CompletedProcess
 from typing import List, Union, Optional
+import sys
 
 import click
 import yaml
@@ -177,7 +178,7 @@ class TestPY(TestSuite):
                 "No tests found, make sure your test file names are structures as 'test_*.py')"
             )
             exit(0)
-
+        testables.sort()
         return testables
 
     def before_run(self):
@@ -193,7 +194,7 @@ class TestPY(TestSuite):
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ; pipenv run python -m pytest",
-            stdout=subprocess.PIPE,
+            stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
             shell=True,

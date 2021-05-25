@@ -2,4 +2,4 @@ mlrun
 torch
 wget
 pygit2
-transformers
+transformers==3.0.2

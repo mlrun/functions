@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: concept-drift-streaming
   tag: ''
-  hash: a44051658454c03666f19832683741a3b3dfe64f
+  hash: 887e4c8d72c6e17dc3b7d9a16681fac183ad87a9
   project: default
   labels:
     author: orz
@@ -14,6 +14,71 @@ spec:
   command: ''
   args: []
   image: mlrun/ml-models
+  entry_points:
+    split_path:
+      name: split_path
+      doc: ''
+      parameters:
+      - name: mntpath
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 15
+    create_stream:
+      name: create_stream
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: path
+        default: ''
+      - name: shards
+        default: 1
+      outputs:
+      - default: ''
+      lineno: 26
+    push_to_stream:
+      name: push_to_stream
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: stream_path
+        default: ''
+      - name: data
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 36
+    construct_record:
+      name: construct_record
+      doc: ''
+      parameters:
+      - name: record
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 44
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 53
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: event
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 91
   description: Deploy a streaming Concept Drift detector on a labeled stream. the
     nuclio part of the concept_drift function
   min_replicas: 1
@@ -28,6 +93,6 @@ spec:
     - python -m pip install scikit-multiflow==0.4.1
     - python -m pip install v3io_frames
     - python -m pip install scikit-multiflow==0.4.1 v3io_frames
-    code_origin: https://github.com/Michaelliv/functions.git#b6d661b4f8ad3f3a632a5024f679a4babbb04395:/home/michaell/projects/functions/concept_drift_streaming/concept_drift_streaming.ipynb
+    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/concept_drift_streaming/concept_drift_streaming.ipynb
   default_handler: handler
 verbose: false

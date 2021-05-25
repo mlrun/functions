@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: aggregate
   tag: ''
-  hash: a8b7d1c19db2b6da47608689c0ae3b7dcc72aa88
+  hash: 6309316d4d87fedb8d701b6bfb0a7e8ad238ad56
   project: default
   labels:
     author: avia
@@ -14,9 +14,84 @@ spec:
   image: mlrun/ml-models
   env: []
   default_handler: aggregate
+  entry_points:
+    aggregate:
+      name: aggregate
+      doc: "Time-series aggregation function\n\nWill perform a rolling aggregation\
+        \ on {df_artifact}, over {window} by the selected {keys}\napplying {metric_aggs}\
+        \ on {metrics} and {label_aggs} on {labels}. adding {suffix} to the \nfeature\
+        \ names.\n\nif not {inplace}, will return the original {df_artifact}, joined\
+        \ by the aggregated result."
+      parameters:
+      - name: context
+        default: ''
+      - name: df_artifact
+        type: Union[DataItem, DataFrame]
+        doc: MLRun input pointing to pandas dataframe (csv/parquet file path) or a  directory
+          containing parquet files. * When given a directory the latest {files_to_select}
+          will be selected
+        default: ''
+      - name: save_to
+        type: str
+        doc: Where to save the result dataframe. * If relative will add to the {artifact_path}
+        default: aggregated-df.pq
+      - name: keys
+        type: list
+        doc: Subset of indexes from the source dataframe to aggregate by (default=all)
+        default: null
+      - name: metrics
+        type: list
+        doc: 'Array containing a list of metrics to run the aggregations on. (default=None) '
+        default: null
+      - name: labels
+        type: list
+        doc: 'Array containing a list of labels to run the aggregations on. (default=None) '
+        default: null
+      - name: metric_aggs
+        type: list
+        doc: 'Array containing a list of aggregation function names to run on {metrics}.
+          (Ex: ''mean'', ''std'') (default=''mean'')'
+        default:
+        - mean
+      - name: label_aggs
+        type: list
+        doc: 'Array containing a list of aggregation function names to run on {metrics}.
+          (Ex: ''max'', ''min'') (default=''max'') '
+        default:
+        - max
+      - name: suffix
+        type: str
+        doc: 'Suffix to add to the feature name, E.g: <Feature_Name>_<Agg_Function>_<Suffix>
+          (Ex: ''last_60_mintes'') (default='''')'
+        default: ''
+      - name: window
+        type: int
+        doc: Window size to perform the rolling aggregate on. (default=3)
+        default: 3
+      - name: center
+        type: bool
+        doc: If True, Sets the value for the central sample in the window, If False,
+          will set the value to the last sample. (default=False)
+        default: false
+      - name: inplace
+        type: bool
+        doc: If True, will return only the aggregated results. If False, will join
+          the aggregated results with the original dataframe
+        default: false
+      - name: drop_na
+        type: bool
+        doc: Will drop na lines due to the Rolling.
+        default: true
+      - name: files_to_select
+        type: int
+        doc: Specifies the number of *latest* files to select (and concat) for aggregation.
+        default: 1
+      outputs:
+      - default: ''
+      lineno: 9
   description: Rolling aggregation over Metrics and Lables according to specifications
   build:
     functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG9zCmltcG9ydCBwYW5kYXMgYXMgcGQKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCgpmcm9tIHR5cGluZyBpbXBvcnQgVW5pb24KCmRlZiBhZ2dyZWdhdGUoY29udGV4dCwKICAgICAgICAgICAgICBkZl9hcnRpZmFjdDogVW5pb25bRGF0YUl0ZW0sIHBkLmNvcmUuZnJhbWUuRGF0YUZyYW1lXSwKICAgICAgICAgICAgICBzYXZlX3RvOiBzdHIgPSAnYWdncmVnYXRlZC1kZi5wcScsIAogICAgICAgICAgICAgIGtleXM6IGxpc3QgPSBOb25lLCAKICAgICAgICAgICAgICBtZXRyaWNzOiBsaXN0ID0gTm9uZSwgCiAgICAgICAgICAgICAgbGFiZWxzOiBsaXN0ID0gTm9uZSwgCiAgICAgICAgICAgICAgbWV0cmljX2FnZ3M6IGxpc3QgPSBbJ21lYW4nXSwgCiAgICAgICAgICAgICAgbGFiZWxfYWdnczogbGlzdCA9IFsnbWF4J10sIAogICAgICAgICAgICAgIHN1ZmZpeDogc3RyID0gJycsIAogICAgICAgICAgICAgIHdpbmRvdzogaW50ID0gMywgCiAgICAgICAgICAgICAgY2VudGVyOiBib29sID0gRmFsc2UsIAogICAgICAgICAgICAgIGlucGxhY2U6IGJvb2wgPSBGYWxzZSwKICAgICAgICAgICAgICBkcm9wX25hOiBib29sID0gVHJ1ZSwKICAgICAgICAgICAgICBmaWxlc190b19zZWxlY3Q6IGludCA9IDEpOgogICAgIiIiVGltZS1zZXJpZXMgYWdncmVnYXRpb24gZnVuY3Rpb24KICAgIAogICAgV2lsbCBwZXJmb3JtIGEgcm9sbGluZyBhZ2dyZWdhdGlvbiBvbiB7ZGZfYXJ0aWZhY3R9LCBvdmVyIHt3aW5kb3d9IGJ5IHRoZSBzZWxlY3RlZCB7a2V5c30KICAgIGFwcGx5aW5nIHttZXRyaWNfYWdnc30gb24ge21ldHJpY3N9IGFuZCB7bGFiZWxfYWdnc30gb24ge2xhYmVsc30uIGFkZGluZyB7c3VmZml4fSB0byB0aGUgCiAgICBmZWF0dXJlIG5hbWVzLgogICAgCiAgICBpZiBub3Qge2lucGxhY2V9LCB3aWxsIHJldHVybiB0aGUgb3JpZ2luYWwge2RmX2FydGlmYWN0fSwgam9pbmVkIGJ5IHRoZSBhZ2dyZWdhdGVkIHJlc3VsdC4KICAgIAogICAgOnBhcmFtIGRmX2FydGlmYWN0OiBNTFJ1biBpbnB1dCBwb2ludGluZyB0byBwYW5kYXMgZGF0YWZyYW1lIChjc3YvcGFycXVldCBmaWxlIHBhdGgpIG9yIGEgCiAgICAgICAgICAgICAgICAgICAgICAgIGRpcmVjdG9yeSBjb250YWluaW5nIHBhcnF1ZXQgZmlsZXMuCiAgICAgICAgICAgICAgICAgICAgICAgICogV2hlbiBnaXZlbiBhIGRpcmVjdG9yeSB0aGUgbGF0ZXN0IHtmaWxlc190b19zZWxlY3R9IHdpbGwgYmUgc2VsZWN0ZWQKICAgIDpwYXJhbSBzYXZlX3RvOiAgICAgV2hlcmUgdG8gc2F2ZSB0aGUgcmVzdWx0IGRhdGFmcmFtZS4KICAgICAgICAgICAgICAgICAgICAgICAgKiBJZiByZWxhdGl2ZSB3aWxsIGFkZCB0byB0aGUge2FydGlmYWN0X3BhdGh9CiAgICA6cGFyYW0ga2V5czogICAgICAgIFN1YnNldCBvZiBpbmRleGVzIGZyb20gdGhlIHNvdXJjZSBkYXRhZnJhbWUgdG8gYWdncmVnYXRlIGJ5IChkZWZhdWx0PWFsbCkKICAgIDpwYXJhbSBtZXRyaWNzOiAgICAgQXJyYXkgY29udGFpbmluZyBhIGxpc3Qgb2YgbWV0cmljcyB0byBydW4gdGhlIGFnZ3JlZ2F0aW9ucyBvbi4gKGRlZmF1bHQ9Tm9uZSkgCiAgICA6cGFyYW0gbGFiZWxzOiAgICAgIEFycmF5IGNvbnRhaW5pbmcgYSBsaXN0IG9mIGxhYmVscyB0byBydW4gdGhlIGFnZ3JlZ2F0aW9ucyBvbi4gKGRlZmF1bHQ9Tm9uZSkgCiAgICA6cGFyYW0gbWV0cmljX2FnZ3M6IEFycmF5IGNvbnRhaW5pbmcgYSBsaXN0IG9mIGFnZ3JlZ2F0aW9uIGZ1bmN0aW9uIG5hbWVzIHRvIHJ1biBvbiB7bWV0cmljc30uCiAgICAgICAgICAgICAgICAgICAgICAgIChFeDogJ21lYW4nLCAnc3RkJykgKGRlZmF1bHQ9J21lYW4nKQogICAgOnBhcmFtIGxhYmVsX2FnZ3M6ICBBcnJheSBjb250YWluaW5nIGEgbGlzdCBvZiBhZ2dyZWdhdGlvbiBmdW5jdGlvbiBuYW1lcyB0byBydW4gb24ge21ldHJpY3N9LgogICAgICAgICAgICAgICAgICAgICAgICAoRXg6ICdtYXgnLCAnbWluJykgKGRlZmF1bHQ9J21heCcpIAogICAgOnBhcmFtIHN1ZmZpeDogICAgICBTdWZmaXggdG8gYWRkIHRvIHRoZSBmZWF0dXJlIG5hbWUsIEUuZzogPEZlYXR1cmVfTmFtZT5fPEFnZ19GdW5jdGlvbj5fPFN1ZmZpeD4KICAgICAgICAgICAgICAgICAgICAgICAgKEV4OiAnbGFzdF82MF9taW50ZXMnKSAoZGVmYXVsdD0nJykKICAgIDpwYXJhbSB3aW5kb3c6ICAgICAgV2luZG93IHNpemUgdG8gcGVyZm9ybSB0aGUgcm9sbGluZyBhZ2dyZWdhdGUgb24uIChkZWZhdWx0PTMpCiAgICA6cGFyYW0gY2VudGVyOiAgICAgIElmIFRydWUsIFNldHMgdGhlIHZhbHVlIGZvciB0aGUgY2VudHJhbCBzYW1wbGUgaW4gdGhlIHdpbmRvdywKICAgICAgICAgICAgICAgICAgICAgICAgSWYgRmFsc2UsIHdpbGwgc2V0IHRoZSB2YWx1ZSB0byB0aGUgbGFzdCBzYW1wbGUuIChkZWZhdWx0PUZhbHNlKQogICAgOnBhcmFtIGlucGxhY2U6ICAgICBJZiBUcnVlLCB3aWxsIHJldHVybiBvbmx5IHRoZSBhZ2dyZWdhdGVkIHJlc3VsdHMuCiAgICAgICAgICAgICAgICAgICAgICAgIElmIEZhbHNlLCB3aWxsIGpvaW4gdGhlIGFnZ3JlZ2F0ZWQgcmVzdWx0cyB3aXRoIHRoZSBvcmlnaW5hbCBkYXRhZnJhbWUKICAgIDpwYXJhbSBkcm9wX25hOiAgICAgV2lsbCBkcm9wIG5hIGxpbmVzIGR1ZSB0byB0aGUgUm9sbGluZy4KICAgIDpwYXJhbSBmaWxlc190b19zZWxlY3Q6IFNwZWNpZmllcyB0aGUgbnVtYmVyIG9mICpsYXRlc3QqIGZpbGVzIHRvIHNlbGVjdCAoYW5kIGNvbmNhdCkgZm9yIGFnZ3JlZ2F0aW9uLgogICAgIiIiCiAgICAKICAgIGZyb21fbW9kZWwgPSB0eXBlKGRmX2FydGlmYWN0KSA9PSBwZC5EYXRhRnJhbWUKICAgIGlmIGZyb21fbW9kZWw6CiAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbygnQWdncmVnYXRpbmcgZnJvbSBCdWZmZXInKQogICAgICAgIGlucHV0X2RmID0gZGZfYXJ0aWZhY3QKICAgIGVsc2U6CiAgICAgICAgaWYgZGZfYXJ0aWZhY3QudXJsLmVuZHN3aXRoKCcvJyk6ICAgIyBpcyBhIGRpcmVjdG9yeT8KICAgICAgICAgICAgbXBhdGggPSBbb3MucGF0aC5qb2luKGRmX2FydGlmYWN0LnVybCwgZmlsZSkgZm9yIGZpbGUgaW4gZGZfYXJ0aWZhY3QubGlzdGRpcigpIGlmIGZpbGUuZW5kc3dpdGgoKCdwYXJxdWV0JywgJ3BxJykpXQogICAgICAgICAgICBmaWxlc19ieV91cGRhdGVkID0gc29ydGVkKG1wYXRoLCBrZXk9b3MucGF0aC5nZXRtdGltZSwgcmV2ZXJzZT1UcnVlKQogICAgICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGZpbGVzX2J5X3VwZGF0ZWQpCiAgICAgICAgICAgIGxhdGVzdCA9IGZpbGVzX2J5X3VwZGF0ZWRbOmZpbGVzX3RvX3NlbGVjdF0KICAgICAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbyhmJ0FnZ3JlZ2F0aW5nIHtsYXRlc3R9JykKICAgICAgICAgICAgaW5wdXRfZGYgPSBwZC5jb25jYXQoW2NvbnRleHQuZ2V0X2RhdGFpdGVtKGRmKS5hc19kZigpIGZvciBkZiBpbiBsYXRlc3RdKQogICAgICAgIGVsc2U6ICAjIEEgcmVndWxhciBhcnRpZmFjdAogICAgICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYnQWdncmVnYXRpbmcge2RmX2FydGlmYWN0LnVybH0nKQogICAgICAgICAgICBpbnB1dF9kZiA9IGRmX2FydGlmYWN0LmFzX2RmKCkKICAgIAogICAgaWYgbm90IChtZXRyaWNzIG9yIGxhYmVscyk6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcigncGxlYXNlIHNwZWNpZnkgbWV0cmljcyBvciBsYWJlbHMgcGFyYW0nKQogICAgCiAgICBpZiBrZXlzOgogICAgICAgIGN1cnJlbnRfaW5kZXggPSBpbnB1dF9kZi5pbmRleC5uYW1lcwogICAgICAgIGluZGV4ZXNfdG9fZHJvcCA9IFtjb2wgZm9yIGNvbCBpbiBpbnB1dF9kZi5pbmRleC5uYW1lcyBpZiBjb2wgbm90IGluIGtleXNdCiAgICAgICAgZGYgPSBpbnB1dF9kZi5yZXNldF9pbmRleChsZXZlbD1pbmRleGVzX3RvX2Ryb3ApCiAgICBlbHNlOgogICAgICAgIGRmID0gaW5wdXRfZGYKICAgICAgICAKICAgIGlmIG1ldHJpY3M6CiAgICAgICAgbWV0cmljc19kZiA9IGRmLmxvY1s6LCBtZXRyaWNzXS5yb2xsaW5nKHdpbmRvdz13aW5kb3csIGNlbnRlcj1jZW50ZXIpLmFnZ3JlZ2F0ZShtZXRyaWNfYWdncykKICAgICAgICAKICAgICAgICBtZXRyaWNzX2RmLmNvbHVtbnMgPSBbJ18nLmpvaW4oY29sKS5zdHJpcCgpIGZvciBjb2wgaW4gbWV0cmljc19kZi5jb2x1bW5zLnZhbHVlc10KICAgICAgICAKICAgICAgICBpZiBzdWZmaXg6CiAgICAgICAgICAgIG1ldHJpY3NfZGYuY29sdW1ucyA9IFtmJ3ttZXRyaWN9X3tzdWZmaXh9JyBmb3IgbWV0cmljIGluIG1ldHJpY3NfZGYuY29sdW1uc10KICAgICAgICAgICAgCiAgICAgICAgaWYgbm90IGlucGxhY2U6CiAgICAgICAgICAgIGZpbmFsX2RmID0gcGQubWVyZ2UoaW5wdXRfZGYsIG1ldHJpY3NfZGYsIHN1ZmZpeGVzPSgnJywgc3VmZml4KSwgbGVmdF9pbmRleD1UcnVlLCByaWdodF9pbmRleD1UcnVlKQogICAgICAgIGVsc2U6CiAgICAgICAgICAgIGZpbmFsX2RmID0gbWV0cmljc19kZgoKICAgIGlmIGxhYmVsczoKICAgICAgICBsYWJlbHNfZGYgPSBkZi5sb2NbOiwgbGFiZWxzXS5yb2xsaW5nKHdpbmRvdz13aW5kb3csCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjZW50ZXI9Y2VudGVyKS5hZ2dyZWdhdGUobGFiZWxfYWdncykKICAgICAgICBsYWJlbHNfZGYuY29sdW1ucyA9IFsnXycuam9pbihjb2wpLnN0cmlwKCkgZm9yIGNvbCBpbiBsYWJlbHNfZGYuY29sdW1ucy52YWx1ZXNdCiAgICAgICAgCiAgICAgICAgaWYgc3VmZml4OgogICAgICAgICAgICBsYWJlbHNfZGYuY29sdW1ucyA9IFtmJ3tsYWJlbH1fe3N1ZmZpeH0nIGZvciBsYWJlbCBpbiBsYWJlbHNfZGYuY29sdW1uc10KICAgICAgICAgICAgCiAgICAgICAgaWYgbWV0cmljczoKICAgICAgICAgICAgZmluYWxfZGYgPSBwZC5tZXJnZShmaW5hbF9kZiwgbGFiZWxzX2RmLCBzdWZmaXhlcz0oJycsIHN1ZmZpeCksIGxlZnRfaW5kZXg9VHJ1ZSwgcmlnaHRfaW5kZXg9VHJ1ZSkgICAKICAgICAgICBlbHNlOgogICAgICAgICAgICBpZiBub3QgaW5wbGFjZToKICAgICAgICAgICAgICAgIGZpbmFsX2RmID0gcGQubWVyZ2UoaW5wdXRfZGYsIGxhYmVsc19kZiwgc3VmZml4ZXM9KCcnLCBzdWZmaXgpLCBsZWZ0X2luZGV4PVRydWUsIHJpZ2h0X2luZGV4PVRydWUpICAgICAgCiAgICAgICAgICAgIGVsc2U6CiAgICAgICAgICAgICAgICBmaW5hbF9kZiA9IGxhYmVsc19kZgogICAgICAgICAgICAgICAgCiAgICBpZiBkcm9wX25hOgogICAgICAgIGZpbmFsX2RmID0gZmluYWxfZGYuZHJvcG5hKCkKICAgICAgICAKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oJ0xvZ2dpbmcgYXJ0aWZhY3QnKQogICAgaWYgbm90IGZyb21fbW9kZWw6CiAgICAgICAgY29udGV4dC5sb2dfZGF0YXNldChrZXk9J2FnZ3JlZ2F0ZScsIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgZGY9ZmluYWxfZGYsIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgZm9ybWF0PSdwYXJxdWV0JywKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxvY2FsX3BhdGg9c2F2ZV90bykKICAgIGVsc2U6CiAgICAgICAgcmV0dXJuIGZpbmFsX2RmCgo=
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#b6d661b4f8ad3f3a632a5024f679a4babbb04395:/home/michaell/projects/functions/aggregate/aggregate.py
+    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/aggregate/aggregate.py
 verbose: false

@@ -2,223 +2,223 @@ aggregate:
   categories:
   - data-prep
   description: Rolling aggregation over Metrics and Lables according to specifications
-  docfile: /home/michaell/projects/functions/aggregate/aggregate.ipynb
+  docfile: aggregate/aggregate.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/aggregate/function.yaml
+    latest: aggregate/function.yaml
 arc-to-parquet:
   categories:
   - data-movement
   - utils
   description: retrieve remote archive, open and save as parquet
-  docfile: /home/michaell/projects/functions/arc_to_parquet/arc_to_parquet.ipynb
+  docfile: arc_to_parquet/arc_to_parquet.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/arc_to_parquet/function.yaml
+    latest: arc_to_parquet/function.yaml
 bert-embeddings:
   categories:
   - NLP
   - BERT
   - embeddings
   description: Get BERT based embeddings for given text
-  docfile: /home/michaell/projects/functions/bert_embeddings/bert_embeddings.ipynb
+  docfile: bert_embeddings/bert_embeddings.ipynb
   kind: remote
   versions:
-    latest: /home/michaell/projects/functions/bert_embeddings/function.yaml
+    latest: bert_embeddings/function.yaml
 churn-server:
   categories:
   - serving
   - ml
   description: churn classification and predictor
-  docfile: /home/michaell/projects/functions/churn_server/churn_server.ipynb
+  docfile: churn_server/churn_server.ipynb
   kind: serving
   versions:
-    latest: /home/michaell/projects/functions/churn_server/function.yaml
+    latest: churn_server/function.yaml
 concept-drift:
   categories:
   - ml
   - serve
   description: Deploy a streaming Concept Drift detector on a labeled stream
-  docfile: /home/michaell/projects/functions/concept_drift/concept_drift.ipynb
+  docfile: concept_drift/concept_drift.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/concept_drift/function.yaml
+    latest: concept_drift/function.yaml
 concept-drift-streaming:
   categories:
   - ml
   - serve
   description: Deploy a streaming Concept Drift detector on a labeled stream. the
     nuclio part of the concept_drift function
-  docfile: /home/michaell/projects/functions/concept_drift_streaming/concept_drift_streaming.ipynb
+  docfile: concept_drift_streaming/concept_drift_streaming.ipynb
   kind: remote
   versions:
-    latest: /home/michaell/projects/functions/concept_drift_streaming/function.yaml
+    latest: concept_drift_streaming/function.yaml
 coxph-test:
   categories:
   - ml
   - test
   description: Test cox proportional hazards model
-  docfile: /home/michaell/projects/functions/coxph_test/coxph_test.ipynb
+  docfile: coxph_test/coxph_test.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/coxph_test/function.yaml
+    latest: coxph_test/function.yaml
 coxph-trainer:
   categories:
   - training
   - ml
   description: cox proportional hazards, kaplan meier plots
-  docfile: /home/michaell/projects/functions/coxph_trainer/coxph_trainer.ipynb
+  docfile: coxph_trainer/coxph_trainer.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/coxph_trainer/function.yaml
+    latest: coxph_trainer/function.yaml
 describe:
   categories:
   - analysis
   description: describe and visualizes dataset stats
-  docfile: /home/michaell/projects/functions/describe/describe.ipynb
+  docfile: describe/describe.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/describe/function.yaml
+    latest: describe/function.yaml
 describe-dask:
   categories:
   - analysis
   description: describe and visualizes dataset stats
-  docfile: /home/michaell/projects/functions/describe_dask/describe_dask.ipynb
+  docfile: describe_dask/describe_dask.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/describe_dask/function.yaml
+    latest: describe_dask/function.yaml
 describe-spark:
   categories: []
   description: ''
-  docfile: /home/michaell/projects/functions/describe_spark/describe_spark.ipynb
+  docfile: describe_spark/describe_spark.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/describe_spark/function.yaml
+    latest: describe_spark/function.yaml
 feature-perms:
   categories:
   - analysis
   description: estimate feature importances using permutations
-  docfile: /home/michaell/projects/functions/feature_perms/feature_perms.ipynb
+  docfile: feature_perms/feature_perms.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/feature_perms/function.yaml
+    latest: feature_perms/function.yaml
 feature-selection:
   categories:
   - data-prep
   - ml
   description: Select features through multiple Statistical and Model filters
-  docfile: /home/michaell/projects/functions/feature_selection/feature_selection.ipynb
+  docfile: feature_selection/feature_selection.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/feature_selection/function.yaml
+    latest: feature_selection/function.yaml
 gen-class-data:
   categories:
   - data-prep
   description: Create a binary classification sample dataset and save.
-  docfile: /home/michaell/projects/functions/gen_class_data/gen_class_data.ipynb
+  docfile: gen_class_data/gen_class_data.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/gen_class_data/function.yaml
+    latest: gen_class_data/function.yaml
 github-utils:
   categories:
   - notifications
   - utils
   description: add comments to github pull request
-  docfile: /home/michaell/projects/functions/github_utils/github_utils.ipynb
+  docfile: github_utils/github_utils.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/github_utils/function.yaml
+    latest: github_utils/function.yaml
 load-dask:
   categories:
   - data-movement
   - utils
   description: load dask cluster with data
-  docfile: /home/michaell/projects/functions/load_dask/load_dask.ipynb
+  docfile: load_dask/load_dask.ipynb
   kind: dask
   versions:
-    latest: /home/michaell/projects/functions/load_dask/function.yaml
+    latest: load_dask/function.yaml
 load-dataset:
   categories:
   - data-source
   - ml
   description: load a toy dataset from scikit-learn
-  docfile: /home/michaell/projects/functions/load_dataset/load_dataset.ipynb
+  docfile: load_dataset/load_dataset.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/load_dataset/function.yaml
+    latest: load_dataset/function.yaml
 model-monitoring-batch:
   categories: []
   description: ''
-  docfile: /home/michaell/projects/functions/model_monitoring_batch/model_monitoring_batch.ipynb
+  docfile: model_monitoring_batch/model_monitoring_batch.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/model_monitoring_batch/function.yaml
+    latest: model_monitoring_batch/function.yaml
 model-monitoring-stream:
   categories: []
   description: ''
-  docfile: /home/michaell/projects/functions/model_monitoring_stream/model_monitoring_stream.ipynb
+  docfile: model_monitoring_stream/model_monitoring_stream.ipynb
   kind: remote
   versions:
-    latest: /home/michaell/projects/functions/model_monitoring_stream/function.yaml
+    latest: model_monitoring_stream/function.yaml
 model-server:
   categories:
   - serving
   - ml
   description: generic sklearn model server
-  docfile: /home/michaell/projects/functions/model_server/model_server.ipynb
+  docfile: model_server/model_server.ipynb
   kind: remote
   versions:
-    latest: /home/michaell/projects/functions/model_server/function.yaml
+    latest: model_server/function.yaml
 model-server-tester:
   categories:
   - ml
   - test
   description: test model servers
-  docfile: /home/michaell/projects/functions/model_server_tester/model_server_tester.ipynb
+  docfile: model_server_tester/model_server_tester.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/model_server_tester/function.yaml
+    latest: model_server_tester/function.yaml
 open-archive:
   categories:
   - data-movement
   - utils
   description: Open a file/object archive into a target directory
-  docfile: /home/michaell/projects/functions/open_archive/open_archive.ipynb
+  docfile: open_archive/open_archive.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/open_archive/function.yaml
+    latest: open_archive/function.yaml
 pandas-profiling-report:
   categories:
   - analysis
   description: Create Pandas Profiling Report from Dataset
-  docfile: /home/michaell/projects/functions/pandas_profiling_report/pandas_profiling_report.ipynb
+  docfile: pandas_profiling_report/pandas_profiling_report.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/pandas_profiling_report/function.yaml
+    latest: pandas_profiling_report/function.yaml
 project-runner:
   categories:
   - utils
   description: Nuclio based - Cron scheduler for running your MLRun projects
-  docfile: /home/michaell/projects/functions/project_runner/project_runner.ipynb
+  docfile: project_runner/project_runner.ipynb
   kind: remote
   versions:
-    latest: /home/michaell/projects/functions/project_runner/function.yaml
+    latest: project_runner/function.yaml
 rnn-serving:
   categories:
   - model-serving
   description: deploy an rnn based stock analysis model server.
-  docfile: /home/michaell/projects/functions/rnn_serving/rnn_serving.ipynb
+  docfile: rnn_serving/rnn_serving.ipynb
   kind: serving
   versions:
-    latest: /home/michaell/projects/functions/rnn_serving/function.yaml
+    latest: rnn_serving/function.yaml
 send-email:
   categories:
   - notifications
   description: Send Email messages through SMTP server
-  docfile: /home/michaell/projects/functions/send_email/send_email.ipynb
+  docfile: send_email/send_email.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/send_email/function.yaml
+    latest: send_email/function.yaml
 sentiment-analysis-serving:
   categories:
   - serving
@@ -226,155 +226,154 @@ sentiment-analysis-serving:
   - BERT
   - sentiment analysis
   description: BERT based sentiment classification model
-  docfile: /home/michaell/projects/functions/sentiment_analysis_serving/sentiment_analysis_serving.ipynb
+  docfile: sentiment_analysis_serving/sentiment_analysis_serving.ipynb
   kind: serving
   versions:
-    latest: /home/michaell/projects/functions/sentiment_analysis_serving/function.yaml
+    latest: sentiment_analysis_serving/function.yaml
 sklearn-classifier:
   categories:
   - ml
   - training
   description: train any classifier using scikit-learn's API
-  docfile: /home/michaell/projects/functions/sklearn_classifier/sklearn_classifier.ipynb
+  docfile: sklearn_classifier/sklearn_classifier.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/sklearn_classifier/function.yaml
+    latest: sklearn_classifier/function.yaml
 sklearn-classifier-dask:
   categories:
   - ml
   - training
   - dask
   description: train any classifier using scikit-learn's API over Dask
-  docfile: /home/michaell/projects/functions/sklearn_classifier_dask/sklearn_classifier_dask.ipynb
+  docfile: sklearn_classifier_dask/sklearn_classifier_dask.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/sklearn_classifier_dask/function.yaml
+    latest: sklearn_classifier_dask/function.yaml
 slack-notify:
   categories:
   - ops
   description: Send Slack notification
-  docfile: /home/michaell/projects/functions/slack_notify/slack_notify.ipynb
+  docfile: slack_notify/slack_notify.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/slack_notify/function.yaml
+    latest: slack_notify/function.yaml
 spark-submit:
   categories: []
   description: ''
-  docfile: /home/michaell/projects/functions/spark_submit/spark_submit.ipynb
+  docfile: spark_submit/spark_submit.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/spark_submit/function.yaml
+    latest: spark_submit/function.yaml
 sql-to-file:
   categories:
   - data-prep
   description: SQL To File - Ingest data using SQL query
-  docfile: /home/michaell/projects/functions/sql_to_file/sql_to_file.ipynb
+  docfile: sql_to_file/sql_to_file.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/sql_to_file/function.yaml
+    latest: sql_to_file/function.yaml
 stream-to-parquet:
   categories:
   - ml
   - serve
   description: Saves a stream to Parquet and can lunch drift detection task on it
-  docfile: /home/michaell/projects/functions/stream_to_parquet/stream_to_parquet.ipynb
+  docfile: stream_to_parquet/stream_to_parquet.ipynb
   kind: remote
   versions:
-    latest: /home/michaell/projects/functions/stream_to_parquet/function.yaml
+    latest: stream_to_parquet/function.yaml
 test-classifier:
   categories:
   - ml
   - test
   description: test a classifier using held-out or new data
-  docfile: /home/michaell/projects/functions/test_classifier/test_classifier.ipynb
+  docfile: test_classifier/test_classifier.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/test_classifier/function.yaml
+    latest: test_classifier/function.yaml
 tf1-serving:
   categories:
   - serving
   - dl
   description: tf1 image classification server
-  docfile: /home/michaell/projects/functions/tf1_serving/tf1_serving.ipynb
+  docfile: tf1_serving/tf1_serving.ipynb
   kind: remote
   versions:
-    latest: /home/michaell/projects/functions/tf1_serving/function.yaml
+    latest: tf1_serving/function.yaml
 tf2-serving:
   categories:
   - serving
   - dl
   description: tf2 image classification server
-  docfile: /home/michaell/projects/functions/tf2_serving/tf2_serving.ipynb
+  docfile: tf2_serving/tf2_serving.ipynb
   kind: remote
   versions:
-    latest: /home/michaell/projects/functions/tf2_serving/function.yaml
+    latest: tf2_serving/function.yaml
 tf2-serving-v2:
   categories:
   - serving
   - dl
   description: tf2 image classification server v2
-  docfile: /home/michaell/projects/functions/tf2_serving_v2/tf2_serving_v2.ipynb
+  docfile: tf2_serving_v2/tf2_serving_v2.ipynb
   kind: serving
   versions:
-    latest: /home/michaell/projects/functions/tf2_serving_v2/function.yaml
+    latest: tf2_serving_v2/function.yaml
 v2-model-server:
   categories:
   - serving
   - ml
   description: generic sklearn model server
-  docfile: /home/michaell/projects/functions/v2_model_server/v2_model_server.ipynb
+  docfile: v2_model_server/v2_model_server.ipynb
   kind: serving
   versions:
-    latest: /home/michaell/projects/functions/v2_model_server/function.yaml
+    latest: v2_model_server/function.yaml
 v2-model-tester:
   categories:
   - ml
   - test
   description: test v2 model servers
-  docfile: /home/michaell/projects/functions/v2_model_tester/v2_model_tester.ipynb
+  docfile: v2_model_tester/v2_model_tester.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/v2_model_tester/function.yaml
+    latest: v2_model_tester/function.yaml
 virtual-drift:
   categories:
   - ml
   - serve
   - concept-drift
   description: Compute drift magnitude between Time-Samples T and U
-  docfile: /home/michaell/projects/functions/virtual_drift/virtual_drift.ipynb
+  docfile: virtual_drift/virtual_drift.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/virtual_drift/function.yaml
+    latest: virtual_drift/function.yaml
 xgb-custom:
   categories:
   - model-testing
   description: simulate data with outliers.
-  docfile: /home/michaell/projects/functions/xgb_custom/xgb_custom.ipynb
+  docfile: xgb_custom/xgb_custom.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/xgb_custom/function.yaml
+    latest: xgb_custom/function.yaml
 xgb-serving:
   categories:
-  - serving
-  - ml
-  description: xgboost test data classification server
-  docfile: /home/michaell/projects/functions/xgb_serving/xgb_serving.ipynb
+  - model-serving
+  description: deploy an XGBoost model server.
+  docfile: xgb_serving/xgb_serving.ipynb
   kind: remote
   versions:
-    latest: /home/michaell/projects/functions/xgb_serving/function.yaml
+    latest: xgb_serving/function.yaml
 xgb-test:
   categories:
   - model-test
   description: Test one or more classifier models against held-out dataset.
-  docfile: /home/michaell/projects/functions/xgb_test/xgb_test.ipynb
+  docfile: xgb_test/xgb_test.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/xgb_test/function.yaml
+    latest: xgb_test/function.yaml
 xgb-trainer:
   categories:
   - model-prep
-  description: train an xgboost model.
-  docfile: /home/michaell/projects/functions/xgb_trainer/xgb_trainer.ipynb
+  description: train multiple model types using xgboost.
+  docfile: xgb_trainer/xgb_trainer.ipynb
   kind: job
   versions:
-    latest: /home/michaell/projects/functions/xgb_trainer/function.yaml
+    latest: xgb_trainer/function.yaml

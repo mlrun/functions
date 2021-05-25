@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: v2-model-server
   tag: ''
-  hash: a259fbddae6509a5a0435a1653531e70b908942f
+  hash: 0d8f41c900d1dd2c7ac5505e837876ce23d46290
   project: default
   labels:
     author: yaronh
@@ -14,6 +14,49 @@ spec:
   command: ''
   args: []
   image: mlrun/mlrun
+  entry_points:
+    load:
+      name: load
+      doc: load and initialize the model and/or other elements
+      parameters:
+      - name: self
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 14
+    predict:
+      name: predict
+      doc: Generate model predictions from sample.
+      parameters:
+      - name: self
+        default: ''
+      - name: body
+        type: dict
+        default: ''
+      outputs:
+      - default: ''
+        type: List
+      lineno: 19
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 27
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: event
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 30
   description: generic sklearn model server
   min_replicas: 1
   max_replicas: 4
@@ -23,7 +66,7 @@ spec:
     kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from /home/michaell/projects/functions/v2_model_server/v2_model_server.ipynb
+        nuclio.io/generated_by: function generated from /home/michaell/projects/temp/functions/v2_model_server/v2_model_server.ipynb
       labels: {}
       name: v2-model-server
     spec:
@@ -41,5 +84,5 @@ spec:
   default_class: ClassifierModel
   build:
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#b6d661b4f8ad3f3a632a5024f679a4babbb04395:/home/michaell/projects/functions/v2_model_server/v2_model_server.ipynb
+    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/v2_model_server/v2_model_server.ipynb
 verbose: false

@@ -14,6 +14,9 @@ from cli.path_iterator import PathIterator
 @click.option(
     "-r", "--root-dir", default=PROJECT_ROOT, help="Path to root project directory"
 )
+def create_legacy_catalog_cli(root_dir: Union[str, Path]):
+    create_legacy_catalog(root_dir)
+
 def create_legacy_catalog(root_dir: Union[str, Path]):
     root_dir = Path(root_dir)
     if not root_dir.is_dir():
@@ -48,23 +51,23 @@ def create_legacy_catalog(root_dir: Union[str, Path]):
                     as_path=True,
                 )
                 notebooks = list(notebook_iterator)
-                doc_file = file_dir if not notebooks else file_dir / notebooks[0]
+                doc_file = file_dir / notebooks[0]
                 entry = {
                     "description": fn.spec.description,
                     "categories": fn.metadata.categories,
                     "kind": fn.kind,
-                    "docfile": str(doc_file.resolve()),
+                    "docfile": f"{doc_file.parent.name}/{doc_file.name}",
                     "versions": {},
                 }
 
-            entry["versions"][fn.metadata.tag or "latest"] = str(file)
+            entry["versions"][fn.metadata.tag or "latest"] = f"{file.parent.name}/{file.name}"
             print(fn.metadata.name, entry)
             catalog[fn.metadata.name] = entry
 
-    with open("catalog.yaml", "w") as fp:
+    with open("../catalog.yaml", "w") as fp:
         yaml.dump(catalog, fp)
 
-    with open("catalog.json", "w") as fp:
+    with open("../catalog.json", "w") as fp:
         json.dump(catalog, fp)
 
     mdheader = """# Functions hub 
@@ -109,3 +112,6 @@ def gen_md_table(header, rows=None):
     for r in rows:
         out += gen_list(r) + "\n"
     return out
+
+if __name__ == '__main__':
+    create_legacy_catalog("..")

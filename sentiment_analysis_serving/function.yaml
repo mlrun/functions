@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: sentiment-analysis-serving
   tag: ''
-  hash: cedb3b2089f9ac48d57bfb7580af6762a9e9ecf6
+  hash: 7522f9d07b92f0b92808aae3699b69a9bbb7bd46
   project: default
   labels:
     author: avia
@@ -16,6 +16,61 @@ spec:
   command: ''
   args: []
   image: mlrun/ml-models
+  entry_points:
+    forward:
+      name: forward
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: input_ids
+        default: ''
+      - name: attention_mask
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 19
+    load:
+      name: load
+      doc: load bert model into class
+      parameters:
+      - name: self
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 33
+    predict:
+      name: predict
+      doc: predict function
+      parameters:
+      - name: self
+        default: ''
+      - name: body
+        doc: set of inputs for bert model to predict from
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 44
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 67
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: event
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 70
   description: BERT based sentiment classification model
   min_replicas: 1
   max_replicas: 4
@@ -48,5 +103,5 @@ spec:
   build:
     commands:
     - python -m pip install transformers==3.0.2
-    code_origin: https://github.com/Michaelliv/functions.git#1753f6ff370a4dabfed2cf4f66a87a51391e3669:/home/michaell/projects/functions/sentiment_analysis_serving/sentiment_analysis_serving.py
+    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/sentiment_analysis_serving/sentiment_analysis_serving.py
 verbose: false

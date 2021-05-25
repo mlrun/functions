@@ -60,7 +60,7 @@
 
         var onClickClipboard = function (hubUrl) {
             if (hubUrl) {
-                let text = "from mlrun import import_funtion\n\nfn = import_function('hub://{" + hubUrl + "}')";
+                let text = "from mlrun import import_function\n\nfn = import_function('hub://{" + hubUrl + "}')";
                 navigator.clipboard.writeText(text).then(function () {
                     toastr.success('Function copied to clipboard!');
                 }, function (err) {

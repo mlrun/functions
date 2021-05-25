@@ -1,2 +1,2 @@
-mlrun
+mlrun >=0.6.3
 pandas

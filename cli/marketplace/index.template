@@ -29,6 +29,7 @@
         .shadow { filter: drop-shadow(2px 2px 2px rgb(149, 149, 149)); }
         a { color: #6f1e7c; font-weight: lighter; }
         .nav-header { color: #231025; font-family: Arial, Helvetica, sans-serif; }
+        .tabulator { border-radius: 20px; }
         .tabulator-col { background-color: #fbfeff !important; }
         .tabulator-col-title { color: #763b80; }
         .tabulator-row.tabulator-row-even { background-color: #fffbff; }
@@ -51,7 +52,7 @@
         var functionYamlFormatter = function (cell, formatterParams, onRendered) {
             let value = cell.getValue();
             if (value) {
-                return `<a href=${value}>View</a> <i class="fa fa-clipboard ml-3" onclick=onClickClipboard("${value.split("/")[2]}")></i>`;
+                return `<a href=${value}>View</a> <i class="fa fa-clipboard fa-lg ml-3" onclick=onClickClipboard("${value.split("/")[2]}")></i>`;
             } else {
                 return "";
             }

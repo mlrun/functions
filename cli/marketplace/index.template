@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,8 +11,9 @@
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/snackbarjs/1.1.0/snackbar.min.js"
         integrity="sha512-Knad2JJvcddGNKm03ySDgeTKXQfBjH0XPrFqUyzM0BuJhKkVfLzoOK5Ii9jsLmbZTXM8YNqn42suHyIEbQXboQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -23,14 +25,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https:////cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <style>
-        .tabulator-col-title {
-            text-align: center !important;
-        }
+        .tabulator-col-title { text-align: center !important; }
+        .shadow { filter: drop-shadow(2px 2px 2px rgb(149, 149, 149)); }
+        a { color: #6f1e7c; font-weight: lighter; }
+        .nav-header { color: #231025; font-family: Arial, Helvetica, sans-serif; }
+        .tabulator-col { background-color: #fbfeff !important; }
+        .tabulator-col-title { color: #763b80; }
+        .tabulator-row.tabulator-row-even { background-color: #fffbff; }
     </style>
     <title>Marketplace</title>
 </head>
 
-<body>
+<body class="m-1">
+    <nav class="navbar d-flex justify-content-between">
+        <a class="w-25" href="https://mlrun.org/">
+            <img width="45%" height="auto" src="https://docs.mlrun.org/en/latest/_static/MLRun_Character.png" alt="">
+        </a>
+        <h2 class="mx-auto display-4 nav-header">Function Marketplace</h2>
+        <div class="w-25"></div>
+    </nav>
     <div id="table"></div>
     <script>
         var tabledata = {{table_json}};
@@ -54,6 +67,25 @@
             }
         }
 
+        var functionYamlFormatter = function (cell, formatterParams, onRendered) {
+            let value = cell.getValue();
+            if (value) {
+                return `<a href=${value}>View</a> <i class="far fa-clipboard ml-3 shadow" onclick=onClickClipboard("${value.split("/")[2]}")></i>`;
+            } else {
+                return "";
+            }
+        };
+
+        var onClickClipboard = function (hubUrl) {
+            if (hubUrl) {
+                let text = "from mlrun import import_funtion\n\nfn = import_function('hub://{" + hubUrl + "}')";
+                navigator.clipboard.writeText(text).then(function () {
+                    toastr.success('Deployment copied to clipboard!');
+                }, function (err) {
+                });
+            }
+        }
+
         var table = new Tabulator("#table", {
             data: tabledata,
             layout: "fitColumns",
@@ -65,7 +97,7 @@
                 { title: "Name", field: "name", headerFilter: true },
                 { title: "Description", field: "description", headerFilter: true },
                 { title: "Categories", field: "categories", headerFilter: true },
-                { title: "Channel", field: "channel_name" },
+                { title: "Channel", field: "channel_name", visible: false },
                 { title: "Version", field: "version" },
                 {
                     title: "Last Updated", field: "generation_date",
@@ -106,13 +138,16 @@
                     },
                 },
                 {
-                    title: "function.yaml",
+                    title: "Deployment",
                     field: "function_yaml",
                     headerSort: false,
                     formatter: functionYamlFormatter,
                 },
             ]
         });
+
+        table.addFilter("channel_name", "=", "master");
+
     </script>
 </body>
 

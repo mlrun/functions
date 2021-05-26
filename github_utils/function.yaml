@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: github-utils
   tag: ''
-  hash: dddffb9111aef9c4957b3d6f4d9afa3180e12f7b
+  hash: e3810a47c58ceddb8a99725382e3cd3fc805ed89
   project: default
   labels:
     author: yaronh
@@ -15,9 +15,50 @@ spec:
   image: mlrun/mlrun
   env: []
   default_handler: run_summary_comment
+  entry_points:
+    pr_comment:
+      name: pr_comment
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: repo
+        type: str
+        default: ''
+      - name: issue
+        type: int
+        default: ''
+      - name: message
+        type: str
+        default: ''
+      - name: message_file
+        type: DataItem
+        default: null
+      outputs:
+      - default: ''
+      lineno: 7
+    run_summary_comment:
+      name: run_summary_comment
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: workflow_id
+        default: ''
+      - name: repo
+        type: str
+        default: ''
+      - name: issue
+        type: int
+        default: ''
+      - name: project
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 27
   description: add comments to github pull request
   build:
     functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHJlcXVlc3RzCmltcG9ydCBvcwpmcm9tIG1scnVuIGltcG9ydCBEYXRhSXRlbSwgZ2V0X3J1bl9kYiwgbWxjb25mCgpkZWYgcHJfY29tbWVudChjb250ZXh0LCByZXBvOiBzdHIsIGlzc3VlIDogaW50LAogICAgICAgICAgICAgICBtZXNzYWdlOiBzdHIgPSAnJywgCiAgICAgICAgICAgICAgIG1lc3NhZ2VfZmlsZTogRGF0YUl0ZW0gPSBOb25lKToKCiAgICB0b2tlbiA9IGNvbnRleHQuZ2V0X3NlY3JldCgnR0lUSFVCX1RPS0VOJykgb3Igb3MuZW52aXJvbi5nZXQoJ0dJVEhVQl9UT0tFTicpCiAgICBpZiBtZXNzYWdlX2ZpbGUgYW5kIG5vdCBtZXNzYWdlOgogICAgICAgIG1lc3NhZ2UgPSBtZXNzYWdlX2ZpbGUuZ2V0KCkKICAgIGVsaWYgbm90IG1lc3NhZ2UgYW5kIG5vdCBtZXNzYWdlX2ZpbGU6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcigncHIgbWVzc2FnZSBvciBtZXNzYWdlIGZpbGUgbXVzdCBiZSBwcm92aWRlZCcpCiAgICAgICAgCiAgICBoZWFkZXJzID0geydBY2NlcHQnOiAnYXBwbGljYXRpb24vdm5kLmdpdGh1Yi52Mytqc29uJywKICAgICAgICAgICAgICAgJ0F1dGhvcml6YXRpb24nOiBmJ3Rva2VuIHt0b2tlbn0nfQogICAgdXJsID0gZidodHRwczovL2FwaS5naXRodWIuY29tL3JlcG9zL3tyZXBvfS9pc3N1ZXMve2lzc3VlfS9jb21tZW50cycKCiAgICByZXNwID0gcmVxdWVzdHMucG9zdCh1cmw9dXJsLCBqc29uPXsiYm9keSI6IHN0cihtZXNzYWdlKX0sIGhlYWRlcnM9aGVhZGVycykKICAgIGlmIG5vdCByZXNwLm9rOgogICAgICAgIGVycm1zZyA9IGYnYmFkIHByIGNvbW1lbnQgcmVzcCEhXG57cmVzcC50ZXh0fScKICAgICAgICBjb250ZXh0LmxvZ2dlci5lcnJvcihlcnJtc2cpCiAgICAgICAgcmFpc2UgSU9FcnJvcihlcnJtc2cpCiAgICAKZGVmIHJ1bl9zdW1tYXJ5X2NvbW1lbnQoY29udGV4dCwgd29ya2Zsb3dfaWQsIHJlcG86IHN0ciwgaXNzdWUgOiBpbnQsIHByb2plY3Q9JycpOgogICAgZGIgPSBnZXRfcnVuX2RiKCkuY29ubmVjdCgpCiAgICBwcm9qZWN0PXByb2plY3Qgb3IgY29udGV4dC5wcm9qZWN0CiAgICBydW5zID0gZGIubGlzdF9ydW5zKHByb2plY3Q9cHJvamVjdCwgbGFiZWxzPWYnd29ya2Zsb3c9e3dvcmtmbG93X2lkfScpCiAgICAKICAgIGhhZF9lcnJvcnMgPSBpID0gMAogICAgZm9yIHIgaW4gcnVuczoKICAgICAgICBuYW1lID0gclsnbWV0YWRhdGEnXVsnbmFtZSddCiAgICAgICAgaWYgclsnc3RhdHVzJ10uZ2V0KCdzdGF0ZScsICcnKSA9PSAnZXJyb3InOgogICAgICAgICAgICBoYWRfZXJyb3JzICs9IDEKICAgICAgICBpZiBuYW1lID09IGNvbnRleHQubmFtZToKICAgICAgICAgICAgZGVsIHJ1bnNbaV0KICAgICAgICBpICs9IDEKCiAgICBwcmludCgnZXJyb3JzOicsIGhhZF9lcnJvcnMpCiAgICAKICAgIGh0bWwgPSAnIyMjIFJ1biBSZXN1bHRzXG5Xb3JrZmxvdyB7fSBmaW5pc2hlZCB3aXRoIHt9IGVycm9ycycuZm9ybWF0KHdvcmtmbG93X2lkLCBoYWRfZXJyb3JzKQogICAgaHRtbCArPSAnPGJyPmNsaWNrIHRoZSBoeXBlciBsaW5rcyBiZWxvdyB0byBzZWUgZGV0YWlsZWQgcmVzdWx0czxicj4nCiAgICBodG1sICs9IHJ1bnMuc2hvdyhkaXNwbGF5PUZhbHNlLCBzaG9ydD1UcnVlKQogICAgaWYgcmVwbzoKICAgICAgICBwcl9jb21tZW50KGNvbnRleHQsIHJlcG8sIGlzc3VlLCBodG1sKQogICAgZWxzZToKICAgICAgICBwcmludCgncmVwbyBub3QgZGVmaW5lZCcpCiAgICAgICAgcHJpbnQoaHRtbCkKICAgIAoK
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#b6d661b4f8ad3f3a632a5024f679a4babbb04395:/home/michaell/projects/functions/github_utils/github_utils.ipynb
+    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/github_utils/github_utils.ipynb
 verbose: false

@@ -15,7 +15,7 @@ mlrunVersion: ''
 name: github-utils
 platformVersion: ''
 spec:
-  filename: ''
+  filename: github_utils.py
   handler: run_summary_comment
   image: mlrun/mlrun
   kind: job

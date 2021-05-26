@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: churn-server
   tag: ''
-  hash: e8de89bdfc50e8f2795d5b0c12932063b3a21ec0
+  hash: 75fda10234b03cbe9a59d3014ee332734c072bed
   project: default
   labels:
     author: Iguazio
@@ -14,6 +14,47 @@ spec:
   command: ''
   args: []
   image: mlrun/ml-models
+  entry_points:
+    load:
+      name: load
+      doc: load multiple models in nested folders, churn model only
+      parameters:
+      - name: self
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 9
+    predict:
+      name: predict
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: body
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 22
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 32
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: event
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 35
   description: churn classification and predictor
   min_replicas: 1
   max_replicas: 4
@@ -25,7 +66,7 @@ spec:
     kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from /home/michaell/projects/functions/churn_server/churn_server.ipynb
+        nuclio.io/generated_by: function generated from /home/michaell/projects/temp/functions/churn_server/churn_server.ipynb
       labels: {}
       name: churn-server
     spec:
@@ -42,5 +83,5 @@ spec:
   default_class: ChurnModel
   build:
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#ca1dc4639738c650fefb8730c8c94828084cb173:/home/michaell/projects/functions/churn_server/churn_server.ipynb
+    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/churn_server/churn_server.ipynb
 verbose: false

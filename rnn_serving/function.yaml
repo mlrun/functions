@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: rnn-serving
   tag: ''
-  hash: cea1b8c57736611107343fa65e7690fd9c4b7f6b
+  hash: f887d978598c06b367bc9184f597e0c6c6e5e049
   project: default
   labels:
     author: Daniel
@@ -64,7 +64,7 @@ spec:
       name: rnn-serving
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from rnn_serving.py
+        nuclio.io/generated_by: function generated from /home/michaell/projects/temp/functions/rnn_serving/rnn_serving.py
     spec:
       runtime: python:3.6
       handler: rnn_serving:handler
@@ -77,9 +77,6 @@ spec:
   source: ''
   function_kind: serving_v2
   build:
-    commands:
-    - python -m pip install mlrun==0.6.2 keras tensorflow wget pygit2
-    code_origin: http://github.com/aviaIguazio/functions.git#8d48032f1a1f807c1aac5e6b88448ec470d63fc7:rnn_serving.py
-  secret_sources: []
-  affinity: null
+    commands: []
+    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/rnn_serving/rnn_serving.py
 verbose: false

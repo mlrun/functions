@@ -15,7 +15,7 @@ mlrunVersion: ''
 name: tf2-serving
 platformVersion: ''
 spec:
-  filename: ''
+  filename: tf2_serving.py
   handler: handler
   image: mlrun/mlrun
   kind: remote

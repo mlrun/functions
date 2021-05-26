@@ -14,7 +14,7 @@ mlrunVersion: ''
 name: send-email
 platformVersion: ''
 spec:
-  filename: ''
+  filename: send_email.py
   handler: send_email
   image: mlrun/ml-models
   kind: job

@@ -22,7 +22,7 @@ def is_function_dir(path: Path) -> bool:
     return any((f.name == "function.yaml" for f in path.iterdir()))
 
 
-def render_jinja_file(
+def render_jinja(
     template_path: Union[str, Path], output_path: Union[str, Path], data: dict
 ):
     with open(template_path, "r") as t:

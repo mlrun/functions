@@ -1,6 +1,6 @@
 import click
 
-from cli.create_legacy_catalog import create_legacy_catalog
+from cli.create_legacy_catalog import create_legacy_catalog_cli
 from cli.function_to_item import function_to_item_cli
 from cli.item_to_function import item_to_function_cli
 from cli.marketplace.build import build_marketplace_cli
@@ -18,7 +18,7 @@ cli.add_command(item_to_function_cli, name="item-to-function")
 cli.add_command(function_to_item_cli, name="function-to-item")
 cli.add_command(test_suite, name="run-tests")
 cli.add_command(build_marketplace_cli, name="build-marketplace")
-cli.add_command(create_legacy_catalog)
+cli.add_command(create_legacy_catalog_cli, name="create-legacy-catalog")
 
 if __name__ == "__main__":
     cli()

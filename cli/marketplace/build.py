@@ -13,7 +13,7 @@ from sphinx.ext.apidoc import main as sphinx_apidoc_cmd
 
 from cli.helpers import (
     is_item_dir,
-    render_jinja_file,
+    render_jinja,
     PROJECT_ROOT,
     get_item_yaml_requirements,
 )
@@ -178,7 +178,9 @@ def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
         update_or_create_item(item_dir, marketplace_dir, temp_docs, change_log)
 
 
-def build_catalog_json(marketplace_dir: Union[str, Path], catalog_path: Union[str, Path]):
+def build_catalog_json(
+    marketplace_dir: Union[str, Path], catalog_path: Union[str, Path]
+):
     click.echo("Building catalog.json...")
 
     marketplace_dir = Path(marketplace_dir)
@@ -196,7 +198,7 @@ def build_catalog_json(marketplace_dir: Union[str, Path], catalog_path: Union[st
             continue
 
         latest_dir = source_dir / "latest"
-        source_yaml_path = latest_dir / "item.yaml"
+        source_yaml_path = latest_dir / "src" / "item.yaml"
 
         latest_yaml = yaml.full_load(open(source_yaml_path, "r"))
         latest_yaml["generationDate"] = str(latest_yaml["generationDate"])
@@ -231,33 +233,92 @@ def update_or_create_item(
         click.echo("Source version already exists in target directory!")
         return
 
-    build_path = temp_docs / "_build"
-    source_html_name = f"{item_dir.stem}.html"
+    documentation_html_name = f"{item_dir.stem}.html"
     example_html_name = f"{item_dir.stem}_example.html"
 
-    source_html = build_path / source_html_name
-    update_html_resource_paths(source_html, relative_path="../../")
+    build_path = temp_docs / "_build"
+
+    documentation_html = build_path / documentation_html_name
+    update_html_resource_paths(documentation_html, relative_path="../../../")
 
     example_html = build_path / example_html_name
-    update_html_resource_paths(example_html, relative_path="../../")
+    update_html_resource_paths(example_html, relative_path="../../../")
+
+    latest_src = target_latest / "src"
+    version_src = target_version / "src"
 
     # If its the first source is encountered, copy source to target
-    if marketplace_item.exists():
-        shutil.rmtree(target_latest)
+    if latest_src.exists():
+        shutil.rmtree(latest_src)
         change_log.update_item(item_dir.stem, source_version, target_version.name)
     else:
         change_log.new_item(item_dir.stem, source_version)
 
-    shutil.copytree(item_dir, target_latest)
-    shutil.copytree(item_dir, target_version)
+    latest_static = target_latest / "static"
+    version_static = target_version / "static"
 
-    if source_html.exists():
-        shutil.copy(source_html, target_latest / source_html_name)
-        shutil.copy(source_html, target_version / source_html_name)
+    shutil.copytree(item_dir, latest_src)
+    shutil.copytree(item_dir, version_src)
+
+    latest_static.mkdir(parents=True, exist_ok=True)
+    version_static.mkdir(parents=True, exist_ok=True)
+
+    if documentation_html.exists():
+        shutil.copy(documentation_html, latest_static / "documentation.html")
+        shutil.copy(documentation_html, version_static / "documentation.html")
 
     if example_html.exists():
-        shutil.copy(example_html, target_latest / example_html_name)
-        shutil.copy(example_html, target_version / example_html_name)
+        shutil.copy(example_html, latest_static / "example.html")
+        shutil.copy(example_html, version_static / "example.html")
+
+    templates = PROJECT_ROOT / "cli" / "marketplace"
+
+    source_py_name = item_yaml.get("spec", {}).get("filename", "")
+    if source_py_name.endswith(".py") and (item_dir / source_py_name).exists():
+
+        with open((item_dir / source_py_name), "r") as f:
+            source_code = f.read()
+
+        render_jinja(
+            templates / "python.html",
+            latest_static / "source.html",
+            {"source_code": source_code},
+        )
+        render_jinja(
+            templates / "python.html",
+            version_static / "source.html",
+            {"source_code": source_code},
+        )
+
+    with open((item_dir / "item.yaml"), "r") as f:
+        source_code = f.read()
+
+    render_jinja(
+        templates / "yaml.html",
+        latest_static / "item.html",
+        {"source_code": source_code},
+    )
+    render_jinja(
+        templates / "yaml.html",
+        version_static / "item.html",
+        {"source_code": source_code},
+    )
+
+    with open((item_dir / "function.yaml"), "r") as f:
+        source_code = f.read()
+
+    render_jinja(
+        templates / "yaml.html",
+        latest_static / "function.html",
+        {"source_code": source_code},
+    )
+    render_jinja(
+        templates / "yaml.html",
+        version_static / "function.html",
+        {"source_code": source_code},
+    )
+
+    pass
 
 
 def update_html_resource_paths(html_path: Path, relative_path: str):
@@ -380,7 +441,7 @@ def sphinx_quickstart(
     conf_py_target = temp_root / "conf.py"
     conf_py_target.unlink()
 
-    render_jinja_file(
+    render_jinja(
         template_path=PROJECT_ROOT / "cli" / "marketplace" / "conf.template",
         output_path=conf_py_target,
         data={

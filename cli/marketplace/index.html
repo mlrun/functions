@@ -109,24 +109,11 @@
         item.prettyName = itemKey.replaceAll("_", " ").toLowerCase();
 
         const base_url = `${source}/${channel}/${itemKey}/latest`;
-
-        let filename = item.spec.filename;
-        filename = filename ? filename.split(".")[0] : null;
-        filename = filename ? `${base_url}/${filename}.html` : null;
-        if (filename) {
-            item.documentation = filename;
-        }
-
-        let example = item.example;
-        example = example ? example.split(".")[0] : null;
-        example = example ? `${base_url}/${example}_example.html` : null
-        if (example) {
-            item.example = example;
-        }
-
-
-        item.itemPath = `${base_url}/item.yaml`
-        item.functionPath = `${base_url}/function.yaml`
+        item.documentation = item.spec.filename ? `${base_url}/static/documentation.html` : null;
+        item.source = item.spec.filename ? `${base_url}/static/source.html` : null;
+        item.example = item.example ? `${base_url}/static/example.html` : null;
+        item.functionPath = `${base_url}/static/function.html`;
+        item.itemPath = `${base_url}/static/item.html`;
 
         table.addRow(item);
     }
@@ -138,18 +125,20 @@
         cellHozAlign: "center",
         columns: [
             {title: "#", field: "itemNum", width: 50},
-            {title: "Name", field: "prettyName", headerFilter: true, hozAlign: "left",},
+            {title: "Name", field: "prettyName", headerFilter: true, hozAlign: "left", width: 170},
             {title: "Description", field: "description", headerFilter: true, hozAlign: "left",},
-            {title: "Categories", field: "categories", headerFilter: true, hozAlign: "left",},
-            {title: "Channel", field: "channel", visible: false},
-            {title: "Version", field: "version"},
+            {title: "Categories", field: "categories", headerFilter: true, hozAlign: "left", width: 150},
+            {title: "Channel", field: "channel", visible: false,},
+            {title: "Version", field: "version", width: 100},
             {
                 title: "Last Updated", field: "generationDate",
-                formatter: "datetimediff", formatterParams: {
+                formatter: "datetimediff",
+                formatterParams: {
                     inputFormat: "YYYY-MM-DD:hh-mm",
                     humanize: true,
                     invalidPlaceholder: "(invalid date)",
-                }
+                },
+                width: 150
             },
             {
                 title: "Documentation",
@@ -162,6 +151,7 @@
                     },
                     target: "_blank"
                 },
+                width: 150
             },
             {
                 title: "Example Notebook",
@@ -174,6 +164,20 @@
                     },
                     target: "_blank"
                 },
+                width: 150
+            },
+            {
+                title: "Source",
+                field: "source",
+                headerSort: false,
+                formatter: "link",
+                formatterParams: {
+                    label: (cell) => {
+                        return (cell._cell.value === undefined ? '' : 'View');
+                    },
+                    target: "_blank"
+                },
+                width: 150
             },
             {
                 title: "Spec",
@@ -186,13 +190,15 @@
                     },
                     target: "_blank"
                 },
+                width: 150
             },
             {
                 title: "Deployment",
                 field: "functionPath",
                 headerSort: false,
                 formatter: functionYamlFormatter,
-            },
+                width: 150
+            }
         ]
     });
 

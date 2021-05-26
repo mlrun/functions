@@ -5,7 +5,6 @@ from pathlib import Path
 from subprocess import CompletedProcess
 from typing import List, Union, Optional
 import sys
-
 import click
 import yaml
 
@@ -22,6 +21,7 @@ from cli.path_iterator import PathIterator
 @click.command()
 @click.option("-r", "--root-directory", default=".", help="Path to root directory")
 @click.option("-s", "--suite", help="Type of suite to run [py/ipynb/examples/items]")
+@click.option("-mp", "--multi-processing", help="run multiple tests")
 @click.option(
     "-f",
     "--stop-on-failure",
@@ -29,18 +29,18 @@ from cli.path_iterator import PathIterator
     default=False,
     help="When true, test suite will stop running after the first test ran",
 )
-def test_suite(root_directory: str, suite: str, stop_on_failure: bool):
+def test_suite(root_directory: str, suite: str, stop_on_failure: bool, multi_processing: bool = False):
     if not suite:
         click.echo("-s/--suite is required")
         exit(1)
 
     if suite == "py":
         TestPY(stop_on_failure=stop_on_failure, clean_env_artifacts=True)._run(
-            root_directory
+            root_directory, multi_processing
         )
     elif suite == "ipynb":
         TestIPYNB(stop_on_failure=stop_on_failure, clean_env_artifacts=True)._run(
-            root_directory
+            root_directory, multi_processing
         )
     elif suite == "examples":
         test_example(root_directory)
@@ -132,20 +132,29 @@ class TestSuite(ABC):
     def after_each(self, path: Union[str, Path], test_result: TestResult):
         pass
 
-    def _run(self, path: Union[str, Path]):
+    def _run(self, path: Union[str, Path], multiprocess):
+        import multiprocessing as mp
+        process_count = 1
+        if multiprocess:
+            process_count = mp.cpu_count()
+
         discovered = self.discover(path)
         self.before_run()
-        for directory in discovered:
-            self.before_each(directory)
-            result = self.run(directory)
-            self.test_results.append(result)
-            self.after_each(directory, result)
+        pool = mp.Pool(process_count)
+        results = pool.map(self.directory_process, [directory for directory in discovered])
+        pool.close()
         self.after_run()
         exit(0)
 
+    def directory_process(self, directory):
+        self.before_each(directory)
+        result = self.run(directory)
+        self.test_results.append(result)
+        self.after_each(directory, result)
+
 
 class TestPY(TestSuite):
-    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True):
+    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True, multi_process: bool= False):
         super().__init__(stop_on_failure)
         self.clean_env_artifacts = clean_env_artifacts
         self.results = []

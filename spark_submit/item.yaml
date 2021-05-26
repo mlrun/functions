@@ -12,7 +12,7 @@ mlrunVersion: ''
 name: spark-submit
 platformVersion: ''
 spec:
-  filename: ''
+  filename: spark_submit.py
   handler: spark_submit
   image: mlrun/mlrun
   kind: job

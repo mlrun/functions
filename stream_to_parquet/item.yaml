@@ -15,7 +15,7 @@ mlrunVersion: ''
 name: stream-to-parquet
 platformVersion: ''
 spec:
-  filename: ''
+  filename: stream_to_parquet.py
   handler: handler
   image: mlrun/ml-models
   kind: remote

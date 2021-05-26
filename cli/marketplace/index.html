@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script crossorigin="anonymous" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" rel="stylesheet">
+    <link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        referrerpolicy="no-referrer" rel="stylesheet" />
+    <script crossorigin="anonymous"
+        integrity="sha512-Knad2JJvcddGNKm03ySDgeTKXQfBjH0XPrFqUyzM0BuJhKkVfLzoOK5Ii9jsLmbZTXM8YNqn42suHyIEbQXboQ=="
+        referrerpolicy="no-referrer"
+        src="https://cdnjs.cloudflare.com/ajax/libs/snackbarjs/1.1.0/snackbar.min.js"></script>
+    <link href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/tabulator-tables@4.9.3/dist/js/tabulator.min.js" type="text/javascript"></script>
+    <script crossorigin="anonymous"
+        integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+        referrerpolicy="no-referrer"
+        src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <style>
+        .tabulator-col-title {
+            text-align: center !important;
+        }
+
+        .shadow {
+            filter: drop-shadow(2px 2px 2px rgb(149, 149, 149));
+        }
+
+        a {
+            color: #6f1e7c;
+            font-weight: lighter;
+        }
+
+        .nav-header {
+            color: #231025;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .tabulator {
+            border-radius: 20px;
+            border-width: 2px;
+        }
+
+        .tabulator-col {
+            background-color: #fbfeff !important;
+        }
+
+        .tabulator-col-title {
+            color: #763b80;
+        }
+
+        .tabulator-row.tabulator-row-even {
+            background-color: #fffbff;
+        }
+    </style>
+    <title>Marketplace</title>
+</head>
+
+<body class="m-1">
+    <!-- Just an image -->
+    <nav class="navbar d-flex justify-content-between">
+        <a class="w-25" href="https://mlrun.org/">
+            <img alt="" height="auto" src="https://docs.mlrun.org/en/latest/_static/MLRun_Character.png" width="45%">
+        </a>
+        <h2 class="mx-auto display-4 nav-header">Function Marketplace</h2>
+        <div class="w-25"></div>
+    </nav>
+    <div id="table"></div>
+
+    <script>
+
+        function parentDir(path) {
+            let parts = path.split("/");
+            let last = parts.pop();
+            return last.includes(".") ? parts.pop() : last;
+        }
+
+        function functionYamlFormatter(cell, formatterParams, onRendered) {
+            let value = cell.getValue();
+            if (value) {
+                return `<a href=${value}>View</a> <i class="far fa-clipboard fa-lg ml-3 shadow" onclick=onClickClipboard("${value.split("/")[2]}")></i>`;
+            } else {
+                return "";
+            }
+        }
+
+        function onClickClipboard(hubUrl) {
+            if (hubUrl) {
+                let text = `import mlrun\n\nfn = mlrun.import_function('hub://${hubUrl}')`;
+                navigator.clipboard.writeText(text).then(function () {
+                    toastr.success('Deployment copied to clipboard!');
+                }, function (err) {
+                });
+            }
+        }
+
+        function addRow(table, source, channel, itemKey, item, itemNum) {
+            item.itemNum = itemNum;
+            item.rawName = itemKey;
+            item.source = source;
+            item.channel = channel;
+            item.prettyName = itemKey.replaceAll("_", " ").toLowerCase();
+
+            const base_url = `${source}/${channel}/${itemKey}/latest`;
+
+            let filename = item.spec.filename;
+            filename = filename ? filename.split(".")[0] : null;
+            filename = filename ? `${base_url}/${filename}.html` : null;
+            if (filename) {
+                item.documentation = filename;
+            }
+
+            let example = item.example;
+            example = example ? example.split(".")[0] : null;
+            example = example ? `${base_url}/${example}_example.html` : null
+            if (example) {
+                item.example = example;
+            }
+
+
+            item.itemPath = `${base_url}/item.yaml`
+            item.functionPath = `${base_url}/function.yaml`
+
+            table.addRow(item);
+        }
+
+        const table = new Tabulator("#table", {
+            layout: "fitColumns",
+            responsiveLayout: "hide",
+            tooltips: true,
+            cellHozAlign: "center",
+            columns: [
+                { title: "#", field: "itemNum", width: 50 },
+                { title: "Name", field: "prettyName", headerFilter: true, hozAlign: "left", },
+                { title: "Description", field: "description", headerFilter: true, hozAlign: "left", },
+                { title: "Categories", field: "categories", headerFilter: true, hozAlign: "left", },
+                { title: "Channel", field: "channel", visible: false },
+                { title: "Version", field: "version" },
+                {
+                    title: "Last Updated", field: "generationDate",
+                    formatter: "datetimediff", formatterParams: {
+                        inputFormat: "YYYY-MM-DD:hh-mm",
+                        humanize: true,
+                        invalidPlaceholder: "(invalid date)",
+                    }
+                },
+                {
+                    title: "Documentation",
+                    field: "documentation",
+                    headerSort: false,
+                    formatter: "link",
+                    formatterParams: {
+                        label: (cell) => {
+                            return (cell._cell.value === undefined ? '' : 'View');
+                        },
+                        target: "_blank"
+                    },
+                },
+                {
+                    title: "Example Notebook",
+                    field: "example",
+                    headerSort: false,
+                    formatter: "link",
+                    formatterParams: {
+                        label: (cell) => {
+                            return (cell._cell.value === undefined ? '' : 'View');
+                        },
+                        target: "_blank"
+                    },
+                },
+                {
+                    title: "Spec",
+                    field: "itemPath",
+                    headerSort: false,
+                    formatter: "link",
+                    formatterParams: {
+                        label: (cell) => {
+                            return (cell._cell.value === undefined ? '' : 'View');
+                        },
+                        target: "_blank"
+                    },
+                },
+                {
+                    title: "Deployment",
+                    field: "functionPath",
+                    headerSort: false,
+                    formatter: functionYamlFormatter,
+                },
+            ]
+        });
+
+        table.addFilter("channel", "=", "master");
+
+        let itemNum = 0
+        fetch("catalog.json", {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (catalog) {
+                for (const source in catalog) {
+                    if (!catalog.hasOwnProperty(source)) {
+                        continue;
+                    }
+                    let sourceCatalog = catalog[source];
+                    for (const channel in sourceCatalog) {
+                        if (!sourceCatalog.hasOwnProperty(channel)) {
+                            continue;
+                        }
+                        let channelCatalog = sourceCatalog[channel];
+                        for (const itemKey in channelCatalog) {
+                            if (!channelCatalog.hasOwnProperty(itemKey)) {
+                                continue;
+                            }
+                            let item = channelCatalog[itemKey]["latest"];
+                            addRow(table, source, channel, itemKey, item, ++itemNum)
+                        }
+                    }
+                }
+            })
+
+    </script>
+</body>
+
+</html>

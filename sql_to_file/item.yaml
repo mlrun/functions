@@ -14,7 +14,7 @@ mlrunVersion: ''
 name: sql-to-file
 platformVersion: ''
 spec:
-  filename: ''
+  filename: sql_to_file.py
   handler: sql_to_file
   image: mlrun/mlrun
   kind: job

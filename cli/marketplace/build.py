@@ -119,7 +119,7 @@ def build_marketplace(
     copy_static_resources(marketplace_dir, temp_docs)
 
     update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log)
-    build_catalog_json(marketplace_dir)
+    build_catalog_json(marketplace_dir, (marketplace_root / "catalog.json"))
 
     if _verbose:
         print_file_tree("Resulting marketplace structure", marketplace_dir)
@@ -156,78 +156,13 @@ def write_change_log(readme_path: Path, change_log: ChangeLog):
 
 def write_index_html(marketplace_root: Union[str, Path]):
     marketplace_root = Path(marketplace_root)
-    items = []
-    item_num = 0
-    for source_dir in marketplace_root.iterdir():
-        if source_dir.is_file() or source_dir.name.startswith("."):
-            continue
+    index_path = marketplace_root / "index.html"
+    template_path = PROJECT_ROOT / "cli" / "marketplace" / "index.html"
 
-        source_name = source_dir.name
-        for channel_dir in source_dir.iterdir():
-            if channel_dir.is_file() or channel_dir.name.startswith("."):
-                continue
+    if index_path.exists():
+        index_path.unlink()
 
-            channel_name = channel_dir.name
-
-            catalog_path = channel_dir / "catalog.json"
-            catalog = json.load(open(catalog_path))
-
-            for item_name, item in catalog.items():
-                item_num += 1
-                remote_base_url = (
-                    Path(source_name) / channel_name / item_name / "latest"
-                )
-                latest = item["latest"]
-                version = latest["version"]
-                generation_date = latest["generationDate"]
-
-                file_name = latest.get("spec", {})["filename"].split(".")[0]
-                file_url = remote_base_url / f"{file_name}.html" if file_name else None
-
-                example = latest.get("example").split(".")[0]
-                example_url = (
-                    remote_base_url / f"{example}_example.html" if example else None
-                )
-
-                item_name = item_name.replace("-", "_").split("_")
-                item_name = map(lambda word: word.capitalize(), item_name)
-                item_name = " ".join(item_name)
-
-                categories = latest.get("categories", [])
-                categories = ", ".join(categories)
-
-                item_yaml = remote_base_url / "item.yaml"
-                function_yaml = remote_base_url / "function.yaml"
-                row = {
-                    "id": item_num,
-                    "source_name": source_name,
-                    "channel_name": channel_name,
-                    "name": item_name,
-                    "description": latest.get("description", ""),
-                    "version": version,
-                    "generation_date": generation_date,
-                    "item_yaml": str(item_yaml),
-                    "function_yaml": str(function_yaml),
-                    "categories": categories,
-                }
-                if file_url:
-                    row["file_url"] = str(file_url)
-                if example_url:
-                    row["example_url"] = str(example_url)
-                items.append(row)
-
-    if items:
-
-        index_path = marketplace_root / "index.html"
-
-        if index_path.exists():
-            index_path.unlink()
-
-        render_jinja_file(
-            template_path=PROJECT_ROOT / "cli" / "marketplace" / "index.template",
-            output_path=index_path,
-            data={"table_json": json.dumps(items)},
-        )
+    shutil.copy(template_path, index_path)
 
 
 def copy_static_resources(marketplace_dir, temp_docs):
@@ -243,13 +178,20 @@ def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
         update_or_create_item(item_dir, marketplace_dir, temp_docs, change_log)
 
 
-def build_catalog_json(target_dir: Union[str, Path]):
+def build_catalog_json(marketplace_dir: Union[str, Path], catalog_path: Union[str, Path]):
     click.echo("Building catalog.json...")
-    target_dir = Path(target_dir)
-    catalog_path = target_dir / "catalog.json"
+
+    marketplace_dir = Path(marketplace_dir)
+    channel = marketplace_dir.name
+    source = marketplace_dir.parent.name
+
     catalog = json.load(open(catalog_path, "r")) if catalog_path.exists() else {}
 
-    for source_dir in target_dir.iterdir():
+    if source not in catalog:
+        catalog[source] = {}
+    if channel not in catalog[source]:
+        catalog[source][channel] = {}
+    for source_dir in marketplace_dir.iterdir():
         if not source_dir.is_dir() or source_dir.name == "_static":
             continue
 
@@ -261,7 +203,7 @@ def build_catalog_json(target_dir: Union[str, Path]):
 
         latest_version = latest_yaml["version"]
 
-        catalog[source_dir.name] = {"latest": latest_yaml}
+        catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
         for version_dir in source_dir.iterdir():
             version = version_dir.name
 
@@ -269,7 +211,7 @@ def build_catalog_json(target_dir: Union[str, Path]):
                 version_yaml_path = version_dir / "item.yaml"
                 version_yaml = yaml.full_load(open(version_yaml_path, "r"))
                 version_yaml["generationDate"] = str(version_yaml["generationDate"])
-                catalog[source_dir.name][version] = version_yaml
+                catalog[source][channel][source_dir.name][version] = version_yaml
 
     json.dump(catalog, open(catalog_path, "w"))
 
@@ -463,4 +405,5 @@ def build_temp_docs(temp_root, temp_docs):
 
 
 if __name__ == "__main__":
-    build_marketplace_cli()
+    # build_marketplace_cli()
+    build_marketplace("../../", "../../../marketp")

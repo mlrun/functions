@@ -51,7 +51,7 @@ def test_run_local_aggregate():
 
 
 def test_run_imported_aggregate():
-    _set_mlrun_hub_url()
+    _set_mlrun_hub_url(function_name="aggregate")
     fn = mlrun.import_function("hub://aggregate")
     fn.run(params={'metrics': ['cpu_utilization'],
                    'labels': ['is_error'],

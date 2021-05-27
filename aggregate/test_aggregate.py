@@ -13,12 +13,10 @@ RUNS_PATH = 'runs'
 SCHEDULES_PATH = 'schedules'
 AGGREGATE_PATH = 'artifacts/aggregate.pq'
 
-
 def _delete_outputs(paths):
     for path in paths:
         if Path(path).is_dir():
             shutil.rmtree(path)
-
 
 def _set_mlrun_hub_url(repo_name = None, branch_name = None, function_name = None):
     repo_name =  re.search("\.com/.*?/", str(subprocess.run(['git', 'remote', '-v'], stdout=subprocess.PIPE).stdout)).group()[5:-1] if not repo_name else repo_name
@@ -48,7 +46,6 @@ def test_run_local_aggregate():
            )
     assert Path(AGGREGATE_PATH).is_file()
     _delete_outputs({ARTIFACTS_PATH, RUNS_PATH, SCHEDULES_PATH})
-
 
 def test_run_imported_aggregate():
     _set_mlrun_hub_url(function_name="aggregate")

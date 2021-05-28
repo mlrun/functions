@@ -11,7 +11,7 @@ labels:
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.6.2
-name: xgb_test
+name: xgb_serving
 platformVersion: 3.0.0
 spec:
   filename: xgb_serving.py

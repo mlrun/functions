@@ -14,7 +14,7 @@ mlrunVersion: ''
 name: pandas-profiling-report
 platformVersion: ''
 spec:
-  filename: ''
+  filename: pandas_profiling_report.py
   handler: pandas_profiling_report
   image: mlrun/mlrun
   kind: job

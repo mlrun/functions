@@ -108,7 +108,7 @@ def create_function_yaml(
         requirements=spec.get("requirements"),
         categories=item_yaml.get("categories", []),
         labels=item_yaml.get("labels", {}),
-        with_doc=False,
+        with_doc=True,
     )
 
     custom_fields = spec.get("customFields", {})

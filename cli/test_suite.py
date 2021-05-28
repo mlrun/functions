@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from subprocess import CompletedProcess
 from typing import List, Union, Optional
-
+import sys
 import click
 import yaml
 
@@ -21,6 +21,8 @@ from cli.path_iterator import PathIterator
 @click.command()
 @click.option("-r", "--root-directory", default=".", help="Path to root directory")
 @click.option("-s", "--suite", help="Type of suite to run [py/ipynb/examples/items]")
+@click.option("-mp", "--multi-processing", help="run multiple tests")
+@click.option("-fn", "--function-name", help="run specific function by name")
 @click.option(
     "-f",
     "--stop-on-failure",
@@ -28,18 +30,22 @@ from cli.path_iterator import PathIterator
     default=False,
     help="When true, test suite will stop running after the first test ran",
 )
-def test_suite(root_directory: str, suite: str, stop_on_failure: bool):
+def test_suite(root_directory: str,
+               suite: str,
+               stop_on_failure: bool,
+               multi_processing: bool = False,
+               function_name: str = None):
     if not suite:
         click.echo("-s/--suite is required")
         exit(1)
 
     if suite == "py":
         TestPY(stop_on_failure=stop_on_failure, clean_env_artifacts=True)._run(
-            root_directory
+            root_directory, multi_processing, function_name
         )
     elif suite == "ipynb":
         TestIPYNB(stop_on_failure=stop_on_failure, clean_env_artifacts=True)._run(
-            root_directory
+            root_directory, multi_processing
         )
     elif suite == "examples":
         test_example(root_directory)
@@ -131,20 +137,30 @@ class TestSuite(ABC):
     def after_each(self, path: Union[str, Path], test_result: TestResult):
         pass
 
-    def _run(self, path: Union[str, Path]):
+    def _run(self, path: Union[str, Path], multiprocess, function_name):
+        import multiprocessing as mp
+        process_count = 1
+        if multiprocess:
+            process_count = mp.cpu_count()
         discovered = self.discover(path)
+        if function_name is not None:
+            discovered = [string for string in discovered if function_name in string]
         self.before_run()
-        for directory in discovered:
-            self.before_each(directory)
-            result = self.run(directory)
-            self.test_results.append(result)
-            self.after_each(directory, result)
+        pool = mp.Pool(process_count)
+        results = pool.map(self.directory_process, [directory for directory in discovered])
+        pool.close()
         self.after_run()
         exit(0)
 
+    def directory_process(self, directory):
+        self.before_each(directory)
+        result = self.run(directory)
+        self.test_results.append(result)
+        self.after_each(directory, result)
+
 
 class TestPY(TestSuite):
-    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True):
+    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True, multi_process: bool= False):
         super().__init__(stop_on_failure)
         self.clean_env_artifacts = clean_env_artifacts
         self.results = []
@@ -177,7 +193,7 @@ class TestPY(TestSuite):
                 "No tests found, make sure your test file names are structures as 'test_*.py')"
             )
             exit(0)
-
+        testables.sort()
         return testables
 
     def before_run(self):
@@ -193,7 +209,7 @@ class TestPY(TestSuite):
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ; pipenv run python -m pytest",
-            stdout=subprocess.PIPE,
+            stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
             shell=True,

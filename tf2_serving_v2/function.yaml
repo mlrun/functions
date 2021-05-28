@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: tf2-serving-v2
   tag: ''
-  hash: 4c590061946b7cac1f8ba66cd242a33e709d3916
+  hash: d3429c2117aaca4249c72a7903966d9cafdee63a
   project: default
   labels:
     author: yaronh
@@ -13,6 +13,60 @@ spec:
   command: ''
   args: []
   image: mlrun/mlrun
+  entry_points:
+    load:
+      name: load
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 21
+    preprocess:
+      name: preprocess
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: body
+        default: ''
+      - name: operation
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 34
+    predict:
+      name: predict
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: data
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 52
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 61
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: event
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 64
   description: tf2 image classification server v2
   min_replicas: 1
   max_replicas: 4
@@ -22,7 +76,7 @@ spec:
     kind: Function
     metadata:
       annotations:
-        nuclio.io/generated_by: function generated from /home/michaell/projects/functions/tf2_serving_v2/tf2_serving_v2.ipynb
+        nuclio.io/generated_by: function generated from /home/michaell/projects/temp/functions/tf2_serving_v2/tf2_serving_v2.ipynb
       labels: {}
       name: tf2-serving-v2
     spec:

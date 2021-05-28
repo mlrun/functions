@@ -16,7 +16,7 @@ mlrunVersion: ''
 name: test-classifier
 platformVersion: ''
 spec:
-  filename: ''
+  filename: test_classifier.py
   handler: test_classifier
   image: mlrun/mlrun
   kind: job

@@ -16,7 +16,7 @@ mlrunVersion: ''
 name: churn-server
 platformVersion: ''
 spec:
-  filename: ''
+  filename: churn_server.py
   handler: handler
   image: mlrun/ml-models
   kind: serving

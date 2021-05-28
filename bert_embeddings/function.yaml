@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: bert-embeddings
   tag: ''
-  hash: 05566f909481bb5c53b22cf68c7b22d71b9bf31d
+  hash: fb81bcb76c25fc8c8e5424f6348983a46cfd2ea9
   project: default
   labels:
     framework: pytorch
@@ -14,6 +14,27 @@ spec:
   command: ''
   args: []
   image: ''
+  entry_points:
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 8
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: event
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 17
   description: Get BERT based embeddings for given text
   min_replicas: 1
   max_replicas: 4
@@ -25,7 +46,7 @@ spec:
       name: bert-embeddings
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from /home/michaell/projects/functions/bert_embeddings/bert_embeddings.py
+        nuclio.io/generated_by: function generated from /home/michaell/projects/temp/functions/bert_embeddings/bert_embeddings.py
     spec:
       runtime: python:3.6
       handler: bert_embeddings:handler
@@ -39,6 +60,6 @@ spec:
   build:
     commands:
     - python -m pip install torch==1.6.0 transformers==3.0.1
-    code_origin: https://github.com/Michaelliv/functions.git#b6d661b4f8ad3f3a632a5024f679a4babbb04395:/home/michaell/projects/functions/bert_embeddings/bert_embeddings.py
+    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/bert_embeddings/bert_embeddings.py
   default_handler: handler
 verbose: false

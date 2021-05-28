@@ -16,7 +16,7 @@ mlrunVersion: ''
 name: model-server
 platformVersion: ''
 spec:
-  filename: ''
+  filename: model_server.py
   handler: handler
   image: mlrun/mlrun
   kind: remote

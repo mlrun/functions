@@ -1,7 +1,7 @@
 kind: remote
 metadata:
   name: tf2-serving
-  hash: 134293b94996e74275d90546f8d4ef96198af679
+  hash: 5532fe9bdbca2d59474e2feab03e014366674193
   project: default
   labels:
     author: yaronh
@@ -11,7 +11,50 @@ metadata:
 spec:
   command: ''
   args: []
-  image: ''
+  image: mlrun/mlrun
+  entry_points:
+    load:
+      name: load
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 32
+    preprocess:
+      name: preprocess
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: body
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 36
+    predict:
+      name: predict
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: data
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 54
+    postprocess:
+      name: postprocess
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: predicted_probability
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 61
   description: tf2 image classification server
   max_replicas: 4
   env:

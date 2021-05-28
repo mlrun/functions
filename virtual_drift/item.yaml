@@ -16,7 +16,7 @@ mlrunVersion: ''
 name: virtual-drift
 platformVersion: ''
 spec:
-  filename: ''
+  filename: virtual_drift.py
   handler: drift_magnitude
   image: mlrun/ml-models
   kind: job

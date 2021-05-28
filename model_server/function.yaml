@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: model-server
   tag: ''
-  hash: 241b871f7c6c8fe550693f0f650ed9e63bf8a93e
+  hash: 6a5ed0764530f963b0dd2b72ee3844d3302ed781
   project: default
   labels:
     author: yaronh
@@ -14,6 +14,30 @@ spec:
   command: ''
   args: []
   image: mlrun/mlrun
+  entry_points:
+    load:
+      name: load
+      doc: Load model from storage.
+      parameters:
+      - name: self
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 17
+    predict:
+      name: predict
+      doc: Generate model predictions from sample.
+      parameters:
+      - name: self
+        default: ''
+      - name: body
+        type: dict
+        doc: 'A dict of observations, each of which is an 1-dimensional feature vector. '
+        default: ''
+      outputs:
+      - default: ''
+        type: List
+      lineno: 22
   description: generic sklearn model server
   min_replicas: 1
   max_replicas: 4
@@ -26,6 +50,6 @@ spec:
     functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG1scnVuCgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CmZyb20gZGF0ZXRpbWUgaW1wb3J0IGRhdGV0aW1lCmZyb20gc2tsZWFybi5kYXRhc2V0cyBpbXBvcnQgbG9hZF9pcmlzCgppbXBvcnQgd2FybmluZ3MKd2FybmluZ3MuZmlsdGVyd2FybmluZ3MoJ2lnbm9yZScpCgppbXBvcnQgb3MKaW1wb3J0IG51bXB5IGFzIG5wCgpjbGFzcyBDbGFzc2lmaWVyTW9kZWwobWxydW4ucnVudGltZXMuTUxNb2RlbFNlcnZlcik6CiAgICBkZWYgbG9hZChzZWxmKToKICAgICAgICAiIiJMb2FkIG1vZGVsIGZyb20gc3RvcmFnZS4iIiIKICAgICAgICBtb2RlbF9maWxlLCBleHRyYV9kYXRhID0gc2VsZi5nZXRfbW9kZWwoJy5wa2wnKQogICAgICAgIHNlbGYubW9kZWwgPSBsb2FkKG9wZW4obW9kZWxfZmlsZSwgJ3JiJykpCgogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keTogZGljdCkgLT4gTGlzdDoKICAgICAgICAiIiJHZW5lcmF0ZSBtb2RlbCBwcmVkaWN0aW9ucyBmcm9tIHNhbXBsZS4KICAgICAgICAKICAgICAgICA6cGFyYW0gYm9keSA6IEEgZGljdCBvZiBvYnNlcnZhdGlvbnMsIGVhY2ggb2Ygd2hpY2ggaXMgYW4gMS1kaW1lbnNpb25hbCBmZWF0dXJlIHZlY3Rvci4KICAgICAgICAgICAgCiAgICAgICAgUmV0dXJucyBtb2RlbCBwcmVkaWN0aW9ucyBhcyBhIGBMaXN0YCwgb25lIGZvciBlYWNoIHJvdyBpbiB0aGUgYGJvZHlgIGlucHV0IGBMaXN0YC4KICAgICAgICAiIiIKICAgICAgICB0cnk6CiAgICAgICAgICAgIGZlYXRzID0gbnAuYXNhcnJheShib2R5WydpbnN0YW5jZXMnXSkKICAgICAgICAgICAgcmVzdWx0OiBucC5uZGFycmF5ID0gc2VsZi5tb2RlbC5wcmVkaWN0KGZlYXRzKQogICAgICAgICAgICByZXNwID0gcmVzdWx0LnRvbGlzdCgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oZiJGYWlsZWQgdG8gcHJlZGljdCB7ZX0iKQogICAgICAgIAogICAgICAgIHJldHVybiByZXNwCgo=
     base_image: mlrun/mlrun
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#b6d661b4f8ad3f3a632a5024f679a4babbb04395:/home/michaell/projects/functions/model_server/model_server.ipynb
+    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/model_server/model_server.ipynb
   default_handler: handler
 verbose: false

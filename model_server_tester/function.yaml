@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: model-server-tester
   tag: ''
-  hash: 17531724b059610fbe26dbc7f70a5c2f5590917a
+  hash: ab74323c11123235d7bdeeebbd8cdbe3b5aff2ed
   project: default
   labels:
     author: yaronh
@@ -15,9 +15,43 @@ spec:
   image: mlrun/mlrun
   env: []
   default_handler: model_server_tester
+  entry_points:
+    model_server_tester:
+      name: model_server_tester
+      doc: Test a model server
+      parameters:
+      - name: context
+        default: ''
+      - name: table
+        type: DataItem
+        doc: csv/parquet table with test data
+        default: ''
+      - name: addr
+        type: str
+        doc: function address/url
+        default: ''
+      - name: label_column
+        type: str
+        doc: name of the label column in table
+        default: label
+      - name: model
+        type: str
+        doc: 'tested model name '
+        default: ''
+      - name: match_err
+        type: bool
+        doc: raise error on validation (require proper test set)
+        default: false
+      - name: rows
+        type: int
+        doc: number of rows to use from test set
+        default: 20
+      outputs:
+      - default: ''
+      lineno: 13
   description: test model servers
   build:
     functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG9zCmltcG9ydCBwYW5kYXMgYXMgcGQKaW1wb3J0IHJlcXVlc3RzCmltcG9ydCBqc29uCmltcG9ydCBudW1weSBhcyBucAoKZnJvbSBkYXRldGltZSBpbXBvcnQgZGF0ZXRpbWUKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCmZyb20gbWxydW4uYXJ0aWZhY3RzIGltcG9ydCBnZXRfbW9kZWwsIENoYXJ0QXJ0aWZhY3QKCmRlZiBtb2RlbF9zZXJ2ZXJfdGVzdGVyKGNvbnRleHQsCiAgICAgICAgICAgICAgICAgICAgICAgIHRhYmxlOiBEYXRhSXRlbSwKICAgICAgICAgICAgICAgICAgICAgICAgYWRkcjogc3RyLCAKICAgICAgICAgICAgICAgICAgICAgICAgbGFiZWxfY29sdW1uOiBzdHIgPSAibGFiZWwiLAogICAgICAgICAgICAgICAgICAgICAgICBtb2RlbDogc3RyID0gJycsCiAgICAgICAgICAgICAgICAgICAgICAgIG1hdGNoX2VycjogYm9vbCA9IEZhbHNlLAogICAgICAgICAgICAgICAgICAgICAgICByb3dzOiBpbnQgPSAyMCk6CiAgICAiIiIgVGVzdCBhIG1vZGVsIHNlcnZlciAKICAgIAogICAgOnBhcmFtIHRhYmxlOiAgICAgICAgIGNzdi9wYXJxdWV0IHRhYmxlIHdpdGggdGVzdCBkYXRhCiAgICA6cGFyYW0gYWRkcjogICAgICAgICAgZnVuY3Rpb24gYWRkcmVzcy91cmwKICAgIDpwYXJhbSBsYWJlbF9jb2x1bW46ICBuYW1lIG9mIHRoZSBsYWJlbCBjb2x1bW4gaW4gdGFibGUKICAgIDpwYXJhbSBtb2RlbDogICAgICAgICB0ZXN0ZWQgbW9kZWwgbmFtZSAKICAgIDpwYXJhbSBtYXRjaF9lcnI6ICAgICByYWlzZSBlcnJvciBvbiB2YWxpZGF0aW9uIChyZXF1aXJlIHByb3BlciB0ZXN0IHNldCkKICAgIDpwYXJhbSByb3dzOiAgICAgICAgICBudW1iZXIgb2Ygcm93cyB0byB1c2UgZnJvbSB0ZXN0IHNldAogICAgIiIiCiAgICAgICAgCiAgICB0YWJsZSA9IHRhYmxlLmFzX2RmKCkKCiAgICB5X2xpc3QgPSB0YWJsZS5wb3AobGFiZWxfY29sdW1uKS52YWx1ZXMudG9saXN0KCkKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oZid0ZXN0aW5nIHdpdGggZGF0YXNldCBhZ2FpbnN0IHthZGRyfSwgbW9kZWw6IHttb2RlbH0nKQogICAgaWYgcm93cyBhbmQgcm93cyA8IHRhYmxlLnNoYXBlWzBdOgogICAgICAgIHRhYmxlID0gdGFibGUuc2FtcGxlKHJvd3MpCiAgICAKICAgIGNvdW50ID0gZXJyX2NvdW50ID0gbWF0Y2ggPSAwCiAgICB0aW1lcyA9IFtdCiAgICBmb3IgeCwgeSBpbiB6aXAodGFibGUudmFsdWVzLCB5X2xpc3QpOgogICAgICAgIGNvdW50ICs9IDEKICAgICAgICBldmVudF9kYXRhID0ganNvbi5kdW1wcyh7Imluc3RhbmNlcyI6W3gudG9saXN0KCldfSkKICAgICAgICBoYWRfZXJyID0gRmFsc2UKICAgICAgICB0cnk6CiAgICAgICAgICAgIHN0YXJ0ID0gZGF0ZXRpbWUubm93KCkKICAgICAgICAgICAgcmVzcCA9IHJlcXVlc3RzLnB1dChmJ3thZGRyfS97bW9kZWx9L3ByZWRpY3QnLCBqc29uPWV2ZW50X2RhdGEpCiAgICAgICAgICAgIGlmIG5vdCByZXNwLm9rOgogICAgICAgICAgICAgICAgY29udGV4dC5sb2dnZXIuZXJyb3IoZidiYWQgZnVuY3Rpb24gcmVzcCEhXG57cmVzcC50ZXh0fScpCiAgICAgICAgICAgICAgICBlcnJfY291bnQgKz0gMQogICAgICAgICAgICAgICAgY29udGludWUKICAgICAgICAgICAgdGltZXMuYXBwZW5kKChkYXRldGltZS5ub3coKS1zdGFydCkubWljcm9zZWNvbmRzKQogICAgICAgICAgICAgICAgCiAgICAgICAgZXhjZXB0IE9TRXJyb3IgYXMgZXJyOgogICAgICAgICAgICBjb250ZXh0LmxvZ2dlci5lcnJvcihmJ2Vycm9yIGluIHJlcXVlc3QsIGRhdGE6e2V2ZW50X2RhdGF9LCBlcnJvcjoge2Vycn0nKQogICAgICAgICAgICBlcnJfY291bnQgKz0gMQogICAgICAgICAgICBjb250aW51ZQogICAgICAgICAgICAKICAgICAgICB5X3Jlc3AgPSByZXNwLmpzb24oKVswXQogICAgICAgIGlmIHkgPT0geV9yZXNwOgogICAgICAgICAgICBtYXRjaCArPSAxCiAgICAgICAgCiAgICBjb250ZXh0LmxvZ19yZXN1bHQoJ3RvdGFsX3Rlc3RzJywgY291bnQpCiAgICBjb250ZXh0LmxvZ19yZXN1bHQoJ2Vycm9ycycsIGVycl9jb3VudCkKICAgIGNvbnRleHQubG9nX3Jlc3VsdCgnbWF0Y2gnLCBtYXRjaCkKICAgIGlmIGNvdW50IC0gZXJyX2NvdW50ID4gMDoKICAgICAgICB0aW1lc19hcnIgPSBucC5hcnJheSh0aW1lcykKICAgICAgICBjb250ZXh0LmxvZ19yZXN1bHQoJ2F2Z19sYXRlbmN5JywgaW50KG5wLm1lYW4odGltZXNfYXJyKSkpCiAgICAgICAgY29udGV4dC5sb2dfcmVzdWx0KCdtaW5fbGF0ZW5jeScsIGludChucC5hbWluKHRpbWVzX2FycikpKQogICAgICAgIGNvbnRleHQubG9nX3Jlc3VsdCgnbWF4X2xhdGVuY3knLCBpbnQobnAuYW1heCh0aW1lc19hcnIpKSkKICAgICAgICAKICAgICAgICBjaGFydCA9IENoYXJ0QXJ0aWZhY3QoJ2xhdGVuY3knLCBoZWFkZXI9WydUZXN0JywgJ0xhdGVuY3kgKG1pY3Jvc2VjKSddKQogICAgICAgIGZvciBpIGluIHJhbmdlKGxlbih0aW1lcykpOgogICAgICAgICAgICBjaGFydC5hZGRfcm93KFtpKzEsIGludCh0aW1lc1tpXSldKQogICAgICAgIGNvbnRleHQubG9nX2FydGlmYWN0KGNoYXJ0KQoKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oZidydW4ge2NvdW50fSB0ZXN0cywge2Vycl9jb3VudH0gZXJyb3JzIGFuZCB7bWF0Y2h9IG1hdGNoIGV4cGVjdGVkIHZhbHVlJykKICAgIAogICAgaWYgZXJyX2NvdW50OgogICAgICAgIHJhaXNlIFZhbHVlRXJyb3IoZidmYWlsZWQgb24ge2Vycl9jb3VudH0gdGVzdHMgb2Yge2NvdW50fScpCiAgICAKICAgIGlmIG1hdGNoX2VyciBhbmQgbWF0Y2ggIT0gY291bnQ6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcihmJ29ubHkge21hdGNofSByZXN1bHRzIG1hdGNoIG91dCBvZiB7Y291bnR9JykKCg==
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#3712979272cddd574ec2d5efcc6324bbe9f45316:/home/michaell/projects/functions/model_server_tester/model_server_tester.ipynb
+    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/model_server_tester/model_server_tester.ipynb
 verbose: false

@@ -40,7 +40,7 @@ jobs:
       - name: Run item validation
         run: python functions/functions.py  run-tests -r functions -s items
       - name: Run py tests
-        run: python functions/functions.py  run-tests -r functions -s py
+        run: python functions/functions.py  run-tests -r functions -s py -mp True
       - name: Run ipynb tests
         run: python functions/functions.py  run-tests -r functions -s ipynb
       - name: Clean

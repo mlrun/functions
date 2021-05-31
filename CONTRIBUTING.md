@@ -120,12 +120,14 @@ select one or more categories and feel free to suggest additional options.
 | Name | How should it be written in item.yaml | When should i choose this category? |
 |------|---------------------------------------|-------------------------------------|
 | Data Preparation | <b>data-preparation</b> | A function that prepares, cleans or otherwise processes data in any other number of ways |
-| Extract, Transform, Load | <b>etl</b> | A function is used to take data from some source, transforms it and finally load it to some destination |
+| Extract, Transform, Load | <b>etl</b> | A function that can be used to take data from some source, transforms it and finally load it to some destination |
 | Machine Learning | <b>machine-learning</b> | A function that is related to machine learning in any way, can be used along-side categories like Data Preparation, Model Training, Model Serving |
-| Model Serving | <b>serving</b> | A function that is used to serve models via V2ModelServer |
-| Model Training | <b>training</b> | A function that is used for training Machine Learning models |
-| Data Analysis | <b>analysis</b> | A function that preforms analysis on data |
-| Alerts And Notifications | <b>notifications</b> | A function that is used to either alert or notify in any way |
+| Model Serving | <b>model-serving</b> | A function that can be used to serve models via V2ModelServer |
+| Model Training | <b>model-training</b> | A function that can be used for training Machine Learning models |
+| Model Testing | <b>model-testing</b> | A function that can be used to test trained models |
+| Data Analysis | <b>data-analysis</b> | A function that can be used to preform analysis and exploration on data |
+| Monitoring | <b>monitoring</b> | A function that can be used to monitor and/or measure metrics regarding data, models and model endpoints |
+| Alerts And Notifications | <b>alerts-and-notifications</b> | A function that is used to either alert or notify in any way |
 
 ## Installation Guide
 It is highly advised using the functions package in a dedicated environment, since Pipenv is used as part of the testing routine, 

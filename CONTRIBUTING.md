@@ -113,6 +113,20 @@ spec:
 version: 0.0.1         # Function version, should follow the standard semantic versioning schema
 ```
 
+### Suggested function categories
+The table below represents the available options to choose from when filling `item.yaml`'s `categories` property. Please 
+select one or more categories and feel free to suggest additional options.
+
+| Name | How should it be written in item.yaml | When should i choose this category? |
+|------|---------------------------------------|-------------------------------------|
+| Data Preparation | <b>data-preparation</b> | A function that prepares, cleans or otherwise processes data in any other number of ways |
+| Extract, Transform, Load | <b>etl</b> | A function is used to take data from some source, transforms it and finally load it to some destination |
+| Machine Learning | <b>machine-learning</b> | A function that is related to machine learning in any way, can be used along-side categories like Data Preparation, Model Training, Model Serving |
+| Model Serving | <b>serving</b> | A function that is used to serve models via V2ModelServer |
+| Model Training | <b>training</b> | A function that is used for training Machine Learning models |
+| Data Analysis | <b>analysis</b> | A function that preforms analysis on data |
+| Alerts And Notifications | <b>notifications</b> | A function that is used to either alert or notify in any way |
+
 ## Installation Guide
 It is highly advised using the functions package in a dedicated environment, since Pipenv is used as part of the testing routine, 
 conda can be used instead.

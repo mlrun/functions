@@ -14,7 +14,7 @@ labels:
   framework: pytorch
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.6.0
+mlrunVersion: 0.6.3
 name: sentiment-analysis-serving
 platformVersion: 3.0.0
 spec:

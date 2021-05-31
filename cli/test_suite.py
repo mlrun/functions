@@ -141,7 +141,8 @@ class TestSuite(ABC):
         import multiprocessing as mp
         process_count = 1
         if multiprocess:
-            process_count = mp.cpu_count()
+            process_count = mp.cpu_count()-1
+        print("running tests with {} process".format(process_count))
         discovered = self.discover(path)
         if function_name is not None:
             discovered = [string for string in discovered if function_name in string]

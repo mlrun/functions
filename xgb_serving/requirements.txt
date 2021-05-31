@@ -3,3 +3,5 @@ pandas
 xgboost
 cloudpickle
 pygit2
+sklearn
+scikit-plot

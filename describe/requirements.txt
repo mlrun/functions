@@ -1,7 +1,5 @@
 mlrun
-dask
-yellowbrick
+sklearn
 matplotlib
 seaborn
-sklearn
 scikit-plot

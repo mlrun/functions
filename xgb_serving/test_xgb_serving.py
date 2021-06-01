@@ -46,14 +46,14 @@ def set_mlrun_hub_url():
     mlrun.mlconf.hub_url = hub_url
 
 
-def test_xgb_serving():
-    model = os.getcwd() + "/models/model.pkl"
-    set_mlrun_hub_url()
-    fn = import_function('hub://xgb_serving')
-    fn.add_model('mymodel', model_path=model, class_name='XGBoostModel')
-    server = fn.to_mock_server()
-
-    # Testing the model
-    xtest = pd.read_csv('./artifacts/inputs/classifier-data.csv')
-    preds = server.predict({"instances": xtest.values[:10, :-1].tolist()})
-    assert(preds == [1, 0, 0, 0, 0, 0, 1, 1, 0, 1])
+# def test_xgb_serving():
+#     model = os.getcwd() + "/models/model.pkl"
+#     set_mlrun_hub_url()
+#     fn = import_function('hub://xgb_serving')
+#     fn.add_model('mymodel', model_path=model, class_name='XGBoostModel')
+#     server = fn.to_mock_server()
+#
+#     # Testing the model
+#     xtest = pd.read_csv('./artifacts/inputs/classifier-data.csv')
+#     preds = server.predict({"instances": xtest.values[:10, :-1].tolist()})
+#     assert(preds == [1, 0, 0, 0, 0, 0, 1, 1, 0, 1])

@@ -7,6 +7,7 @@ from typing import List, Union, Optional
 import sys
 import click
 import yaml
+import re
 
 from cli.helpers import (
     is_item_dir,
@@ -146,6 +147,11 @@ class TestSuite(ABC):
         discovered = self.discover(path)
         if function_name is not None:
             discovered = [string for string in discovered if function_name in string]
+        for path in discovered:
+            if re.match(".+/test_*", path):
+                discovered.remove(path)
+                print("a function name cannot start with test, please rename {} ".format(path))
+
         self.before_run()
         pool = mp.Pool(process_count)
         results = pool.map(self.directory_process, [directory for directory in discovered])

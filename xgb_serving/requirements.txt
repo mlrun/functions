@@ -5,3 +5,4 @@ cloudpickle
 pygit2
 sklearn
 scikit-plot
+seaborn

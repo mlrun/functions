@@ -41,8 +41,8 @@ jobs:
         run: python functions/functions.py  run-tests -r functions -s items
       - name: Run py tests
         run: python functions/functions.py  run-tests -r functions -s py -mp True
-      - name: Run ipynb tests
-        run: python functions/functions.py  run-tests -r functions -s ipynb
+#      - name: Run ipynb tests
+#        run: python functions/functions.py  run-tests -r functions -s ipynb
       - name: Clean
         run: |
           rm -rf functions

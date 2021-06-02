@@ -13,7 +13,7 @@ on:
 jobs:
   tests:
     name: Run tests
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       # Source
       - name: Checkout current repo

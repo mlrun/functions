@@ -1,7 +1,7 @@
 kind: remote
 metadata:
   name: xgb-serving
-  hash: 6a440a336ee339cb8f02662bff15cf74cbc29942
+  hash: f80c174652d9e75b2ec04c10a3756bb3b7e8f4d1
   project: default
   labels:
     author: yaronh
@@ -11,30 +11,8 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/ml-models
-  entry_points:
-    load:
-      name: load
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 10
-    predict:
-      name: predict
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: body
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 14
-  description: deploy an XGBoost model server.
-  min_replicas: 1
+  image: ''
+  description: xgboost test data classification server
   max_replicas: 4
   env:
   - name: SERVING_MODEL_xgb_serving_v2

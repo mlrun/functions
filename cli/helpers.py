@@ -2,9 +2,12 @@ import subprocess
 from pathlib import Path
 from typing import Union, List, Set
 import sys
-
+import re
+from pygit2 import Repository
 import yaml
 from jinja2 import Template
+import shutil
+
 
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 
@@ -107,3 +110,16 @@ def print_std(subprocess_result):
     if subprocess_result.stderr != None:
         print(subprocess_result.stderr.decode("utf-8"))
     print()
+
+
+def set_mlrun_hub_url(repo_name = None, branch_name = None, function_name = None):
+    repo_name =  re.search("\.com/.*?/", str(subprocess.run(['git', 'remote', '-v'], stdout=subprocess.PIPE).stdout)).group()[5:-1] if not repo_name else repo_name
+    branch_name = Repository('.').head.shorthand if not branch_name else branch_name
+    function_name = "" if not function_name else function_name # MUST ENTER FUNCTION NAME !!!!
+    hub_url = f"https://raw.githubusercontent.com/{repo_name}/functions/{branch_name}/{function_name}/function.yaml"
+
+
+def delete_outputs(paths):
+    for path in paths:
+        if Path(path).is_dir():
+            shutil.rmtree(path)

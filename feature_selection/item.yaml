@@ -19,8 +19,6 @@ spec:
   handler: feature_selection/feature_selection
   image: mlrun/ml-models
   kind: job
-  requirements:
-  - mlrun
-  - sklearn
+  requirements: []
 url: ''
 version: 0.0.1

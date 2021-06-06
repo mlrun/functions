@@ -11,41 +11,41 @@ on:
       - master
 
 jobs:
-#  tests:
-#    name: Run tests
-#    runs-on: ubuntu-latest
-#    steps:
-#      # Source
-#      - name: Checkout current repo
-#        uses: actions/checkout@v2
-#        with:
-#          path: functions
-#      # Install python
-#      - name: Install python
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: 3.7
-#      # Install dependencies
-#      - uses: actions/cache@v1
-#        id: cache
-#        with:
-#          path: ~/.cache/pip
-#          key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
-#          restore-keys: |
-#            ${{ runner.os }}-pip-
-#      - name: Install requirements
-#        run: |
-#          pip install --upgrade pip
-#          pip install -r functions/requirements.txt
-#      - name: Run item validation
-#        run: python functions/functions.py test-suite -r functions -s items
-#      - name: Run py tests
-#        run: python functions/functions.py test-suite -r functions -s py
+  tests:
+    name: Run tests
+    runs-on: self-hosted
+    steps:
+      # Source
+      - name: Checkout current repo
+        uses: actions/checkout@v2
+        with:
+          path: functions
+      # Install python
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      # Install dependencies
+      - uses: actions/cache@v1
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install requirements
+        run: |
+          pip install --upgrade pip
+          pip install -r functions/requirements.txt
+      - name: Run item validation
+        run: python functions/functions.py  run-tests -r functions -s items
+      - name: Run py tests
+        run: python functions/functions.py  run-tests -r functions -s py -mp True
 #      - name: Run ipynb tests
-#        run: python functions/functions.py test-suite -r functions -s ipynb
-#      - name: Clean
-#        run: |
-#          rm -rf functions
+#        run: python functions/functions.py  run-tests -r functions -s ipynb
+      - name: Clean
+        run: |
+          rm -rf functions
 
   build-marketplace:
     name: Build marketplace

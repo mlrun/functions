@@ -7,6 +7,7 @@ from typing import List, Union, Optional
 import sys
 import click
 import yaml
+import re
 
 from cli.helpers import (
     is_item_dir,
@@ -22,6 +23,7 @@ from cli.path_iterator import PathIterator
 @click.option("-r", "--root-directory", default=".", help="Path to root directory")
 @click.option("-s", "--suite", help="Type of suite to run [py/ipynb/examples/items]")
 @click.option("-mp", "--multi-processing", help="run multiple tests")
+@click.option("-fn", "--function-name", help="run specific function by name")
 @click.option(
     "-f",
     "--stop-on-failure",
@@ -29,14 +31,18 @@ from cli.path_iterator import PathIterator
     default=False,
     help="When true, test suite will stop running after the first test ran",
 )
-def test_suite(root_directory: str, suite: str, stop_on_failure: bool, multi_processing: bool = False):
+def test_suite(root_directory: str,
+               suite: str,
+               stop_on_failure: bool,
+               multi_processing: bool = False,
+               function_name: str = None):
     if not suite:
         click.echo("-s/--suite is required")
         exit(1)
 
     if suite == "py":
         TestPY(stop_on_failure=stop_on_failure, clean_env_artifacts=True)._run(
-            root_directory, multi_processing
+            root_directory, multi_processing, function_name
         )
     elif suite == "ipynb":
         TestIPYNB(stop_on_failure=stop_on_failure, clean_env_artifacts=True)._run(
@@ -132,13 +138,20 @@ class TestSuite(ABC):
     def after_each(self, path: Union[str, Path], test_result: TestResult):
         pass
 
-    def _run(self, path: Union[str, Path], multiprocess):
+    def _run(self, path: Union[str, Path], multiprocess, function_name):
         import multiprocessing as mp
         process_count = 1
         if multiprocess:
-            process_count = mp.cpu_count()
-
+            process_count = mp.cpu_count()-1
+        print("running tests with {} process".format(process_count))
         discovered = self.discover(path)
+        if function_name is not None:
+            discovered = [string for string in discovered if function_name in string]
+        for path in discovered:
+            if re.match(".+/test_*", path):
+                discovered.remove(path)
+                print("a function name cannot start with test, please rename {} ".format(path))
+
         self.before_run()
         pool = mp.Pool(process_count)
         results = pool.map(self.directory_process, [directory for directory in discovered])

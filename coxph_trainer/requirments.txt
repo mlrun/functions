@@ -1,0 +1,7 @@
+sklearn
+seaborn
+scikit-plot
+mlrun
+pandas
+subprocess
+pygit2

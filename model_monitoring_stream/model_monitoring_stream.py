@@ -18,15 +18,15 @@ from storey import (
     FieldAggregator,
     NoopDriver,
     Table,
-    Source,
     Map,
     MapClass,
     AggregateByKey,
     build_flow,
-    WriteToParquet,
     Filter,
-    WriteToTSDB,
     FlatMap,
+    TSDBTarget,
+    ParquetTarget,
+    SyncEmitSource,
 )
 from storey.dtypes import SlidingWindows
 from storey.steps import SampleWindow
@@ -139,7 +139,7 @@ class EventStreamProcessor:
 
         self._flow = build_flow(
             [
-                Source(),
+                SyncEmitSource(),
                 ProcessEndpointEvent(self.kv_container, self.kv_path),
                 FilterNotNone(),
                 FlatMap(lambda x: x),
@@ -191,7 +191,7 @@ class EventStreamProcessor:
                         [
                             FilterKeys(BASE_METRICS),
                             UnpackValues(BASE_METRICS),
-                            WriteToTSDB(
+                            TSDBTarget(
                                 path=self.tsdb_path,
                                 rate="10/m",
                                 time_col=TIMESTAMP,
@@ -208,7 +208,7 @@ class EventStreamProcessor:
                         [
                             FilterKeys(ENDPOINT_FEATURES),
                             UnpackValues(ENDPOINT_FEATURES),
-                            WriteToTSDB(
+                            TSDBTarget(
                                 path=self.tsdb_path,
                                 rate="10/m",
                                 time_col=TIMESTAMP,
@@ -226,7 +226,7 @@ class EventStreamProcessor:
                             FilterKeys(CUSTOM_METRICS),
                             FilterNotNone(),
                             UnpackValues(CUSTOM_METRICS),
-                            WriteToTSDB(
+                            TSDBTarget(
                                 path=self.tsdb_path,
                                 rate="10/m",
                                 time_col=TIMESTAMP,
@@ -245,7 +245,7 @@ class EventStreamProcessor:
                 # Branch 2: Batch events, write to parquet
                 [
                     Map(self.process_before_parquet),
-                    WriteToParquet(
+                    ParquetTarget(
                         path=self.parquet_path,
                         partition_cols=["$key", "$year", "$month", "$day", "$hour"],
                         infer_columns_from_data=True,
@@ -478,7 +478,8 @@ def enrich_even_details(event) -> Optional[dict]:
     versioned_model = f"{model}:{version}" if version else model
 
     endpoint_id = create_model_endpoint_id(
-        function_uri=function_uri, versioned_model=versioned_model,
+        function_uri=function_uri,
+        versioned_model=versioned_model,
     )
 
     endpoint_id = str(endpoint_id)
@@ -660,12 +661,18 @@ def get_endpoint_record(
     kv_container: str, kv_path: str, endpoint_id: str
 ) -> Optional[dict]:
     logger.info(
-        f"Grabbing endpoint data", endpoint_id=endpoint_id, table_path=kv_path,
+        f"Grabbing endpoint data",
+        endpoint_id=endpoint_id,
+        table_path=kv_path,
     )
     try:
         endpoint_record = (
             get_v3io_client()
-            .kv.get(container=kv_container, table_path=kv_path, key=endpoint_id,)
+            .kv.get(
+                container=kv_container,
+                table_path=kv_path,
+                key=endpoint_id,
+            )
             .output.item
         )
         return endpoint_record

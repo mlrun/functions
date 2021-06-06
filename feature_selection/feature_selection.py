@@ -170,6 +170,7 @@ def feature_selection(context,
             stat_df = select_from_model.estimator_.coef_
         elif hasattr(select_from_model.estimator_, 'feature_importances_'):
             stat_df = select_from_model.estimator_.feature_importances_
+
         stat_df = pd.DataFrame(index=X.columns,
                                columns=[model_name],
                                data=stat_df[0])

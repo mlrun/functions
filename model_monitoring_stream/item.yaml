@@ -15,7 +15,7 @@ spec:
   filename: model_monitoring_stream.py
   handler: handler
   image: mlrun/mlrun
-  kind: remote
+  kind: nuclio
   requirements: []
 url: ''
 version: 0.0.1

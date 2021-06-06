@@ -1,7 +1,7 @@
 kind: remote
 metadata:
   name: tf1-serving
-  hash: 0e736d2fadf6be671cd9f9817e50cc3be2cd97a5
+  hash: adf7287e30fd7c44103ad364b909f169df9225d1
   project: default
   labels:
     author: yaronh
@@ -11,50 +11,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/mlrun
-  entry_points:
-    load:
-      name: load
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 32
-    preprocess:
-      name: preprocess
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: body
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 36
-    predict:
-      name: predict
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: data
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 54
-    postprocess:
-      name: postprocess
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: predicted_probability
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 61
+  image: ''
   description: tf1 image classification server
   max_replicas: 4
   env:

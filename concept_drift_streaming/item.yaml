@@ -19,7 +19,7 @@ spec:
   filename: concept_drift_streaming.py
   handler: handler
   image: mlrun/ml-models
-  kind: remote
+  kind: nuclio
   requirements:
   - scikit-multiflow==0.4.1
   - v3io_frames

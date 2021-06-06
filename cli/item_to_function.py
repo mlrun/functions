@@ -144,4 +144,7 @@ def create_function_yaml(
 
 
 if __name__ == "__main__":
-    item_to_function_cli()
+    # item_to_function_cli()
+    item_to_function(
+        "/home/michaell/projects/functions/tf1_serving"
+    )

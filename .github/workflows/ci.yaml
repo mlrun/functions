@@ -49,7 +49,7 @@ jobs:
 
   build-marketplace:
     name: Build marketplace
-    if: github.repository == 'mlrun/functions' && github.event_name != 'pull_request'
+    if: github.repository == 'mlrun/functions'
     runs-on: self-hosted
 #    needs: tests
 

@@ -2,6 +2,7 @@ name: Test functions, build marketplace
 
 on:
   pull_request:
+    types: [opened]
     branches:
       - "*"
 

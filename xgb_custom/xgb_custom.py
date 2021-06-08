@@ -220,6 +220,6 @@ def fit(
     context.log_model("model",
                       body=dumps(booster),
                       model_file="model.pkl",
-                      artifact_path='/User/artifacts/tttt')
+                      artifact_path='artifacts/')
 
     learning_curves(context, results)

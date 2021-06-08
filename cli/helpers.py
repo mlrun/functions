@@ -1,6 +1,7 @@
 import subprocess
 from pathlib import Path
 from typing import Union, List, Set
+import sys
 
 import yaml
 from jinja2 import Template
@@ -21,7 +22,7 @@ def is_function_dir(path: Path) -> bool:
     return any((f.name == "function.yaml" for f in path.iterdir()))
 
 
-def render_jinja_file(
+def render_jinja(
     template_path: Union[str, Path], output_path: Union[str, Path], data: dict
 ):
     with open(template_path, "r") as t:
@@ -37,7 +38,7 @@ def render_jinja_file(
 def install_pipenv():
     print("Installing pipenv...")
     pipenv_install: subprocess.CompletedProcess = subprocess.run(
-        "pip install pipenv", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        f"export PIP_NO_INPUT=1;pip install pipenv", stdout=sys.stdout, stderr=subprocess.PIPE, shell=True
     )
     exit_on_non_zero_return(pipenv_install)
 
@@ -45,8 +46,8 @@ def install_pipenv():
 def install_python(directory: Union[str, Path]):
     print(f"Installing python for {directory}...")
     python_install: subprocess.CompletedProcess = subprocess.run(
-        f"pipenv --python 3.7",
-        stdout=subprocess.PIPE,
+        f"pipenv --rm;pipenv --python 3.7",
+        stdout=sys.stdout,
         stderr=subprocess.PIPE,
         cwd=directory,
         shell=True,
@@ -71,7 +72,7 @@ def install_requirements(directory: str, requirements: Union[List[str], Set[str]
     print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
     requirements_install: subprocess.CompletedProcess = subprocess.run(
         f"pipenv install --skip-lock {' '.join(requirements)}",
-        stdout=subprocess.PIPE,
+        stdout=sys.stdout,
         stderr=subprocess.PIPE,
         shell=True,
         cwd=directory,
@@ -100,7 +101,9 @@ def exit_on_non_zero_return(completed_process: subprocess.CompletedProcess):
 def print_std(subprocess_result):
     print()
     print("==================== stdout ====================")
-    print(subprocess_result.stdout.decode("utf-8"))
+    if subprocess_result.stdout != None:
+        print(subprocess_result.stdout.decode("utf-8"))
     print("==================== stderr ====================")
-    print(subprocess_result.stderr.decode("utf-8"))
+    if subprocess_result.stderr != None:
+        print(subprocess_result.stderr.decode("utf-8"))
     print()

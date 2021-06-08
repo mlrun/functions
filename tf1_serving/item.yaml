@@ -15,10 +15,13 @@ mlrunVersion: ''
 name: tf1-serving
 platformVersion: ''
 spec:
-  filename: ''
+  filename: tf1_serving.py
   handler: handler
   image: mlrun/mlrun
-  kind: remote
+  kind: nuclio:serving
   requirements: []
+  env:
+    MODEL_CLASS: TFModel
+    ENABLE_EXPLAINER: False
 url: ''
 version: 0.0.1

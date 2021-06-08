@@ -15,10 +15,13 @@ mlrunVersion: ''
 name: stream-to-parquet
 platformVersion: ''
 spec:
-  filename: ''
+  filename: stream_to_parquet.py
   handler: handler
   image: mlrun/ml-models
-  kind: remote
+  kind: nuclio
   requirements: []
+  customFields:
+    min_replicas: 1
+    max_replicas: 1
 url: ''
 version: 0.0.1

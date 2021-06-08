@@ -14,7 +14,7 @@ mlrunVersion: 0.5.4
 name: describe
 platformVersion: 2.10.0
 spec:
-  filename: ''
+  filename: describe.py
   handler: summarize
   image: mlrun/mlrun
   kind: job

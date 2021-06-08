@@ -14,7 +14,7 @@ mlrunVersion: ''
 name: slack-notify
 platformVersion: ''
 spec:
-  filename: ''
+  filename: slack_notify.py
   handler: slack_notify
   image: python:3.6-jessie
   kind: job

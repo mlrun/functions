@@ -1,4 +1,4 @@
-from mlrun import code_to_function,import_function
+from mlrun import import_function
 import os
 from functions.cli.helpers import delete_outputs,set_mlrun_hub_url
 import pandas as pd

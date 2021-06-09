@@ -1,7 +1,4 @@
-import os
-import json
 import numpy as np
-import xgboost as xgb
 from cloudpickle import load
 import mlrun
 

@@ -12,3 +12,4 @@ nuclio-jupyter
 myst_nb
 black
 isort
+pygit2

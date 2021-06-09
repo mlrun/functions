@@ -1,15 +1,15 @@
 apiVersion: v1
 categories:
-- model-test
+- Alerts And Notifications
 description: Test one or more classifier models against held-out dataset.
 doc: ''
 example: xgb_test.ipynb
 generationDate: 2021-05-19:23-13
 icon: ''
 labels:
-  author: Daniel
+  author: Iguazio
   framework: xgboost
-maintainers: []
+maintainers: [DanielS]
 marketplaceType: ''
 mlrunVersion: 0.6.2
 name: xgb_test
@@ -19,6 +19,6 @@ spec:
   handler: xgb_test
   image: mlrun/ml-models
   kind: job
-  requirements: []
+  requirements: [mlrun,pandas,xgboost,cloudpickle,matplotlib,seaborn,scikit-plot]
 url: ''
 version: 0.0.1

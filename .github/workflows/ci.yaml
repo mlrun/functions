@@ -14,7 +14,7 @@ on:
 jobs:
   tests:
     name: Run tests
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       # Source
       - name: Checkout current repo

@@ -21,7 +21,7 @@ def test_local_gen_class_data():
 
     df = pd.read_csv("artifacts/inputs/classifier-data.csv")
     assert (os.path.exists("./artifacts/inputs/classifier-data.csv")) is True
-    assert (df["labels"].sum() == 5008) is True
+    assert (True if df["labels"].sum() == 5008 else False) is True
     delete_outputs({RUNS_PATH,SCHEDULES_PATH,ARTIFACT_PATH})
 
 

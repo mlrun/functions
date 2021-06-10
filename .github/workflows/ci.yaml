@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - id: set-matrix
-        run: echo "::set-output name=matrix::$(git diff ${{ github.base_ref }} ${{ github.head_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq)"
+        run: echo "::set-output name=matrix::$(git diff origin/${{ github.base_ref }} ${{ github.head_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq)"
 
     # here, we save the result of this 1st phase to the "outputs"
     outputs:

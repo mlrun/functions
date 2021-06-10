@@ -12,9 +12,8 @@ on:
       - master
 
 jobs:
-  get_last_changes:
+  get_diff_matrix:
     runs-on: ubuntu-latest
-
     # Associating github.base_ref with origin github.base_ref
     # https://stackoverflow.com/questions/58630097/github-actions-error-cannot-see-git-diff-to-master
     steps:
@@ -23,10 +22,19 @@ jobs:
         run: |
           git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
           echo "::set-output name=matrix::$(git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq)"
-
-    # here, we save the result of this 1st phase to the "outputs"
+      outputs:
+        matrix: ${{ steps.set-matrix.outputs.matrix }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+  run_monorepo_tests:
+    needs: get_diff_matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ${{ needs.get_diff_matrix.outputs.matrix }}
+    steps:
+      - run: echo ${{ matrix.package }}
 
 #    tests:
 #    name: Run tests

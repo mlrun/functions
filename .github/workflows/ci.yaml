@@ -10,6 +10,7 @@ on:
     branches:
       - development
       - master
+      - ci_function_matrix
 
 jobs:
   get_last_changes:

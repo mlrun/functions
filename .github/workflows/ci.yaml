@@ -12,25 +12,39 @@ on:
       - master
 
 jobs:
-  get_diff_matrix:
+  build_stategy_matrix:
     runs-on: ubuntu-latest
-    # Associating github.base_ref with origin github.base_ref
-    # https://stackoverflow.com/questions/58630097/github-actions-error-cannot-see-git-diff-to-master
     steps:
       - uses: actions/checkout@v2
       - id: set-matrix
+        # This is very hacky, but it goes like that:
+        # 1) Associate base_ref with origin/base_ref since actions/checkout doesn't do it, if we don't do that we won't be able to check the actual diff
+        # 2) Build JSON string
+        #  2.1) Add beginning of JSON
+        #  2.2) Get diff between origin/base_ref and the checked-out repo => git diff ${{ github.base_ref }} --name-only
+        #  2.3) Clean the file name and leave us only with directories => sed 's,/*[^/]\+/*$,,'
+        #  2.4) Sort and keep only unique directories => sort | uniq
+        #  2.5) Remove directories starting with '.' => grep -v '^\.'
+        #  2.6) Add quotation marks to all strings => sed 's/.*/"&"/'
+        #  2.7) Add comma suffix to all strings excluding the last one => sed '$!s/.*/&,/'
+        #  2.8) Close JSON
+        # 3) Save matrix JSON to output
         run: |
           git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
-          echo "::set-output name=matrix::$(git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq)"
+          matrix=$(
+          echo '{ "package" : ['
+          git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
+          echo " ]}"
+          )
+          echo "::set-output name=matrix::$matrix"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
   run_monorepo_tests:
-    needs: get_diff_matrix
+    needs: build_stategy_matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        package: ${{ needs.get_diff_matrix.outputs.matrix }}
+      matrix: ${{fromJson(needs.build_stategy_matrix.outputs.matrix)}}
     steps:
       - run: echo ${{ matrix.package }}
 

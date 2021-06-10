@@ -18,10 +18,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          path: functions
       - id: set-matrix
-        run: echo "::set-output name=matrix::$(cd functions; git diff --dirstat=files,0 HEAD~1 | sed 's/^[ 0-9.]\+% //g')"
+        run: echo "::set-output name=matrix::$(!git diff --dirstat=files,0 HEAD~1 | sed 's/^[ 0-9.]\+% //g')"
 
     # here, we save the result of this 1st phase to the "outputs"
     outputs:

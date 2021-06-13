@@ -4,4 +4,3 @@ scikit-plot
 mlrun
 pandas
 subprocess
-pygit2

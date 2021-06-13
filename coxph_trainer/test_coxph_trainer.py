@@ -1,11 +1,10 @@
-from coxph_trainer import train_model
 from mlrun import get_or_create_ctx,import_function
 import os
 import json
 import pandas as pd
 import numpy as np
 from collections import defaultdict
-from cloudpickle import dumps, dump, load
+from cloudpickle import dumps, load
 from sklearn.preprocessing import (OneHotEncoder,LabelEncoder)
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem

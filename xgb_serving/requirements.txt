@@ -2,7 +2,6 @@ mlrun
 pandas
 xgboost
 cloudpickle
-pygit2
 sklearn
 scikit-plot
 seaborn

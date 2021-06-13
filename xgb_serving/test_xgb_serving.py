@@ -1,32 +1,31 @@
-from mlrun import code_to_function, import_function
+from mlrun import import_function
 import os
-from pygit2 import Repository
-import mlrun
 import pandas as pd
+from functions.cli.helpers import delete_outputs
+from functions.xgb_serving.xgb_serving import XGBoostModel
 
 
-def get_class_data():
-    fn = code_to_function(name='test_gen_class_data',
-                          filename= os.path.dirname(os.path.dirname(__file__)) + "/gen_class_data/gen_class_data.py",
-                          handler="gen_class_data",
-                          kind="job",
-                          )
+ARTIFACT_PATH = "artifacts"
+FUNCTION_PATH = "functions"
+MODELS_PATH = "models"
+PLOTS_PATH = "plots"
+RUNS_PATH = "runs"
+SCHEDULES_PATH = "schedules"
+
+
+def test_local_xgb_serving():
+    # importing data preparation function (gen_class_data) locally
+    fn = import_function("../gen_class_data/function.yaml")
     fn.run(params={
         "n_samples": 10_000,
         "m_features": 5,
         "k_classes": 2,
         "weight": [0.5, 0.5],
         "sk_params": {"n_informative": 2},
-        "file_ext": "csv"}, local=True,artifact_path="./artifacts/inputs")
+        "file_ext": "csv"}, local=True, artifact_path="./artifacts/inputs")
 
-
-def xgb_trainer():
-    get_class_data()
-    fn = code_to_function(name='xgb_trainer',
-                          filename=os.path.dirname(os.path.dirname(__file__)) + "/xgb_trainer/xgb_trainer.py",
-                          handler="train_model",
-                          kind="job",
-                          )
+    # importing model training function (xgb_trainer) locally
+    fn = import_function("../xgb_trainer/function.yaml")
     fn.run(params={
         "model_type": "classifier",
         "CLASS_tree_method": "hist",
@@ -37,23 +36,12 @@ def xgb_trainer():
         "test_set": "./artifacts/test-set"},
         local=True, inputs={"dataset": './artifacts/inputs/classifier-data.csv'})
 
-
-def set_mlrun_hub_url():
-    xgb_trainer()
-    branch = Repository('.').head.shorthand
-    hub_url = "https://raw.githubusercontent.com/mlrun/functions/{}/xgb_serving/function.yaml".format(
-        branch)
-    mlrun.mlconf.hub_url = hub_url
-
-
-# def test_xgb_serving():
-#     model = os.getcwd() + "/models/model.pkl"
-#     set_mlrun_hub_url()
-#     fn = import_function('hub://xgb_serving')
-#     fn.add_model('mymodel', model_path=model, class_name='XGBoostModel')
-#     server = fn.to_mock_server()
-#
-#     # Testing the model
-#     xtest = pd.read_csv('./artifacts/inputs/classifier-data.csv')
-#     preds = server.predict({"instances": xtest.values[:10, :-1].tolist()})
-#     assert(preds == [1, 0, 0, 0, 0, 0, 1, 1, 0, 1])
+    # because this class is implemented with MLModelServer, creating a class instance and not to_mock_server(V2_Model_Server).
+    model = os.getcwd() + "/models/model.pkl"
+    my_server = XGBoostModel("my-model", model_dir=model)
+    my_server.load()
+    # Testing the model
+    xtest = pd.read_csv('./artifacts/inputs/classifier-data.csv')
+    preds = my_server.predict({"instances": xtest.values[:10, :-1].tolist()})
+    assert (True if preds == [1, 0, 0, 0, 0, 0, 1, 1, 0, 1] else False) is True
+    delete_outputs({ARTIFACT_PATH,FUNCTION_PATH,MODELS_PATH,PLOTS_PATH,RUNS_PATH,SCHEDULES_PATH})

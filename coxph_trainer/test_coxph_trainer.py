@@ -1,5 +1,5 @@
 from coxph_trainer import train_model
-from mlrun import get_or_create_ctx
+from mlrun import get_or_create_ctx,import_function
 import os
 import json
 import pandas as pd
@@ -10,9 +10,15 @@ from sklearn.preprocessing import (OneHotEncoder,LabelEncoder)
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 import mlrun
-import re
-import subprocess
-from pygit2 import Repository
+from functions.cli.helpers import delete_outputs, set_mlrun_hub_url
+
+
+ARTIFACT_PATH="artifacts"
+FUNCTION_PATH="functions"
+MODELS_PATH = "models"
+PLOTS_PATH= "plots"
+RUNS_PATH="runs"
+SCHEDULES_PATH="schedules"
 
 
 def data_clean(
@@ -80,39 +86,45 @@ def data_clean(
                                                  models_dest),
                       model_file="model.pkl")
 
-def _set_mlrun_hub_url(repo_name = None, branch_name = None, function_name = None):
-    repo_name =  re.search("\.com/.*?/", str(subprocess.run(['git', 'remote', '-v'], stdout=subprocess.PIPE).stdout)).group()[5:-1] if not repo_name else repo_name
-    branch_name = Repository('.').head.shorthand if not branch_name else branch_name
-    function_name = "" if not function_name else function_name # MUST ENTER FUNCTION NAME !!!!
-    hub_url = f"https://raw.githubusercontent.com/{repo_name}/functions/{branch_name}/{function_name}/function.yaml"
-    mlrun.mlconf.hub_url = hub_url
 
 def test_local_coxph_train():
     ctx = get_or_create_ctx(name="tasks survive trainer")
     data_url = "https://raw.githubusercontent.com/mlrun/demos/0.6.x/customer-churn-prediction/WA_Fn-UseC_-Telco-Customer-Churn.csv"
     src = mlrun.get_dataitem(data_url)
-    data_clean(context=ctx,src=src)
-    dataset = pd.read_csv("encoded-data.csv")
-    train_model(strata_cols=['InternetService', 'StreamingMovies', 'StreamingTV', 'PhoneService'],
-                encode_cols={"Contract": "Contract", "PaymentMethod": "Payment"},
-                models_dest='models/cox',
-                dataset=dataset, context=ctx)
+    data_clean(context=ctx, src=src,cleaned_key="artifacts/inputs/cleaned-data",encoded_key="artifacts/inputs/encoded-data")
+    fn = import_function("function.yaml")
+    fn.run(params={"strata_cols": ['InternetService', 'StreamingMovies', 'StreamingTV', 'PhoneService'],
+                   "encode_cols": {"Contract": "Contract", "PaymentMethod": "Payment"},
+                   "models_dest": 'models/cox'},
+           inputs={"dataset": "artifacts/inputs/encoded-data.csv"},
+           local=True)
+    model = load(open("models/cox/km/model.pkl", "rb"))
+    ans = model.predict([1, 10, 30, 100, 200])
+    assert (list(np.around(ans, 3)) == [0.969, 0.869, 0.781, 0.668, 0.668])
+    delete_outputs({ARTIFACT_PATH,FUNCTION_PATH,MODELS_PATH,PLOTS_PATH,RUNS_PATH,SCHEDULES_PATH})
+    files = os.listdir()
+    files = [file for file in files if file.endswith("csv")]
+    for file in files:
+        os.remove(file)
 
-    model =load(open("models/cox/km/model.pkl", "rb"))
-    ans = model.predict([1,10,30,100,200])
-
-def test_remote_coxph_train():
+def test_hub_coxph_train():
     ctx = get_or_create_ctx(name="tasks survive trainer")
     data_url = "https://raw.githubusercontent.com/mlrun/demos/0.6.x/customer-churn-prediction/WA_Fn-UseC_-Telco-Customer-Churn.csv"
     src = mlrun.get_dataitem(data_url)
-    data_clean(context=ctx, src=src)
-    _set_mlrun_hub_url(function_name="coxph_trainer")
-    fn = mlrun.import_function("hub://coxph_trainer")
-    fn.run(params={"event_column": "labels",
-                     "strata_cols": ['InternetService', 'StreamingMovies', 'StreamingTV', 'PhoneService'],
-                     "encode_cols": {"Contract": "Contract", "PaymentMethod": "Payment"},
-                     "models_dest": 'models/cox'},
-           inputs={"dataset": "encoded-data.csv"}, local=True)
-
+    data_clean(context=ctx, src=src, cleaned_key="artifacts/inputs/cleaned-data",
+               encoded_key="artifacts/inputs/encoded-data")
+    set_mlrun_hub_url(function_name="coxph_trainer")
+    fn=import_function("hub://coxph_trainer")
+    fn.run(params={"strata_cols": ['InternetService', 'StreamingMovies', 'StreamingTV', 'PhoneService'],
+                   "encode_cols": {"Contract": "Contract", "PaymentMethod": "Payment"},
+                   "models_dest": 'models/cox'},
+           inputs={"dataset": "artifacts/inputs/encoded-data.csv"},
+           local=True)
     model = load(open("models/cox/km/model.pkl", "rb"))
     ans = model.predict([1, 10, 30, 100, 200])
+    assert(list(np.around(ans,3)) == [0.969,0.869,0.781,0.668,0.668])
+    delete_outputs({ARTIFACT_PATH,FUNCTION_PATH,MODELS_PATH,PLOTS_PATH,RUNS_PATH,SCHEDULES_PATH})
+    files = os.listdir()
+    files = [file for file in files if file.endswith("csv")]
+    for file in files:
+        os.remove(file)

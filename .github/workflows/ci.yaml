@@ -58,9 +58,41 @@ jobs:
     needs: build_stategy_matrix
     runs-on: ubuntu-latest
     strategy:
+      # matrix: [{"package": some package that changed}, {...}, ...]
       matrix: ${{fromJson(needs.build_stategy_matrix.outputs.matrix)}}
     steps:
-      - run: echo ${{ matrix.package }}
+      # Source
+      - name: Checkout current repo
+        uses: actions/checkout@v2
+        with:
+          path: functions
+      # Install python
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      # Install dependencies
+      - uses: actions/cache@v1
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install requirements
+        run: |
+          pip install --upgrade pip
+          pip install -r functions/requirements.txt
+#      - name: Run item validation
+        # add functionality for test single item
+#        run: python functions/functions.py  run-tests -r functions -s items
+      - name: Run py tests
+        run: python functions/functions.py  run-tests -r functions -fn ${{ matrix.package }}
+#      - name: Run ipynb tests
+#        run: python functions/functions.py  run-tests -r functions -s ipynb
+      - name: Clean
+        run: |
+          rm -rf functions
 
 #    tests:
 #    name: Run tests

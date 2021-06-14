@@ -87,7 +87,7 @@ jobs:
         # add functionality for test single item
 #        run: python functions/functions.py  run-tests -r functions -s items
       - name: Run py tests
-        run: python functions/functions.py  run-tests -r functions -fn ${{ matrix.package }}
+        run: python functions/functions.py  run-tests -r functions -s py -fn ${{ matrix.package }}
 #      - name: Run ipynb tests
 #        run: python functions/functions.py  run-tests -r functions -s ipynb
       - name: Clean

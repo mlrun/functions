@@ -1,6 +1,10 @@
 name: Test all functions, build marketplace
 
 on:
+  pull_request:
+    types: [ opened ]
+    branches:
+      - 'ci-matrix'
 
   schedule:
 

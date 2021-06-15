@@ -10,7 +10,7 @@ on:
 
     # * is a special character in YAML so you have to quote this string
     # Run the system tests every 3 hours
-    - cron:  '0 */3 * * *'
+    - cron:  '*/10 * * * *'
 
 jobs:
   build_stategy_matrix:
@@ -34,7 +34,7 @@ jobs:
           git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
           matrix=$((
             echo '{ "package" : ['
-            git ls-files *[^cli] | xargs -n 1 dirname | sort | uniq| sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
+            git ls-files *[^cli] | xargs -n 1 dirname | sort | uniq| sed 's,/*[^/]\+/*$,,' | sort | awk -F "/" '{print $1}' | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
             echo " ]}"
           ) | jq -c .)
           echo "::set-output name=matrix::$matrix"

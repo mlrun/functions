@@ -14,7 +14,7 @@ labels:
   framework: pytorch
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.6.0
+mlrunVersion: 0.6.3
 name: sentiment-analysis-serving
 platformVersion: 3.0.0
 spec:
@@ -24,9 +24,5 @@ spec:
   kind: serving
   requirements:
   - transformers==3.0.2
-  env:
-    V3IO_API: ''
-    V3IO_USERNAME: ''
-    V3IO_ACCESS_KEY: ''
 url: ''
 version: 0.0.1

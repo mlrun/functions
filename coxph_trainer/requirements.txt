@@ -1,6 +1,6 @@
-mlrun
 sklearn
-matplotlib
 seaborn
 scikit-plot
-
+mlrun
+pandas
+lifelines

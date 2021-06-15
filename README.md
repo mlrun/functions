@@ -8,9 +8,8 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | function | kind | description | categories |
 | --- | --- | --- | --- |
 | [aggregate](aggregate/aggregate.ipynb) | job | Rolling aggregation over Metrics and Lables according to specifications | data-prep |
-| [arc-to-parquet](arc_to_parquet/arc_to_parquet.ipynb) | job | retrieve remote archive, open and save as parquet | data-movement, utils |
 | [bert-embeddings](bert_embeddings/bert_embeddings.ipynb) | nuclio | Get BERT based embeddings for given text | NLP, BERT, embeddings |
-| [churn-server](churn_server/churn_server.ipynb) | serving | churn classification and predictor | serving, ml |
+| [churn-server](churn_server/churn_server.ipynb) | nuclio | churn classification and predictor | serving, ml |
 | [concept-drift](concept_drift/concept_drift.ipynb) | job | Deploy a streaming Concept Drift detector on a labeled stream | ml, serve |
 | [concept-drift-streaming](concept_drift_streaming/concept_drift_streaming.ipynb) | nuclio | Deploy a streaming Concept Drift detector on a labeled stream. the nuclio part of the concept_drift function | ml, serve |
 | [coxph-test](coxph_test/coxph_test.ipynb) | job | Test cox proportional hazards model | ml, test |
@@ -28,7 +27,6 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [model-monitoring-stream](model_monitoring_stream/model_monitoring_stream.ipynb) | nuclio |  |  |
 | [model-server](model_server/model_server.ipynb) | nuclio | generic sklearn model server | serving, ml |
 | [model-server-tester](model_server_tester/model_server_tester.ipynb) | job | test model servers | ml, test |
-| [open-archive](open_archive/open_archive.ipynb) | job | Open a file/object archive into a target directory | data-movement, utils |
 | [pandas-profiling-report](pandas_profiling_report/pandas_profiling_report.ipynb) | job | Create Pandas Profiling Report from Dataset | analysis |
 | [project-runner](project_runner/project_runner.ipynb) | nuclio | Nuclio based - Cron scheduler for running your MLRun projects | utils |
 | [rnn-serving](rnn_serving/rnn_serving.ipynb) | serving | deploy an rnn based stock analysis model server. | model-serving |
@@ -37,7 +35,6 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [sklearn-classifier](sklearn_classifier/sklearn_classifier.ipynb) | job | train any classifier using scikit-learn's API | ml, training |
 | [sklearn-classifier-dask](sklearn_classifier_dask/sklearn_classifier_dask.ipynb) | job | train any classifier using scikit-learn's API over Dask | ml, training, dask |
 | [slack-notify](slack_notify/slack_notify.ipynb) | job | Send Slack notification | ops |
-| [spark-submit](spark_submit/spark_submit.ipynb) | job |  |  |
 | [sql-to-file](sql_to_file/sql_to_file.ipynb) | job | SQL To File - Ingest data using SQL query | data-prep |
 | [stream-to-parquet](stream_to_parquet/stream_to_parquet.ipynb) | nuclio | Saves a stream to Parquet and can lunch drift detection task on it | ml, serve |
 | [test-classifier](test_classifier/test_classifier.ipynb) | job | test a classifier using held-out or new data | ml, test |
@@ -48,6 +45,6 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [v2-model-tester](v2_model_tester/v2_model_tester.ipynb) | job | test v2 model servers | ml, test |
 | [virtual-drift](virtual_drift/virtual_drift.ipynb) | job | Compute drift magnitude between Time-Samples T and U | ml, serve, concept-drift |
 | [xgb-custom](xgb_custom/xgb_custom.ipynb) | job | simulate data with outliers. | model-testing |
-| [xgb-serving](xgb_serving/xgb_serving.ipynb) | nuclio | deploy an XGBoost model server. | model-serving |
+| [xgb-serving](xgb_serving/xgb_serving.ipynb) | nuclio | xgboost test data classification server | model-serving |
 | [xgb-test](xgb_test/xgb_test.ipynb) | job | Test one or more classifier models against held-out dataset. | model-test |
 | [xgb-trainer](xgb_trainer/xgb_trainer.ipynb) | job | train multiple model types using xgboost. | model-prep |

@@ -1,15 +1,16 @@
-name: Test functions, build marketplace
+name: Test all functions, build marketplace
 
 on:
-  pull_request:
-    types: [opened]
-    branches:
-      - "*"
+#  pull_request:
+#    types: [ opened ]
+#    branches:
+#      - development
 
-  push:
-    branches:
-      - development
-      - master
+  schedule:
+
+    # * is a special character in YAML so you have to quote this string
+    # Run the system tests every 3 hours
+    - cron:  '0 */3 * * *'
 
 jobs:
   build_stategy_matrix:
@@ -33,7 +34,7 @@ jobs:
           git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
           matrix=$((
             echo '{ "package" : ['
-            git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
+            git ls-files *[^cli] | xargs -n 1 dirname | sort | uniq| sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
             echo " ]}"
           ) | jq -c .)
           echo "::set-output name=matrix::$matrix"

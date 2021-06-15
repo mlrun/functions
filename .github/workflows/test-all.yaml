@@ -1,10 +1,10 @@
 name: Test all functions, build marketplace
 
 on:
-  pull_request:
-    types: [ opened ]
-    branches:
-      - development
+#  pull_request:
+#    types: [ opened ]
+#    branches:
+#      - development
 
   schedule:
 

@@ -6,11 +6,11 @@ on:
       - development
       - master
 
-  schedule:
-
-    # * is a special character in YAML so you have to quote this string
-    # Run the system tests every 3 hours
-    - cron:  '* */3 * * *'
+#  schedule:
+#
+#    # * is a special character in YAML so you have to quote this string
+#    # Run the system tests every 3 hours
+#    - cron:  '* */3 * * *'
 
 jobs:
   build_stategy_matrix:
@@ -34,7 +34,7 @@ jobs:
           git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
           matrix=$((
             echo '{ "package" : ['
-            git ls-files *[^cli] | sort | uniq| sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
+            git ls-files *[^cli] | sort | uniq| sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/' | grep '\/'
             echo " ]}"
           ) | jq -c .)
           echo "::set-output name=matrix::$matrix"

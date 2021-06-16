@@ -35,5 +35,4 @@ def test_run_local_aggregate():
            , inputs={'df_artifact': METRICS_PATH}
            )
     assert Path(AGGREGATE_PATH).is_file()
-    _delete_outputs({ARTIFACTS_PATH, RUNS_PATH, SCHEDULES_PATH})
 

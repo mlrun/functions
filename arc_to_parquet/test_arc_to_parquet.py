@@ -1,6 +1,6 @@
 from mlrun import code_to_function
 
-DATA_URL = "higgs-sample.csv.gz"
+DATA_URL = "https://s3.wasabisys.com/iguazio/data/market-palce/arc_to_parquet/higgs-sample.csv.gz"
 
 def test_run_local_arc_to_parquet():
     fn = code_to_function(name='test_arc_to_parquet',

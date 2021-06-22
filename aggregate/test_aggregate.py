@@ -2,25 +2,17 @@ from pathlib import Path
 import shutil
 from mlrun import code_to_function
 
-METRICS_PATH = 'data/metrics.pq'
-ARTIFACTS_PATH = 'artifacts'
-RUNS_PATH = 'runs'
-SCHEDULES_PATH = 'schedules'
-AGGREGATE_PATH = 'artifacts/aggregate.pq'
-
-
-def _delete_outputs(paths):
-    for path in paths:
-        if Path(path).is_dir():
-            shutil.rmtree(path)
+AGGREGATE_PATH = "artifacts/aggregate.pq"
+DATA = "https://s3.wasabisys.com/iguazio/data/market-palce/aggregate/metrics.pq"
 
 
 def test_run_local_aggregate():
     fn = code_to_function(name='test_aggregate',
                           filename="aggregate.py",
                           handler="aggregate",
-                          kind="job",
+                          kind="local",
                           )
+    fn.spec.command = 'aggregate.py'
     fn.run(params={'metrics': ['cpu_utilization'],
                    'labels': ['is_error'],
                    'metric_aggs': ['mean', 'sum'],
@@ -31,8 +23,8 @@ def test_run_local_aggregate():
                    'center': True,
                    'save_to': AGGREGATE_PATH,
                    'files_to_select': 2}
-           , local=True
-           , inputs={'df_artifact': METRICS_PATH}
+           #, local=True
+           , inputs={'df_artifact': DATA}
            )
     assert Path(AGGREGATE_PATH).is_file()
 

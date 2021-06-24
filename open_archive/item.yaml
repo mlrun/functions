@@ -15,7 +15,7 @@ mlrunVersion: ''
 name: open-archive
 platformVersion: ''
 spec:
-  filename: ''
+  filename: open_archive.py
   handler: open_archive
   image: mlrun/mlrun
   kind: job

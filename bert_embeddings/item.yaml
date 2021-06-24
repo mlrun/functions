@@ -18,10 +18,9 @@ platformVersion: 2.10.0
 spec:
   filename: bert_embeddings.py
   handler: handler
-  image: ''
+  image: mlrun/ml-models
   kind: nuclio
   requirements:
   - torch==1.6.0
-  - transformers==3.0.1
 url: ''
 version: 0.0.1

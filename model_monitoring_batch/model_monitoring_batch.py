@@ -144,14 +144,26 @@ class VirtualDrift:
         # Verify all the features exist between datasets
         base_features = set(base_histogram.columns)
         latest_features = set(latest_histogram.columns)
-        if not base_features == latest_features:
+
+        features_common = list(base_features.intersection(latest_features))
+        feature_difference = list(base_features ^ latest_features)
+
+        if features_common:
             raise ValueError(
-                f"Base dataset and latest dataset have different featuers: {base_features} <> {latest_features}"
+                f"No common features found: {base_features} <> {latest_features}"
             )
+
+        base_histogram = base_histogram.drop(
+            feature_difference, axis=1, errors="ignore"
+        )
+        latest_histogram = latest_histogram.drop(
+            feature_difference, axis=1, errors="ignore"
+        )
 
         # Compute the drift per feature
         features_drift_measures = self.compute_metrics_over_df(
-            base_histogram.loc[:, base_features], latest_histogram.loc[:, base_features]
+            base_histogram.loc[:, features_common],
+            latest_histogram.loc[:, features_common],
         )
 
         # Compute total drift measures for features
@@ -168,7 +180,7 @@ class VirtualDrift:
 
         drift_result = defaultdict(dict)
 
-        for feature in base_features:
+        for feature in features_common:
             for metric, values in features_drift_measures.items():
                 drift_result[feature][metric] = values[feature]
                 sum = features_drift_measures[metric]["total_sum"]

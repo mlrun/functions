@@ -380,20 +380,45 @@ class ProcessEndpointEvent(MapClass):
         features = event.get("request", {}).get("inputs")
         predictions = event.get("resp", {}).get("outputs")
 
-        if not self.is_valid(is_not_none, timestamp, ["when"]):
+        if not self.is_valid(
+            endpoint_id,
+            is_not_none,
+            timestamp,
+            ["when"],
+        ):
             return None
 
         if endpoint_id not in self.first_request:
             self.first_request[endpoint_id] = timestamp
         self.last_request[endpoint_id] = timestamp
 
-        if not self.is_valid(is_not_none, request_id, ["request", "id"]):
+        if not self.is_valid(
+            endpoint_id,
+            is_not_none,
+            request_id,
+            ["request", "id"],
+        ):
             return None
-        if not self.is_valid(is_not_none, latency, ["microsec"]):
+        if not self.is_valid(
+            endpoint_id,
+            is_not_none,
+            latency,
+            ["microsec"],
+        ):
             return None
-        if not self.is_valid(is_not_none, features, ["request", "inputs"]):
+        if not self.is_valid(
+            endpoint_id,
+            is_not_none,
+            features,
+            ["request", "inputs"],
+        ):
             return None
-        if not self.is_valid(is_not_none, predictions, ["resp", "outputs"]):
+        if not self.is_valid(
+            endpoint_id,
+            is_not_none,
+            predictions,
+            ["resp", "outputs"],
+        ):
             return None
 
         unpacked_labels = {f"_{k}": v for k, v in event.get(LABELS, {}).items()}
@@ -402,7 +427,10 @@ class ProcessEndpointEvent(MapClass):
         events = []
         for i, (feature, prediction) in enumerate(zip(features, predictions)):
             if not self.is_valid(
-                is_list_of_numerics, feature, ["request", "inputs", f"[{i}]"]
+                endpoint_id,
+                is_list_of_numerics,
+                feature,
+                ["request", "inputs", f"[{i}]"],
             ):
                 return None
 
@@ -450,15 +478,17 @@ class ProcessEndpointEvent(MapClass):
                     self.error_count[endpoint_id] = error_count
             self.endpoints.add(endpoint_id)
 
-    def is_valid(self, validation_function, field: Any, dict_path: List[str]):
+    def is_valid(
+        self, endpoint_id: str, validation_function, field: Any, dict_path: List[str]
+    ):
         if validation_function(field, dict_path):
             return True
-        self.error_count += 1
+        self.error_count[endpoint_id] += 1
         return False
 
     def handle_errors(self, endpoint_id, event) -> bool:
         if "error" in event:
-            self.error_count += 1
+            self.error_count[endpoint_id] += 1
             return True
 
         return False

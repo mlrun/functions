@@ -90,7 +90,7 @@ def _oob_classifier_accuracy(rf, X_train, y_train) -> float:
     return oob_score
 
 
-def permutation_importances(
+def permutation_importance(
     context: MLClientCtx,
     model: DataItem,
     dataset: DataItem,

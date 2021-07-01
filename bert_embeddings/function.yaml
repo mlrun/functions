@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: bert-embeddings
   tag: ''
-  hash: fb81bcb76c25fc8c8e5424f6348983a46cfd2ea9
+  hash: a534b3882dca355dee3f60e0ad36b52455e0ec0c
   project: default
   labels:
     framework: pytorch
@@ -13,7 +13,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: ''
+  image: mlrun/ml-models
   entry_points:
     init_context:
       name: init_context
@@ -46,7 +46,7 @@ spec:
       name: bert-embeddings
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from /home/michaell/projects/temp/functions/bert_embeddings/bert_embeddings.py
+        nuclio.io/generated_by: function generated from /Users/aviasulin/PycharmProjects/mlrun/functions/bert_embeddings/bert_embeddings.py
     spec:
       runtime: python:3.6
       handler: bert_embeddings:handler
@@ -59,7 +59,8 @@ spec:
   source: ''
   build:
     commands:
-    - python -m pip install torch==1.6.0 transformers==3.0.1
-    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/bert_embeddings/bert_embeddings.py
+    - python -m pip install torch==1.6.0
+    code_origin: http://github.com/aviaIguazio/functions.git#72e86f1cd026a04ad6c505f7215725a00119fe27:/Users/aviasulin/PycharmProjects/mlrun/functions/bert_embeddings/bert_embeddings.py
   default_handler: handler
+  affinity: null
 verbose: false

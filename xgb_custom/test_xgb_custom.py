@@ -1,6 +1,9 @@
 from mlrun import import_function
 import os
+<<<<<<< HEAD
 from functions.cli.helpers import delete_outputs,set_mlrun_hub_url
+=======
+>>>>>>> upstream/development
 
 
 ARTIFACT_PATH = "artifacts"
@@ -28,6 +31,7 @@ def test_local_xgb_custom():
            local=True)
 
     assert(os.path.exists(os.getcwd() + "/plots/learning-curves.html"))
+<<<<<<< HEAD
     delete_outputs({ARTIFACT_PATH, FUNCTION_PATH, PLOTS_PATH, RUNS_PATH, SCHEDULES_PATH})
 
 
@@ -51,3 +55,8 @@ def test_hub_xgb_custom():
 
     assert (os.path.exists(os.getcwd() + "/plots/learning-curves.html"))
     delete_outputs({ARTIFACT_PATH, FUNCTION_PATH, PLOTS_PATH, RUNS_PATH, SCHEDULES_PATH})
+=======
+
+
+
+>>>>>>> upstream/development

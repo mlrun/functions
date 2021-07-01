@@ -1,0 +1,55 @@
+kind: job
+metadata:
+  name: open-archive
+  tag: ''
+  hash: 186f6c6eb0741757455349cc2a7c04bcd52c1804
+  project: default
+  labels:
+    author: yaronh
+  categories:
+  - data-movement
+  - utils
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  env: []
+  default_handler: open_archive
+  entry_points:
+    open_archive:
+      name: open_archive
+      doc: 'Open a file/object archive into a target directory
+
+
+        Currently supports zip and tar.gz'
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: function execution context
+        default: ''
+      - name: archive_url
+        type: DataItem
+        doc: url of archive file
+        default: ''
+      - name: subdir
+        type: str
+        doc: path within artifact store where extracted files are stored
+        default: content
+      - name: key
+        type: str
+        doc: key of archive contents in artifact store
+        default: content
+      - name: target_path
+        type: str
+        doc: file system path to store extracted files (use either this or subdir)
+        default: null
+      outputs:
+      - default: ''
+      lineno: 15
+  description: Open a file/object archive into a target directory
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG9zCmltcG9ydCB6aXBmaWxlCmltcG9ydCB1cmxsaWIucmVxdWVzdAppbXBvcnQgdGFyZmlsZQppbXBvcnQganNvbgoKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CmZyb20gbWxydW4uZGF0YXN0b3JlIGltcG9ydCBEYXRhSXRlbQoKZnJvbSB0eXBpbmcgaW1wb3J0IFVuaW9uCgoKZGVmIG9wZW5fYXJjaGl2ZSgKICAgIGNvbnRleHQ6IE1MQ2xpZW50Q3R4LAogICAgYXJjaGl2ZV91cmw6IERhdGFJdGVtLAogICAgc3ViZGlyOiBzdHIgPSAiY29udGVudCIsCiAgICBrZXk6IHN0ciA9ICJjb250ZW50IiwKICAgIHRhcmdldF9wYXRoOiBzdHIgPSBOb25lLAopOgogICAgIiIiT3BlbiBhIGZpbGUvb2JqZWN0IGFyY2hpdmUgaW50byBhIHRhcmdldCBkaXJlY3RvcnkKCiAgICBDdXJyZW50bHkgc3VwcG9ydHMgemlwIGFuZCB0YXIuZ3oKCiAgICA6cGFyYW0gY29udGV4dDogICAgICBmdW5jdGlvbiBleGVjdXRpb24gY29udGV4dAogICAgOnBhcmFtIGFyY2hpdmVfdXJsOiAgdXJsIG9mIGFyY2hpdmUgZmlsZQogICAgOnBhcmFtIHN1YmRpcjogICAgICAgcGF0aCB3aXRoaW4gYXJ0aWZhY3Qgc3RvcmUgd2hlcmUgZXh0cmFjdGVkIGZpbGVzCiAgICAgICAgICAgICAgICAgICAgICAgICBhcmUgc3RvcmVkCiAgICA6cGFyYW0ga2V5OiAgICAgICAgICBrZXkgb2YgYXJjaGl2ZSBjb250ZW50cyBpbiBhcnRpZmFjdCBzdG9yZQogICAgOnBhcmFtIHRhcmdldF9wYXRoOiAgZmlsZSBzeXN0ZW0gcGF0aCB0byBzdG9yZSBleHRyYWN0ZWQgZmlsZXMgKHVzZSBlaXRoZXIgdGhpcyBvciBzdWJkaXIpCiAgICAiIiIKICAgIG9zLm1ha2VkaXJzKHRhcmdldF9wYXRoIG9yIHN1YmRpciwgZXhpc3Rfb2s9VHJ1ZSkKCiAgICBhcmNoaXZlX3VybCA9IGFyY2hpdmVfdXJsLmxvY2FsKCkKICAgIGlmIGFyY2hpdmVfdXJsLmVuZHN3aXRoKCJneiIpOgogICAgICAgIHdpdGggdGFyZmlsZS5vcGVuKGFyY2hpdmVfdXJsLCBtb2RlPSJyfGd6IikgYXMgcmVmOgogICAgICAgICAgICByZWYuZXh0cmFjdGFsbCh0YXJnZXRfcGF0aCBvciBzdWJkaXIpCiAgICBlbGlmIGFyY2hpdmVfdXJsLmVuZHN3aXRoKCJ6aXAiKToKICAgICAgICB3aXRoIHppcGZpbGUuWmlwRmlsZShhcmNoaXZlX3VybCwgInIiKSBhcyByZWY6CiAgICAgICAgICAgIHJlZi5leHRyYWN0YWxsKHRhcmdldF9wYXRoIG9yIHN1YmRpcikKICAgIGVsc2U6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcihmInVuc3VwcG9ydGVkIGFyY2hpdmUgdHlwZSBpbiB7YXJjaGl2ZV91cmx9IikKCiAgICBrd2FyZ3MgPSB7fQogICAgaWYgdGFyZ2V0X3BhdGg6CiAgICAgICAga3dhcmdzID0geyJ0YXJnZXRfcGF0aCI6IHRhcmdldF9wYXRofQogICAgZWxzZToKICAgICAgICBrd2FyZ3MgPSB7ImxvY2FsX3BhdGgiOiBzdWJkaXJ9CiAgICBjb250ZXh0LmxvZ19hcnRpZmFjdChrZXksICoqa3dhcmdzKQo=
+    commands: []
+    code_origin: http://github.com/aviaIguazio/functions.git#b51483fe05a26e9da937d308998720d1ba3b3dfc:/Users/aviasulin/PycharmProjects/mlrun/functions/open_archive/open_archive.py
+  affinity: null
+verbose: false

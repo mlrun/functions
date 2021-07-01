@@ -1,8 +1,12 @@
 from mlrun import import_function
 import os
 import pandas as pd
+<<<<<<< HEAD
 from functions.cli.helpers import delete_outputs
 from functions.xgb_serving.xgb_serving import XGBoostModel
+=======
+from xgb_serving import XGBoostModel
+>>>>>>> upstream/development
 
 
 ARTIFACT_PATH = "artifacts"
@@ -44,4 +48,7 @@ def test_local_xgb_serving():
     xtest = pd.read_csv('./artifacts/inputs/classifier-data.csv')
     preds = my_server.predict({"instances": xtest.values[:10, :-1].tolist()})
     assert (True if preds == [1, 0, 0, 0, 0, 0, 1, 1, 0, 1] else False) is True
+<<<<<<< HEAD
     delete_outputs({ARTIFACT_PATH,FUNCTION_PATH,MODELS_PATH,PLOTS_PATH,RUNS_PATH,SCHEDULES_PATH})
+=======
+>>>>>>> upstream/development

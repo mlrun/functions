@@ -1,11 +1,10 @@
-from mlrun import code_to_function , import_function
+from mlrun import code_to_function, import_function
 from pathlib import Path
 import os
-import shutil
 
 ARTIFACTS_PATH = 'artifacts'
-DATA_URL = "https://s3.wasabisys.com/iguazio/data/market-palce/arc_to_parquet/higgs-sample.csv.gz"
-
+DATA_URL = "https://raw.githubusercontent.com/parrt/random-forest-importances/master/notebooks/data/rent.csv"
+FEATURE_OUTPUT = ARTIFACTS_PATH + "/feature-importances-permute-tbl.parquet"
 
 def arc_to_parquet():
     from mlrun import import_function
@@ -44,37 +43,44 @@ def sklearn_classifier(run):
            )
 
 
-def test_run_local_feature_selection():
-    arc_run = arc_to_parquet()
-    #sk_run =  sklearn_classifier(arc_run)
-    # labels = "interest_level"
-    #
-    # fn = code_to_function(name='test_run_local_feature_perms',
-    #                       filename="feature_perms.py",
-    #                       handler="permutation_importance",
-    #                       kind="local",
-    #                       )
-    # fi_perms = fn.run(params={"labels": labels,
-    #                     "plots_dest": "plots"},
-    #     inputs={"model": model, "dataset": data},
-    #     artifact_path=artifact_path)
-
-
-def test_tust():
+def train_model():
     from mlrun import import_function
     from mlrun.platforms import auto_mount
 
     train = import_function('hub://sklearn_classifier')
-    #.apply(auto_mount())
+    # .apply(auto_mount())
 
     train_run = train.run(
-                          inputs={"dataset": DATA_URL},
-                          params={
-                              "sample": -5_000,  # 5k random rows,
-                              "model_pkg_class": "sklearn.ensemble.RandomForestClassifier",
-                              "label_column": "interest_level",
-                              "CLASS_n_estimators": 100,
-                              "CLASS_min_samples_leaf": 1,
-                              "CLASS_n_jobs": -1,
-                              "CLASS_oob_score": True},
-                          local=True)
+        inputs={"dataset": "artifacts/rent.csv"},
+        params={
+            "sample": -5_000,  # 5k random rows,
+            "model_pkg_class": "sklearn.ensemble.RandomForestClassifier",
+            "label_column": "interest_level",
+            "CLASS_n_estimators": 100,
+            "CLASS_min_samples_leaf": 1,
+            "CLASS_n_jobs": -1,
+            "CLASS_oob_score": True},
+        local=True)
+
+
+def test_run_local_feature_selection():
+    arc_to_parquet()
+    train_model()
+    data = "artifacts/rent.csv"
+    labels = "interest_level"
+    model = "model/model.pkl"
+
+    # labels = "interest_level"
+    #
+    fn = code_to_function(name='test_run_local_feature_perms',
+                          filename="feature_perms.py",
+                          handler="permutation_importance",
+                          kind="local",
+                          )
+    fn.spec.command = "feature_perms.py"
+    fi_perms = fn.run(params={"labels": labels,
+                        "plots_dest": "plots"},
+        inputs={"model": model, "dataset": data},
+        artifact_path='artifacts')
+    assert Path(FEATURE_OUTPUT).is_file()
+

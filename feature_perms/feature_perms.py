@@ -90,7 +90,7 @@ def _oob_classifier_accuracy(rf, X_train, y_train) -> float:
     return oob_score
 
 
-def permutation_importances(
+def permutation_importance(
     context: MLClientCtx,
     model: DataItem,
     dataset: DataItem,
@@ -134,7 +134,7 @@ def permutation_importances(
         elif fitype is "dropcol":
             X_ = X.drop(col, axis=1)
             model_ = clone(model)
-            model_.random_state = random_state
+            #model_.random_state = random_state
             model_.fit(X_, y)
             o = model_.oob_score_
             imp.append(baseline - o)

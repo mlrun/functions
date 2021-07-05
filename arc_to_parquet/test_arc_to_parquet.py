@@ -1,6 +1,6 @@
-from mlrun import code_to_function
+from mlrun import code_to_function, import_function
 
-DATA_URL = "higgs-sample.csv.gz"
+DATA_URL = "https://s3.wasabisys.com/iguazio/data/market-palce/arc_to_parquet/higgs-sample.csv.gz"
 
 def test_run_local_arc_to_parquet():
     fn = code_to_function(name='test_arc_to_parquet',
@@ -17,5 +17,17 @@ def test_run_local_arc_to_parquet():
 
            )
 
+
+def test_run_local_arc_to_parquet():
+    import os
+    os.getcwd()
+    fn = import_function("function.yaml")
+    fn.run(params={"key": "higgs-sample"},
+           handler="arc_to_parquet",
+           inputs={"archive_url": DATA_URL},
+           artifact_path=os.getcwd()+'/artifacts'
+           , local=True
+
+           )
 
 

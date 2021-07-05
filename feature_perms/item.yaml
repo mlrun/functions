@@ -15,7 +15,7 @@ name: feature-perms
 platformVersion: ''
 spec:
   filename: feature_perms.py
-  handler: permutation_importances
+  handler: permutation_importance
   image: mlrun/ml-models
   kind: job
   requirements: []

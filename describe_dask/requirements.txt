@@ -5,3 +5,4 @@ matplotlib
 seaborn
 sklearn
 scikit-plot
+dask-kubernetes

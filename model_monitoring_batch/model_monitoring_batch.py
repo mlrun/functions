@@ -1,10 +1,12 @@
 import json
+import os
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Optional, List, Dict
 
 import numpy as np
 import pandas as pd
+import v3io
 from mlrun import get_run_db
 from mlrun import store_manager
 from mlrun.data_types.infer import DFDataInfer, InferOptions
@@ -212,10 +214,13 @@ class VirtualDrift:
 
 
 class BatchProcessor:
-    def __init__(self, context: MLClientCtx, project: str):
+    def __init__(
+        self, context: MLClientCtx, project: str, model_monitoring_api_key: str
+    ):
         self.context = context
         self.project = project
         self.virtual_drift = VirtualDrift(inf_capping=10)
+        self.model_monitoring_api_key = model_monitoring_api_key
 
         template = config.model_endpoint_monitoring.store_prefixes.default
 
@@ -253,23 +258,24 @@ class BatchProcessor:
         )
 
         self.db = get_run_db()
-        self.v3io = get_v3io_client()
+        self.v3io = get_v3io_client(access_key=self.model_monitoring_api_key)
         self.frames = get_frames_client(
-            address=config.v3io_framesd, container=self.tsdb_container
+            address=config.v3io_framesd,
+            container=self.tsdb_container,
+            token=self.model_monitoring_api_key,
         )
 
     def post_init(self):
-        try:
-            self.v3io.stream.create(
-                container=self.stream_container,
-                stream_path=self.stream_path,
-                shard_count=1,
-            )
-        except Exception as e:
-            if "ResourceInUseException" in str(e):
-                logger.error("Stream already exsits...")
-            else:
-                raise e
+        response = self.v3io.create_stream(
+            container=self.stream_container,
+            path=self.stream_path,
+            shard_count=1,
+            raise_for_status=v3io.dataplane.RaiseForStatus.never,
+            access_key=self.model_monitoring_api_key,
+        )
+
+        if not (response.status_code == 400 and "ResourceInUse" in str(response.body)):
+            response.raise_for_status([409, 204, 403])
 
     def run(self):
 
@@ -410,6 +416,8 @@ class BatchProcessor:
 
 
 def handler(context: MLClientCtx, project: str):
-    batch_processor = BatchProcessor(context, project)
+    batch_processor = BatchProcessor(
+        context, project, os.environ.get("MODEL_MONITORING_API_KEY")
+    )
     batch_processor.post_init()
     batch_processor.run()

@@ -415,9 +415,9 @@ class BatchProcessor:
         return last_dir
 
 
-def handler(context: MLClientCtx, project: str):
+def handler(context: MLClientCtx):
     batch_processor = BatchProcessor(
-        context, project, os.environ.get("MODEL_MONITORING_API_KEY")
+        context, context.project, os.environ.get("MODEL_MONITORING_API_KEY")
     )
     batch_processor.post_init()
     batch_processor.run()

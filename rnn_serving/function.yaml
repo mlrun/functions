@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: rnn-serving
   tag: ''
-  hash: f887d978598c06b367bc9184f597e0c6c6e5e049
+  hash: 15f42c805a2ecfa68369d1c9166885573bd5dc71
   project: default
   labels:
     author: Daniel
@@ -64,7 +64,7 @@ spec:
       name: rnn-serving
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from /home/michaell/projects/temp/functions/rnn_serving/rnn_serving.py
+        nuclio.io/generated_by: function generated from /Users/aviasulin/PycharmProjects/mlrun/functions/rnn_serving/rnn_serving.py
     spec:
       runtime: python:3.6
       handler: rnn_serving:handler
@@ -78,5 +78,7 @@ spec:
   function_kind: serving_v2
   build:
     commands: []
-    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/rnn_serving/rnn_serving.py
+    code_origin: http://github.com/aviaIguazio/functions.git#53f7efb7fb728c6568580a5decc8a95bee03983b:/Users/aviasulin/PycharmProjects/mlrun/functions/rnn_serving/rnn_serving.py
+  secret_sources: []
+  affinity: null
 verbose: false

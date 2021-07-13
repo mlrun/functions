@@ -46,7 +46,7 @@ def test_suite(root_directory: str,
         )
     elif suite == "ipynb":
         TestIPYNB(stop_on_failure=stop_on_failure, clean_env_artifacts=True)._run(
-            root_directory, multi_processing
+            root_directory, multi_processing, function_name
         )
     elif suite == "examples":
         test_example(root_directory)
@@ -418,8 +418,8 @@ class TestIPYNB(TestSuite):
                 click.echo(complete_subprocess.stderr.decode("utf-8"))
                 exit(test_result.status_code)
 
-    def _run(self, path: Union[str, Path]):
-        super()._run(path)
+    def _run(self, path: Union[str, Path], multi_processing, function_name):
+        super()._run(path, multi_processing, function_name )
 
     @staticmethod
     def is_test_ipynb(path: Path):

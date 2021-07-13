@@ -38,7 +38,7 @@ DATASET = np.array([[6.9955170e-01, 6.9952875e-01, 2.7922913e-02, 2.7853036e-02,
 
 def download_pretrained_model(model_path):
     # Run this to download the pre-trained model to your `models` directory
-    model_location = 'https://s3.wasabisys.com/iguazio/models/bert/bert_classifier_v1.h5'
+    model_location = 'https://s3.wasabisys.com/iguazio/models/rnn/rnn_model.h5'
     saved_models_directory = model_path
     # Create paths
     os.makedirs(saved_models_directory, exist_ok=1)
@@ -48,13 +48,13 @@ def download_pretrained_model(model_path):
 
 def test_rnn_serving():
     model_path = os.path.join(os.path.abspath('./'), 'models')
-    model = model_path + '/bert_classifier_v1.h5'
+    model = model_path + '/rnn_model.h5'
     if not path.exists(model):
         download_pretrained_model(model_path)
 
     fn = import_function('function.yaml')
-    fn.add_model('mymodel', model_path=model, class_name='RNN_Model_Serving')
+    fn.add_model('rnn_model', model_path=model, class_name='RNN_Model_Serving')
     # create an emulator (mock server) from the function configuration)
     server = fn.to_mock_server()
-    server.test("/v2/models/model2/infer", {"inputs": DATASET})
-    # should add assert
+    resp = server.test("/v2/models/rnn_model/infer", {"inputs": DATASET})
+    assert (resp['outputs'] == '[[0.453309565782547]]')

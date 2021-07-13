@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: rnn-serving
   tag: ''
-  hash: 471cf278a6f85a31e62e688352bb7d73ffe907c5
+  hash: 9270d7f4936a53ebdff2df7de8c34253c0bd4ba1
   project: default
   labels:
     author: Daniel
@@ -77,8 +77,9 @@ spec:
   source: ''
   function_kind: serving_v2
   build:
-    commands: []
-    code_origin: http://github.com/aviaIguazio/functions.git#6f26eeb899b1c01fd967c10cb44f9662bc571f43:/Users/aviasulin/PycharmProjects/mlrun/functions/rnn_serving/rnn_serving.py
+    commands:
+    - python -m pip install keras
+    code_origin: http://github.com/aviaIguazio/functions.git#2fd5c1d23cd0e873b235b2e52cf836964f43522c:/Users/aviasulin/PycharmProjects/mlrun/functions/rnn_serving/rnn_serving.py
   secret_sources: []
   affinity: null
 verbose: false

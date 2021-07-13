@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: rnn-serving
   tag: ''
-  hash: 15f42c805a2ecfa68369d1c9166885573bd5dc71
+  hash: 471cf278a6f85a31e62e688352bb7d73ffe907c5
   project: default
   labels:
     author: Daniel
@@ -11,7 +11,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/ml-model
+  image: mlrun/ml-models
   entry_points:
     load:
       name: load
@@ -78,7 +78,7 @@ spec:
   function_kind: serving_v2
   build:
     commands: []
-    code_origin: http://github.com/aviaIguazio/functions.git#53f7efb7fb728c6568580a5decc8a95bee03983b:/Users/aviasulin/PycharmProjects/mlrun/functions/rnn_serving/rnn_serving.py
+    code_origin: http://github.com/aviaIguazio/functions.git#6f26eeb899b1c01fd967c10cb44f9662bc571f43:/Users/aviasulin/PycharmProjects/mlrun/functions/rnn_serving/rnn_serving.py
   secret_sources: []
   affinity: null
 verbose: false

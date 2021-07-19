@@ -14,7 +14,7 @@ platformVersion: ''
 spec:
   filename: model_monitoring_batch.py
   handler: handler
-  image: mlrun/mlrun
+  image: livsmichael/mlrun-api:automation
   kind: job
   requirements: []
 url: ''

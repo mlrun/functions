@@ -1,4 +1,5 @@
 import json
+import os
 from collections import defaultdict
 from datetime import datetime
 from os import environ
@@ -110,7 +111,9 @@ class EventStreamProcessor:
         )
         self.tsdb_path = f"{self.tsdb_container}/{self.tsdb_path}"
 
-        self.parquet_path = template.format(project=project, kind="parquet")
+        self.parquet_path = config.model_endpoint_monitoring.store_prefixes.user_space.format(
+            project=project, kind="parquet"
+        )
 
         logger.info(
             "Writer paths",
@@ -252,6 +255,10 @@ class EventStreamProcessor:
                         # Settings for _Batching
                         max_events=self.parquet_batching_max_events,
                         timeout_secs=self.parquet_batching_timeout_secs,
+                        # Settings for v3io storage
+                        storage_options={
+                            "access_key": os.environ.get("MODEL_MONITORING_API_KEY")
+                        },
                     ),
                 ],
             ]
@@ -380,44 +387,23 @@ class ProcessEndpointEvent(MapClass):
         features = event.get("request", {}).get("inputs")
         predictions = event.get("resp", {}).get("outputs")
 
-        if not self.is_valid(
-            endpoint_id,
-            is_not_none,
-            timestamp,
-            ["when"],
-        ):
+        if not self.is_valid(endpoint_id, is_not_none, timestamp, ["when"],):
             return None
 
         if endpoint_id not in self.first_request:
             self.first_request[endpoint_id] = timestamp
         self.last_request[endpoint_id] = timestamp
 
+        if not self.is_valid(endpoint_id, is_not_none, request_id, ["request", "id"],):
+            return None
+        if not self.is_valid(endpoint_id, is_not_none, latency, ["microsec"],):
+            return None
         if not self.is_valid(
-            endpoint_id,
-            is_not_none,
-            request_id,
-            ["request", "id"],
+            endpoint_id, is_not_none, features, ["request", "inputs"],
         ):
             return None
         if not self.is_valid(
-            endpoint_id,
-            is_not_none,
-            latency,
-            ["microsec"],
-        ):
-            return None
-        if not self.is_valid(
-            endpoint_id,
-            is_not_none,
-            features,
-            ["request", "inputs"],
-        ):
-            return None
-        if not self.is_valid(
-            endpoint_id,
-            is_not_none,
-            predictions,
-            ["resp", "outputs"],
+            endpoint_id, is_not_none, predictions, ["resp", "outputs"],
         ):
             return None
 
@@ -508,8 +494,7 @@ def enrich_even_details(event) -> Optional[dict]:
     versioned_model = f"{model}:{version}" if version else model
 
     endpoint_id = create_model_endpoint_id(
-        function_uri=function_uri,
-        versioned_model=versioned_model,
+        function_uri=function_uri, versioned_model=versioned_model,
     )
 
     endpoint_id = str(endpoint_id)
@@ -691,18 +676,12 @@ def get_endpoint_record(
     kv_container: str, kv_path: str, endpoint_id: str
 ) -> Optional[dict]:
     logger.info(
-        f"Grabbing endpoint data",
-        endpoint_id=endpoint_id,
-        table_path=kv_path,
+        f"Grabbing endpoint data", endpoint_id=endpoint_id, table_path=kv_path,
     )
     try:
         endpoint_record = (
             get_v3io_client()
-            .kv.get(
-                container=kv_container,
-                table_path=kv_path,
-                key=endpoint_id,
-            )
+            .kv.get(container=kv_container, table_path=kv_path, key=endpoint_id,)
             .output.item
         )
         return endpoint_record

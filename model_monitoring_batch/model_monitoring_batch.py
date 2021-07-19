@@ -224,8 +224,6 @@ class BatchProcessor:
 
         template = config.model_endpoint_monitoring.store_prefixes.default
 
-        self.parquet_path = template.format(project=self.project, kind="parquet")
-
         kv_path = template.format(project=self.project, kind="endpoints")
         _, self.kv_container, self.kv_path = parse_model_endpoint_store_prefix(kv_path)
 
@@ -237,6 +235,10 @@ class BatchProcessor:
         stream_path = template.format(project=self.project, kind="log_stream")
         _, self.stream_container, self.stream_path = parse_model_endpoint_store_prefix(
             stream_path
+        )
+
+        self.parquet_path = config.model_endpoint_monitoring.store_prefixes.user_space.format(
+            project=project, kind="parquet"
         )
 
         logger.info(

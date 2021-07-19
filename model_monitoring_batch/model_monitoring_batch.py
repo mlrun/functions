@@ -215,12 +215,19 @@ class VirtualDrift:
 
 class BatchProcessor:
     def __init__(
-        self, context: MLClientCtx, project: str, model_monitoring_api_key: str
+        self,
+        context: MLClientCtx,
+        project: str,
+        model_monitoring_api_key: str,
+        pipelines_api_key: str,
     ):
         self.context = context
         self.project = project
-        self.virtual_drift = VirtualDrift(inf_capping=10)
+
         self.model_monitoring_api_key = model_monitoring_api_key
+        self.pipelines_api_key = pipelines_api_key
+
+        self.virtual_drift = VirtualDrift(inf_capping=10)
 
         template = config.model_endpoint_monitoring.store_prefixes.default
 
@@ -260,11 +267,11 @@ class BatchProcessor:
         )
 
         self.db = get_run_db()
-        self.v3io = get_v3io_client(access_key=self.model_monitoring_api_key)
+        self.v3io = get_v3io_client(access_key=self.pipelines_api_key)
         self.frames = get_frames_client(
             address=config.v3io_framesd,
             container=self.tsdb_container,
-            token=self.model_monitoring_api_key,
+            token=self.pipelines_api_key,
         )
 
     def post_init(self):
@@ -273,7 +280,7 @@ class BatchProcessor:
             path=self.stream_path,
             shard_count=1,
             raise_for_status=v3io.dataplane.RaiseForStatus.never,
-            access_key=self.model_monitoring_api_key,
+            access_key=self.pipelines_api_key,
         )
 
         if not (response.status_code == 400 and "ResourceInUse" in str(response.body)):

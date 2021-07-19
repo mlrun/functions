@@ -18,7 +18,7 @@ platformVersion: ''
 spec:
   filename: v2_model_server.py
   handler: handler
-  image: mlrun/mlrun
+  image: livsmichael/mlrun-api:experimental
   kind: serving
   requirements: []
   customFields:

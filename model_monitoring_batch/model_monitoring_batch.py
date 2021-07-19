@@ -426,7 +426,10 @@ class BatchProcessor:
 
 def handler(context: MLClientCtx):
     batch_processor = BatchProcessor(
-        context, context.project, os.environ.get("MODEL_MONITORING_API_KEY")
+        context=context,
+        project=context.project,
+        model_monitoring_api_key=os.environ.get("MODEL_MONITORING_API_KEY"),
+        pipelines_api_key=os.environ.get("V3IO_ACCESS_KEY"),
     )
     batch_processor.post_init()
     batch_processor.run()

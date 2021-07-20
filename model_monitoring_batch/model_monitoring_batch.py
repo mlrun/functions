@@ -148,7 +148,7 @@ class VirtualDrift:
         features_common = list(base_features.intersection(latest_features))
         feature_difference = list(base_features ^ latest_features)
 
-        if features_common:
+        if not features_common:
             raise ValueError(
                 f"No common features found: {base_features} <> {latest_features}"
             )

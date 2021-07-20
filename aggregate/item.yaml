@@ -16,7 +16,7 @@ platformVersion: 3.0.0
 spec:
   filename: aggregate.py
   handler: aggregate
-  image: mlrun/ml-models
+  image: mlrun/mlrun
   kind: job
   requirements: []
 url: ''

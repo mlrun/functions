@@ -16,8 +16,8 @@ platformVersion: ''
 spec:
   filename: rnn_serving.py
   handler: handler
-  image: mlrun/ml-model
+  image: mlrun/ml-models
   kind: serving
-  requirements: []
+  requirements: [keras]
 url: ''
 version: 0.0.1

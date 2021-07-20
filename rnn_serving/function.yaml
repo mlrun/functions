@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: rnn-serving
   tag: ''
-  hash: f887d978598c06b367bc9184f597e0c6c6e5e049
+  hash: 9270d7f4936a53ebdff2df7de8c34253c0bd4ba1
   project: default
   labels:
     author: Daniel
@@ -11,7 +11,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/ml-model
+  image: mlrun/ml-models
   entry_points:
     load:
       name: load
@@ -64,7 +64,7 @@ spec:
       name: rnn-serving
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from /home/michaell/projects/temp/functions/rnn_serving/rnn_serving.py
+        nuclio.io/generated_by: function generated from /Users/aviasulin/PycharmProjects/mlrun/functions/rnn_serving/rnn_serving.py
     spec:
       runtime: python:3.6
       handler: rnn_serving:handler
@@ -77,6 +77,9 @@ spec:
   source: ''
   function_kind: serving_v2
   build:
-    commands: []
-    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/rnn_serving/rnn_serving.py
+    commands:
+    - python -m pip install keras
+    code_origin: http://github.com/aviaIguazio/functions.git#2fd5c1d23cd0e873b235b2e52cf836964f43522c:/Users/aviasulin/PycharmProjects/mlrun/functions/rnn_serving/rnn_serving.py
+  secret_sources: []
+  affinity: null
 verbose: false

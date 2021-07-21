@@ -6,6 +6,7 @@ from os import environ
 from typing import Dict, List, Set, Optional, Any, Union
 
 import pandas as pd
+import v3io
 from mlrun.config import config
 from mlrun.run import MLClientCtx
 from mlrun.utils import logger
@@ -701,6 +702,7 @@ def get_endpoint_record(
                 table_path=kv_path,
                 key=endpoint_id,
                 access_key=access_key,
+                raise_for_status=v3io.dataplane.RaiseForStatus.always
             )
             .output.item
         )

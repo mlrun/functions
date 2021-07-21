@@ -146,10 +146,18 @@ class EventStreamProcessor:
         self._flow = build_flow(
             [
                 SyncEmitSource(),
-                ProcessEndpointEvent(self.kv_container, self.kv_path),
+                ProcessEndpointEvent(
+                    kv_container=self.kv_container,
+                    kv_path=self.kv_path,
+                    v3io_access_key=self.v3io_access_key,
+                ),
                 FilterNotNone(),
                 FlatMap(lambda x: x),
-                MapFeatureNames(self.kv_container, self.kv_path),
+                MapFeatureNames(
+                    kv_container=self.kv_container,
+                    kv_path=self.kv_path,
+                    access_key=self.v3io_access_key,
+                ),
                 # Branch 1: Aggregate events, count averages and update TSDB and KV
                 [
                     AggregateByKey(
@@ -259,7 +267,9 @@ class EventStreamProcessor:
                         max_events=self.parquet_batching_max_events,
                         timeout_secs=self.parquet_batching_timeout_secs,
                         # Settings for v3io storage
-                        storage_options={"access_key": self.model_monitoring_access_key},
+                        storage_options={
+                            "access_key": self.model_monitoring_access_key
+                        },
                     ),
                 ],
             ]
@@ -358,10 +368,11 @@ class EventStreamProcessor:
 
 
 class ProcessEndpointEvent(MapClass):
-    def __init__(self, kv_container: str, kv_path: str, **kwargs):
+    def __init__(self, kv_container: str, kv_path: str, v3io_access_key: str, **kwargs):
         super().__init__(**kwargs)
         self.kv_container: str = kv_container
         self.kv_path: str = kv_path
+        self.v3io_access_key: str = v3io_access_key
         self.first_request: Dict[str, str] = dict()
         self.last_request: Dict[str, str] = dict()
         self.error_count: Dict[str, int] = defaultdict(int)
@@ -455,6 +466,7 @@ class ProcessEndpointEvent(MapClass):
                 kv_container=self.kv_container,
                 kv_path=self.kv_path,
                 endpoint_id=endpoint_id,
+                access_key=self.v3io_access_key,
             )
             if endpoint_record:
                 first_request = endpoint_record.get(FIRST_REQUEST)
@@ -561,10 +573,11 @@ class UnpackValues(MapClass):
 
 
 class MapFeatureNames(MapClass):
-    def __init__(self, kv_container: str, kv_path: str, **kwargs):
+    def __init__(self, kv_container: str, kv_path: str, access_key: str, **kwargs):
         super().__init__(**kwargs)
         self.kv_container = kv_container
         self.kv_path = kv_path
+        self.access_key = access_key
         self.feature_names = {}
         self.label_columns = {}
 
@@ -576,6 +589,7 @@ class MapFeatureNames(MapClass):
                 kv_container=self.kv_container,
                 kv_path=self.kv_path,
                 endpoint_id=endpoint_id,
+                access_key=self.access_key,
             )
             feature_names = endpoint_record.get(FEATURE_NAMES)
             feature_names = json.loads(feature_names) if feature_names else None
@@ -674,7 +688,7 @@ class InferSchema(MapClass):
 
 
 def get_endpoint_record(
-    kv_container: str, kv_path: str, endpoint_id: str
+    kv_container: str, kv_path: str, endpoint_id: str, access_key: str
 ) -> Optional[dict]:
     logger.info(
         f"Grabbing endpoint data", endpoint_id=endpoint_id, table_path=kv_path,
@@ -682,7 +696,12 @@ def get_endpoint_record(
     try:
         endpoint_record = (
             get_v3io_client()
-            .kv.get(container=kv_container, table_path=kv_path, key=endpoint_id,)
+            .kv.get(
+                container=kv_container,
+                table_path=kv_path,
+                key=endpoint_id,
+                access_key=access_key,
+            )
             .output.item
         )
         return endpoint_record
@@ -696,6 +715,7 @@ def init_context(context: MLClientCtx):
     parameters = json.loads(parameters) if parameters else {}
     stream_processor = EventStreamProcessor(**parameters)
     setattr(context, "stream_processor", stream_processor)
+
 
 def handler(context: MLClientCtx, event: Event):
     event_body = json.loads(event.body)

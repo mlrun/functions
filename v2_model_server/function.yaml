@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: v2-model-server
   tag: ''
-  hash: 2c2054f1e35a62bb7e2f29c8175c9b83a7c4826f
+  hash: 7e03eff5670b9c0b53051e19022385c21ca68724
   project: default
   labels:
     author: yaronh
@@ -13,7 +13,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: livsmichael/mlrun-api:experimental
+  image: mlrun/mlrun
   entry_points:
     load:
       name: load
@@ -83,5 +83,5 @@ spec:
   default_class: ClassifierModel
   build:
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#d8b77d2b54742920964517e4e8fbdfe77fe910dd:/home/michaell/projects/functions/v2_model_server/v2_model_server.py
+    code_origin: https://github.com/Michaelliv/functions.git#ec84e9f69115f0762b3da12214a79ecdeb9fef72:/home/michaell/projects/functions/v2_model_server/v2_model_server.py
 verbose: false

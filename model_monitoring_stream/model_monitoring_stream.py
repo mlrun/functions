@@ -97,8 +97,11 @@ class EventStreamProcessor:
         self.aggregate_count_period = aggregate_count_period
         self.aggregate_avg_windows = aggregate_avg_windows or ["5m", "1h"]
         self.aggregate_avg_period = aggregate_avg_period
+
         self.v3io_access_key = v3io_access_key or environ.get("V3IO_ACCESS_KEY")
         self.v3io_framesd = v3io_framesd or config.v3io_framesd
+
+        self.model_monitoring_access_key = os.environ.get("MODEL_MONITORING_ACCESS_KEY")
 
         template = config.model_endpoint_monitoring.store_prefixes.default
 
@@ -256,9 +259,7 @@ class EventStreamProcessor:
                         max_events=self.parquet_batching_max_events,
                         timeout_secs=self.parquet_batching_timeout_secs,
                         # Settings for v3io storage
-                        storage_options={
-                            "access_key": os.environ.get("MODEL_MONITORING_API_KEY")
-                        },
+                        storage_options={"access_key": self.model_monitoring_access_key},
                     ),
                 ],
             ]
@@ -690,14 +691,11 @@ def get_endpoint_record(
 
 
 def init_context(context: MLClientCtx):
-    context.logger.info("Initializing EventStreamProcessor")
-    parameters = environ.get("MODEL_MONITORING_PARAMETERS")
-    parameters = json.loads(parameters) if parameters else {}
-    stream_processor = EventStreamProcessor(**parameters)
+    stream_processor = EventStreamProcessor(project=context.project)
     setattr(context, "stream_processor", stream_processor)
 
 
 def handler(context: MLClientCtx, event: Event):
     event_body = json.loads(event.body)
-    context.logger.info(event_body)
+    context.logger.debug(event_body)
     context.stream_processor.consume(event_body)

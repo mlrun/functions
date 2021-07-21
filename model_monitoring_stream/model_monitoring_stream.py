@@ -259,9 +259,7 @@ class EventStreamProcessor:
                         max_events=self.parquet_batching_max_events,
                         timeout_secs=self.parquet_batching_timeout_secs,
                         # Settings for v3io storage
-                        storage_options={
-                            "access_key": self.model_monitoring_access_key
-                        },
+                        storage_options={"access_key": self.model_monitoring_access_key},
                     ),
                 ],
             ]
@@ -692,16 +690,14 @@ def get_endpoint_record(
         return None
 
 
-created = False
-
+def init_context(context: MLClientCtx):
+    context.logger.info("Initializing EventStreamProcessor")
+    parameters = environ.get("MODEL_MONITORING_PARAMETERS")
+    parameters = json.loads(parameters) if parameters else {}
+    stream_processor = EventStreamProcessor(**parameters)
+    setattr(context, "stream_processor", stream_processor)
 
 def handler(context: MLClientCtx, event: Event):
-    global created
-    if not created:
-        stream_processor = EventStreamProcessor(project=context.project)
-        setattr(context, "stream_processor", stream_processor)
-        created = True
-
     event_body = json.loads(event.body)
     context.logger.debug(event_body)
     context.stream_processor.consume(event_body)

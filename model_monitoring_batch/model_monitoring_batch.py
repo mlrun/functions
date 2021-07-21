@@ -218,14 +218,14 @@ class BatchProcessor:
         self,
         context: MLClientCtx,
         project: str,
-        model_monitoring_api_key: str,
-        pipelines_api_key: str,
+        model_monitoring_access_key: str,
+        v3io_access_key: str,
     ):
         self.context = context
         self.project = project
 
-        self.model_monitoring_api_key = model_monitoring_api_key
-        self.pipelines_api_key = pipelines_api_key
+        self.model_monitoring_access_key = model_monitoring_access_key
+        self.v3io_access_key = v3io_access_key
 
         self.virtual_drift = VirtualDrift(inf_capping=10)
 
@@ -267,11 +267,11 @@ class BatchProcessor:
         )
 
         self.db = get_run_db()
-        self.v3io = get_v3io_client(access_key=self.pipelines_api_key)
+        self.v3io = get_v3io_client(access_key=self.v3io_access_key)
         self.frames = get_frames_client(
             address=config.v3io_framesd,
             container=self.tsdb_container,
-            token=self.pipelines_api_key,
+            token=self.v3io_access_key,
         )
 
     def post_init(self):
@@ -280,7 +280,7 @@ class BatchProcessor:
             path=self.stream_path,
             shard_count=1,
             raise_for_status=v3io.dataplane.RaiseForStatus.never,
-            access_key=self.pipelines_api_key,
+            access_key=self.v3io_access_key,
         )
 
         if not (response.status_code == 400 and "ResourceInUse" in str(response.body)):
@@ -428,8 +428,8 @@ def handler(context: MLClientCtx):
     batch_processor = BatchProcessor(
         context=context,
         project=context.project,
-        model_monitoring_api_key=os.environ.get("MODEL_MONITORING_API_KEY"),
-        pipelines_api_key=os.environ.get("V3IO_ACCESS_KEY"),
+        model_monitoring_access_key=os.environ.get("MODEL_MONITORING_ACCESS_KEY"),
+        v3io_access_key=os.environ.get("V3IO_ACCESS_KEY"),
     )
     batch_processor.post_init()
     batch_processor.run()

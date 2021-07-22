@@ -696,7 +696,6 @@ def get_endpoint_record(
         container=kv_container,
         table_path=kv_path,
         key=endpoint_id,
-        access_key=access_key,
     )
     try:
         endpoint_record = (

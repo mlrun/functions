@@ -87,6 +87,7 @@ class EventStreamProcessor:
         aggregate_avg_period: str = "30s",
         v3io_access_key: Optional[str] = None,
         v3io_framesd: Optional[str] = None,
+        v3io_api: Optional[str] = None,
     ):
         self.project = project
         self.sample_window = sample_window
@@ -101,6 +102,7 @@ class EventStreamProcessor:
 
         self.v3io_access_key = v3io_access_key or environ.get("V3IO_ACCESS_KEY")
         self.v3io_framesd = v3io_framesd or config.v3io_framesd
+        self.v3io_api = v3io_api or config.v3io_api
 
         self.model_monitoring_access_key = os.environ.get("MODEL_MONITORING_ACCESS_KEY")
 
@@ -269,7 +271,8 @@ class EventStreamProcessor:
                         timeout_secs=self.parquet_batching_timeout_secs,
                         # Settings for v3io storage
                         storage_options={
-                            "access_key": self.model_monitoring_access_key
+                            "v3io_api": self.v3io_api,
+                            "v3io_access_key": self.model_monitoring_access_key
                         },
                     ),
                 ],

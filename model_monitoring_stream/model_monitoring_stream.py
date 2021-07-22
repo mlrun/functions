@@ -505,7 +505,7 @@ def enrich_even_details(event) -> Optional[dict]:
         return None
 
     version = event.get(VERSION)
-    versioned_model = f"{model}:{version}" if version else model
+    versioned_model = f"{model}:{version}" if version else f"{model}:latest"
 
     endpoint_id = create_model_endpoint_id(
         function_uri=function_uri, versioned_model=versioned_model,

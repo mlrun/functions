@@ -692,7 +692,11 @@ def get_endpoint_record(
     kv_container: str, kv_path: str, endpoint_id: str, access_key: str
 ) -> Optional[dict]:
     logger.info(
-        f"Grabbing endpoint data", endpoint_id=endpoint_id, table_path=kv_path,
+        f"Grabbing endpoint data",
+        container=kv_container,
+        table_path=kv_path,
+        key=endpoint_id,
+        access_key=access_key,
     )
     try:
         endpoint_record = (
@@ -702,7 +706,7 @@ def get_endpoint_record(
                 table_path=kv_path,
                 key=endpoint_id,
                 access_key=access_key,
-                raise_for_status=v3io.dataplane.RaiseForStatus.always
+                raise_for_status=v3io.dataplane.RaiseForStatus.always,
             )
             .output.item
         )

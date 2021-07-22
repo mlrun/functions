@@ -278,7 +278,7 @@ class EventStreamProcessor:
                         # Settings for v3io storage
                         storage_options={
                             "v3io_api": self.v3io_api,
-                            "access_key": self.model_monitoring_access_key,
+                            "v3io_access_key": self.model_monitoring_access_key,
                         },
                     ),
                 ],

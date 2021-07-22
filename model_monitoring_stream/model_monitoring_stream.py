@@ -123,6 +123,8 @@ class EventStreamProcessor:
 
         logger.info(
             "V3IO Configuration",
+            v3io_access_key=self.v3io_access_key,
+            model_monitoring_access_key=self.model_monitoring_access_key,
             default_store_prefix=config.model_endpoint_monitoring.store_prefixes.default,
             user_space_store_prefix=config.model_endpoint_monitoring.store_prefixes.user_space,
             v3io_api=self.v3io_api,

@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
-- ml
-- test
+- model-serving
+- machine-learning
 description: test v2 model servers
 doc: ''
 example: v2_model_tester.ipynb

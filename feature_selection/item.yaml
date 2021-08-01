@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
-- data-prep
-- ml
+- data-preparation
+- machine-learning
 description: Select features through multiple Statistical and Model filters
 doc: ''
 example: feature_selection.ipynb

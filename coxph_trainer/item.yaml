@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
-- training
-- ml
+- model-training
+- machine-learning
 description: cox proportional hazards, kaplan meier plots
 doc: ''
 example: coxph_trainer.ipynb

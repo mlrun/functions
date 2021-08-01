@@ -2,83 +2,18 @@ kind: remote
 metadata:
   name: concept-drift-streaming
   tag: ''
-  hash: 513a854cde68a3a0a8f787790d1c206bf8949e5c
+  hash: d97012d8a20a9042c2f13dd790ecb28e34d9f29f
   project: default
   labels:
     author: orz
     framework: sklearn
   categories:
-  - ml
-  - serve
+  - machine-learning
+  - monitoring
 spec:
   command: ''
   args: []
   image: mlrun/ml-models
-  entry_points:
-    split_path:
-      name: split_path
-      doc: ''
-      parameters:
-      - name: mntpath
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 16
-    create_stream:
-      name: create_stream
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      - name: path
-        default: ''
-      - name: shards
-        default: 1
-      outputs:
-      - default: ''
-      lineno: 27
-    push_to_stream:
-      name: push_to_stream
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      - name: stream_path
-        default: ''
-      - name: data
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 41
-    construct_record:
-      name: construct_record
-      doc: ''
-      parameters:
-      - name: record
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 49
-    init_context:
-      name: init_context
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 59
-    handler:
-      name: handler
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      - name: event
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 102
   description: Deploy a streaming Concept Drift detector on a labeled stream. the
     nuclio part of the concept_drift function
   min_replicas: 1
@@ -91,7 +26,7 @@ spec:
       name: concept-drift-streaming
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from /home/michaell/projects/functions/concept_drift_streaming/concept_drift_streaming.py
+        nuclio.io/generated_by: function generated from /home/kali/functions/concept_drift_streaming/concept_drift_streaming.py
     spec:
       runtime: python:3.6
       handler: concept_drift_streaming:handler
@@ -105,6 +40,7 @@ spec:
   build:
     commands:
     - python -m pip install scikit-multiflow==0.4.1 v3io_frames
-    code_origin: https://github.com/Michaelliv/functions.git#c2a9f297d0ffbcb024993df7580e99835ee66292:/home/michaell/projects/functions/concept_drift_streaming/concept_drift_streaming.py
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/concept_drift_streaming/concept_drift_streaming.py
   default_handler: handler
+  affinity: null
 verbose: false

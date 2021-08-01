@@ -2,39 +2,17 @@ kind: remote
 metadata:
   name: bert-embeddings
   tag: ''
-  hash: a534b3882dca355dee3f60e0ad36b52455e0ec0c
+  hash: 77dd0921ea6d23ed5c0e944037e291e2cd6727fd
   project: default
   labels:
     framework: pytorch
   categories:
-  - NLP
-  - BERT
-  - embeddings
+  - machine-learning
+  - data-preparation
 spec:
   command: ''
   args: []
   image: mlrun/ml-models
-  entry_points:
-    init_context:
-      name: init_context
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 8
-    handler:
-      name: handler
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      - name: event
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 17
   description: Get BERT based embeddings for given text
   min_replicas: 1
   max_replicas: 4
@@ -46,7 +24,7 @@ spec:
       name: bert-embeddings
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from /Users/aviasulin/PycharmProjects/mlrun/functions/bert_embeddings/bert_embeddings.py
+        nuclio.io/generated_by: function generated from /home/kali/functions/bert_embeddings/bert_embeddings.py
     spec:
       runtime: python:3.6
       handler: bert_embeddings:handler
@@ -60,7 +38,7 @@ spec:
   build:
     commands:
     - python -m pip install torch==1.6.0
-    code_origin: http://github.com/aviaIguazio/functions.git#72e86f1cd026a04ad6c505f7215725a00119fe27:/Users/aviasulin/PycharmProjects/mlrun/functions/bert_embeddings/bert_embeddings.py
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/bert_embeddings/bert_embeddings.py
   default_handler: handler
   affinity: null
 verbose: false

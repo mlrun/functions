@@ -2,61 +2,18 @@ kind: serving
 metadata:
   name: v2-model-server
   tag: ''
-  hash: 0d8f41c900d1dd2c7ac5505e837876ce23d46290
+  hash: 41f1834001c85234d9cce6f061d00ef54d0873d2
   project: default
   labels:
     author: yaronh
     framework: sklearn
   categories:
-  - serving
-  - ml
+  - model-serving
+  - machine-learning
 spec:
   command: ''
   args: []
   image: mlrun/mlrun
-  entry_points:
-    load:
-      name: load
-      doc: load and initialize the model and/or other elements
-      parameters:
-      - name: self
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 14
-    predict:
-      name: predict
-      doc: Generate model predictions from sample.
-      parameters:
-      - name: self
-        default: ''
-      - name: body
-        type: dict
-        default: ''
-      outputs:
-      - default: ''
-        type: List
-      lineno: 19
-    init_context:
-      name: init_context
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 27
-    handler:
-      name: handler
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      - name: event
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 30
   description: generic sklearn model server
   min_replicas: 1
   max_replicas: 4
@@ -65,24 +22,25 @@ spec:
     apiVersion: nuclio.io/v1
     kind: Function
     metadata:
-      annotations:
-        nuclio.io/generated_by: function generated from /home/michaell/projects/temp/functions/v2_model_server/v2_model_server.ipynb
-      labels: {}
       name: v2-model-server
+      labels: {}
+      annotations:
+        nuclio.io/generated_by: function generated from /home/kali/functions/v2_model_server/v2_model_server.py
     spec:
-      build:
-        baseImage: mlrun/mlrun
-        commands: []
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG1scnVuCgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CmZyb20gc2tsZWFybi5kYXRhc2V0cyBpbXBvcnQgbG9hZF9pcmlzCmltcG9ydCBudW1weSBhcyBucAoKaW1wb3J0IHdhcm5pbmdzIAp3YXJuaW5ncy5maWx0ZXJ3YXJuaW5ncygnaWdub3JlJykKCmNsYXNzIENsYXNzaWZpZXJNb2RlbChtbHJ1bi5zZXJ2aW5nLlYyTW9kZWxTZXJ2ZXIpOgogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgIiIibG9hZCBhbmQgaW5pdGlhbGl6ZSB0aGUgbW9kZWwgYW5kL29yIG90aGVyIGVsZW1lbnRzIiIiCiAgICAgICAgbW9kZWxfZmlsZSwgZXh0cmFfZGF0YSA9IHNlbGYuZ2V0X21vZGVsKCcucGtsJykKICAgICAgICBzZWxmLm1vZGVsID0gbG9hZChvcGVuKG1vZGVsX2ZpbGUsICdyYicpKQoKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGJvZHk6IGRpY3QpIC0+IExpc3Q6CiAgICAgICAgIiIiR2VuZXJhdGUgbW9kZWwgcHJlZGljdGlvbnMgZnJvbSBzYW1wbGUuIiIiCiAgICAgICAgZmVhdHMgPSBucC5hc2FycmF5KGJvZHlbJ2lucHV0cyddKQogICAgICAgIHJlc3VsdDogbnAubmRhcnJheSA9IHNlbGYubW9kZWwucHJlZGljdChmZWF0cykKICAgICAgICByZXR1cm4gcmVzdWx0LnRvbGlzdCgpCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nX3YyJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
-        noBaseImagesPull: true
-      env: []
-      handler: v2_model_server:handler
       runtime: python:3.6
+      handler: v2_model_server:handler
+      env: []
       volumes: []
+      build:
+        commands: []
+        noBaseImagesPull: true
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG1scnVuCgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CmZyb20gc2tsZWFybi5kYXRhc2V0cyBpbXBvcnQgbG9hZF9pcmlzCmltcG9ydCBudW1weSBhcyBucAoKaW1wb3J0IHdhcm5pbmdzCgp3YXJuaW5ncy5maWx0ZXJ3YXJuaW5ncygiaWdub3JlIikKCgpjbGFzcyBDbGFzc2lmaWVyTW9kZWwobWxydW4uc2VydmluZy5WMk1vZGVsU2VydmVyKToKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgICIiImxvYWQgYW5kIGluaXRpYWxpemUgdGhlIG1vZGVsIGFuZC9vciBvdGhlciBlbGVtZW50cyIiIgogICAgICAgIG1vZGVsX2ZpbGUsIGV4dHJhX2RhdGEgPSBzZWxmLmdldF9tb2RlbCgiLnBrbCIpCiAgICAgICAgc2VsZi5tb2RlbCA9IGxvYWQob3Blbihtb2RlbF9maWxlLCAicmIiKSkKCiAgICBkZWYgcHJlZGljdChzZWxmLCBib2R5OiBkaWN0KSAtPiBMaXN0OgogICAgICAgICIiIkdlbmVyYXRlIG1vZGVsIHByZWRpY3Rpb25zIGZyb20gc2FtcGxlLiIiIgogICAgICAgIGZlYXRzID0gbnAuYXNhcnJheShib2R5WyJpbnB1dHMiXSkKICAgICAgICByZXN1bHQ6IG5wLm5kYXJyYXkgPSBzZWxmLm1vZGVsLnByZWRpY3QoZmVhdHMpCiAgICAgICAgcmV0dXJuIHJlc3VsdC50b2xpc3QoKQoKCmZyb20gbWxydW4ucnVudGltZXMgaW1wb3J0IG51Y2xpb19pbml0X2hvb2sKCgpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICJzZXJ2aW5nX3YyIikKCgpkZWYgaGFuZGxlcihjb250ZXh0LCBldmVudCk6CiAgICByZXR1cm4gY29udGV4dC5tbHJ1bl9oYW5kbGVyKGNvbnRleHQsIGV2ZW50KQoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nX3YyJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
   source: ''
   function_kind: serving_v2
   default_class: ClassifierModel
   build:
     commands: []
-    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/v2_model_server/v2_model_server.ipynb
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/v2_model_server/v2_model_server.py
+  secret_sources: []
+  affinity: null
 verbose: false

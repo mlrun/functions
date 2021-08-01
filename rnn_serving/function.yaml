@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: rnn-serving
   tag: ''
-  hash: 5de34f33e72e9696faf13a12f7c61fdf2c50e8bb
+  hash: c21d8eee1a9d5eb69be14cc4d397f1227137fa93
   project: default
   labels:
     author: Daniel
@@ -39,7 +39,7 @@ spec:
   build:
     commands:
     - python -m pip install keras
-    code_origin: https://github.com/daniels290813/functions.git#505b2e295c5dbef3c096c05aa65d2996f8c8555c:/home/kali/functions/rnn_serving/rnn_serving.py
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/rnn_serving/rnn_serving.py
   secret_sources: []
   affinity: null
 verbose: false

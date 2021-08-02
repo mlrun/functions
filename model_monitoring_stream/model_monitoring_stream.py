@@ -34,6 +34,8 @@ from storey.dtypes import SlidingWindows
 from storey.steps import SampleWindow
 
 # Constants
+from v3io.dataplane import RaiseForStatus
+
 ISO_8061_UTC = "%Y-%m-%d %H:%M:%S.%f%z"
 FUNCTION_URI = "function_uri"
 MODEL = "model"
@@ -621,6 +623,7 @@ class MapFeatureNames(MapClass):
                     access_key=self.access_key,
                     key=event[ENDPOINT_ID],
                     attributes={FEATURE_NAMES: json.dumps(feature_names)},
+                    raise_for_status=RaiseForStatus.always,
                 )
 
             if not label_columns:
@@ -635,6 +638,7 @@ class MapFeatureNames(MapClass):
                     access_key=self.access_key,
                     key=event[ENDPOINT_ID],
                     attributes={LABEL_COLUMNS: json.dumps(label_columns)},
+                    raise_for_status=RaiseForStatus.always,
                 )
 
             self.label_columns[endpoint_id] = label_columns

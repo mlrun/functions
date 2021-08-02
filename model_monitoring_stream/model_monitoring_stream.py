@@ -618,6 +618,7 @@ class MapFeatureNames(MapClass):
                 get_v3io_client().kv.update(
                     container=self.kv_container,
                     table_path=self.kv_path,
+                    access_key=self.access_key,
                     key=event[ENDPOINT_ID],
                     attributes={FEATURE_NAMES: json.dumps(feature_names)},
                 )
@@ -631,12 +632,16 @@ class MapFeatureNames(MapClass):
                 get_v3io_client().kv.update(
                     container=self.kv_container,
                     table_path=self.kv_path,
+                    access_key=self.access_key,
                     key=event[ENDPOINT_ID],
                     attributes={LABEL_COLUMNS: json.dumps(label_columns)},
                 )
 
             self.label_columns[endpoint_id] = label_columns
             self.feature_names[endpoint_id] = feature_names
+
+            logger.info("Label columns", endpoint_id=endpoint_id, label_columns=label_columns)
+            logger.info("Feature names", endpoint_id=endpoint_id, feature_names=feature_names)
 
         feature_names = self.feature_names[endpoint_id]
         features = event[FEATURES]

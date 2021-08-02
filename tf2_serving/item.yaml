@@ -18,7 +18,7 @@ spec:
   filename: tf2_serving.py
   handler: handler
   image: mlrun/mlrun
-  kind: remote
+  kind: serving
   requirements:
   - requests
   - pillow

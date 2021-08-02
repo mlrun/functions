@@ -1,9 +1,7 @@
 apiVersion: v1
 categories:
-- serving
-- NLP
-- BERT
-- sentiment analysis
+- model-serving
+- machine-learning
 description: BERT based sentiment classification model
 doc: ''
 example: sentiment_analysis_serving.ipynb

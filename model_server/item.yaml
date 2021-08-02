@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
-- serving
-- ml
+- model-serving
+- machine-learning
 description: generic sklearn model server
 doc: ''
 example: model_server.ipynb

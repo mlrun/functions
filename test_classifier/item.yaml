@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
-- ml
-- test
+- machine-learning
+- model-testing
 description: test a classifier using held-out or new data
 doc: README.md
 example: test_classifier.ipynb

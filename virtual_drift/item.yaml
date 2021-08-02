@@ -1,8 +1,7 @@
 apiVersion: v1
 categories:
-- ml
-- serve
-- concept-drift
+- data-analysis
+- machine-learning
 description: Compute drift magnitude between Time-Samples T and U
 doc: ''
 example: virtual_drift.ipynb

@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
-- ml
-- test
+- monitoring
+- model-serving
 description: test model servers
 doc: ''
 example: model_server_tester.ipynb

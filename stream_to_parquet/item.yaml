@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
-- ml
-- serve
+- machine-learning
+- data-preparation
 description: Saves a stream to Parquet and can lunch drift detection task on it
 doc: ''
 example: stream_to_parquet.ipynb

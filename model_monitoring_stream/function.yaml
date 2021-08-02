@@ -2,238 +2,14 @@ kind: remote
 metadata:
   name: model-monitoring-stream
   tag: ''
-  hash: bfcc097ca2977913a2ac0fab55317bbdbd247fee
+  hash: 4dd87a1b2a2a92f3621f54b289a21126c2710e74
   project: default
-  categories: []
+  categories:
+  - monitoring
 spec:
   command: ''
   args: []
   image: mlrun/mlrun
-  entry_points:
-    consume:
-      name: consume
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: event
-        type: Dict
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 260
-    compute_predictions_per_second:
-      name: compute_predictions_per_second
-      doc: ''
-      parameters:
-      - name: event
-        type: dict
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 278
-    process_before_kv:
-      name: process_before_kv
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: event
-        type: dict
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 283
-    process_before_events_tsdb:
-      name: process_before_events_tsdb
-      doc: ''
-      parameters:
-      - name: event
-        type: Dict
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 292
-    process_before_parquet:
-      name: process_before_parquet
-      doc: ''
-      parameters:
-      - name: event
-        type: dict
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 329
-    set_none_if_empty:
-      name: set_none_if_empty
-      doc: ''
-      parameters:
-      - name: _event
-        type: dict
-        default: ''
-      - name: keys
-        type: List[str]
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 331
-    drop_if_exists:
-      name: drop_if_exists
-      doc: ''
-      parameters:
-      - name: _event
-        type: dict
-        default: ''
-      - name: keys
-        type: List[str]
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 336
-    unpack_if_exists:
-      name: unpack_if_exists
-      doc: ''
-      parameters:
-      - name: _event
-        type: dict
-        default: ''
-      - name: keys
-        type: List[str]
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 340
-    do:
-      name: do
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: event
-        type: Dict
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 675
-    resume_state:
-      name: resume_state
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: endpoint_id
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 462
-    is_valid:
-      name: is_valid
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: endpoint_id
-        type: str
-        default: ''
-      - name: validation_function
-        default: ''
-      - name: field
-        type: Any
-        default: ''
-      - name: dict_path
-        type: List[str]
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 481
-    handle_errors:
-      name: handle_errors
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: endpoint_id
-        default: ''
-      - name: event
-        default: ''
-      outputs:
-      - default: ''
-        type: bool
-      lineno: 489
-    enrich_even_details:
-      name: enrich_even_details
-      doc: ''
-      parameters:
-      - name: event
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 497
-    is_not_none:
-      name: is_not_none
-      doc: ''
-      parameters:
-      - name: field
-        type: Any
-        default: ''
-      - name: dict_path
-        type: List[str]
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 523
-    is_list_of_numerics:
-      name: is_list_of_numerics
-      doc: ''
-      parameters:
-      - name: field
-        type: List[Union[int, float, dict, list]]
-        default: ''
-      - name: dict_path
-        type: List[str]
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 532
-    get_endpoint_record:
-      name: get_endpoint_record
-      doc: ''
-      parameters:
-      - name: kv_container
-        type: str
-        default: ''
-      - name: kv_path
-        type: str
-        default: ''
-      - name: endpoint_id
-        type: str
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 690
-    init_context:
-      name: init_context
-      doc: ''
-      parameters:
-      - name: context
-        type: MLClientCtx
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 713
-    handler:
-      name: handler
-      doc: ''
-      parameters:
-      - name: context
-        type: MLClientCtx
-        default: ''
-      - name: event
-        type: Event
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 721
   description: ''
   min_replicas: 1
   max_replicas: 4
@@ -245,7 +21,7 @@ spec:
       name: model-monitoring-stream
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from /home/michaell/projects/functions/model_monitoring_stream/model_monitoring_stream.py
+        nuclio.io/generated_by: function generated from /home/kali/functions/model_monitoring_stream/model_monitoring_stream.py
     spec:
       runtime: python:3.6
       handler: model_monitoring_stream:handler
@@ -258,6 +34,7 @@ spec:
   source: ''
   build:
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#7b67b012cfb7f53f41439efe02a1452e28959eb0:/home/michaell/projects/functions/model_monitoring_stream/model_monitoring_stream.py
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/model_monitoring_stream/model_monitoring_stream.py
   default_handler: handler
+  affinity: null
 verbose: false

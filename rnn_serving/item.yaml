@@ -1,6 +1,7 @@
 apiVersion: v1
 categories:
 - model-serving
+- machine-learning
 description: deploy an rnn based stock analysis model server.
 doc: ''
 example: rnn_serving.ipynb

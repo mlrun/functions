@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
-- data-movement
-- utils
+- data-preparation
+- etl
 description: load dask cluster with data
 doc: ''
 example: load_dask.ipynb

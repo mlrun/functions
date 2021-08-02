@@ -1,6 +1,8 @@
 apiVersion: v1
 categories:
-- model-testing
+- model-training
+- machine-learning
+- data-preparation
 description: simulate data with outliers.
 doc: ''
 example: xgb_custom.ipynb

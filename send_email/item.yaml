@@ -1,6 +1,6 @@
 apiVersion: v1
 categories:
-- notifications
+- utils
 description: Send Email messages through SMTP server
 doc: ''
 example: send_email.ipynb

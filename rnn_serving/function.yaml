@@ -2,57 +2,17 @@ kind: serving
 metadata:
   name: rnn-serving
   tag: ''
-  hash: 9270d7f4936a53ebdff2df7de8c34253c0bd4ba1
+  hash: c21d8eee1a9d5eb69be14cc4d397f1227137fa93
   project: default
   labels:
     author: Daniel
   categories:
   - model-serving
+  - machine-learning
 spec:
   command: ''
   args: []
   image: mlrun/ml-models
-  entry_points:
-    load:
-      name: load
-      doc: load and initialize the model and/or other elements
-      parameters:
-      - name: self
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 8
-    predict:
-      name: predict
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: body
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 13
-    init_context:
-      name: init_context
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 23
-    handler:
-      name: handler
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      - name: event
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 26
   description: deploy an rnn based stock analysis model server.
   min_replicas: 1
   max_replicas: 4
@@ -64,7 +24,7 @@ spec:
       name: rnn-serving
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from /Users/aviasulin/PycharmProjects/mlrun/functions/rnn_serving/rnn_serving.py
+        nuclio.io/generated_by: function generated from /home/kali/functions/rnn_serving/rnn_serving.py
     spec:
       runtime: python:3.6
       handler: rnn_serving:handler
@@ -79,7 +39,7 @@ spec:
   build:
     commands:
     - python -m pip install keras
-    code_origin: http://github.com/aviaIguazio/functions.git#2fd5c1d23cd0e873b235b2e52cf836964f43522c:/Users/aviasulin/PycharmProjects/mlrun/functions/rnn_serving/rnn_serving.py
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/rnn_serving/rnn_serving.py
   secret_sources: []
   affinity: null
 verbose: false

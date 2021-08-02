@@ -2,71 +2,17 @@ kind: serving
 metadata:
   name: tf2-serving-v2
   tag: ''
-  hash: 8c3ea402b1f937fafaab086231dab23f9ca2fab8
+  hash: 8748deb1d9804f9b436c913322c84d5b46c82bd9
   project: default
   labels:
     author: yaronh
   categories:
-  - serving
-  - dl
+  - model-serving
+  - machine-learning
 spec:
   command: ''
   args: []
-  image: ''
-  entry_points:
-    load:
-      name: load
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 23
-    preprocess:
-      name: preprocess
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: body
-        default: ''
-      - name: operation
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 36
-    predict:
-      name: predict
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: data
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 54
-    init_context:
-      name: init_context
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 63
-    handler:
-      name: handler
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      - name: event
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 66
+  image: mlrun/mlrun
   description: tf2 image classification server v2
   min_replicas: 1
   max_replicas: 4
@@ -75,25 +21,25 @@ spec:
     apiVersion: nuclio.io/v1
     kind: Function
     metadata:
-      annotations:
-        nuclio.io/generated_by: function generated from /User/mlrun_repos/functions/tf2_serving_v2/tf2_serving_v2.ipynb
-      labels: {}
       name: tf2-serving-v2
+      labels: {}
+      annotations:
+        nuclio.io/generated_by: function generated from /home/kali/functions/tf2_serving_v2/tf2_serving_v2.py
     spec:
-      build:
-        baseImage: mlrun/mlrun
-        commands:
-        - pip install tensorflow>=2.1
-        - pip install requests pillow
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKCgppbXBvcnQgd2FybmluZ3MKd2FybmluZ3Muc2ltcGxlZmlsdGVyKGFjdGlvbj0iaWdub3JlIiwgY2F0ZWdvcnk9RnV0dXJlV2FybmluZykKCmltcG9ydCBqc29uCmltcG9ydCBudW1weSBhcyBucAppbXBvcnQgcmVxdWVzdHMKZnJvbSB0ZW5zb3JmbG93IGltcG9ydCBrZXJhcwpmcm9tIHRlbnNvcmZsb3cua2VyYXMubW9kZWxzIGltcG9ydCBsb2FkX21vZGVsCmZyb20gdGVuc29yZmxvdy5rZXJhcy5wcmVwcm9jZXNzaW5nIGltcG9ydCBpbWFnZQpmcm9tIHRlbnNvcmZsb3cua2VyYXMucHJlcHJvY2Vzc2luZy5pbWFnZSBpbXBvcnQgbG9hZF9pbWcKZnJvbSBvcyBpbXBvcnQgZW52aXJvbiwgcGF0aApmcm9tIFBJTCBpbXBvcnQgSW1hZ2UKZnJvbSBpbyBpbXBvcnQgQnl0ZXNJTwpmcm9tIHVybGxpYi5yZXF1ZXN0IGltcG9ydCB1cmxvcGVuCmltcG9ydCBtbHJ1bgoKY2xhc3MgVEZNb2RlbChtbHJ1bi5zZXJ2aW5nLlYyTW9kZWxTZXJ2ZXIpOgoKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgIHNlbGYuSU1BR0VfV0lEVEggPSBpbnQoZW52aXJvbi5nZXQoJ0lNQUdFX1dJRFRIJywgJzEyOCcpKQogICAgICAgIHNlbGYuSU1BR0VfSEVJR0hUID0gaW50KGVudmlyb24uZ2V0KCdJTUFHRV9IRUlHSFQnLCAnMTI4JykpCiAgICAgICAgCiAgICAgICAgdHJ5OgogICAgICAgICAgICB3aXRoIG9wZW4oZW52aXJvblsnY2xhc3Nlc19tYXAnXSwgJ3InKSBhcyBmOgogICAgICAgICAgICAgICAgc2VsZi5jbGFzc2VzID0ganNvbi5sb2FkKGYpCiAgICAgICAgZXhjZXB0OgogICAgICAgICAgICBzZWxmLmNsYXNzZXMgPSBOb25lCiAgICAgICAgCiAgICAgICAgbW9kZWxfZmlsZSwgZXh0cmFfZGF0YSA9IHNlbGYuZ2V0X21vZGVsKCcuaDUnKQogICAgICAgIHNlbGYubW9kZWwgPSBsb2FkX21vZGVsKG1vZGVsX2ZpbGUpCiAgICAgICAgCiAgICBkZWYgcHJlcHJvY2VzcyhzZWxmLCBib2R5LCBvcGVyYXRpb24pOgogICAgICAgIHRyeToKICAgICAgICAgICAgb3V0cHV0ID0geydpbnB1dHMnOiBbXX0KICAgICAgICAgICAgaW5wdXRzID0gYm9keS5nZXQoJ2lucHV0cycsIFtdKQogICAgICAgICAgICBmb3IgYnl0ZV9pbWFnZSBpbiBpbnB1dHM6CiAgICAgICAgICAgICAgICBpbWcgPSBJbWFnZS5vcGVuKGJ5dGVfaW1hZ2UpCiAgICAgICAgICAgICAgICBpbWcgPSBpbWcucmVzaXplKChzZWxmLklNQUdFX1dJRFRILCBzZWxmLklNQUdFX0hFSUdIVCkpCgogICAgICAgICAgICAgICAgeCA9IGltYWdlLmltZ190b19hcnJheShpbWcpCiAgICAgICAgICAgICAgICB4ID0gbnAuZXhwYW5kX2RpbXMoeCwgYXhpcz0wKQogICAgICAgICAgICAgICAgb3V0cHV0WydpbnB1dHMnXS5hcHBlbmQoeCkKICAgICAgICAgICAgCiAgICAgICAgICAgIG91dHB1dFsnaW5wdXRzJ10gPSBbbnAudnN0YWNrKG91dHB1dFsnaW5wdXRzJ10pXQogICAgICAgICAgICByZXR1cm4gb3V0cHV0CiAgICAgICAgZXhjZXB0OgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oZidyZWNlaXZlZDoge2JvZHl9JykKICAgICAgICAgICAgCgogICAgZGVmIHByZWRpY3Qoc2VsZiwgZGF0YSk6CiAgICAgICAgaW1hZ2VzID0gZGF0YS5nZXQoJ2lucHV0cycsIFtdKQoKICAgICAgICBwcmVkaWN0ZWRfcHJvYmFiaWxpdHkgPSBzZWxmLm1vZGVsLnByZWRpY3QoaW1hZ2VzKQoKICAgICAgICByZXR1cm4gcHJlZGljdGVkX3Byb2JhYmlsaXR5LnRvbGlzdCgpWzBdCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nX3YyJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
-        noBaseImagesPull: true
-      env: []
-      handler: tf2_serving_v2:handler
       runtime: python:3.6
+      handler: tf2_serving_v2:handler
+      env: []
       volumes: []
+      build:
+        commands: []
+        noBaseImagesPull: true
+        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHdhcm5pbmdzCgp3YXJuaW5ncy5zaW1wbGVmaWx0ZXIoYWN0aW9uPSJpZ25vcmUiLCBjYXRlZ29yeT1GdXR1cmVXYXJuaW5nKQoKaW1wb3J0IGpzb24KaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCByZXF1ZXN0cwpmcm9tIHRlbnNvcmZsb3cgaW1wb3J0IGtlcmFzCmZyb20gdGVuc29yZmxvdy5rZXJhcy5tb2RlbHMgaW1wb3J0IGxvYWRfbW9kZWwKZnJvbSB0ZW5zb3JmbG93LmtlcmFzLnByZXByb2Nlc3NpbmcgaW1wb3J0IGltYWdlCmZyb20gdGVuc29yZmxvdy5rZXJhcy5wcmVwcm9jZXNzaW5nLmltYWdlIGltcG9ydCBsb2FkX2ltZwpmcm9tIG9zIGltcG9ydCBlbnZpcm9uLCBwYXRoCmZyb20gUElMIGltcG9ydCBJbWFnZQpmcm9tIGlvIGltcG9ydCBCeXRlc0lPCmZyb20gdXJsbGliLnJlcXVlc3QgaW1wb3J0IHVybG9wZW4KaW1wb3J0IG1scnVuCgoKY2xhc3MgVEZNb2RlbChtbHJ1bi5zZXJ2aW5nLlYyTW9kZWxTZXJ2ZXIpOgogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgc2VsZi5JTUFHRV9XSURUSCA9IGludChlbnZpcm9uLmdldCgiSU1BR0VfV0lEVEgiLCAiMTI4IikpCiAgICAgICAgc2VsZi5JTUFHRV9IRUlHSFQgPSBpbnQoZW52aXJvbi5nZXQoIklNQUdFX0hFSUdIVCIsICIxMjgiKSkKCiAgICAgICAgdHJ5OgogICAgICAgICAgICB3aXRoIG9wZW4oZW52aXJvblsiY2xhc3Nlc19tYXAiXSwgInIiKSBhcyBmOgogICAgICAgICAgICAgICAgc2VsZi5jbGFzc2VzID0ganNvbi5sb2FkKGYpCiAgICAgICAgZXhjZXB0OgogICAgICAgICAgICBzZWxmLmNsYXNzZXMgPSBOb25lCgogICAgICAgIG1vZGVsX2ZpbGUsIGV4dHJhX2RhdGEgPSBzZWxmLmdldF9tb2RlbCgiLmg1IikKICAgICAgICBzZWxmLm1vZGVsID0gbG9hZF9tb2RlbChtb2RlbF9maWxlKQoKICAgIGRlZiBwcmVwcm9jZXNzKHNlbGYsIGJvZHksIG9wZXJhdGlvbik6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBvdXRwdXQgPSB7ImlucHV0cyI6IFtdfQogICAgICAgICAgICBpbnB1dHMgPSBib2R5LmdldCgiaW5wdXRzIiwgW10pCiAgICAgICAgICAgIGZvciBieXRlX2ltYWdlIGluIGlucHV0czoKICAgICAgICAgICAgICAgIGltZyA9IEltYWdlLm9wZW4oYnl0ZV9pbWFnZSkKICAgICAgICAgICAgICAgIGltZyA9IGltZy5yZXNpemUoKHNlbGYuSU1BR0VfV0lEVEgsIHNlbGYuSU1BR0VfSEVJR0hUKSkKCiAgICAgICAgICAgICAgICB4ID0gaW1hZ2UuaW1nX3RvX2FycmF5KGltZykKICAgICAgICAgICAgICAgIHggPSBucC5leHBhbmRfZGltcyh4LCBheGlzPTApCiAgICAgICAgICAgICAgICBvdXRwdXRbImlucHV0cyJdLmFwcGVuZCh4KQoKICAgICAgICAgICAgb3V0cHV0WyJpbnB1dHMiXSA9IFtucC52c3RhY2sob3V0cHV0WyJpbnB1dHMiXSldCiAgICAgICAgICAgIHJldHVybiBvdXRwdXQKICAgICAgICBleGNlcHQ6CiAgICAgICAgICAgIHJhaXNlIEV4Y2VwdGlvbihmInJlY2VpdmVkOiB7Ym9keX0iKQoKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGRhdGEpOgogICAgICAgIGltYWdlcyA9IGRhdGEuZ2V0KCJpbnB1dHMiLCBbXSkKCiAgICAgICAgcHJlZGljdGVkX3Byb2JhYmlsaXR5ID0gc2VsZi5tb2RlbC5wcmVkaWN0KGltYWdlcykKCiAgICAgICAgcmV0dXJuIHByZWRpY3RlZF9wcm9iYWJpbGl0eS50b2xpc3QoKVswXQoKCmZyb20gbWxydW4ucnVudGltZXMgaW1wb3J0IG51Y2xpb19pbml0X2hvb2sKCgpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICJzZXJ2aW5nX3YyIikKCgpkZWYgaGFuZGxlcihjb250ZXh0LCBldmVudCk6CiAgICByZXR1cm4gY29udGV4dC5tbHJ1bl9oYW5kbGVyKGNvbnRleHQsIGV2ZW50KQoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nX3YyJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
   source: ''
   function_kind: serving_v2
   build:
-    commands: []
-    code_origin: https://github.com/igz-us-sales/functions.git#c5c190f383a5fe6bdf56ca688d377dc1c29011c5:tf2-serving-v2.ipynb
+    commands:
+    - python -m pip install requests pillow tensorflow>=2.1
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/tf2_serving_v2/tf2_serving_v2.py
+  secret_sources: []
+  affinity: null
 verbose: false

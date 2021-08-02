@@ -658,6 +658,7 @@ class MapFeatureNames(MapClass):
         event[NAMED_PREDICTIONS] = {
             name: prediction for name, prediction in zip(label_columns, prediction)
         }
+        logger.info("Mapped event", event=event)
         return event
 
 

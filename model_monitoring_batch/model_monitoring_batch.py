@@ -342,7 +342,12 @@ class BatchProcessor:
                     self.v3io.stream.put_records(
                         container=self.stream_container,
                         stream_path=self.stream_path,
-                        records=[{"drift_status": drift_status, **drift_result}],
+                        records=[{"data" : json.dumps({
+                            "endpoint_id": endpoint_id,
+                            "drift_status": drift_status,
+                            "drift_measure": drift_measure,
+                            "drift_per_feature": {**drift_result}}
+                        )}],
                     )
 
                 self.v3io.kv.update(

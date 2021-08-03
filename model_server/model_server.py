@@ -15,7 +15,7 @@ import os
 import numpy as np
 
 
-class ClassifierModel(mlrun.runtimes.MLModelServer):
+class ClassifierModel(mlrun.runtimes.V2ModelServer):
     def load(self):
         """Load model from storage."""
         model_file, extra_data = self.get_model(".pkl")
@@ -34,5 +34,4 @@ class ClassifierModel(mlrun.runtimes.MLModelServer):
             resp = result.tolist()
         except Exception as e:
             raise Exception(f"Failed to predict {e}")
-
         return resp

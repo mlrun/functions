@@ -67,7 +67,7 @@ class TFModel(mlrun.runtimes.MLModelServer):
                 "prediction": [
                     self.classes[str(int(cls))] for cls in predicted_classes
                 ],
-                f'{self.classes["1"]}-probability': predicted_probabilities,
+                f'{self.classes["1"]}-probability is ': predicted_probabilities,
             }
         else:
             return predicted_probability.tolist()[0]

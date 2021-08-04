@@ -2,14 +2,14 @@ kind: serving
 metadata:
   name: v2-model-server
   tag: ''
-  hash: 7e03eff5670b9c0b53051e19022385c21ca68724
+  hash: ad85919d3b9cf2acae43a3434ba56e01b005755e
   project: default
   labels:
     author: yaronh
     framework: sklearn
   categories:
-  - serving
-  - ml
+  - model-serving
+  - machine-learning
 spec:
   command: ''
   args: []
@@ -83,5 +83,5 @@ spec:
   default_class: ClassifierModel
   build:
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#ec84e9f69115f0762b3da12214a79ecdeb9fef72:/home/michaell/projects/functions/v2_model_server/v2_model_server.py
+    code_origin: https://github.com/Michaelliv/functions.git#0e79859b0adccb92a9b65b02d438ed3dfa3e785f:/home/michaell/projects/functions/v2_model_server/v2_model_server.py
 verbose: false

@@ -224,8 +224,10 @@ class BatchProcessor:
         self.context = context
         self.project = project
 
-        self.model_monitoring_access_key = model_monitoring_access_key
         self.v3io_access_key = v3io_access_key
+        self.model_monitoring_access_key = (
+            model_monitoring_access_key or v3io_access_key
+        )
 
         self.virtual_drift = VirtualDrift(inf_capping=10)
 
@@ -250,6 +252,9 @@ class BatchProcessor:
 
         logger.info(
             "Initializing BatchProcessor",
+            project=project,
+            model_monitoring_access_key_initalized=bool(model_monitoring_access_key),
+            v3io_access_key_initialized=bool(v3io_access_key),
             parquet_path=self.parquet_path,
             kv_container=self.kv_container,
             kv_path=self.kv_path,

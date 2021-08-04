@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
-- serving
-- ml
+- model-serving
+- machine-learning
 description: churn classification and predictor
 doc: ''
 example: churn_server.ipynb

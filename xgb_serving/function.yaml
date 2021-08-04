@@ -1,52 +1,49 @@
 kind: remote
 metadata:
   name: xgb-serving
-  hash: f80c174652d9e75b2ec04c10a3756bb3b7e8f4d1
+  tag: ''
+  hash: d80a0b814b7707e100b3cd7d69fee276ebb2ff16
   project: default
   labels:
-    author: yaronh
-    framework: xgboost
+    author: Daniel
   categories:
   - model-serving
+  - machine-learning
 spec:
   command: ''
   args: []
-  image: ''
-  description: xgboost test data classification server
+  image: mlrun/ml-models
+  entry_points:
+    load:
+      name: load
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 10
+    predict:
+      name: predict
+      doc: ''
+      parameters:
+      - name: self
+        default: ''
+      - name: body
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 14
+  description: deploy an XGBoost model server.
+  min_replicas: 1
   max_replicas: 4
-  env:
-  - name: SERVING_MODEL_xgb_serving_v2
-    value: /User/artifacts/xgb/models
-  - name: MODEL_CLASS
-    value: XGBoostModel
-  - name: ENABLE_EXPLAINER
-    value: 'False'
-  config:
-    spec.triggers.http:
-      kind: http
-      maxWorkers: 8
-      attributes:
-        ingresses: {}
-      annotations: {}
-  base_spec:
-    apiVersion: nuclio.io/v1
-    kind: nuclio:serving
-    metadata:
-      annotations:
-        nuclio.io/generated_by: function generated from 30-08-2020
-      labels: {}
-      name: xgb-serving
-    spec:
-      build:
-        baseImage: mlrun/ml-models
-        commands: []
-        functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKCgppbXBvcnQgb3MKaW1wb3J0IGpzb24KaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCB4Z2Jvb3N0IGFzIHhnYgpmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCgoKaW1wb3J0IG1scnVuCmNsYXNzIFhHQm9vc3RNb2RlbChtbHJ1bi5ydW50aW1lcy5NTE1vZGVsU2VydmVyKToKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgIG1vZGVsX2ZpbGUsIGV4dHJhX2RhdGEgPSBzZWxmLmdldF9tb2RlbCgiLnBrbCIpCiAgICAgICAgc2VsZi5tb2RlbCA9IGxvYWQob3BlbihzdHIobW9kZWxfZmlsZSksICJyYiIpKQogIAoKICAgIGRlZiBwcmVkaWN0KHNlbGYsIGJvZHkpOgogICAgICAgIHRyeToKICAgICAgICAgICAgZmVhdHMgPSBucC5hc2FycmF5KGJvZHlbImluc3RhbmNlcyJdLCBkdHlwZT1ucC5mbG9hdDMyKS5yZXNoYXBlKC0xLCA1KQogICAgICAgICAgICByZXN1bHQgPSBzZWxmLm1vZGVsLnByZWRpY3QoZmVhdHMsIHZhbGlkYXRlX2ZlYXR1cmVzPUZhbHNlKQogICAgICAgICAgICByZXR1cm4gcmVzdWx0LnRvbGlzdCgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oIkZhaWxlZCB0byBwcmVkaWN0ICVzIiAlIGUpCgoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
-        noBaseImagesPull: true
-      env:
-      - name: MODEL_CLASS
-        value: XGBoostModel
-      handler: xgb_serving:handler
-      runtime: python:3.6
-      volumes: []
+  env: []
+  base_spec: ''
   source: ''
-  function_kind: serving
+  build:
+    functionSourceCode: aW1wb3J0IG9zCmltcG9ydCBqc29uCmltcG9ydCBudW1weSBhcyBucAppbXBvcnQgeGdib29zdCBhcyB4Z2IKZnJvbSBjbG91ZHBpY2tsZSBpbXBvcnQgbG9hZAppbXBvcnQgbWxydW4KCgpjbGFzcyBYR0Jvb3N0TW9kZWwobWxydW4ucnVudGltZXMuTUxNb2RlbFNlcnZlcik6CiAgICBkZWYgbG9hZChzZWxmKToKICAgICAgICBtb2RlbF9maWxlLCBleHRyYV9kYXRhID0gc2VsZi5nZXRfbW9kZWwoIi5wa2wiKQogICAgICAgIHNlbGYubW9kZWwgPSBsb2FkKG9wZW4oc3RyKG1vZGVsX2ZpbGUpLCAicmIiKSkKCiAgICBkZWYgcHJlZGljdChzZWxmLCBib2R5KToKICAgICAgICB0cnk6CiAgICAgICAgICAgIGZlYXRzID0gbnAuYXNhcnJheShib2R5WyJpbnN0YW5jZXMiXSwgZHR5cGU9bnAuZmxvYXQzMikucmVzaGFwZSgtMSwgNSkKICAgICAgICAgICAgcmVzdWx0ID0gc2VsZi5tb2RlbC5wcmVkaWN0KGZlYXRzLCB2YWxpZGF0ZV9mZWF0dXJlcz1GYWxzZSkKICAgICAgICAgICAgcmV0dXJuIHJlc3VsdC50b2xpc3QoKQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZToKICAgICAgICAgICAgcmFpc2UgRXhjZXB0aW9uKCJGYWlsZWQgdG8gcHJlZGljdCAlcyIgJSBlKQ==
+    commands: []
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/xgb_serving/xgb_serving.py
+  default_handler: handler
+  affinity: null
+verbose: false

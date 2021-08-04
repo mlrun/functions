@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
-- ml
-- serve
+- machine-learning
+- monitoring
 description: Deploy a streaming Concept Drift detector on a labeled stream. the nuclio part of the concept_drift function
 doc: ''
 example: concept_drift_streaming.ipynb

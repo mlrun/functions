@@ -1,8 +1,7 @@
 apiVersion: v1
 categories:
-- NLP
-- BERT
-- embeddings
+- machine-learning
+- data-preparation
 description: Get BERT based embeddings for given text
 doc: ''
 example: bert_embeddings.ipynb

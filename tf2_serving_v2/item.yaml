@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
-- serving
-- dl
+- model-serving
+- machine-learning
 description: tf2 image classification server v2
 doc: ''
 example: tf2_serving_v2.ipynb

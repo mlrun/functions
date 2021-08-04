@@ -127,7 +127,7 @@ select one or more categories and feel free to suggest additional options.
 | Model Testing | <b>model-testing</b> | A function that can be used to test trained models |
 | Data Analysis | <b>data-analysis</b> | A function that can be used to preform analysis and exploration on data |
 | Monitoring | <b>monitoring</b> | A function that can be used to monitor and/or measure metrics regarding data, models and model endpoints |
-| Alerts And Notifications | <b>alerts-and-notifications</b> | A function that is used to either alert or notify in any way |
+| Utilities | <b>Utilities</b> | A function that is used to alert, notify or provide services in any way |
 
 ## Installation Guide
 It is highly advised using the functions package in a dedicated environment, since Pipenv is used as part of the testing routine, 

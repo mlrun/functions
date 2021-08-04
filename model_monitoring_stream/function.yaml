@@ -2,9 +2,10 @@ kind: remote
 metadata:
   name: model-monitoring-stream
   tag: ''
-  hash: 722137880b25254a26728033929e1504d40de1cb
+  hash: e7f89d0e1dd4ad972524ee428db2e3257fb82749
   project: default
-  categories: []
+  categories:
+  - monitoring
 spec:
   command: ''
   args: []
@@ -261,6 +262,6 @@ spec:
   source: ''
   build:
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#eff280d0e10584e31644c72fdf79a06d0d457d7c:/home/michaell/projects/functions/model_monitoring_stream/model_monitoring_stream.py
+    code_origin: https://github.com/Michaelliv/functions.git#63ead35bd9b4fdbd5c519c636d5512516f83ea44:/home/michaell/projects/functions/model_monitoring_stream/model_monitoring_stream.py
   default_handler: handler
 verbose: false

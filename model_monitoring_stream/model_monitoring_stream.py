@@ -32,7 +32,6 @@ from storey import (
 )
 from storey.dtypes import SlidingWindows
 from storey.steps import SampleWindow
-
 # Constants
 from v3io.dataplane import RaiseForStatus
 
@@ -106,7 +105,9 @@ class EventStreamProcessor:
         self.v3io_api = v3io_api or config.v3io_api
 
         self.v3io_access_key = v3io_access_key or environ.get("V3IO_ACCESS_KEY")
-        self.model_monitoring_access_key = os.environ.get("MODEL_MONITORING_ACCESS_KEY")
+        self.model_monitoring_access_key = (
+            os.environ.get("MODEL_MONITORING_ACCESS_KEY") or self.v3io_access_key
+        )
 
         template = config.model_endpoint_monitoring.store_prefixes.default
 
@@ -644,8 +645,12 @@ class MapFeatureNames(MapClass):
             self.label_columns[endpoint_id] = label_columns
             self.feature_names[endpoint_id] = feature_names
 
-            logger.info("Label columns", endpoint_id=endpoint_id, label_columns=label_columns)
-            logger.info("Feature names", endpoint_id=endpoint_id, feature_names=feature_names)
+            logger.info(
+                "Label columns", endpoint_id=endpoint_id, label_columns=label_columns
+            )
+            logger.info(
+                "Feature names", endpoint_id=endpoint_id, feature_names=feature_names
+            )
 
         feature_names = self.feature_names[endpoint_id]
         features = event[FEATURES]

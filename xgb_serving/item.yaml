@@ -20,6 +20,6 @@ spec:
   kind: nuclio:serving
   requirements: []
   env:
-    MODEL_CLASS: TFModel
+    MODEL_CLASS: XGBoostModel
 url: ''
 version: 0.0.1

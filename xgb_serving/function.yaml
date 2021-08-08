@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: xgb-serving
   tag: ''
-  hash: 3f7e7f6a9fa12fd5dba55db646d037f01c4ef48d
+  hash: 9f1a17b5c8bfaf2b72bd63e5f3cd137e3ed9db1d
   project: default
   labels:
     author: Daniel
@@ -59,7 +59,7 @@ spec:
   max_replicas: 4
   env:
   - name: MODEL_CLASS
-    value: TFModel
+    value: XGBoostModel
   base_spec:
     apiVersion: nuclio.io/v1
     kind: Function
@@ -81,7 +81,7 @@ spec:
   function_kind: serving
   build:
     commands: []
-    code_origin: http://github.com/aviaIguazio/functions.git#785c3a5ebe5c143ada43ece1251d8e79c971e791:/Users/aviasulin/PycharmProjects/mlrun/functions/xgb_serving/xgb_serving.py
+    code_origin: http://github.com/aviaIguazio/functions.git#5284834fc83e95de550c22d0eb8dc30f5469dd25:/Users/aviasulin/PycharmProjects/mlrun/functions/xgb_serving/xgb_serving.py
   default_handler: handler
   affinity: null
 verbose: false

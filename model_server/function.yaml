@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: model-server
   tag: ''
-  hash: a747a3700eb1626d59a739482ad75c529108c775
+  hash: bb1c6df8bc36fe7fad858bc0809f2208b896fa91
   project: default
   labels:
     author: yaronh
@@ -38,8 +38,9 @@ spec:
   source: ''
   function_kind: serving
   build:
-    commands: []
-    code_origin: https://github.com/daniels290813/functions.git#5618b47fd98ada6f6b092b2e190259e867827009:/User/test/functions/model_server/model_server.py
+    commands:
+    - python -m pip install sklearn
+    code_origin: https://github.com/daniels290813/functions.git#3e3c5bff3587e959bcfa3a7498b518c39c3ece3b:/User/test/functions/model_server/model_server.py
   default_handler: handler
   affinity: null
 verbose: false

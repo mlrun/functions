@@ -20,6 +20,6 @@ spec:
   handler: handler
   image: mlrun/mlrun
   kind: nuclio:serving
-  requirements: []
+  requirements: [sklearn]
 url: ''
 version: 0.0.1

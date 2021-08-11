@@ -19,7 +19,7 @@ spec:
   filename: model_server.py
   handler: handler
   image: mlrun/mlrun
-  kind: serving
+  kind: nuclio:serving
   requirements: []
 url: ''
 version: 0.0.1

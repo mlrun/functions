@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: model-server
   tag: ''
-  hash: 74027eb08ddc87b43d2acbd92c1c2cc9ed71e515
+  hash: a747a3700eb1626d59a739482ad75c529108c775
   project: default
   labels:
     author: yaronh
@@ -25,7 +25,7 @@ spec:
       name: model-server
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from /home/kali/functions/model_server/model_server.py
+        nuclio.io/generated_by: function generated from /User/test/functions/model_server/model_server.py
     spec:
       runtime: python:3.6
       handler: model_server:handler
@@ -39,7 +39,7 @@ spec:
   function_kind: serving
   build:
     commands: []
-    code_origin: https://github.com/daniels290813/functions.git#785c3a5ebe5c143ada43ece1251d8e79c971e791:/home/kali/functions/model_server/model_server.py
+    code_origin: https://github.com/daniels290813/functions.git#5618b47fd98ada6f6b092b2e190259e867827009:/User/test/functions/model_server/model_server.py
   default_handler: handler
   affinity: null
 verbose: false

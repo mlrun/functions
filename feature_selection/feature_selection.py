@@ -72,7 +72,7 @@ def plot_stat(context,
 
 def feature_selection(context,
                       df_artifact,
-                      k: int=10,
+                      k: int=5,
                       min_votes: float=0.5,
                       label_column: str=None,
                       stat_filters: list=['f_classif', 'mutual_info_classif', 'chi2', 'f_regression'],
@@ -82,7 +82,8 @@ def feature_selection(context,
                       max_scaled_scores: bool=True,
                       sample_ratio: float=None,
                       output_vector_name: float=None,
-                      ignore_type_errors: bool=False):
+                      ignore_type_errors: bool=False,
+                      is_feature_vector: bool=False):
     
     """Applies selected feature selection statistical functions
     or models on our 'df_artifact'.
@@ -115,10 +116,10 @@ def feature_selection(context,
     
     :param output_vector_name: creates a new feature vector containing only the identifies features.
     
-    :ignore_type_errors: skips datatypes that are neither float or int within the feature vector.
-    """
+    :param ignore_type_errors: skips datatypes that are neither float or int within the feature vector.
     
-    is_feature_vector = False
+    :param is_feature_vector: bool stating if the data is passed as a feature vector.
+    """
         
     # Check if df.meta is valid, if it is, look for a feature vector
     if df_artifact.meta:
@@ -266,23 +267,23 @@ def feature_selection(context,
                         format='parquet')
     
     # Creating a new feature vector containing only the identified top features
-    if df_artifact.meta.spec.features and output_vector_name:
-        
+    if is_feature_vector and df_artifact.meta.spec.features and output_vector_name:
+
         # Selecting the top K features from our top feature dataframe
         selected_features = result_matrix_df.head(k).index
-        
+
         # Match the selected feature names to the FS Feature annotations
         matched_selections = [feature for feature in list(df_artifact.meta.spec.features) for selected in list(selected_features) if feature.endswith(selected)]
-        
+
         # Defining our new feature vector
         top_features_fv = fs.FeatureVector(output_vector_name, 
                                     matched_selections, 
                                     label_feature="labels.label",
                                     description='feature vector composed strictly of our top features')
-        
+
         # Saving
         top_features_fv.save()
         fs.get_offline_features(top_features_fv, target=ParquetTarget())
-        
+
         # Logging our new feature vector URI
         context.log_result('top_features_vector', top_features_fv.uri)

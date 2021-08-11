@@ -38,7 +38,7 @@ def gen_model():
 
 def test_remote_model_server():
     x,y = gen_model()
-    fn = mlrun.import_function('hub://model_server').apply(mlrun.auto_mount())
+    fn = mlrun.import_function('hub://model_server')#.apply(mlrun.auto_mount())
     fn.add_model('iris',model_path = os.getcwd()+'/model.pkl')
     fn.set_envs({'MODEL_CLASS': "ClassifierModel"})
     address = fn.deploy()

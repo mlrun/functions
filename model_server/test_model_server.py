@@ -32,13 +32,13 @@ def gen_model():
     classifier = LogisticRegression(random_state = 0, solver='lbfgs', multi_class='auto')
     classifier.fit(X_train, y_train)
     # saving the model
-    filename = 'model.pkl'
+    filename = os.getcwd()+'/model.pkl'
     pickle.dump(classifier, open(filename, 'wb'))
     return X_test,y_test
 
 def test_remote_model_server():
     x,y = gen_model()
-    fn = mlrun.import_function('function.yaml').apply(mlrun.auto_mount())
+    fn = mlrun.import_function('hub://model_server').apply(mlrun.auto_mount())
     fn.add_model('iris',model_path = os.getcwd()+'/model.pkl')
     fn.set_envs({'MODEL_CLASS': "ClassifierModel"})
     address = fn.deploy()
@@ -46,4 +46,3 @@ def test_remote_model_server():
     predict_url = address+"/iris/predict"
     ans = requests.post(url = predict_url,json = my_dict).text
     assert(accuracy_score(y,json.loads(ans)) > 0.8)
-

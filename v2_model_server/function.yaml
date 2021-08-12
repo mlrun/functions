@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: v2-model-server
   tag: ''
-  hash: 41f1834001c85234d9cce6f061d00ef54d0873d2
+  hash: ad85919d3b9cf2acae43a3434ba56e01b005755e
   project: default
   labels:
     author: yaronh
@@ -14,6 +14,49 @@ spec:
   command: ''
   args: []
   image: mlrun/mlrun
+  entry_points:
+    load:
+      name: load
+      doc: load and initialize the model and/or other elements
+      parameters:
+      - name: self
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 16
+    predict:
+      name: predict
+      doc: Generate model predictions from sample.
+      parameters:
+      - name: self
+        default: ''
+      - name: body
+        type: dict
+        default: ''
+      outputs:
+      - default: ''
+        type: List
+      lineno: 21
+    init_context:
+      name: init_context
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 39
+    handler:
+      name: handler
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      - name: event
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 42
   description: generic sklearn model server
   min_replicas: 1
   max_replicas: 4
@@ -25,7 +68,7 @@ spec:
       name: v2-model-server
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from /home/kali/functions/v2_model_server/v2_model_server.py
+        nuclio.io/generated_by: function generated from /home/michaell/projects/functions/v2_model_server/v2_model_server.py
     spec:
       runtime: python:3.6
       handler: v2_model_server:handler
@@ -40,7 +83,5 @@ spec:
   default_class: ClassifierModel
   build:
     commands: []
-    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/v2_model_server/v2_model_server.py
-  secret_sources: []
-  affinity: null
+    code_origin: https://github.com/Michaelliv/functions.git#0e79859b0adccb92a9b65b02d438ed3dfa3e785f:/home/michaell/projects/functions/v2_model_server/v2_model_server.py
 verbose: false

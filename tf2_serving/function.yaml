@@ -6,8 +6,8 @@ metadata:
   labels:
     author: yaronh
   categories:
-  - serving
-  - dl
+  - model-serving
+  - machine-learning
 spec:
   command: ''
   args: []

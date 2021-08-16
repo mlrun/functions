@@ -9,7 +9,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: livsmichael/mlrun-api:automation
+  image: mlrun/mlrun
   env: []
   default_handler: handler
   entry_points:

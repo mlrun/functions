@@ -15,7 +15,7 @@ platformVersion: ''
 spec:
   filename: model_monitoring_stream.py
   handler: handler
-  image: mlrun/mlrun
+  image: livsmichael/mlrun-api:automation
   kind: nuclio
   requirements: []
 url: ''

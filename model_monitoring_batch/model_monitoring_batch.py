@@ -294,7 +294,7 @@ class BatchProcessor:
     def run(self):
 
         try:
-            endpoints = self.db.list_endpoints(self.project)
+            endpoints = self.db.list_model_endpoints(self.project)
         except Exception as e:
             logger.error("Failed to list endpoints", exc=e)
             return
@@ -326,7 +326,7 @@ class BatchProcessor:
 
                 logger.info(f"Now processing {full_path}")
 
-                endpoint = self.db.get_endpoint(
+                endpoint = self.db.get_model_endpoint(
                     project=self.project, endpoint_id=endpoint_id
                 )
 
@@ -362,7 +362,18 @@ class BatchProcessor:
                     self.v3io.stream.put_records(
                         container=self.stream_container,
                         stream_path=self.stream_path,
-                        records=[{"drift_status": drift_status, **drift_result}],
+                        records=[
+                            {
+                                "data": json.dumps(
+                                    {
+                                        "endpoint_id": endpoint_id,
+                                        "drift_status": drift_status,
+                                        "drift_measure": drift_measure,
+                                        "drift_per_feature": {**drift_result},
+                                    }
+                                )
+                            }
+                        ],
                     )
 
                 self.v3io.kv.update(

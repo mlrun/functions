@@ -10,6 +10,7 @@ import mlrun
 # Feature selection strategies
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import SelectFromModel
+from sklearn.linear_model import LogisticRegression
 
 # Scale feature scores
 from sklearn.preprocessing import MinMaxScaler
@@ -192,6 +193,7 @@ def feature_selection(context,
             selected_models[model_name] = ClassifierClass(**current_model["CLASS"])
         elif model in all_sklearn_estimators:
             selected_models[model_name] = all_sklearn_estimators[model_name]()
+            
         else:
             try:
                 current_model = json.loads(model) if isinstance(model, str) else current_model
@@ -203,6 +205,11 @@ def feature_selection(context,
     # Run model filters
     models_df = pd.DataFrame(index=X.columns)
     for model_name, model in selected_models.items():
+        
+
+        if model_name == 'LogisticRegression':
+            model.set_params(solver='liblinear')
+            
         # Train model and get feature importance
         select_from_model = SelectFromModel(model).fit(X, y)
         feature_idx = select_from_model.get_support()

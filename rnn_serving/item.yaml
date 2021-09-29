@@ -19,6 +19,6 @@ spec:
   handler: handler
   image: mlrun/ml-models
   kind: serving
-  requirements: [keras]
+  requirements:
 url: ''
 version: 0.0.1

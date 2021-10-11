@@ -169,6 +169,8 @@ jobs:
         run: |
           cd marketplace
           COMMIT_SHA=$(git rev-parse --short "$GITHUB_SHA")
+          echo "commit sha: $COMMIT_SHA"
+          echo "github sha: $GITHUB_SHA"
           BRANCH_NAME=marketplace-doc-gen-$COMMIT_SHA
           REMOTE=https://$USERNAME:$GITHUB_TOKEN@github.com/$BASE_REPO/$REPO_PATH.git
           echo "Validating environment params...";

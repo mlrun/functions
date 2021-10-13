@@ -311,7 +311,8 @@ class TestIPYNB(TestSuite):
         if (path / "item.yaml").exists():
             for inner_file in path.iterdir():
                 if self.is_test_ipynb(inner_file):
-                    testables.append(str(inner_file.resolve()))
+                    #testables.append(str(inner_file.resolve()))
+                    testables.append(str(path.resolve()))
             if testables:
                 click.echo("Found testable directory...")
         # Handle multiple directories
@@ -321,7 +322,8 @@ class TestIPYNB(TestSuite):
                 # Iterate individual files in each directory
                 for inner_file in inner_dir.iterdir():
                     if self.is_test_ipynb(inner_file):
-                        testables.append(str(inner_file.resolve()))
+                        #testables.append(str(inner_file.resolve()))
+                        testables.append(str(path.resolve()))
             click.echo(f"Found {len(testables)} testable items...")
 
         if not testables:
@@ -329,7 +331,7 @@ class TestIPYNB(TestSuite):
                 "No tests found, make sure your test file names are structures as 'test_*.py')"
             )
             exit(0)
-
+        testables.sort()
         return testables
 
     def before_run(self):
@@ -425,8 +427,8 @@ class TestIPYNB(TestSuite):
     def is_test_ipynb(path: Path):
         return (
             path.is_file()
-            and path.name.startswith("test_")
-            and path.name.endswith(".py")
+            #and path.name.startswith("test_")
+            and path.name.endswith(".ipynb")
         )
 
 

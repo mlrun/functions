@@ -23,7 +23,7 @@ class ChurnModel(mlrun.serving.V2ModelServer):
 
     def predict(self, body):
         try:
-            feats = np.asarray(body["instances"], dtype=np.float32).reshape(-1, 23)
+            feats = np.asarray(body["inputs"], dtype=np.float32).reshape(-1, 23)
             result = self.model.predict(feats, validate_features=False)
             return result.tolist()
         except Exception as e:

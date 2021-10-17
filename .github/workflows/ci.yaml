@@ -35,7 +35,7 @@ jobs:
         env:
            BASE: ${{ github.base_ref }}
         run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/${BASE}:refs/remotes/origin/${BASE}
+          git fetch --no-tags --prune --depth=1 origin ${BASE}:${BASE}
           matrix=$((
             echo '{ "package" : ['
             git diff ${BASE} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'

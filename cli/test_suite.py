@@ -210,6 +210,7 @@ class TestPY(TestSuite):
         pass
 
     def run(self, path: Union[str, Path]):
+        print("PY run path {}".format(path))
         install_python(path)
         item_requirements = get_item_yaml_requirements(path)
         install_requirements(path, ["pytest"] + item_requirements)
@@ -311,8 +312,7 @@ class TestIPYNB(TestSuite):
         if (path / "item.yaml").exists():
             for inner_file in path.iterdir():
                 if self.is_test_ipynb(inner_file):
-                    #testables.append(str(inner_file.resolve()))
-                    testables.append(str(path.resolve()))
+                    testables.append(str(inner_file.resolve()))
             if testables:
                 click.echo("Found testable directory...")
         # Handle multiple directories
@@ -322,8 +322,7 @@ class TestIPYNB(TestSuite):
                 # Iterate individual files in each directory
                 for inner_file in inner_dir.iterdir():
                     if self.is_test_ipynb(inner_file):
-                        #testables.append(str(inner_file.resolve()))
-                        testables.append(str(path.resolve()))
+                        testables.append(str(inner_dir.resolve()))
             click.echo(f"Found {len(testables)} testable items...")
 
         if not testables:
@@ -340,7 +339,9 @@ class TestIPYNB(TestSuite):
     def before_each(self, path: Union[str, Path]):
         pass
 
-    def run(self, path: Union[str, Path]) -> TestResult:
+#    def run(self, path: Union[str, Path]) -> TestResult:
+    def run(self, path: Union[str, Path]):
+        print("IPYNB run path {}".format(path))
         install_python(path)
         item_requirements = get_item_yaml_requirements(path)
         install_requirements(path, ["papermill", "jupyter"] + item_requirements)

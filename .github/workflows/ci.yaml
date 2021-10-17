@@ -29,11 +29,16 @@ jobs:
         #  2.7) Add comma suffix to all strings excluding the last one => sed '$!s/.*/&,/'
         #  2.8) Close JSON
         # 3) Save matrix JSON to output
+        # This is previous fetch command that stopped working (wile invetsigating added WA bello in run sectiong): git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
+        # This is old git diff version:             git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
+
+        env:
+           BASE: ${{ github['base_ref'] }}
         run: |
-          git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/${BASE}:refs/remotes/origin/${BASE}
           matrix=$((
             echo '{ "package" : ['
-            git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
+            git diff ${BASE} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
             echo " ]}"
           ) | jq -c .)
           echo "::set-output name=matrix::$matrix"

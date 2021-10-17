@@ -33,7 +33,7 @@ jobs:
         # This is old git diff version:             git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
 
         env:
-           BASE: ${{ github['base_ref'] }}
+           BASE: ${{ github.base_ref }}
         run: |
           git fetch --no-tags --prune --depth=1 origin +refs/heads/${BASE}:refs/remotes/origin/${BASE}
           matrix=$((

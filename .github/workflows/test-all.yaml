@@ -136,9 +136,10 @@ jobs:
     needs: run_monorepo_tests
 
     steps:
-      - name: Get branch name
-        id: branch
-        run: echo "::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})"
+      - name: Get the current branch name
+        shell: bash
+        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        id: myref
       - name: Checkout current repo
         uses: actions/checkout@v2
         with:
@@ -159,7 +160,7 @@ jobs:
           pip install -r requirements.txt
       - name: Build marketplace docs
         env:
-          CHANNEL: ${{ steps.branch.outputs.branch }}
+          CHANNEL: ${{ steps.myref.outputs.branch }}
         run: |
           cd marketplace
           git pull origin

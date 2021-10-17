@@ -31,7 +31,7 @@ jobs:
         # 3) Save matrix JSON to output
         # This is old fetch command it cant work cause base_ref is only avaliable on pull request actions: git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
         run: |
-          git fetch origin ${{ steps.myref.outputs.branch }}:${{ steps.myref.outputs.branch }}
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/${{ steps.myref.outputs.branch }}:refs/remotes/origin/${{ steps.myref.outputs.branch }}
           matrix=$((
             echo '{ "package" : ['
             git ls-files *[^cli] | grep '/' | sort | uniq| sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'

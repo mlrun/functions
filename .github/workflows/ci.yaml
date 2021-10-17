@@ -32,13 +32,11 @@ jobs:
         # This is previous fetch command that stopped working (wile invetsigating added WA bello in run sectiong): git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
         # This is old git diff version:             git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
 
-        env:
-           BASE: ${{ github['base_ref'] }}
         run: |
-          git fetch --no-tags --prune --depth=1 origin $BASE:$BASE
+          git fetch --no-tags --prune --depth=1 origin ${{ github['base_ref'] }}:${{ github['base_ref'] }}
           matrix=$((
             echo '{ "package" : ['
-            git diff $BASE --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
+            git diff ${{ github['base_ref'] }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
             echo " ]}"
           ) | jq -c .)
           echo "::set-output name=matrix::$matrix"

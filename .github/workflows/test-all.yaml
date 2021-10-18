@@ -186,6 +186,7 @@ jobs:
               exit 1;
           };
           git config --local user.name $USERNAME
+          git remote add $REMOTE
           echo "Checking out [$BRANCH_NAME]..."
           git checkout -b $BRANCH_NAME
           echo "Checking out [$BASE_BRANCH]..."

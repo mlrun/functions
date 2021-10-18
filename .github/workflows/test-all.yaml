@@ -173,6 +173,7 @@ jobs:
           BASE_REPO: mlrun
           BASE_BRANCH: master
         run: |
+          cd marketplace
           pwd
           COMMIT_SHA=$(git rev-parse --short "$GITHUB_SHA")
           echo "commit sha: $COMMIT_SHA"

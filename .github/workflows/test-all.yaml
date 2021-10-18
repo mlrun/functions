@@ -164,7 +164,7 @@ jobs:
         run: |
           cd marketplace 
           git pull origin
-          python functions/functions.py build-marketplace -s functions -sn functions -m marketplace -c $CHANNEL -v
+          python ../functions/functions.py build-marketplace -s functions -sn functions -m marketplace -c $CHANNEL -v
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V2 }}

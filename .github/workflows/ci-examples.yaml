@@ -5,11 +5,11 @@ on:
     branches:
       - '.+-system-tests'
 
-  schedule:
-
-    # * is a special character in YAML so you have to quote this string
-    # Run the system tests every 3 hours
-    - cron:  '0 */3 * * *'
+#  schedule:
+#
+#    # * is a special character in YAML so you have to quote this string
+#    # Run the system tests every 3 hours
+#    - cron:  '0 */3 * * *'
 
   workflow_dispatch:
     inputs:

@@ -308,6 +308,12 @@ class BatchProcessor:
         prefix = self.parquet_path.replace(sub, "")
         fs = store.get_filesystem(silent=False)
 
+        if not fs.exists(sub):
+            logger.warn(
+                f"{sub} does not exist"
+            )
+            return
+
         for endpoint_dir in fs.ls(sub):
             endpoint_id = endpoint_dir["name"].split("=")[-1]
             if endpoint_id not in active_endpoints:

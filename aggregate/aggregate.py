@@ -6,24 +6,25 @@ from mlrun.datastore import DataItem
 
 from typing import Union
 
+
 def aggregate(context,
               df_artifact: Union[DataItem, pd.core.frame.DataFrame],
-              save_to: str = 'aggregated-df.pq', 
-              keys: list = None, 
-              metrics: list = None, 
-              labels: list = None, 
-              metric_aggs: list = ['mean'], 
-              label_aggs: list = ['max'], 
-              suffix: str = '', 
-              window: int = 3, 
-              center: bool = False, 
+              save_to: str = 'aggregated-df.pq',
+              keys: list = None,
+              metrics: list = None,
+              labels: list = None,
+              metric_aggregations: list = ['mean'],
+              label_aggregations: list = ['max'],
+              suffix: str = '',
+              window: int = 3,
+              center: bool = False,
               inplace: bool = False,
               drop_na: bool = True,
               files_to_select: int = 1):
     """Time-series aggregation function
     
     Will perform a rolling aggregation on {df_artifact}, over {window} by the selected {keys}
-    applying {metric_aggs} on {metrics} and {label_aggs} on {labels}. adding {suffix} to the 
+    applying {metric_aggregations} on {metrics} and {label_aggregations} on {labels}. adding {suffix} to the
     feature names.
     
     if not {inplace}, will return the original {df_artifact}, joined by the aggregated result.
@@ -36,12 +37,12 @@ def aggregate(context,
     :param keys:        Subset of indexes from the source dataframe to aggregate by (default=all)
     :param metrics:     Array containing a list of metrics to run the aggregations on. (default=None) 
     :param labels:      Array containing a list of labels to run the aggregations on. (default=None) 
-    :param metric_aggs: Array containing a list of aggregation function names to run on {metrics}.
+    :param metric_aggregations: Array containing a list of aggregation function names to run on {metrics}.
                         (Ex: 'mean', 'std') (default='mean')
-    :param label_aggs:  Array containing a list of aggregation function names to run on {metrics}.
+    :param label_aggregations:  Array containing a list of aggregation function names to run on {metrics}.
                         (Ex: 'max', 'min') (default='max') 
     :param suffix:      Suffix to add to the feature name, E.g: <Feature_Name>_<Agg_Function>_<Suffix>
-                        (Ex: 'last_60_mintes') (default='')
+                        (Ex: 'last_60_minutes') (default='')
     :param window:      Window size to perform the rolling aggregate on. (default=3)
     :param center:      If True, Sets the value for the central sample in the window,
                         If False, will set the value to the last sample. (default=False)
@@ -78,8 +79,7 @@ def aggregate(context,
         df = input_df
         
     if metrics:
-        metrics_df = df.loc[:, metrics].rolling(window=window, center=center).aggregate(metric_aggs)
-        
+        metrics_df = df.loc[:, metrics].rolling(window=window, center=center).aggregate(metric_aggregations)
         metrics_df.columns = ['_'.join(col).strip() for col in metrics_df.columns.values]
         
         if suffix:
@@ -92,7 +92,7 @@ def aggregate(context,
 
     if labels:
         labels_df = df.loc[:, labels].rolling(window=window,
-                                              center=center).aggregate(label_aggs)
+                                              center=center).aggregate(label_aggregations)
         labels_df.columns = ['_'.join(col).strip() for col in labels_df.columns.values]
         
         if suffix:

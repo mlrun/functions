@@ -1,7 +1,6 @@
 from pathlib import Path
-import shutil
 from mlrun import code_to_function, import_function
-#Testing the CI with dummy commit 14
+
 AGGREGATE_PATH = "artifacts/aggregate.pq"
 DATA = "https://s3.wasabisys.com/iguazio/data/market-palce/aggregate/metrics.pq"
 

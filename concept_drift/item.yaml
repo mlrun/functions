@@ -20,6 +20,6 @@ spec:
   handler: concept_drift_deployer
   image: mlrun/ml-models
   kind: job
-  requirements: []
+  requirements: [scikit-multiflow]
 url: ''
-version: 0.0.1
+version: 0.0.2

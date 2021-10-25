@@ -11,6 +11,13 @@ on:
 #    # Run the system tests every 3 hours
 #    - cron:  '0 */3 * * *'
 
+  workflow_dispatch:
+    inputs:
+      mlrun_version:
+        description: 'mlrun version'
+        required: true
+        default: '0.7.1'
+
 env:
   NAMESPACE: mlrun
   MLRUN_API_NODE_PORT: 30070

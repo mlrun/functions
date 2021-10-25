@@ -24,4 +24,4 @@ spec:
   - scikit-multiflow==0.4.1
   - v3io_frames
 url: ''
-version: 0.0.1
+version: 0.0.2

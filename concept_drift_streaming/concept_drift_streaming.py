@@ -52,7 +52,7 @@ def construct_record(record):
     res = dict([(k, record[k]) for k in ["when", "class", "model", "resp", "request"]])
     res["feature_vector"] = res.pop("request")["instances"][0]
     res["timestamp"] = res.pop("when")
-    res["prediction"] = res["resp"][0]
+    res[prediction_col] = res["resp"][0]
     return res
 
 

@@ -68,7 +68,7 @@ jobs:
             v3io-stable/mlrun-kit
     - name: Prepare system tests env
       run: |
-        echo "MLRUN_DBPATH: http://$(minikube ip):${MLRUN_API_NODE_PORT}" > tests/system/env.yml
+        echo "MLRUN_DBPATH: http://$(minikube ip):${MLRUN_API_NODE_PORT}"
     - name: Run system tests
       run: |
         python functions/functions.py  run-tests -r functions -s ipynb

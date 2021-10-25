@@ -66,7 +66,7 @@ def concept_drift_deployer(
 
     mlconf.dbpath = mlconf.dbpath or "http://mlrun-api:8080"
     mlconf.hub_url = hub_url
-    fn = import_function(url="hub://concept_drift_streaming")
+    fn = import_function(url=f"hub://concept_drift_streaming:{fn_tag}")
 
     context.logger.info("Loading base dataset")
     base_df = base_dataset.as_df()

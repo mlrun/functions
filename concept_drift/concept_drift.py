@@ -16,6 +16,7 @@ def concept_drift_deployer(
     context: MLClientCtx,
     base_dataset: DataItem,
     input_stream: str,
+    consumer_group: str,
     output_stream: str,
     output_tsdb: str,
     tsdb_batch_size: int,
@@ -127,8 +128,6 @@ def concept_drift_deployer(
             "ddm_out_control": ddm_out_control_level,
         }
     )
-    fn.add_trigger(
-        "labeled_stream", V3IOStreamTrigger(url=input_stream, name="labeled_stream")
-    )
+    fn.add_v3io_stream_trigger(stream_path = input_stream, name = 'stream', group = consumer_group)
     fn.apply(mount_v3io())
     fn.deploy(project=context.project)

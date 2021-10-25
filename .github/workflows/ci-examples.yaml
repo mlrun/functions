@@ -69,6 +69,27 @@ jobs:
     - name: Prepare system tests env
       run: |
         echo "MLRUN_DBPATH: http://$(minikube ip):${MLRUN_API_NODE_PORT}"
+    - name: Checkout current repo
+      uses: actions/checkout@v2
+      with:
+        path: functions
+    # Install python
+    - name: Install python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    # Install dependencies
+    - uses: actions/cache@v1
+      id: cache
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install requirements
+      run: |
+        pip install --upgrade pip
+        pip install -r functions/requirements.txt
     - name: Run system tests
       run: |
         python functions/functions.py  run-tests -r functions -s ipynb

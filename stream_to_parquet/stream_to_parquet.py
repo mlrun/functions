@@ -31,12 +31,7 @@ def init_context(context):
     if "hub_url" in os.environ:
         mlrun.mlconf.hub_url = os.environ["hub_url"]
     virtual_drift_fn = mlrun.import_function("hub://virtual_drift")
-    virtual_drift_fn.apply(
-        mlrun.mount_v3io(
-            mount_path=os.getenv("mount_path", "~/"),
-            remote=os.getenv("mount_remote", "/User"),
-        )
-    )
+    virtual_drift_fn.apply(mlrun.auto_mount())
     setattr(context, "virtual_drift_fn", virtual_drift_fn)
 
     predictions_col = os.getenv("predictions", None)
@@ -67,7 +62,7 @@ def handler(context, event):
             context.save_to,
             f"{datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')}.pq",
         )
-        df.to_parquet(df_path)
+        df.to_parquet(df_path,index=False)
 
         task = mlrun.NewTask(
             name="drift_magnitude",

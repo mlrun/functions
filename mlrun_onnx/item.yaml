@@ -1,0 +1,23 @@
+apiVersion: v1
+categories:
+- model-optimization
+description: ONNX intigration in MLRun, converting and optimizing models from different framework to ONNX using MLRun.
+doc: ''
+example: mlrun_onnx.ipynb
+generationDate: 2021-10-25:00-15
+icon: ''
+labels:
+  author: guyl
+maintainers: []
+marketplaceType: ''
+mlrunVersion: ''
+name: mlrun_onnx
+platformVersion: ''
+spec:
+  filename: mlrun_onnx.py
+  handler: to_onnx
+  image: mlrun/ml-models
+  kind: job
+  requirements: []
+url: ''
+version: 0.0.1

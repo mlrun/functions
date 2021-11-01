@@ -1,0 +1,7 @@
+numpy
+tensorflow
+onnx
+onnxoptimizer
+tf2onnx
+git-lfs
+mlrun

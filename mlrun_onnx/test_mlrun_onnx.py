@@ -1,17 +1,8 @@
-import importlib
 import os
 import shutil
 import tempfile
 
 import mlrun
-import pytest
-
-# Read requirements:
-with open("./requirements.txt") as requirements_file:
-    TEST_REQUIREMENTS = [
-        requirement.rstrip().replace("-", "_")
-        for requirement in requirements_file.readlines()
-    ]
 
 # Choose our model's name:
 MODEL_NAME = "model"
@@ -21,20 +12,6 @@ ONNX_MODEL_NAME = f"onnx_{MODEL_NAME}"
 
 # Choose our optimized ONNX version model's name:
 OPTIMIZED_ONNX_MODEL_NAME = f"optimized_{ONNX_MODEL_NAME}"
-
-
-def _is_available_onnx_modules() -> bool:
-    """
-    Check if all the modules in the global list variable 'TEST_REQUIREMENTS' are available in order to run the test.
-
-    :returns: A boolean value indicating whether to skip the test or not.
-    """
-    try:
-        for required_module in TEST_REQUIREMENTS:
-            importlib.import_module(required_module)
-    except ModuleNotFoundError:
-        return False  # Skip the test
-    return True  # Do not skip the test
 
 
 def _setup_environment() -> str:
@@ -102,8 +79,8 @@ def _log_onnx_model(context: mlrun.MLClientCtx, model_name: str):
     :param context:    The context to log to.
     :param model_name: The model name to use.
     """
-    import requests
     import mlrun.frameworks.onnx as mlrun_onnx
+    import requests
 
     # Download the MNIST model:
     mnist_model_name = "mnist-8"
@@ -111,7 +88,9 @@ def _log_onnx_model(context: mlrun.MLClientCtx, model_name: str):
         f"https://github.com/onnx/models/blob/master/vision/classification/mnist/"
         f"model/{mnist_model_name}.onnx?raw=true"
     )
-    with open(os.path.join(context.artifact_path, f"{model_name}.onnx"), 'bw') as onnx_file:
+    with open(
+        os.path.join(context.artifact_path, f"{model_name}.onnx"), "bw"
+    ) as onnx_file:
         onnx_file.write(requested_model.content)
 
     # Initialize a model handler for logging the model:
@@ -126,10 +105,6 @@ def _log_onnx_model(context: mlrun.MLClientCtx, model_name: str):
     model_handler.log()
 
 
-@pytest.mark.skipif(
-    not _is_available_onnx_modules(),
-    reason=f"Missing one or more of the following ONNX modules: {TEST_REQUIREMENTS}",
-)
 def test_tf_keras_to_onnx():
     """
     Test the 'to_onnx' handler, giving it a tf.keras model.
@@ -181,10 +156,6 @@ def test_tf_keras_to_onnx():
     assert "{}.onnx".format(ONNX_MODEL_NAME) in artifacts_list
 
 
-@pytest.mark.skipif(
-    not _is_available_onnx_modules(),
-    reason=f"Missing one or more of the following ONNX modules: {TEST_REQUIREMENTS}",
-)
 def test_optimize():
     """
     Test the 'optimize' handler, giving it a model from the ONNX zoo git repository.

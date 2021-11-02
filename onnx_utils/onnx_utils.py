@@ -28,8 +28,8 @@ class _ToONNXConversions:
         model_name: str,
         model_path: str,
         onnx_model_name: str = None,
-        input_signature: List[Tuple[Tuple[int], str]] = None,
         optimize_model: bool = True,
+        input_signature: List[Tuple[Tuple[int], str]] = None,
     ):
         """
         Convert a tf.keras model to an ONNX model and log it back to MLRun as a new model object.
@@ -39,14 +39,14 @@ class _ToONNXConversions:
         :param model_path:      The model path store object.
         :param onnx_model_name: The name to use to log the converted ONNX model. If not given, the given `model_name`
                                 will be used with an additional suffix `_onnx`. Defaulted to None.
+        :param optimize_model:  Whether or not to optimize the ONNX model using 'onnxoptimizer' before saving the model.
+                                Defaulted to True.
         :param input_signature: A list of the input layers shape and data type properties. Expected to receive a list
                                 where each element is an input layer tuple. An input layer tuple is a tuple of:
                                 [0] = Layer's shape, a tuple of integers.
                                 [1] = Layer's data type, a dtype numpy string.
                                 If None, the input signature will be tried to be read automatically before converting to
                                 ONNX. Defaulted to None.
-        :param optimize_model:  Whether or not to optimize the ONNX model using 'onnxoptimizer' before saving the model.
-                                Defaulted to True.
         """
         # Import the handler:
         from mlrun.frameworks.tf_keras import TFKerasModelHandler
@@ -86,6 +86,7 @@ def to_onnx(
     model_name: str,
     model_path: str,
     onnx_model_name: str = None,
+    optimize_model: bool = True,
     framework: str = None,
     framework_kwargs: Dict[str, Any] = None,
 ):
@@ -97,10 +98,12 @@ def to_onnx(
     :param model_path:       The model path store object.
     :param onnx_model_name:  The name to use to log the converted ONNX model. If not given, the given `model_name` will
                              be used with an additional suffix `_onnx`. Defaulted to None.
+    :param optimize_model:   Whether to optimize the ONNX model using 'onnxoptimizer' before saving the model. Defaulted
+                             to True.
     :param framework:        The model's framework. If None, it will be read from the 'framework' label of the model
                              artifact provided. Defaulted to None.
     :param framework_kwargs: Additional arguments each framework may require in order to convert to ONNX. To get the doc
-                             string of the desired framework onnx conversion function, pass {"help": True}.
+                             string of the desired framework onnx conversion function, pass "help".
     """
     # Get the model's framework if needed:
     if framework is None:
@@ -109,18 +112,18 @@ def to_onnx(
     # Use the conversion map to get the specific framework to onnx conversion:
     if framework not in _CONVERSION_MAP:
         raise mlrun.errors.MLRunInvalidArgumentError(
-            "The following framework: '{}', has no ONNX conversion.".format(framework)
+            f"The following framework: '{framework}', has no ONNX conversion."
         )
     conversion_function = _CONVERSION_MAP[framework]
+
+    # Check if needed to print the function's doc string ("help" is passed):
+    if framework_kwargs == "help":
+        print(conversion_function.__doc__)
+        return
 
     # Set the default empty framework kwargs if needed:
     if framework_kwargs is None:
         framework_kwargs = {}
-
-    # Check if needed to print the function's doc string:
-    if "help" in framework_kwargs.keys():
-        print(conversion_function.__doc__)
-        return
 
     # Run the conversion:
     try:
@@ -129,15 +132,15 @@ def to_onnx(
             model_name=model_name,
             model_path=model_path,
             onnx_model_name=onnx_model_name,
+            optimize_model=optimize_model,
             **framework_kwargs
         )
-    except Exception as exception:
-        print(
-            "ERROR: An exception was raised during the conversion. If the exception is due to miss use of arguments, "
-            "please read the '{}' framework conversion function doc string by passing 'help' in the "
-            "'framework_kwargs' dictionary parameter.".format(framework)
+    except TypeError as exception:
+        raise mlrun.errors.MLRunInvalidArgumentError(
+            f"ERROR: A TypeError exception was raised during the conversion:\n{exception}. "
+            f"Please read the {framework} framework conversion function doc string by passing 'help' in the "
+            f"'framework_kwargs' dictionary parameter."
         )
-        raise exception
 
 
 def optimize(
@@ -149,20 +152,26 @@ def optimize(
     optimized_model_name: str = None,
 ):
     """
-    Use the onnxoptimizer package to optimize the ONNX model. The optimizations supported can be seen by calling
-    'onnxoptimizer.get_available_passes()'
+    Optimize the given ONNX model.
 
     :param context:              The MLRun function execution context.
     :param model_name:           The model's name.
     :param model_path:           Path to the ONNX model object.
-    :param optimizations:        List of possible optimizations. If None, all of the optimizations will be used.
-                                 Defaulted to None.
+    :param optimizations:        List of possible optimizations. To see what optimizations are available, pass "help".
+                                 If None, all of the optimizations will be used. Defaulted to None.
     :param fixed_point:          Optimize the weights using fixed point. Defaulted to False.
     :param optimized_model_name: The name of the optimized model. If None, the original model will be overridden.
                                  Defaulted to None.
     """
     # Import the model handler:
+    import onnxoptimizer
     from mlrun.frameworks.onnx import ONNXModelHandler
+
+    # Check if needed to print the available optimizations ("help" is passed):
+    if optimizations == "help":
+        available_passes = '\n* '.join(onnxoptimizer.get_available_passes())
+        print(f"The available optimizations are:\n* {available_passes}")
+        return
 
     # Create the model handler:
     model_handler = ONNXModelHandler(

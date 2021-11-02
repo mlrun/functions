@@ -1,0 +1,142 @@
+kind: job
+metadata:
+  name: onnx-utils
+  tag: ''
+  hash: 3970829608ce23864247dca5392689fd8e0a2fba
+  project: default
+  labels:
+    author: guyl
+  categories:
+  - Utilities
+spec:
+  command: ''
+  args: []
+  image: mlrun/ml-models
+  env: []
+  default_handler: to_onnx
+  entry_points:
+    tf_keras_to_onnx:
+      name: tf_keras_to_onnx
+      doc: Convert a tf.keras model to an ONNX model and log it back to MLRun as a
+        new model object.
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: The MLRun function execution context
+        default: ''
+      - name: model_name
+        type: str
+        doc: The model's name.
+        default: ''
+      - name: model_path
+        type: str
+        doc: The model path store object.
+        default: ''
+      - name: onnx_model_name
+        type: str
+        doc: The name to use to log the converted ONNX model. If not given, the given
+          `model_name` will be used with an additional suffix `_onnx`. Defaulted to
+          None.
+        default: null
+      - name: optimize_model
+        type: bool
+        doc: Whether or not to optimize the ONNX model using 'onnxoptimizer' before
+          saving the model. Defaulted to True.
+        default: true
+      - name: input_signature
+        type: List[Tuple[Tuple[int], str]]
+        doc: 'A list of the input layers shape and data type properties. Expected
+          to receive a list where each element is an input layer tuple. An input layer
+          tuple is a tuple of: [0] = Layer''s shape, a tuple of integers. [1] = Layer''s
+          data type, a dtype numpy string. If None, the input signature will be tried
+          to be read automatically before converting to ONNX. Defaulted to None.'
+        default: null
+      outputs:
+      - default: ''
+      lineno: 25
+    to_onnx:
+      name: to_onnx
+      doc: Convert the given model to an ONNX model.
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: The MLRun function execution context
+        default: ''
+      - name: model_name
+        type: str
+        doc: The model's name.
+        default: ''
+      - name: model_path
+        type: str
+        doc: The model path store object.
+        default: ''
+      - name: onnx_model_name
+        type: str
+        doc: The name to use to log the converted ONNX model. If not given, the given
+          `model_name` will be used with an additional suffix `_onnx`. Defaulted to
+          None.
+        default: null
+      - name: optimize_model
+        type: bool
+        doc: Whether to optimize the ONNX model using 'onnxoptimizer' before saving
+          the model. Defaulted to True.
+        default: true
+      - name: framework
+        type: str
+        doc: The model's framework. If None, it will be read from the 'framework'
+          label of the model artifact provided. Defaulted to None.
+        default: null
+      - name: framework_kwargs
+        type: Dict[str, Any]
+        doc: Additional arguments each framework may require in order to convert to
+          ONNX. To get the doc string of the desired framework onnx conversion function,
+          pass "help".
+        default: null
+      outputs:
+      - default: ''
+      lineno: 84
+    optimize:
+      name: optimize
+      doc: Optimize the given ONNX model.
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: The MLRun function execution context.
+        default: ''
+      - name: model_name
+        type: str
+        doc: The model's name.
+        default: ''
+      - name: model_path
+        type: str
+        doc: Path to the ONNX model object.
+        default: ''
+      - name: optimizations
+        type: List[str]
+        doc: List of possible optimizations. To see what optimizations are available,
+          pass "help" here. If None, all of the optimizations will be used. Defaulted
+          to None.
+        default: null
+      - name: fixed_point
+        type: bool
+        doc: Optimize the weights using fixed point. Defaulted to False.
+        default: false
+      - name: optimized_model_name
+        type: str
+        doc: The name of the optimized model. If None, the original model will be
+          overridden. Defaulted to None.
+        default: null
+      outputs:
+      - default: ''
+      lineno: 146
+  description: ONNX intigration in MLRun, some utils functions for the ONNX framework,
+    optimizing and converting models from different framework to ONNX using MLRun.
+  build:
+    functionSourceCode: ZnJvbSB0eXBpbmcgaW1wb3J0IEFueSwgQ2FsbGFibGUsIERpY3QsIExpc3QsIFR1cGxlCgppbXBvcnQgbWxydW4KaW1wb3J0IG51bXB5IGFzIG5wCmZyb20gbWxydW4uZGF0YXN0b3JlIGltcG9ydCBzdG9yZV9tYW5hZ2VyCgoKZGVmIF9nZXRfZnJhbWV3b3JrKG1vZGVsX3BhdGg6IHN0cikgLT4gc3RyOgogICAgIiIiCiAgICBHZXQgdGhlIGZyYW1ld29yayBvZiB0aGUgbW9kZWwgc3RvcmVkIGluIHRoZSBnaXZlbiBwYXRoLgoKICAgIDpwYXJhbSBtb2RlbF9wYXRoOiBUaGUgbW9kZWwgcGF0aCBzdG9yZSBvYmplY3QuCgogICAgOnJldHVybnM6IFRoZSBtb2RlbCdzIGZyYW1ld29yay4KICAgICIiIgogICAgbW9kZWxfYXJ0aWZhY3QsIF8gPSBzdG9yZV9tYW5hZ2VyLmdldF9zdG9yZV9hcnRpZmFjdChtb2RlbF9wYXRoKQogICAgcmV0dXJuIG1vZGVsX2FydGlmYWN0LmxhYmVsc1siZnJhbWV3b3JrIl0KCgpjbGFzcyBfVG9PTk5YQ29udmVyc2lvbnM6CiAgICAiIiIKICAgIEFuIE9OTlggY29udmVyc2lvbiBmdW5jdGlvbnMgbGlicmFyeSBjbGFzcy4KICAgICIiIgoKICAgIEBzdGF0aWNtZXRob2QKICAgIGRlZiB0Zl9rZXJhc190b19vbm54KAogICAgICAgIGNvbnRleHQ6IG1scnVuLk1MQ2xpZW50Q3R4LAogICAgICAgIG1vZGVsX25hbWU6IHN0ciwKICAgICAgICBtb2RlbF9wYXRoOiBzdHIsCiAgICAgICAgb25ueF9tb2RlbF9uYW1lOiBzdHIgPSBOb25lLAogICAgICAgIG9wdGltaXplX21vZGVsOiBib29sID0gVHJ1ZSwKICAgICAgICBpbnB1dF9zaWduYXR1cmU6IExpc3RbVHVwbGVbVHVwbGVbaW50XSwgc3RyXV0gPSBOb25lLAogICAgKToKICAgICAgICAiIiIKICAgICAgICBDb252ZXJ0IGEgdGYua2VyYXMgbW9kZWwgdG8gYW4gT05OWCBtb2RlbCBhbmQgbG9nIGl0IGJhY2sgdG8gTUxSdW4gYXMgYSBuZXcgbW9kZWwgb2JqZWN0LgoKICAgICAgICA6cGFyYW0gY29udGV4dDogICAgICAgICBUaGUgTUxSdW4gZnVuY3Rpb24gZXhlY3V0aW9uIGNvbnRleHQKICAgICAgICA6cGFyYW0gbW9kZWxfbmFtZTogICAgICBUaGUgbW9kZWwncyBuYW1lLgogICAgICAgIDpwYXJhbSBtb2RlbF9wYXRoOiAgICAgIFRoZSBtb2RlbCBwYXRoIHN0b3JlIG9iamVjdC4KICAgICAgICA6cGFyYW0gb25ueF9tb2RlbF9uYW1lOiBUaGUgbmFtZSB0byB1c2UgdG8gbG9nIHRoZSBjb252ZXJ0ZWQgT05OWCBtb2RlbC4gSWYgbm90IGdpdmVuLCB0aGUgZ2l2ZW4gYG1vZGVsX25hbWVgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgd2lsbCBiZSB1c2VkIHdpdGggYW4gYWRkaXRpb25hbCBzdWZmaXggYF9vbm54YC4gRGVmYXVsdGVkIHRvIE5vbmUuCiAgICAgICAgOnBhcmFtIG9wdGltaXplX21vZGVsOiAgV2hldGhlciBvciBub3QgdG8gb3B0aW1pemUgdGhlIE9OTlggbW9kZWwgdXNpbmcgJ29ubnhvcHRpbWl6ZXInIGJlZm9yZSBzYXZpbmcgdGhlIG1vZGVsLgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIERlZmF1bHRlZCB0byBUcnVlLgogICAgICAgIDpwYXJhbSBpbnB1dF9zaWduYXR1cmU6IEEgbGlzdCBvZiB0aGUgaW5wdXQgbGF5ZXJzIHNoYXBlIGFuZCBkYXRhIHR5cGUgcHJvcGVydGllcy4gRXhwZWN0ZWQgdG8gcmVjZWl2ZSBhIGxpc3QKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB3aGVyZSBlYWNoIGVsZW1lbnQgaXMgYW4gaW5wdXQgbGF5ZXIgdHVwbGUuIEFuIGlucHV0IGxheWVyIHR1cGxlIGlzIGEgdHVwbGUgb2Y6CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgWzBdID0gTGF5ZXIncyBzaGFwZSwgYSB0dXBsZSBvZiBpbnRlZ2Vycy4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBbMV0gPSBMYXllcidzIGRhdGEgdHlwZSwgYSBkdHlwZSBudW1weSBzdHJpbmcuCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgSWYgTm9uZSwgdGhlIGlucHV0IHNpZ25hdHVyZSB3aWxsIGJlIHRyaWVkIHRvIGJlIHJlYWQgYXV0b21hdGljYWxseSBiZWZvcmUgY29udmVydGluZyB0bwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE9OTlguIERlZmF1bHRlZCB0byBOb25lLgogICAgICAgICIiIgogICAgICAgICMgSW1wb3J0IHRoZSBoYW5kbGVyOgogICAgICAgIGZyb20gbWxydW4uZnJhbWV3b3Jrcy50Zl9rZXJhcyBpbXBvcnQgVEZLZXJhc01vZGVsSGFuZGxlcgoKICAgICAgICAjIEluaXRpYWxpemUgdGhlIGhhbmRsZXI6CiAgICAgICAgbW9kZWxfaGFuZGxlciA9IFRGS2VyYXNNb2RlbEhhbmRsZXIoCiAgICAgICAgICAgIG1vZGVsX25hbWU9bW9kZWxfbmFtZSwKICAgICAgICAgICAgbW9kZWxfcGF0aD1tb2RlbF9wYXRoLAogICAgICAgICAgICBjb250ZXh0PWNvbnRleHQsCiAgICAgICAgKQoKICAgICAgICAjIExvYWQgdGhlIHRmLmtlcmFzIG1vZGVsOgogICAgICAgIG1vZGVsX2hhbmRsZXIubG9hZCgpCgogICAgICAgICMgUGFyc2UgdGhlICdpbnB1dF9zaWduYXR1cmUnIHBhcmFtZXRlcjoKICAgICAgICBpZiBpbnB1dF9zaWduYXR1cmUgaXMgbm90IE5vbmU6CiAgICAgICAgICAgIGlucHV0X3NpZ25hdHVyZSA9IFsKICAgICAgICAgICAgICAgIG5wLnplcm9zKHNoYXBlPXNoYXBlLCBkdHlwZT1kdHlwZSkgZm9yIChzaGFwZSwgZHR5cGUpIGluIGlucHV0X3NpZ25hdHVyZQogICAgICAgICAgICBdCgogICAgICAgICMgQ29udmVydCB0byBPTk5YOgogICAgICAgIG1vZGVsX2hhbmRsZXIudG9fb25ueCgKICAgICAgICAgICAgbW9kZWxfbmFtZT1vbm54X21vZGVsX25hbWUsCiAgICAgICAgICAgIGlucHV0X3NpZ25hdHVyZT1pbnB1dF9zaWduYXR1cmUsCiAgICAgICAgICAgIG9wdGltaXplPW9wdGltaXplX21vZGVsLAogICAgICAgICkKCgojIE1hcCBmb3IgZ2V0dGluZyB0aGUgY29udmVyc2lvbiBmdW5jdGlvbiBhY2NvcmRpbmcgdG8gdGhlIHByb3ZpZGVkIGZyYW1ld29yazoKX0NPTlZFUlNJT05fTUFQID0gewogICAgInRmLmtlcmFzIjogX1RvT05OWENvbnZlcnNpb25zLnRmX2tlcmFzX3RvX29ubngKfSAgIyB0eXBlOiBEaWN0W3N0ciwgQ2FsbGFibGVdCgoKZGVmIHRvX29ubngoCiAgICBjb250ZXh0OiBtbHJ1bi5NTENsaWVudEN0eCwKICAgIG1vZGVsX25hbWU6IHN0ciwKICAgIG1vZGVsX3BhdGg6IHN0ciwKICAgIG9ubnhfbW9kZWxfbmFtZTogc3RyID0gTm9uZSwKICAgIG9wdGltaXplX21vZGVsOiBib29sID0gVHJ1ZSwKICAgIGZyYW1ld29yazogc3RyID0gTm9uZSwKICAgIGZyYW1ld29ya19rd2FyZ3M6IERpY3Rbc3RyLCBBbnldID0gTm9uZSwKKToKICAgICIiIgogICAgQ29udmVydCB0aGUgZ2l2ZW4gbW9kZWwgdG8gYW4gT05OWCBtb2RlbC4KCiAgICA6cGFyYW0gY29udGV4dDogICAgICAgICAgVGhlIE1MUnVuIGZ1bmN0aW9uIGV4ZWN1dGlvbiBjb250ZXh0CiAgICA6cGFyYW0gbW9kZWxfbmFtZTogICAgICAgVGhlIG1vZGVsJ3MgbmFtZS4KICAgIDpwYXJhbSBtb2RlbF9wYXRoOiAgICAgICBUaGUgbW9kZWwgcGF0aCBzdG9yZSBvYmplY3QuCiAgICA6cGFyYW0gb25ueF9tb2RlbF9uYW1lOiAgVGhlIG5hbWUgdG8gdXNlIHRvIGxvZyB0aGUgY29udmVydGVkIE9OTlggbW9kZWwuIElmIG5vdCBnaXZlbiwgdGhlIGdpdmVuIGBtb2RlbF9uYW1lYCB3aWxsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYmUgdXNlZCB3aXRoIGFuIGFkZGl0aW9uYWwgc3VmZml4IGBfb25ueGAuIERlZmF1bHRlZCB0byBOb25lLgogICAgOnBhcmFtIG9wdGltaXplX21vZGVsOiAgIFdoZXRoZXIgdG8gb3B0aW1pemUgdGhlIE9OTlggbW9kZWwgdXNpbmcgJ29ubnhvcHRpbWl6ZXInIGJlZm9yZSBzYXZpbmcgdGhlIG1vZGVsLiBEZWZhdWx0ZWQKICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0byBUcnVlLgogICAgOnBhcmFtIGZyYW1ld29yazogICAgICAgIFRoZSBtb2RlbCdzIGZyYW1ld29yay4gSWYgTm9uZSwgaXQgd2lsbCBiZSByZWFkIGZyb20gdGhlICdmcmFtZXdvcmsnIGxhYmVsIG9mIHRoZSBtb2RlbAogICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFydGlmYWN0IHByb3ZpZGVkLiBEZWZhdWx0ZWQgdG8gTm9uZS4KICAgIDpwYXJhbSBmcmFtZXdvcmtfa3dhcmdzOiBBZGRpdGlvbmFsIGFyZ3VtZW50cyBlYWNoIGZyYW1ld29yayBtYXkgcmVxdWlyZSBpbiBvcmRlciB0byBjb252ZXJ0IHRvIE9OTlguIFRvIGdldCB0aGUgZG9jCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RyaW5nIG9mIHRoZSBkZXNpcmVkIGZyYW1ld29yayBvbm54IGNvbnZlcnNpb24gZnVuY3Rpb24sIHBhc3MgImhlbHAiLgogICAgIiIiCiAgICAjIEdldCB0aGUgbW9kZWwncyBmcmFtZXdvcmsgaWYgbmVlZGVkOgogICAgaWYgZnJhbWV3b3JrIGlzIE5vbmU6CiAgICAgICAgZnJhbWV3b3JrID0gX2dldF9mcmFtZXdvcmsobW9kZWxfcGF0aD1tb2RlbF9wYXRoKQoKICAgICMgVXNlIHRoZSBjb252ZXJzaW9uIG1hcCB0byBnZXQgdGhlIHNwZWNpZmljIGZyYW1ld29yayB0byBvbm54IGNvbnZlcnNpb246CiAgICBpZiBmcmFtZXdvcmsgbm90IGluIF9DT05WRVJTSU9OX01BUDoKICAgICAgICByYWlzZSBtbHJ1bi5lcnJvcnMuTUxSdW5JbnZhbGlkQXJndW1lbnRFcnJvcigKICAgICAgICAgICAgZiJUaGUgZm9sbG93aW5nIGZyYW1ld29yazogJ3tmcmFtZXdvcmt9JywgaGFzIG5vIE9OTlggY29udmVyc2lvbi4iCiAgICAgICAgKQogICAgY29udmVyc2lvbl9mdW5jdGlvbiA9IF9DT05WRVJTSU9OX01BUFtmcmFtZXdvcmtdCgogICAgIyBDaGVjayBpZiBuZWVkZWQgdG8gcHJpbnQgdGhlIGZ1bmN0aW9uJ3MgZG9jIHN0cmluZyAoImhlbHAiIGlzIHBhc3NlZCk6CiAgICBpZiBmcmFtZXdvcmtfa3dhcmdzID09ICJoZWxwIjoKICAgICAgICBwcmludChjb252ZXJzaW9uX2Z1bmN0aW9uLl9fZG9jX18pCiAgICAgICAgcmV0dXJuCgogICAgIyBTZXQgdGhlIGRlZmF1bHQgZW1wdHkgZnJhbWV3b3JrIGt3YXJncyBpZiBuZWVkZWQ6CiAgICBpZiBmcmFtZXdvcmtfa3dhcmdzIGlzIE5vbmU6CiAgICAgICAgZnJhbWV3b3JrX2t3YXJncyA9IHt9CgogICAgIyBSdW4gdGhlIGNvbnZlcnNpb246CiAgICB0cnk6CiAgICAgICAgY29udmVyc2lvbl9mdW5jdGlvbigKICAgICAgICAgICAgY29udGV4dD1jb250ZXh0LAogICAgICAgICAgICBtb2RlbF9uYW1lPW1vZGVsX25hbWUsCiAgICAgICAgICAgIG1vZGVsX3BhdGg9bW9kZWxfcGF0aCwKICAgICAgICAgICAgb25ueF9tb2RlbF9uYW1lPW9ubnhfbW9kZWxfbmFtZSwKICAgICAgICAgICAgb3B0aW1pemVfbW9kZWw9b3B0aW1pemVfbW9kZWwsCiAgICAgICAgICAgICoqZnJhbWV3b3JrX2t3YXJncwogICAgICAgICkKICAgIGV4Y2VwdCBUeXBlRXJyb3IgYXMgZXhjZXB0aW9uOgogICAgICAgIHJhaXNlIG1scnVuLmVycm9ycy5NTFJ1bkludmFsaWRBcmd1bWVudEVycm9yKAogICAgICAgICAgICBmIkVSUk9SOiBBIFR5cGVFcnJvciBleGNlcHRpb24gd2FzIHJhaXNlZCBkdXJpbmcgdGhlIGNvbnZlcnNpb246XG57ZXhjZXB0aW9ufS4gIgogICAgICAgICAgICBmIlBsZWFzZSByZWFkIHRoZSB7ZnJhbWV3b3JrfSBmcmFtZXdvcmsgY29udmVyc2lvbiBmdW5jdGlvbiBkb2Mgc3RyaW5nIGJ5IHBhc3NpbmcgJ2hlbHAnIGluIHRoZSAiCiAgICAgICAgICAgIGYiJ2ZyYW1ld29ya19rd2FyZ3MnIGRpY3Rpb25hcnkgcGFyYW1ldGVyLiIKICAgICAgICApCgoKZGVmIG9wdGltaXplKAogICAgY29udGV4dDogbWxydW4uTUxDbGllbnRDdHgsCiAgICBtb2RlbF9uYW1lOiBzdHIsCiAgICBtb2RlbF9wYXRoOiBzdHIsCiAgICBvcHRpbWl6YXRpb25zOiBMaXN0W3N0cl0gPSBOb25lLAogICAgZml4ZWRfcG9pbnQ6IGJvb2wgPSBGYWxzZSwKICAgIG9wdGltaXplZF9tb2RlbF9uYW1lOiBzdHIgPSBOb25lLAopOgogICAgIiIiCiAgICBPcHRpbWl6ZSB0aGUgZ2l2ZW4gT05OWCBtb2RlbC4KCiAgICA6cGFyYW0gY29udGV4dDogICAgICAgICAgICAgIFRoZSBNTFJ1biBmdW5jdGlvbiBleGVjdXRpb24gY29udGV4dC4KICAgIDpwYXJhbSBtb2RlbF9uYW1lOiAgICAgICAgICAgVGhlIG1vZGVsJ3MgbmFtZS4KICAgIDpwYXJhbSBtb2RlbF9wYXRoOiAgICAgICAgICAgUGF0aCB0byB0aGUgT05OWCBtb2RlbCBvYmplY3QuCiAgICA6cGFyYW0gb3B0aW1pemF0aW9uczogICAgICAgIExpc3Qgb2YgcG9zc2libGUgb3B0aW1pemF0aW9ucy4gVG8gc2VlIHdoYXQgb3B0aW1pemF0aW9ucyBhcmUgYXZhaWxhYmxlLCBwYXNzICJoZWxwIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBoZXJlLiBJZiBOb25lLCBhbGwgb2YgdGhlIG9wdGltaXphdGlvbnMgd2lsbCBiZSB1c2VkLiBEZWZhdWx0ZWQgdG8gTm9uZS4KICAgIDpwYXJhbSBmaXhlZF9wb2ludDogICAgICAgICAgT3B0aW1pemUgdGhlIHdlaWdodHMgdXNpbmcgZml4ZWQgcG9pbnQuIERlZmF1bHRlZCB0byBGYWxzZS4KICAgIDpwYXJhbSBvcHRpbWl6ZWRfbW9kZWxfbmFtZTogVGhlIG5hbWUgb2YgdGhlIG9wdGltaXplZCBtb2RlbC4gSWYgTm9uZSwgdGhlIG9yaWdpbmFsIG1vZGVsIHdpbGwgYmUgb3ZlcnJpZGRlbi4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRGVmYXVsdGVkIHRvIE5vbmUuCiAgICAiIiIKICAgICMgSW1wb3J0IHRoZSBtb2RlbCBoYW5kbGVyOgogICAgaW1wb3J0IG9ubnhvcHRpbWl6ZXIKICAgIGZyb20gbWxydW4uZnJhbWV3b3Jrcy5vbm54IGltcG9ydCBPTk5YTW9kZWxIYW5kbGVyCgogICAgIyBDaGVjayBpZiBuZWVkZWQgdG8gcHJpbnQgdGhlIGF2YWlsYWJsZSBvcHRpbWl6YXRpb25zICgiaGVscCIgaXMgcGFzc2VkKToKICAgIGlmIG9wdGltaXphdGlvbnMgPT0gImhlbHAiOgogICAgICAgIGF2YWlsYWJsZV9wYXNzZXMgPSAnXG4qICcuam9pbihvbm54b3B0aW1pemVyLmdldF9hdmFpbGFibGVfcGFzc2VzKCkpCiAgICAgICAgcHJpbnQoZiJUaGUgYXZhaWxhYmxlIG9wdGltaXphdGlvbnMgYXJlOlxuKiB7YXZhaWxhYmxlX3Bhc3Nlc30iKQogICAgICAgIHJldHVybgoKICAgICMgQ3JlYXRlIHRoZSBtb2RlbCBoYW5kbGVyOgogICAgbW9kZWxfaGFuZGxlciA9IE9OTlhNb2RlbEhhbmRsZXIoCiAgICAgICAgbW9kZWxfbmFtZT1tb2RlbF9uYW1lLCBtb2RlbF9wYXRoPW1vZGVsX3BhdGgsIGNvbnRleHQ9Y29udGV4dAogICAgKQoKICAgICMgTG9hZCB0aGUgT05OWCBtb2RlbDoKICAgIG1vZGVsX2hhbmRsZXIubG9hZCgpCgogICAgIyBPcHRpbWl6ZSB0aGUgbW9kZWwgdXNpbmcgdGhlIGdpdmVuIGNvbmZpZ3VyYXRpb25zOgogICAgbW9kZWxfaGFuZGxlci5vcHRpbWl6ZShvcHRpbWl6YXRpb25zPW9wdGltaXphdGlvbnMsIGZpeGVkX3BvaW50PWZpeGVkX3BvaW50KQoKICAgICMgUmVuYW1lIGlmIG5lZWRlZDoKICAgIGlmIG9wdGltaXplZF9tb2RlbF9uYW1lIGlzIG5vdCBOb25lOgogICAgICAgIG1vZGVsX2hhbmRsZXIuc2V0X21vZGVsX25hbWUobW9kZWxfbmFtZT1vcHRpbWl6ZWRfbW9kZWxfbmFtZSkKCiAgICAjIExvZyB0aGUgb3B0aW1pemVkIG1vZGVsOgogICAgbW9kZWxfaGFuZGxlci5sb2coKQo=
+    commands: []
+    code_origin: https://github.com/guy1992l/functions.git#a9f1437f1387982af6a009ad2f8953c1588ed533:/Users/guyl/Projects/functions/onnx_utils/onnx_utils.py
+    origin_filename: /Users/guyl/Projects/functions/onnx_utils/onnx_utils.py
+  disable_auto_mount: false
+  priority_class_name: ''
+  affinity: null
+verbose: false

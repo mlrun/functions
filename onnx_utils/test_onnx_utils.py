@@ -105,16 +105,16 @@ def _log_onnx_model(context: mlrun.MLClientCtx, model_name: str):
     model_handler.log()
 
 
-def test_tf_keras_to_onnx():
+def test_to_onnx_help():
     """
-    Test the 'to_onnx' handler, giving it a tf.keras model.
+    Test the 'to_onnx' handler, passing "help" in the 'framework_kwargs'.
     """
     # Setup the tests environment:
     artifact_path = _setup_environment()
 
     # Create the function parsing this notebook's code using 'code_to_function':
     log_model_function = mlrun.code_to_function(
-        filename="test_mlrun_onnx.py",
+        filename="test_onnx_utils.py",
         name="log_model",
         kind="job",
         image="mlrun/ml-models",
@@ -128,7 +128,60 @@ def test_tf_keras_to_onnx():
         local=True,
     )
 
-    # Import the ONNX function from the marketplace:
+    # Import the ONNX Utils function:
+    onnx_function = mlrun.import_function("function.yaml")
+
+    # Run the function, passing "help" in 'framework_kwargs' and see that no exception was raised:
+    is_test_passed = True
+    try:
+        onnx_function.run(
+            handler="to_onnx",
+            artifact_path=artifact_path,
+            params={
+                "model_name": "",
+                "model_path": log_model_run.outputs[
+                    MODEL_NAME
+                ],  # <- Take the logged model from the previous function.
+                "framework_kwargs": "help",
+            },
+            local=True,
+        )
+    except TypeError as exception:
+        print(
+            f"The test failed, the help was not handled properly and raised the following error: {exception}"
+        )
+        is_test_passed = False
+
+    # Cleanup the tests environment:
+    _cleanup_environment(artifact_path=artifact_path)
+
+    assert is_test_passed
+
+
+def test_tf_keras_to_onnx():
+    """
+    Test the 'to_onnx' handler, giving it a tf.keras model.
+    """
+    # Setup the tests environment:
+    artifact_path = _setup_environment()
+
+    # Create the function parsing this notebook's code using 'code_to_function':
+    log_model_function = mlrun.code_to_function(
+        filename="test_onnx_utils.py",
+        name="log_model",
+        kind="job",
+        image="mlrun/ml-models",
+    )
+
+    # Run the function to log the model:
+    log_model_run = log_model_function.run(
+        handler="_log_tf_keras_model",
+        artifact_path=artifact_path,
+        params={"model_name": MODEL_NAME},
+        local=True,
+    )
+
+    # Import the ONNX Utils function:
     onnx_function = mlrun.import_function("function.yaml")
 
     # Run the function to convert our model to ONNX:
@@ -156,6 +209,41 @@ def test_tf_keras_to_onnx():
     assert "{}.onnx".format(ONNX_MODEL_NAME) in artifacts_list
 
 
+def test_optimize_help():
+    """
+    Test the 'optimize' handler, passing "help" in the 'optimizations'.
+    """
+    # Setup the tests environment:
+    artifact_path = _setup_environment()
+
+    # Import the ONNX Utils function:
+    onnx_function = mlrun.import_function("function.yaml")
+
+    # Run the function, passing "help" in 'optimizations' and see that no exception was raised:
+    is_test_passed = True
+    try:
+        onnx_function.run(
+            handler="optimize",
+            artifact_path=artifact_path,
+            params={
+                "model_name": "",
+                "model_path": "",
+                "optimizations": "help",
+            },
+            local=True,
+        )
+    except TypeError as exception:
+        print(
+            f"The test failed, the help was not handled properly and raised the following error: {exception}"
+        )
+        is_test_passed = False
+
+    # Cleanup the tests environment:
+    _cleanup_environment(artifact_path=artifact_path)
+
+    assert is_test_passed
+
+
 def test_optimize():
     """
     Test the 'optimize' handler, giving it a model from the ONNX zoo git repository.
@@ -165,7 +253,7 @@ def test_optimize():
 
     # Create the function parsing this notebook's code using 'code_to_function':
     log_model_function = mlrun.code_to_function(
-        filename="test_mlrun_onnx.py",
+        filename="test_onnx_utils.py",
         name="log_model",
         kind="job",
         image="mlrun/ml-models",
@@ -179,10 +267,10 @@ def test_optimize():
         local=True,
     )
 
-    # Import the ONNX function from the marketplace:
+    # Import the ONNX Utils function:
     onnx_function = mlrun.import_function("function.yaml")
 
-    # Run the function to convert our model to ONNX:
+    # Run the function to optimize our model:
     onnx_function.run(
         handler="optimize",
         artifact_path=artifact_path,

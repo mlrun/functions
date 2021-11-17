@@ -10,7 +10,7 @@ labels:
   author: avia
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.7.1
+mlrunVersion: 0.8.0
 name: aggregate
 platformVersion: 3.2.0
 spec:

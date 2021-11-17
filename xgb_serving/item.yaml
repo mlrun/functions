@@ -11,9 +11,9 @@ labels:
   author: Daniel
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.6.2
+mlrunVersion: 0.8.0
 name: xgb_serving
-platformVersion: 3.0.0
+platformVersion: 3.2.0
 spec:
   filename: xgb_serving.py
   handler: handler
@@ -21,4 +21,4 @@ spec:
   kind: remote
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.0.8

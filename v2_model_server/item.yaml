@@ -12,16 +12,16 @@ labels:
   framework: sklearn
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: v2-model-server
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
+  customFields:
+    default_class: ClassifierModel
   filename: v2_model_server.py
   handler: handler
   image: mlrun/mlrun
   kind: serving
   requirements: []
-  customFields:
-    default_class: ClassifierModel
 url: ''
-version: 0.0.1
+version: 0.0.8

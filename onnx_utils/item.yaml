@@ -1,7 +1,8 @@
 apiVersion: v1
 categories:
 - Utilities
-description: ONNX intigration in MLRun, some utils functions for the ONNX framework, optimizing and converting models from different framework to ONNX using MLRun.
+description: ONNX intigration in MLRun, some utils functions for the ONNX framework,
+  optimizing and converting models from different framework to ONNX using MLRun.
 doc: ''
 example: onnx_utils.ipynb
 generationDate: 2021-10-25:00-15
@@ -10,9 +11,9 @@ labels:
   author: guyl
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: onnx_utils
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: onnx_utils.py
   handler: to_onnx
@@ -20,4 +21,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.0.8

@@ -11,9 +11,9 @@ labels:
   author: yaronh
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: tf2-serving-v2
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: tf2_serving_v2.py
   handler: handler
@@ -24,4 +24,4 @@ spec:
   - pillow
   - tensorflow>=2.1
 url: ''
-version: 0.0.1
+version: 0.0.8

@@ -24,4 +24,4 @@ spec:
   - scipy
   - v3io_frames
 url: ''
-version: 0.0.8
+version: 0.8.0

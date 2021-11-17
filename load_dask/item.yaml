@@ -21,4 +21,4 @@ spec:
   kind: dask
   requirements: []
 url: ''
-version: 0.0.8
+version: 0.8.0

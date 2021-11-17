@@ -11,9 +11,9 @@ labels:
   author: yaronh
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: v2-model-tester
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: v2_model_tester.py
   handler: model_server_tester
@@ -21,4 +21,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.0.8

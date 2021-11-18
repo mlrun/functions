@@ -5,7 +5,7 @@ categories:
 description: Get BERT based embeddings for given text
 doc: ''
 example: bert_embeddings.ipynb
-generationDate: 2021-05-19:22-04
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   framework: pytorch

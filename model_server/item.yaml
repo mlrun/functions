@@ -12,9 +12,9 @@ labels:
   framework: sklearn
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: model-server
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: model_server.py
   handler: handler
@@ -22,4 +22,4 @@ spec:
   kind: nuclio:serving
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.8.0

@@ -11,9 +11,9 @@ labels:
   author: orz
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.5.4
+mlrunVersion: 0.8.0
 name: feature-selection
-platformVersion: 2.10.0
+platformVersion: 3.2.0
 spec:
   filename: feature_selection.py
   handler: feature_selection/feature_selection
@@ -21,4 +21,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.8.0

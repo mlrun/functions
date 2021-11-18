@@ -10,9 +10,9 @@ labels:
   author: adih
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: sql-to-file
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: sql_to_file.py
   handler: sql_to_file
@@ -20,4 +20,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.8.0

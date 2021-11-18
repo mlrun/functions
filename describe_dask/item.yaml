@@ -10,9 +10,9 @@ labels:
   author: Iguazio
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.5.4
+mlrunVersion: 0.8.0
 name: describe-dask
-platformVersion: 2.10.0
+platformVersion: 3.2.0
 spec:
   filename: describe_dask.py
   handler: summarize
@@ -20,4 +20,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.8.0

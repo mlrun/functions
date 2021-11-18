@@ -11,14 +11,14 @@ labels:
   author: Daniel
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: rnn-serving
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: rnn_serving.py
   handler: handler
   image: mlrun/ml-models
   kind: serving
-  requirements:
+  requirements: null
 url: ''
-version: 0.0.1
+version: 0.8.0

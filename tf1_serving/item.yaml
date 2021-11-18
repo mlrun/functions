@@ -11,17 +11,17 @@ labels:
   author: yaronh
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: tf1-serving
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
+  env:
+    ENABLE_EXPLAINER: false
+    MODEL_CLASS: TFModel
   filename: tf1_serving.py
   handler: handler
   image: mlrun/mlrun
   kind: nuclio:serving
   requirements: []
-  env:
-    MODEL_CLASS: TFModel
-    ENABLE_EXPLAINER: False
 url: ''
-version: 0.0.1
+version: 0.8.0

@@ -10,9 +10,9 @@ labels:
   author: nicks
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: pandas-profiling-report
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: pandas_profiling_report.py
   handler: pandas_profiling_report
@@ -21,4 +21,4 @@ spec:
   requirements:
   - pandas_profiling
 url: ''
-version: 0.0.1
+version: 0.8.0

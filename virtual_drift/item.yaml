@@ -11,9 +11,9 @@ labels:
   author: orz
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: virtual-drift
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: virtual_drift.py
   handler: drift_magnitude
@@ -24,4 +24,4 @@ spec:
   - scipy
   - v3io_frames
 url: ''
-version: 0.0.1
+version: 0.8.0

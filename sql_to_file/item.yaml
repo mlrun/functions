@@ -4,7 +4,7 @@ categories:
 description: SQL To File - Ingest data using SQL query
 doc: ''
 example: sql_to_file.ipynb
-generationDate: 2021-05-19:23-13
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   author: adih

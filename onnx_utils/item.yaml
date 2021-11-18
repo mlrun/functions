@@ -5,7 +5,7 @@ description: ONNX intigration in MLRun, some utils functions for the ONNX framew
   optimizing and converting models from different framework to ONNX using MLRun.
 doc: ''
 example: onnx_utils.ipynb
-generationDate: 2021-10-25:00-15
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   author: guyl

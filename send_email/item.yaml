@@ -4,7 +4,7 @@ categories:
 description: Send Email messages through SMTP server
 doc: ''
 example: send_email.ipynb
-generationDate: 2021-05-19:23-13
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   author: saarc

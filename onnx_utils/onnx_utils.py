@@ -1,20 +1,6 @@
 from typing import Any, Callable, Dict, List, Tuple
 
 import mlrun
-import numpy as np
-from mlrun.datastore import store_manager
-
-
-def _get_framework(model_path: str) -> str:
-    """
-    Get the framework of the model stored in the given path.
-
-    :param model_path: The model path store object.
-
-    :returns: The model's framework.
-    """
-    model_artifact, _ = store_manager.get_store_artifact(model_path)
-    return model_artifact.labels["framework"]
 
 
 class _ToONNXConversions:
@@ -24,19 +10,15 @@ class _ToONNXConversions:
 
     @staticmethod
     def tf_keras_to_onnx(
-        context: mlrun.MLClientCtx,
-        model_name: str,
-        model_path: str,
+        model_handler,
         onnx_model_name: str = None,
         optimize_model: bool = True,
         input_signature: List[Tuple[Tuple[int], str]] = None,
     ):
         """
-        Convert a tf.keras model to an ONNX model and log it back to MLRun as a new model object.
+        Convert a TF.Keras model to an ONNX model and log it back to MLRun as a new model object.
 
-        :param context:         The MLRun function execution context
-        :param model_name:      The model's name.
-        :param model_path:      The model path store object.
+        :param model_handler:   An initialized TFKerasModelHandler with a loaded model to convert to ONNX.
         :param onnx_model_name: The name to use to log the converted ONNX model. If not given, the given `model_name`
                                 will be used with an additional suffix `_onnx`. Defaulted to None.
         :param optimize_model:  Whether or not to optimize the ONNX model using 'onnxoptimizer' before saving the model.
@@ -44,27 +26,33 @@ class _ToONNXConversions:
         :param input_signature: A list of the input layers shape and data type properties. Expected to receive a list
                                 where each element is an input layer tuple. An input layer tuple is a tuple of:
                                 [0] = Layer's shape, a tuple of integers.
-                                [1] = Layer's data type, a dtype numpy string.
-                                If None, the input signature will be tried to be read automatically before converting to
-                                ONNX. Defaulted to None.
+                                [1] = Layer's data type, a mlrun.data_types.ValueType string.
+                                If None, the input signature will be tried to be read from the model artifact. Defaulted
+                                to None.
         """
-        # Import the handler:
-        from mlrun.frameworks.tf_keras import TFKerasModelHandler
+        # Import the framework and handler:
+        import tensorflow as tf
 
-        # Initialize the handler:
-        model_handler = TFKerasModelHandler(
-            model_name=model_name,
-            model_path=model_path,
-            context=context,
-        )
-
-        # Load the tf.keras model:
-        model_handler.load()
-
-        # Parse the 'input_signature' parameter:
-        if input_signature is not None:
+        # Check the given 'input_signature' parameter:
+        if input_signature is None:
+            # Read the inputs from the model:
+            try:
+                model_handler.read_inputs_from_model()
+            except Exception as error:
+                raise mlrun.errors.MLRunRuntimeError(
+                    f"Please provide the 'input_signature' parameter. The function tried reading the input layers "
+                    f"information automatically but failed with the following error: {error}"
+                )
+        else:
+            # Parse the 'input_signature' parameter:
             input_signature = [
-                np.zeros(shape=shape, dtype=dtype) for (shape, dtype) in input_signature
+                tf.TensorSpec(
+                    shape=shape,
+                    dtype=model_handler.convert_value_type_to_tf_dtype(
+                        value_type=value_type
+                    ),
+                )
+                for (shape, value_type) in input_signature
             ]
 
         # Convert to ONNX:
@@ -74,40 +62,94 @@ class _ToONNXConversions:
             optimize=optimize_model,
         )
 
+    @staticmethod
+    def pytorch_to_onnx(
+        model_handler,
+        onnx_model_name: str = None,
+        optimize_model: bool = True,
+        input_signature: List[Tuple[Tuple[int], str]] = None,
+        input_layers_names: List[str] = None,
+        output_layers_names: List[str] = None,
+    ):
+        """
+        Convert a PyTorch model to an ONNX model and log it back to MLRun as a new model object.
+
+        :param model_handler:       An initialized PyTorchModelHandler with a loaded model to convert to ONNX.
+        :param onnx_model_name:     The name to use to log the converted ONNX model. If not given, the given
+                                    `model_name` will be used with an additional suffix `_onnx`. Defaulted to None.
+        :param optimize_model:      Whether or not to optimize the ONNX model using 'onnxoptimizer' before saving the
+                                    model. Defaulted to True.
+        :param input_signature:     A list of the input layers shape and data type properties. Expected to receive a
+                                    list where each element is an input layer tuple. An input layer tuple is a tuple of:
+                                    [0] = Layer's shape, a tuple of integers.
+                                    [1] = Layer's data type, a mlrun.data_types.ValueType string.
+                                    If None, the input signature will be tried to be read from the model artifact.
+                                    Defaulted to None.
+        :param input_layers_names:  List of names to assign to the input nodes of the graph in order. All of the other
+                                    parameters (inner layers) can be set as well by passing additional names in the
+                                    list. The order is by the order of the parameters in the model.
+        :param output_layers_names: List of names to assign to the output nodes of the graph in order.
+        """
+        # Import the framework and handler:
+        import torch
+
+        # Parse the 'input_signature' parameter:
+        if input_signature is not None:
+            input_signature = torch.stack(
+                [
+                    torch.zeros(
+                        size=shape,
+                        dtype=model_handler.convert_value_type_to_torch_dtype(
+                            value_type=value_type
+                        ),
+                    )
+                    for (shape, value_type) in input_signature
+                ]
+            )
+
+        # Convert to ONNX:
+        model_handler.to_onnx(
+            model_name=onnx_model_name,
+            input_sample=input_signature,
+            optimize=optimize_model,
+            input_layers_names=input_layers_names,
+            output_layers_names=output_layers_names,
+        )
+
 
 # Map for getting the conversion function according to the provided framework:
 _CONVERSION_MAP = {
-    "tf.keras": _ToONNXConversions.tf_keras_to_onnx
+    "tf.keras": _ToONNXConversions.tf_keras_to_onnx,
+    "pytorch": _ToONNXConversions.pytorch_to_onnx,
 }  # type: Dict[str, Callable]
 
 
 def to_onnx(
     context: mlrun.MLClientCtx,
-    model_name: str,
     model_path: str,
     onnx_model_name: str = None,
     optimize_model: bool = True,
-    framework: str = None,
     framework_kwargs: Dict[str, Any] = None,
 ):
     """
     Convert the given model to an ONNX model.
 
     :param context:          The MLRun function execution context
-    :param model_name:       The model's name.
     :param model_path:       The model path store object.
     :param onnx_model_name:  The name to use to log the converted ONNX model. If not given, the given `model_name` will
                              be used with an additional suffix `_onnx`. Defaulted to None.
     :param optimize_model:   Whether to optimize the ONNX model using 'onnxoptimizer' before saving the model. Defaulted
                              to True.
-    :param framework:        The model's framework. If None, it will be read from the 'framework' label of the model
-                             artifact provided. Defaulted to None.
     :param framework_kwargs: Additional arguments each framework may require in order to convert to ONNX. To get the doc
                              string of the desired framework onnx conversion function, pass "help".
     """
-    # Get the model's framework if needed:
-    if framework is None:
-        framework = _get_framework(model_path=model_path)
+    from mlrun.frameworks.auto_mlrun.auto_mlrun import AutoMLRun
+
+    # Get a model handler of the required framework:
+    model_handler = AutoMLRun.load_model(model_path=model_path, context=context)
+
+    # Get the model's framework:
+    framework = model_handler.FRAMEWORK_NAME
 
     # Use the conversion map to get the specific framework to onnx conversion:
     if framework not in _CONVERSION_MAP:
@@ -128,12 +170,10 @@ def to_onnx(
     # Run the conversion:
     try:
         conversion_function(
-            context=context,
-            model_name=model_name,
-            model_path=model_path,
+            model_handler=model_handler,
             onnx_model_name=onnx_model_name,
             optimize_model=optimize_model,
-            **framework_kwargs
+            **framework_kwargs,
         )
     except TypeError as exception:
         raise mlrun.errors.MLRunInvalidArgumentError(
@@ -145,7 +185,6 @@ def to_onnx(
 
 def optimize(
     context: mlrun.MLClientCtx,
-    model_name: str,
     model_path: str,
     optimizations: List[str] = None,
     fixed_point: bool = False,
@@ -155,7 +194,6 @@ def optimize(
     Optimize the given ONNX model.
 
     :param context:              The MLRun function execution context.
-    :param model_name:           The model's name.
     :param model_path:           Path to the ONNX model object.
     :param optimizations:        List of possible optimizations. To see what optimizations are available, pass "help".
                                  If None, all of the optimizations will be used. Defaulted to None.
@@ -169,13 +207,13 @@ def optimize(
 
     # Check if needed to print the available optimizations ("help" is passed):
     if optimizations == "help":
-        available_passes = '\n* '.join(onnxoptimizer.get_available_passes())
+        available_passes = "\n* ".join(onnxoptimizer.get_available_passes())
         print(f"The available optimizations are:\n* {available_passes}")
         return
 
     # Create the model handler:
     model_handler = ONNXModelHandler(
-        model_name=model_name, model_path=model_path, context=context
+        model_path=model_path, context=context
     )
 
     # Load the ONNX model:

@@ -70,6 +70,8 @@ class _ToONNXConversions:
         input_signature: List[Tuple[Tuple[int], str]] = None,
         input_layers_names: List[str] = None,
         output_layers_names: List[str] = None,
+        dynamic_axes: Dict[str, Dict[int, str]] = None,
+        is_batched: bool = True,
     ):
         """
         Convert a PyTorch model to an ONNX model and log it back to MLRun as a new model object.
@@ -87,8 +89,21 @@ class _ToONNXConversions:
                                     Defaulted to None.
         :param input_layers_names:  List of names to assign to the input nodes of the graph in order. All of the other
                                     parameters (inner layers) can be set as well by passing additional names in the
-                                    list. The order is by the order of the parameters in the model.
-        :param output_layers_names: List of names to assign to the output nodes of the graph in order.
+                                    list. The order is by the order of the parameters in the model. If None, the inputs
+                                    will be read from the handler's inputs. If its also None, it is defaulted to:
+                                    "input_0", "input_1", ...
+        :param output_layers_names: List of names to assign to the output nodes of the graph in order. If None, the
+                                    outputs will be read from the handler's outputs. If its also None, it is defaulted
+                                    to: "output_0" (for multiple outputs, this parameter must be provided).
+        :param dynamic_axes:        If part of the input / output shape is dynamic, like (batch_size, 3, 32, 32) you can
+                                    specify it by giving a dynamic axis to the input / output layer by its name as
+                                    follows: {
+                                        "input layer name": {0: "batch_size"},
+                                        "output layer name": {0: "batch_size"},
+                                    }
+                                    If provided, the 'is_batched' flag will be ignored. Defaulted to None.
+        :param is_batched:          Whether to include a batch size as the first axis in every input and output layer.
+                                    Defaulted to True. Will be ignored if 'dynamic_axes' is provided.
         """
         # Import the framework and handler:
         import torch
@@ -114,6 +129,8 @@ class _ToONNXConversions:
             optimize=optimize_model,
             input_layers_names=input_layers_names,
             output_layers_names=output_layers_names,
+            dynamic_axes=dynamic_axes,
+            is_batched=is_batched
         )
 
 

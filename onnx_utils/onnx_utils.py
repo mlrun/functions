@@ -110,7 +110,7 @@ class _ToONNXConversions:
 
         # Parse the 'input_signature' parameter:
         if input_signature is not None:
-            input_signature = torch.stack(
+            input_signature = tuple(
                 [
                     torch.zeros(
                         size=shape,

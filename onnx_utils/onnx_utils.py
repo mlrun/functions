@@ -67,7 +67,7 @@ class _ToONNXConversions:
         model_handler,
         onnx_model_name: str = None,
         optimize_model: bool = True,
-        input_signature: List[Tuple[Tuple[int], str]] = None,
+        input_signature: List[Tuple[Tuple[int, ...], str]] = None,
         input_layers_names: List[str] = None,
         output_layers_names: List[str] = None,
         dynamic_axes: Dict[str, Dict[int, str]] = None,

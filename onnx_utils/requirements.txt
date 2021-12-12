@@ -8,4 +8,4 @@ onnxoptimizer~=0.2.0
 onnxmltools~=1.9.0
 tf2onnx~=1.9.0
 mlrun
-bokeh~=2.2.0
+plotly~=5.4.0

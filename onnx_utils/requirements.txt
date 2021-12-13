@@ -1,8 +1,11 @@
+tqdm~=4.62.3
 tensorflow~=2.4.1
+torch~=1.10.0
+torchvision~=0.11.1
 onnx~=1.10.1
 onnxruntime~=1.8.1
 onnxoptimizer~=0.2.0
 onnxmltools~=1.9.0
 tf2onnx~=1.9.0
-mlrun==0.8.0rc15
-bokeh~=2.2.0
+mlrun
+plotly~=5.4.0

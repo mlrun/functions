@@ -325,10 +325,7 @@ class BatchProcessor:
                 last_day = self.get_last_created_dir(fs, last_month)
                 last_hour = self.get_last_created_dir(fs, last_day)
 
-                parquet_files = fs.ls(last_hour["name"])
-                last_parquet = sorted(parquet_files, key=lambda k: k["mtime"])[-1]
-                parquet_name = last_parquet["name"]
-                full_path = f"{prefix}{parquet_name}"
+                full_path = f"{prefix}{last_hour}"
 
                 logger.info(f"Now processing {full_path}")
 

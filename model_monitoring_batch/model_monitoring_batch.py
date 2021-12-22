@@ -325,7 +325,7 @@ class BatchProcessor:
                 last_day = self.get_last_created_dir(fs, last_month)
                 last_hour = self.get_last_created_dir(fs, last_day)
 
-                full_path = f"{prefix}{last_hour}"
+                full_path = f"{prefix}{last_hour['name']}"
 
                 logger.info(f"Now processing {full_path}")
 

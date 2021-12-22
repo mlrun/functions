@@ -16,7 +16,7 @@ spec:
   filename: model_monitoring_batch.py
   handler: handler
   image: mlrun/mlrun
-  kind: job
+  kind: serving
   requirements: []
 url: ''
 version: 0.8.0

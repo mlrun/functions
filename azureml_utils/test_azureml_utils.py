@@ -64,12 +64,6 @@ def _cleanup_environment(artifact_path: str):
     # Clean the artifacts directory:
     shutil.rmtree(artifact_path)
 
-    # Delete csv and log files from working directory:
-    working_dir = os.path.abspath('./')
-    for filename in os.listdir(working_dir):
-        if filename.endswith('.csv') or filename.endswith('.log'):
-            os.remove(os.path.join(working_dir, filename))
-
 
 @pytest.mark.skipif(
     condition=not _validate_environment_variables(),
@@ -86,11 +80,6 @@ def test_automl_train():
 
     # Setting environment:
     artifact_path = _set_environment()
-
-    data_file = "iris.csv"
-    iris_dataset = mlrun.get_dataitem(DATA_URL).as_df()
-    iris_dataset.to_csv(data_file, index=False, header=True)
-    data_uri = os.path.join(os.path.abspath("./"), data_file)
 
     azure_automl_fn = import_function("function.yaml")
     model_paths, save_n_models = [], 2
@@ -110,7 +99,7 @@ def test_automl_train():
                 "register_model_name": "iris-model",
                 "save_n_models": save_n_models,
             },
-            inputs={"training_data_uri": data_uri},
+            inputs={"training_data": DATA_URL},
             artifact_path=artifact_path,
             local=True,
         )

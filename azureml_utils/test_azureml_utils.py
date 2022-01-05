@@ -64,12 +64,6 @@ def _cleanup_environment(artifact_path: str):
     # Clean the artifacts directory:
     shutil.rmtree(artifact_path)
 
-    # Delete csv and log files from working directory:
-    working_dir = os.path.abspath('./')
-    for filename in os.listdir(working_dir):
-        if filename.endswith('.log'):
-            os.remove(os.path.join(working_dir, filename))
-
 
 @pytest.mark.skipif(
     condition=not _validate_environment_variables(),

@@ -219,11 +219,15 @@ class BatchProcessor:
         context: MLClientCtx,
         project: str,
         model_monitoring_access_key: str,
+        v3io_access_key: str,
     ):
         self.context = context
         self.project = project
 
-        self.model_monitoring_access_key = model_monitoring_access_key
+        self.v3io_access_key = v3io_access_key
+        self.model_monitoring_access_key = (
+                model_monitoring_access_key or v3io_access_key
+        )
 
         self.virtual_drift = VirtualDrift(inf_capping=10)
 
@@ -250,6 +254,7 @@ class BatchProcessor:
             "Initializing BatchProcessor",
             project=project,
             model_monitoring_access_key_initalized=bool(model_monitoring_access_key),
+            v3io_access_key_initialized=bool(v3io_access_key),
             parquet_path=self.parquet_path,
             kv_container=self.kv_container,
             kv_path=self.kv_path,
@@ -267,11 +272,11 @@ class BatchProcessor:
         )
 
         self.db = get_run_db()
-        self.v3io = get_v3io_client(access_key=self.model_monitoring_access_key)
+        self.v3io = get_v3io_client(access_key=self.v3io_access_key)
         self.frames = get_frames_client(
             address=config.v3io_framesd,
             container=self.tsdb_container,
-            token=self.model_monitoring_access_key,
+            token=self.v3io_access_key,
         )
         self.exception = None
 
@@ -281,7 +286,7 @@ class BatchProcessor:
             path=self.stream_path,
             shard_count=1,
             raise_for_status=v3io.dataplane.RaiseForStatus.never,
-            access_key=self.model_monitoring_access_key,
+            access_key=self.v3io_access_key,
         )
 
         if not (response.status_code == 400 and "ResourceInUse" in str(response.body)):
@@ -450,6 +455,7 @@ def handler(context: MLClientCtx):
         context=context,
         project=context.project,
         model_monitoring_access_key=os.environ.get("MODEL_MONITORING_ACCESS_KEY"),
+        v3io_access_key=os.environ.get("V3IO_ACCESS_KEY"),
     )
     batch_processor.post_init()
     batch_processor.run()

@@ -12,7 +12,7 @@ from mlrun import store_manager
 from mlrun.data_types.infer import DFDataInfer, InferOptions
 from mlrun.run import MLClientCtx
 from mlrun.utils import logger, config
-from mlrun.utils.model_monitoring import parse_model_endpoint_store_prefix
+from mlrun.utils.model_monitoring import EndpointType, parse_model_endpoint_store_prefix
 from mlrun.utils.v3io_clients import get_v3io_client, get_frames_client
 from sklearn.preprocessing import KBinsDiscretizer
 
@@ -226,7 +226,7 @@ class BatchProcessor:
 
         self.v3io_access_key = v3io_access_key
         self.model_monitoring_access_key = (
-            model_monitoring_access_key or v3io_access_key
+                model_monitoring_access_key or v3io_access_key
         )
 
         self.virtual_drift = VirtualDrift(inf_capping=10)
@@ -278,6 +278,7 @@ class BatchProcessor:
             container=self.tsdb_container,
             token=self.v3io_access_key,
         )
+        self.exception = None
 
     def post_init(self):
         response = self.v3io.create_stream(
@@ -332,6 +333,11 @@ class BatchProcessor:
                 endpoint = self.db.get_model_endpoint(
                     project=self.project, endpoint_id=endpoint_id
                 )
+
+                if endpoint.status.endpoint_type == EndpointType.ROUTER:
+                    # endpoint.status.feature_stats is None
+                    logger.info(f"{endpoint_id} is router skipping")
+                    continue
 
                 df = pd.read_parquet(full_path)
                 timestamp = df["timestamp"].iloc[-1]
@@ -409,7 +415,8 @@ class BatchProcessor:
                 logger.info(f"Done updating drift measures {full_path}")
 
             except Exception as e:
-                logger.error(e)
+                logger.error(f"Exception for endpoint {endpoint_id}")
+                self.exception = e
 
     def check_for_drift(self, drift_result, endpoint):
         tvd_mean = drift_result.get("tvd_mean")
@@ -452,3 +459,5 @@ def handler(context: MLClientCtx):
     )
     batch_processor.post_init()
     batch_processor.run()
+    if batch_processor.exception:
+        raise batch_processor.exception

@@ -261,7 +261,7 @@ def _get_top_n_runs(
     complete_runs = [
         run
         for run in remote_run.get_children(status="Completed")
-        if "setup" not in run.id
+        if not any(s in run.id for s in ["setup", "worker"])
     ]
 
     # Checking that the required number of runs are done:
@@ -325,6 +325,8 @@ def _get_model_hp(
                 ]
             else:
                 result_dict[key] = d[key.replace(f"{name}_", "")]
+            if not result_dict[key]:
+                result_dict[key] = ''
 
     return result_dict
 
@@ -363,7 +365,7 @@ def submit_training_job(
     # Setup experiment:
     context.logger.info("Setting up experiment parameters")
     dataset = Dataset.get_by_name(workspace, name=registered_dataset_name)
-    automl_settings = automl_settings
+
     automl_config = AutoMLConfig(
         compute_target=compute_target,
         training_data=dataset,

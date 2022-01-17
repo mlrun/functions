@@ -80,7 +80,6 @@ def test_automl_train():
 
     # Setting environment:
     artifact_path = _set_environment()
-
     azure_automl_fn = import_function("function.yaml")
     model_paths, save_n_models = [], 2
 

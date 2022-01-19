@@ -4,7 +4,6 @@ import pandas as pd
 import mlrun.feature_store as fs
 from mlrun.datastore.targets import get_target_driver
 from mlrun.datastore.base import DataItem
-from mlrun.run import get_dataitem
 from mlrun.execution import MLClientCtx
 
 

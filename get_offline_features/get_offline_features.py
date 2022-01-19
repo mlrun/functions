@@ -1,8 +1,7 @@
-from typing import Union, List, Optional, Dict
+from typing import Union, List, Dict
 
-import pandas as pd
 import mlrun.feature_store as fs
-from mlrun.datastore.targets import get_target_driver
+from mlrun.datastore.targets import get_target_driver, kind_to_driver
 from mlrun.datastore.base import DataItem
 from mlrun.execution import MLClientCtx
 
@@ -15,16 +14,23 @@ def get_offline_features(
         target: Union[str, Dict] = None,
         run_config: Union[str, Dict] = None,
         drop_columns: List[str] = None,
-        start_time: Optional[pd.Timestamp] = None,
-        end_time: Optional[pd.Timestamp] = None,
+        start_time: str = None,
+        end_time: str = None,
         with_indexes: bool = False,
         update_stats: bool = False,
 ):
     """retrieve offline feature vector results
 
-    specify a feature vector uri and retrieve the desired features, their metadata
+    specify a feature vector object/uri and retrieve the desired features, their metadata
     and statistics. returns :py:class:`~mlrun.feature_store.OfflineVectorResponse`,
     results can be returned as a dataframe or written to a target
+
+    The start_time and end_time attributes allow filtering the data to a given time range, they accept
+    string values or pandas `Timestamp` objects, string values can also be relative, for example:
+    "now", "now - 1d2h", "now+5m", where a valid pandas Timedelta string follows the verb "now",
+    for time alignment you can use the verb "floor" e.g. "now -1d floor 1H" will align the time to the last hour
+    (the floor string is passed to pandas.Timestamp.floor(), can use D, H, T, S for day, hour, min, sec alignment).
+
 
     :param context:        MLRun context.
     :param feature_vector: feature vector uri or FeatureVector object.
@@ -43,22 +49,27 @@ def get_offline_features(
 
     :returns feature_vector input
     """
-    # --- Preparing inputs ---
 
     # Preparing entity_rows:
     if entity_rows is not None:
-        context.logger.info(f'Preparing entity_rows: {entity_rows}')
+        context.logger.info(f'Creating DataFrame from entity_rows = {entity_rows}')
         entity_rows = entity_rows.as_df()
 
     # Preparing target:
     if target:
-        context.logger.info(f'Preparing target: {target}')
+        if isinstance(target, str):
+            target = kind_to_driver[target]()
+
+        name = target.name if hasattr(target, 'name') else target['name']
+        context.logger.info(f"Preparing '{name}' target")
         target = get_target_driver(target)
+
     # Preparing run_config:
-    if isinstance(run_config, dict):
+    if run_config and isinstance(run_config, dict):
         context.logger.info('Preparing run configuration')
         run_config = fs.RunConfig(**run_config)
 
+    # Calling get_offline_features:
     context.logger.info(f'getting offline features from the FeatureVector {feature_vector}')
     fs.get_offline_features(
         feature_vector=feature_vector,

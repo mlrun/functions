@@ -261,7 +261,7 @@ def _get_top_n_runs(
     complete_runs = [
         run
         for run in remote_run.get_children(status="Completed")
-        if "setup" not in run.id
+        if not any(s in run.id for s in ["setup", "worker"])
     ]
 
     # Checking that the required number of runs are done:
@@ -325,6 +325,8 @@ def _get_model_hp(
                 ]
             else:
                 result_dict[key] = d[key.replace(f"{name}_", "")]
+            if not result_dict[key]:
+                result_dict[key] = ""
 
     return result_dict
 
@@ -376,7 +378,8 @@ def submit_training_job(
     context.logger.info("Submitting and running experiment")
     remote_run = experiment.submit(automl_config)
     remote_run.wait_for_completion(show_output=show_output)
-
+    if show_output:
+        print(f"\n{'*' * 92}\n")
     # Get top N runs to log:
     top_runs = _get_top_n_runs(
         remote_run=remote_run,
@@ -416,14 +419,15 @@ def submit_training_job(
         # Collect model hyper-parameters:
         model_hp_dict = _get_model_hp(run)
         with context.get_child_context(**model_hp_dict) as child:
+            model_key = f"model_{i + 1}_{model_hp_dict['data_trans_class_name'].lower()}_{model_hp_dict['train_class_name'].lower()}"
             # Log model:
             context.logger.info(
-                f"Logging {model_hp_dict['train_class_name']} model to MLRun"
+                f"Logging {model_key} model to MLRun"
             )
             child.log_results(metrics)
             child.log_model(
                 "model",
-                db_key=f"model_{i}_{model_hp_dict['train_class_name'].lower()}",
+                db_key=model_key,
                 artifact_path=context.artifact_subpath("models"),
                 metrics=metrics,
                 model_file=f"{model.version}/model.pkl",
@@ -434,20 +438,21 @@ def submit_training_job(
                 algorithm=model_hp_dict.get("train_class_name"),
             )
             if i == 0:
+                # This also logs the model:
                 child.mark_as_best()
-
-            context.log_model(
-                f"model_{i}",
-                db_key=f"model_{i}_{model_hp_dict['train_class_name'].lower()}",
-                artifact_path=context.artifact_subpath("models"),
-                metrics=metrics,
-                model_file=f"{model.version}/model.pkl",
-                training_set=training_set,
-                label_column=label_column_name,
-                feature_vector=feature_vector,
-                framework="AzureML",
-                algorithm=model_hp_dict.get("train_class_name"),
-            )
+            else:
+                context.log_model(
+                    f"model_{i + 1}",
+                    db_key=model_key,
+                    artifact_path=context.artifact_subpath(f"models"),
+                    metrics=metrics,
+                    model_file=f"{model.version}/model.pkl",
+                    training_set=training_set,
+                    label_column=label_column_name,
+                    feature_vector=feature_vector,
+                    framework="AzureML",
+                    algorithm=model_hp_dict.get("train_class_name"),
+                )
 
 
 def train(

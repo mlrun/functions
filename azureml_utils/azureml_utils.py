@@ -261,7 +261,7 @@ def _get_top_n_runs(
     complete_runs = [
         run
         for run in remote_run.get_children(status="Completed")
-        if "setup" not in run.id
+        if not any(s in run.id for s in ["setup", "worker"])
     ]
 
     # Checking that the required number of runs are done:
@@ -325,6 +325,8 @@ def _get_model_hp(
                 ]
             else:
                 result_dict[key] = d[key.replace(f"{name}_", "")]
+            if not result_dict[key]:
+                result_dict[key] = ""
 
     return result_dict
 
@@ -363,7 +365,7 @@ def submit_training_job(
     # Setup experiment:
     context.logger.info("Setting up experiment parameters")
     dataset = Dataset.get_by_name(workspace, name=registered_dataset_name)
-    automl_settings = automl_settings
+
     automl_config = AutoMLConfig(
         compute_target=compute_target,
         training_data=dataset,
@@ -374,9 +376,10 @@ def submit_training_job(
 
     # Run experiment on AzureML:
     context.logger.info("Submitting and running experiment")
-    remote_run = experiment.submit(automl_config, show_output=show_output)
+    remote_run = experiment.submit(automl_config)
     remote_run.wait_for_completion(show_output=show_output)
-
+    if show_output:
+        print(f"\n{'*' * 92}\n")
     # Get top N runs to log:
     top_runs = _get_top_n_runs(
         remote_run=remote_run,
@@ -416,14 +419,15 @@ def submit_training_job(
         # Collect model hyper-parameters:
         model_hp_dict = _get_model_hp(run)
         with context.get_child_context(**model_hp_dict) as child:
+            model_key = f"model_{i + 1}_{model_hp_dict['data_trans_class_name'].lower()}_{model_hp_dict['train_class_name'].lower()}"
             # Log model:
             context.logger.info(
-                f"Logging {model_hp_dict['train_class_name']} model to MLRun"
+                f"Logging {model_key} model to MLRun"
             )
             child.log_results(metrics)
             child.log_model(
                 "model",
-                db_key=f"model_{i}_{model_hp_dict['train_class_name'].lower()}",
+                db_key=model_key,
                 artifact_path=context.artifact_subpath("models"),
                 metrics=metrics,
                 model_file=f"{model.version}/model.pkl",
@@ -434,25 +438,27 @@ def submit_training_job(
                 algorithm=model_hp_dict.get("train_class_name"),
             )
             if i == 0:
+                # This also logs the model:
                 child.mark_as_best()
+            else:
+                context.log_model(
+                    f"model_{i + 1}",
+                    db_key=model_key,
+                    artifact_path=context.artifact_subpath(f"models"),
+                    metrics=metrics,
+                    model_file=f"{model.version}/model.pkl",
+                    training_set=training_set,
+                    label_column=label_column_name,
+                    feature_vector=feature_vector,
+                    framework="AzureML",
+                    algorithm=model_hp_dict.get("train_class_name"),
+                )
 
-            context.log_model(
-                f"model_{i}",
-                db_key=f"model_{i}_{model_hp_dict['train_class_name'].lower()}",
-                artifact_path=context.artifact_subpath("models"),
-                metrics=metrics,
-                model_file=f"{model.version}/model.pkl",
-                training_set=training_set,
-                label_column=label_column_name,
-                feature_vector=feature_vector,
-                framework="AzureML",
-                algorithm=model_hp_dict.get("train_class_name"),)
 
-
-def automl_train(
+def train(
     # MlRun
     context: MLClientCtx,
-    training_data: DataItem,
+    dataset: DataItem,
     # Init experiment and compute
     experiment_name: str = "",
     cpu_cluster_name: str = "",
@@ -474,25 +480,27 @@ def automl_train(
     submits training job to Azure AutoML, and downloads trained model
     when completed.
 
-    :param context:               MLRun context.
+    :param context:             MLRun context.
 
-    :param experiment_name:       Name of experiment to create in Azure ML.
-    :param cpu_cluster_name:      Name of Azure ML compute target. Created if does not exist.
-    :param vm_size:               Azure machine type for compute target.
-    :param max_nodes:             Maximum number of concurrent compute targets.
+    :param dataset:             MLRun FeatureVector or dataset URI to upload. Will drop
+                                index before uploading when it is a FeatureVector.
 
-    :param dataset_name:          Name of Azure dataset to register.
-    :param dataset_description:   Description of Azure dataset to register.
-    :param training_data:         MLRun FeatureVector or dataset URI to upload. Will drop
-                                  index before uploading when it is a FeatureVector.
-    :param create_new_version:    Register Azure dataset as new version. Must be used when
-                                  modifying dataset schema.
-    :param label_column_name:     Target column in dataset.
+    :param experiment_name:     Name of experiment to create in Azure ML.
+    :param cpu_cluster_name:    Name of Azure ML compute target. Created if does not exist.
+    :param vm_size:             Azure machine type for compute target.
+    :param max_nodes:           Maximum number of concurrent compute targets.
 
-    :param register_model_name:   Name of model to register in Azure.
-    :param save_n_models:         How many of the top performing models to log.
-    :param log_azure:             Displaying Azure logs.
-    :param automl_settings:       JSON string of all Azure AutoML settings.
+    :param dataset_name:        Name of Azure dataset to register.
+    :param dataset_description: Description of Azure dataset to register.
+
+    :param create_new_version:  Register Azure dataset as new version. Must be used when
+                                modifying dataset schema.
+    :param label_column_name:   Target column in dataset.
+
+    :param register_model_name: Name of model to register in Azure.
+    :param save_n_models:       How many of the top performing models to log.
+    :param log_azure:           Displaying Azure logs.
+    :param automl_settings:     JSON string of all Azure AutoML settings.
     """
     if not automl_settings:
         automl_settings = {
@@ -530,7 +538,7 @@ def automl_train(
         context=context,
         dataset_name=dataset_name,
         dataset_description=dataset_description,
-        data=training_data,
+        data=dataset,
         create_new_version=create_new_version,
     )
 
@@ -543,7 +551,7 @@ def automl_train(
         registered_dataset_name=dataset_name,
         label_column_name=label_column_name,
         automl_settings=automl_settings,
-        training_set=training_data,
+        training_set=dataset,
         show_output=log_azure,
         save_n_models=save_n_models,
     )

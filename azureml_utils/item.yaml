@@ -17,9 +17,12 @@ name: azureml_utils
 platformVersion: ''
 spec:
   filename: azureml_utils.py
-  handler: automl_train
-  image: mlrun/mlrun
+  handler: train
+  commands:
+  image: ''
   kind: job
-  requirements: []
+  requirements:
+    - azureml-core
+    - azureml-train-automl-client
 url: ''
 version: 0.0.1

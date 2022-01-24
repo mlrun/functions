@@ -110,7 +110,8 @@ def create_function_yaml(
         labels=item_yaml.get("labels", {}),
         with_doc=True,
     )
-
+    if function_object.metadata.project == 'default':
+        function_object.metadata.project = ''
     custom_fields = spec.get("customFields", {})
     for key, value in custom_fields.items():
         setattr(function_object.spec, key, value)

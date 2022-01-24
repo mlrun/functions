@@ -218,8 +218,8 @@ def test_get_offline_vector():
     except Exception as e:
         print(f"- The test failed - raised the following error:\n- {e}")
 
-    target_df = get_dataitem(target_dict["path"]).as_df() if os.path.exists(target_dict["path"]) else None
-    vector_df = get_dataitem(gof_run.outputs["return"]).as_df()
+    target_df = get_dataitem(gof_run.outputs["target"]).as_df()
+    vector_df = get_dataitem(gof_run.outputs["feature_vector"]).as_df()
 
     # Asserting that the target and FeatureVector dataframes are the same:
     assert (vector_df.equals(target_df)), "Target and feature vector are not the same"

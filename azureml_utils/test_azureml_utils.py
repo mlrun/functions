@@ -69,7 +69,7 @@ def _cleanup_environment(artifact_path: str):
     condition=not _validate_environment_variables(),
     reason="AzureML secrets should be provided as environment variables",
 )
-def test_automl_train():
+def test_train():
     """
     Test the 'automl_train' handler with iris dataset.
     """
@@ -80,14 +80,13 @@ def test_automl_train():
 
     # Setting environment:
     artifact_path = _set_environment()
-
     azure_automl_fn = import_function("function.yaml")
     model_paths, save_n_models = [], 2
 
     try:
         azureml_run = azure_automl_fn.run(
             runspec=secrets_spec,
-            handler="automl_train",
+            handler="train",
             params={
                 "experiment_name": EXPERIMENT_NAME,
                 "cpu_cluster_name": "azureml-cpu",
@@ -99,12 +98,13 @@ def test_automl_train():
                 "register_model_name": "iris-model",
                 "save_n_models": save_n_models,
             },
-            inputs={"training_data": DATA_URL},
+            inputs={"dataset": DATA_URL},
             artifact_path=artifact_path,
             local=True,
         )
         # Get trained models:
         model_paths = [azureml_run.outputs[key] for key in azureml_run.outputs.keys() if "model" in key]
+        print(model_paths)
         test_pass = len(model_paths) == save_n_models
 
     except Exception as exception:

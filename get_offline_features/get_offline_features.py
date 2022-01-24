@@ -63,6 +63,8 @@ def get_offline_features(
         name = target.name if hasattr(target, 'name') else target['name']
         context.logger.info(f"Preparing '{name}' target")
         target = get_target_driver(target)
+    if target.path:
+        context.log_result('target', target.path)
 
     # Preparing run_config:
     if run_config and isinstance(run_config, dict):
@@ -84,4 +86,4 @@ def get_offline_features(
         update_stats=update_stats
     )
 
-    return feature_vector
+    context.log_result('feature_vector', feature_vector)

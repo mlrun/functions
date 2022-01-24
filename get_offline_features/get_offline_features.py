@@ -33,7 +33,7 @@ def get_offline_features(
 
 
     :param context:        MLRun context.
-    :param feature_vector: feature vector uri or FeatureVector object.
+    :param feature_vector: feature vector uri.
     :param entity_rows:    URI of the data entity rows to join with.
     :param target:         where to write the results to.
     :param drop_columns:   list of columns to drop from the final result

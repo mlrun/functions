@@ -7,17 +7,17 @@ from mlrun.execution import MLClientCtx
 
 
 def get_offline_features(
-        context: MLClientCtx,
-        feature_vector: str,
-        entity_rows: DataItem = None,
-        entity_timestamp_column: str = None,
-        target: Union[str, Dict] = None,
-        run_config: Union[str, Dict] = None,
-        drop_columns: List[str] = None,
-        start_time: str = None,
-        end_time: str = None,
-        with_indexes: bool = False,
-        update_stats: bool = False,
+    context: MLClientCtx,
+    feature_vector: str,
+    entity_rows: DataItem = None,
+    entity_timestamp_column: str = None,
+    target: Union[str, Dict] = None,
+    run_config: Union[str, Dict] = None,
+    drop_columns: List[str] = None,
+    start_time: str = None,
+    end_time: str = None,
+    with_indexes: bool = False,
+    update_stats: bool = False,
 ):
     """retrieve offline feature vector results
 
@@ -33,7 +33,7 @@ def get_offline_features(
 
 
     :param context:        MLRun context.
-    :param feature_vector: feature vector uri.
+    :param feature_vector: feature vector uri or FeatureVector object.
     :param entity_rows:    URI of the data entity rows to join with.
     :param target:         where to write the results to.
     :param drop_columns:   list of columns to drop from the final result
@@ -52,7 +52,7 @@ def get_offline_features(
 
     # Preparing entity_rows:
     if entity_rows is not None:
-        context.logger.info(f'Creating DataFrame from entity_rows = {entity_rows}')
+        context.logger.info(f"Creating DataFrame from entity_rows = {entity_rows}")
         entity_rows = entity_rows.as_df()
 
     # Preparing target:
@@ -60,19 +60,21 @@ def get_offline_features(
         if isinstance(target, str):
             target = kind_to_driver[target]()
 
-        name = target.name if hasattr(target, 'name') else target['name']
+        name = target.name if hasattr(target, "name") else target["name"]
         context.logger.info(f"Preparing '{name}' target")
         target = get_target_driver(target)
     if target.path:
-        context.log_result('target', target.path)
+        context.log_result("target", target.path)
 
     # Preparing run_config:
     if run_config and isinstance(run_config, dict):
-        context.logger.info('Preparing run configuration')
+        context.logger.info("Preparing run configuration")
         run_config = fs.RunConfig(**run_config)
 
     # Calling get_offline_features:
-    context.logger.info(f'getting offline features from the FeatureVector {feature_vector}')
+    context.logger.info(
+        f"getting offline features from the FeatureVector {feature_vector}"
+    )
     fs.get_offline_features(
         feature_vector=feature_vector,
         entity_rows=entity_rows,
@@ -83,7 +85,7 @@ def get_offline_features(
         start_time=start_time,
         end_time=end_time,
         with_indexes=with_indexes,
-        update_stats=update_stats
+        update_stats=update_stats,
     )
 
-    context.log_result('feature_vector', feature_vector)
+    context.log_result("feature_vector", feature_vector)

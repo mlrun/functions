@@ -379,6 +379,7 @@ def submit_training_job(
     remote_run = experiment.submit(automl_config)
     remote_run.wait_for_completion(show_output=show_output)
     if show_output:
+        # Azure log ending row:
         print(f"\n{'*' * 92}\n")
     # Get top N runs to log:
     top_runs = _get_top_n_runs(
@@ -440,19 +441,6 @@ def submit_training_job(
             if i == 0:
                 # This also logs the model:
                 child.mark_as_best()
-            else:
-                context.log_model(
-                    f"model_{i + 1}",
-                    db_key=model_key,
-                    artifact_path=context.artifact_subpath(f"models"),
-                    metrics=metrics,
-                    model_file=f"{model.version}/model.pkl",
-                    training_set=training_set,
-                    label_column=label_column_name,
-                    feature_vector=feature_vector,
-                    framework="AzureML",
-                    algorithm=model_hp_dict.get("train_class_name"),
-                )
 
 
 def train(

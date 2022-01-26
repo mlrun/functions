@@ -22,7 +22,7 @@ spec:
   image: ''
   kind: job
   requirements:
-    - azureml-core
-    - azureml-train-automl-client
+  - azureml-core==1.33.0
+  - azureml-train-automl-client==1.33.0
 url: ''
 version: 0.0.1

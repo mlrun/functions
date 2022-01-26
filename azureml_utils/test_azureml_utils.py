@@ -61,7 +61,7 @@ def _cleanup_environment(artifact_path: str):
             else:
                 os.remove(test_output_path)
 
-    # Clean the artifacts directory:
+    # Clean the artifacts' directory:
     shutil.rmtree(artifact_path)
 
 
@@ -71,7 +71,7 @@ def _cleanup_environment(artifact_path: str):
 )
 def test_train():
     """
-    Test the 'automl_train' handler with iris dataset.
+    Test the 'train' handler with iris dataset.
     """
     test_pass = False
 

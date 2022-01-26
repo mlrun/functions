@@ -198,10 +198,6 @@ def test_get_offline_vector():
         "mycsv", path=os.path.join(artifact_path, "my_csv.csv")
     ).to_dict()
 
-    # Creating the FeatureVector and saving it:
-    vector = fstore.FeatureVector("stocks-vec", features)
-    vector.save()
-
     # Running the getting_offline_features function:
     gof_run = None
     try:
@@ -209,7 +205,8 @@ def test_get_offline_vector():
             handler="get_offline_features",
             inputs={"entity_rows": trades_uri},
             params={
-                "feature_vector": vector.uri,
+                "feature_vector": "stocks-vec",
+                "features": features,
                 "target": target_dict,
                 "entity_timestamp_column": "time",
             },

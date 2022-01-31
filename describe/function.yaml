@@ -3,7 +3,7 @@ metadata:
   name: describe
   tag: ''
   hash: eacdf2a88e7b127d890f642ef8ec880b7f2322c3
-  project: default
+  project: ''
   labels:
     author: Iguazio
   categories:

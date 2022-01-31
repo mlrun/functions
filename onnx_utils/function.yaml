@@ -3,7 +3,7 @@ metadata:
   name: onnx-utils
   tag: ''
   hash: 23c1f9c201f8cfdced8e1f681c52b1690699f259
-  project: default
+  project: ''
   labels:
     author: guyl
   categories:

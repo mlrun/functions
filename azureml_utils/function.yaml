@@ -3,7 +3,7 @@ metadata:
   name: azureml-utils
   tag: ''
   hash: 58a0ae140ed07f6dc1c52c70111cd3fbd35abf95
-  project: default
+  project: ''
   labels:
     author: yonish
   categories:

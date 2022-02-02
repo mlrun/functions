@@ -6,6 +6,7 @@ from typing import Tuple, List
 from mlrun import MLClientCtx, DataItem, get_dataitem
 import mlrun.feature_store as f_store
 from mlrun.api.schemas import ObjectKind
+from mlrun.datastore.targets import ParquetTarget
 
 from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.workspace import Workspace
@@ -144,7 +145,6 @@ def register_dataset(
         context, "AZURE_STORAGE_CONNECTION_STRING"
     ), "AZURE_STORAGE_CONNECTION_STRING secret not set"
 
-    data_type = data.suffix
     # Connect to AzureML experiment and datastore:
     context.logger.info("Connecting to AzureML experiment default datastore")
 
@@ -152,16 +152,18 @@ def register_dataset(
     datastore = workspace.get_default_datastore()
 
     # Azure blob path (default datastore for workspace):
-    blob_path = f"az://{datastore.container_name}/{dataset_name}{data_type}"
+    blob_path = f"az://{datastore.container_name}/{dataset_name}"
 
+    feature_vector_case = data.meta and data.meta.kind == ObjectKind.feature_vector
     # Retrieve data source as dataframe:
-    if data.meta and data.meta.kind == ObjectKind.feature_vector:
+    if feature_vector_case:
         # FeatureVector case:
         context.logger.info(
             f"Retrieving feature vector and uploading to Azure blob storage: {blob_path}"
         )
-        f_store.get_offline_features(data.meta.uri).to_parquet(blob_path)
+        f_store.get_offline_features(data.meta.uri, target=ParquetTarget(path=blob_path))
     else:
+        blob_path += data.suffix
         # DataItem case:
         context.logger.info(
             f"Retrieving feature vector and uploading to Azure blob storage: {blob_path}"
@@ -171,7 +173,7 @@ def register_dataset(
 
     # Register dataset in AzureML:
     context.logger.info(f"Registering dataset {dataset_name} in Azure ML")
-    if data_type == ".parquet":
+    if data.suffix == ".parquet" or feature_vector_case:
         dataset = Dataset.Tabular.from_parquet_files(
             path=(datastore, f"{dataset_name}.parquet"), validate=False
         )
@@ -182,7 +184,7 @@ def register_dataset(
         # OpenSSL version must be 1.1
         os.environ["CLR_OPENSSL_VERSION_OVERRIDE"] = "1.1"
         dataset = Dataset.Tabular.from_delimited_files(
-            path=(datastore, f"{dataset_name}{data_type}"), validate=False
+            path=(datastore, f"{dataset_name}{data.suffix}"), validate=False
         )
 
     dataset.register(
@@ -337,9 +339,9 @@ def submit_training_job(
     compute_target: ComputeTarget,
     register_model_name: str,
     registered_dataset_name: str,
-    label_column_name: str,
     automl_settings: dict,
     training_set: DataItem,
+    label_column_name: str = '',
     save_n_models: int = 3,
     show_output: bool = True,
 ) -> None:
@@ -366,6 +368,16 @@ def submit_training_job(
     context.logger.info("Setting up experiment parameters")
     dataset = Dataset.get_by_name(workspace, name=registered_dataset_name)
 
+    # Get training set to log with model:
+    feature_vector = None
+    if training_set.meta and training_set.meta.kind == ObjectKind.feature_vector:
+        feature_vector = training_set.meta.uri
+        label_column_name = label_column_name or training_set.meta.status.label_column
+        context.logger.info(f'label column name: {label_column_name}')
+        training_set = f_store.get_offline_features(feature_vector).to_dataframe()
+    else:
+        training_set = training_set.as_df()
+
     automl_config = AutoMLConfig(
         compute_target=compute_target,
         training_data=dataset,
@@ -387,12 +399,6 @@ def submit_training_job(
         n=save_n_models,
         primary_metric=automl_settings["primary_metric"],
     )
-
-    # Get training set to log with model:
-    feature_vector = None
-    if training_set.meta and training_set.meta.kind == ObjectKind.feature_vector:
-        feature_vector = training_set.meta.uri
-    training_set = training_set.as_df()
 
     # Register, download, and log models:
     for i, run in enumerate(top_runs):

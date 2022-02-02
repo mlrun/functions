@@ -1,6 +1,6 @@
 apiVersion: v1
 categories:
-- Utilities
+- utilities
 - machine-learning
 - model-training
 description: Azure AutoML integration in MLRun, including utils functions for training models on Azure AutoML platfrom.
@@ -18,8 +18,12 @@ platformVersion: ''
 spec:
   filename: azureml_utils.py
   handler: train
-  commands:
-  image: ''
+  extra_spec:
+    build:
+      commands:
+      - python -m pip install pip==21.2.4
+      - apt-get update && apt-get install -y --no-install-recommends git
+  image: python:3.7.9-slim
   kind: job
   requirements:
   - azureml-core==1.33.0

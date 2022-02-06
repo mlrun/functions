@@ -1,0 +1,25 @@
+apiVersion: v1
+categories:
+- machine-learning
+- model-training
+description: ''
+doc: ''
+example: auto_trainer.ipynb
+generationDate: 2022-02-06:10-18
+icon: ''
+labels:
+  author: yonish
+maintainers: []
+marketplaceType: ''
+mlrunVersion: ''
+name: auto_trainer
+platformVersion: ''
+spec:
+  filename: auto_trainer.py
+  handler: train
+  commands:
+  image: ''
+  kind: job
+  requirements: []
+url: ''
+version: 0.0.1

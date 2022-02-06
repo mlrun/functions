@@ -3,7 +3,7 @@ metadata:
   name: sentiment-analysis-serving
   tag: ''
   hash: 611580a53c5471a18097b1b9240fa1c2c8c1dcb6
-  project: default
+  project: ''
   labels:
     author: avia
     framework: pytorch

@@ -3,7 +3,7 @@ metadata:
   name: aggregate
   tag: ''
   hash: e96a23ca027ed86819b5de6c7dc18d87d8266ea7
-  project: default
+  project: ''
   labels:
     author: avia
   categories:

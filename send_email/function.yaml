@@ -3,7 +3,7 @@ metadata:
   name: send-email
   tag: ''
   hash: 2849002aee620e0c891078134d85127210e03ea9
-  project: default
+  project: ''
   labels:
     author: saarc
   categories:

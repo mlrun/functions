@@ -3,7 +3,7 @@ metadata:
   name: virtual-drift
   tag: ''
   hash: 8990fdd72fc550189a0c8b488b69997428b786c9
-  project: default
+  project: ''
   labels:
     author: orz
   categories:

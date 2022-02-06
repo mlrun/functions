@@ -3,7 +3,7 @@ metadata:
   name: xgb-serving
   tag: ''
   hash: d80a0b814b7707e100b3cd7d69fee276ebb2ff16
-  project: default
+  project: ''
   labels:
     author: Daniel
   categories:

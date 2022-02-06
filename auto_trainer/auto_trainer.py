@@ -1,27 +1,29 @@
 import mlrun
 import warnings
 
-from typing import List, Dict, Union
+from typing import List
 from sklearn.model_selection import train_test_split
 from importlib import import_module
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.frameworks.auto_mlrun import AutoMLRun
+from mlrun import feature_store as fs
+from mlrun.api.schemas import ObjectKind
 from inspect import _empty, signature
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 warnings.filterwarnings("ignore")
 
 
-def get_class_fit(package_module_class: str) -> Dict[str, Union[Dict[str, ], str]]:
+def get_class_fit(module_pkg_class: str):
     """generate a model config
-    :param package_module_class:  str description of model, e.g.
+    :param module_pkg_class:  str description of model, e.g.
         `sklearn.ensemble.RandomForestClassifier`
     """
-    package, module, klass = package_module_class.split(".")
-
+    splits = module_pkg_class.split(".")
+    package_module, klass = ".".join(splits[:-1]), splits[-1]
     # getting the model:
-    model = getattr(import_module(f"{package}.{module}"), klass)
+    model = getattr(import_module(package_module), klass)
 
     # model.fit() signature:
     fit_signature = dict(signature(model().fit).parameters)
@@ -34,8 +36,8 @@ def get_class_fit(package_module_class: str) -> Dict[str, Union[Dict[str, ], str
         "CLASS": model().get_params(),
         "FIT": fit_signature,
         "META": {
-            "package_version": import_module(package).__version__,
-            "class": package_module_class,
+            "package_version": import_module(package_module).__version__,
+            "class": module_pkg_class,
         },
     }
 
@@ -76,16 +78,21 @@ def train(context: MLClientCtx,
     model_config = _gen_model_config(model_class, dict(context.parameters.items()))
 
     # Pull DataFrame from DataItem
-    dataset = dataset.as_df() if type(dataset) == mlrun.datastore.base.DataItem else dataset
+    if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
+        # feature-vector case:
+        dataset = fs.get_offline_features(dataset.meta.uri).to_dataframe()
+    else:
+        # simple URL case:
+        dataset = dataset.as_df()
 
     # Split according to test_size
-    X = dataset[dataset.columns[dataset.columns != label_column]]
+    x = dataset[dataset.columns[dataset.columns != label_column]]
     y = dataset[label_column]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size)
 
     # Update config with the new split
-    model_config["FIT"].update({"X": X_train, "y": y_train})
+    model_config["FIT"].update({"X": x_train, "y": y_train})
 
     # ?
     model_class = create_class(model_config["META"]["class"])

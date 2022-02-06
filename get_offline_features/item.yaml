@@ -1,0 +1,25 @@
+apiVersion: v1
+categories:
+- data-preparation
+- data-analysis
+- feature-store
+description: retrieve offline feature vector results
+doc: ''
+example: get_offline_features.ipynb
+generationDate: 2022-01-17:17-56
+icon: ''
+labels:
+  author: yonish
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.9.1
+name: get_offline_features
+platformVersion: ''
+spec:
+  filename: get_offline_features.py
+  handler: get_offline_features
+  image: mlrun/mlrun
+  kind: job
+  requirements: []
+url: ''
+version: 0.0.1

@@ -12,9 +12,9 @@ def test_train():
             "MODEL_CLASS_C": 0.1,
         },
         "xgboost.XGBRegressor": {
-            "MODEL_CLASS_max_depth": 3,
-            "MODEL_CLASS_learning_rate": 1e-2,
-            "MODEL_CLASS_random_state": 42,
+            # "FIT_max_depth": 3,
+            # "FIT_learning_rate": 1e-2,
+            # "FIT_random_state": 42,
         },
     }
     try:

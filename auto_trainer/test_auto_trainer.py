@@ -4,19 +4,23 @@ DATASET_URL = "https://s3.wasabisys.com/iguazio/data/function-marketplace-data/x
 
 
 def test_train():
+    # Importing function:
     fn = import_function("function.yaml")
 
+    # Creating model classes as inputs to the run:
     model_classes = {
         "sklearn.linear_model.LogisticRegression": {
-            "MODEL_CLASS_penalty": "l2",
-            "MODEL_CLASS_C": 0.1,
+            "CLASS_penalty": "l2",
+            "CLASS_C": 0.1,
         },
         "xgboost.XGBRegressor": {
-            # "FIT_max_depth": 3,
-            # "FIT_learning_rate": 1e-2,
-            # "FIT_random_state": 42,
+            "CLASS_max_depth": 3,
         },
+        "lightgbm.LGBMClassifier": {
+            "CLASS_max_depth": 3,
+        }
     }
+
     try:
         for i, (model_class, kwargs) in enumerate(model_classes.items()):
             train_run = fn.run(
@@ -29,8 +33,7 @@ def test_train():
                     "label_columns": "labels",
                     # "test_set": ''
                     "train_test_split_size": 0.2,
-                    # "artifacts": {},
-                    "kwargs": kwargs,
+                    **kwargs,
                 },
                 handler="train",
                 local=True,

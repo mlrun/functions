@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: azureml-utils
   tag: ''
-  hash: 5507183de144a6a7f5e913a4e73742d5b3696243
+  hash: 1fc5be8a055e4365db21d18a323f3bad03dc25aa
   project: ''
   labels:
     author: yonish
@@ -20,7 +20,7 @@ spec:
     - python -m pip install pip==21.2.4
     - apt-get update && apt-get install -y --no-install-recommends git
     - python -m pip install azureml-core==1.33.0 azureml-train-automl-client==1.33.0
-    code_origin: https://github.com/mlrun/functions.git#e41b7a87c3705ec897fce3416ed53dfce38502e1:C:\Users\yonatans\projects\functions\azureml_utils\azureml_utils.py
+    code_origin: https://github.com/mlrun/functions.git#aa290ed845242924547b007ecd44637582acf152:C:\Users\yonatans\projects\functions\azureml_utils\azureml_utils.py
     origin_filename: C:\Users\yonatans\projects\functions\azureml_utils\azureml_utils.py
   entry_points:
     init_compute:

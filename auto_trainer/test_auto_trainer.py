@@ -7,25 +7,30 @@ def test_train():
     fn = import_function("function.yaml")
 
     model_classes = {
-        'sklearn.linear_model.LogisticRegression': {
-            "MODEL_CLASS_penalty": 'l2',
+        "sklearn.linear_model.LogisticRegression": {
+            "MODEL_CLASS_penalty": "l2",
             "MODEL_CLASS_C": 0.1,
-        }
+        },
+        "xgboost.XGBRegressor": {
+            "MODEL_CLASS_max_depth": 3,
+            "MODEL_CLASS_learning_rate": 1e-2,
+            "MODEL_CLASS_random_state": 42,
+        },
     }
     try:
-        for model_class, kwargs in model_classes.items():
+        for i, (model_class, kwargs) in enumerate(model_classes.items()):
             train_run = fn.run(
                 inputs={"dataset": DATASET_URL},
                 params={
-                    "drop_columns": ['feat_0', 'feat_2'],
+                    "drop_columns": ["feat_0", "feat_2"],
                     "model_class": model_class,
-                    "model_name": 'my_model',
+                    "model_name": f"model_{i}",
                     # "tag": "",
                     "label_columns": "labels",
                     # "test_set": ''
                     "train_test_split_size": 0.2,
                     # "artifacts": {},
-                    "kwargs": kwargs
+                    "kwargs": kwargs,
                 },
                 handler="train",
                 local=True,
@@ -33,4 +38,3 @@ def test_train():
 
     except Exception as exception:
         print(f"- The test failed - raised the following error:\n- {exception}")
-

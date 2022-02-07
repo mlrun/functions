@@ -3,7 +3,7 @@ metadata:
   name: concept-drift-streaming
   tag: ''
   hash: dc41ff41149be69f19b91a6d78a06571937063ae
-  project: default
+  project: ''
   labels:
     author: orz
     framework: sklearn

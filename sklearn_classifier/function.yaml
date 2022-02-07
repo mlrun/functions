@@ -3,7 +3,7 @@ metadata:
   name: sklearn-classifier
   tag: ''
   hash: 563204860716de5832376cede1ebdf55e107269d
-  project: default
+  project: ''
   labels:
     author: yjb
     framework: sklearn

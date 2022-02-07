@@ -3,7 +3,7 @@ metadata:
   name: concept-drift
   tag: ''
   hash: 935da41196802875e19948974f32b6f00c29feb2
-  project: default
+  project: ''
   labels:
     author: orz
     framework: sklearn

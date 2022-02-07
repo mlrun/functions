@@ -3,7 +3,7 @@ metadata:
   name: xgb-custom
   tag: ''
   hash: 5a052481ac303bde0afeccef9d2c5257abc4b00e
-  project: default
+  project: ''
   labels:
     author: Daniel
   categories:

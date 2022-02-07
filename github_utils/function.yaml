@@ -3,7 +3,7 @@ metadata:
   name: github-utils
   tag: ''
   hash: d8e639af306794ce6f59eb246f0b845c016c9da4
-  project: default
+  project: ''
   labels:
     author: yaronh
   categories:

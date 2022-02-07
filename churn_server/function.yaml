@@ -3,7 +3,7 @@ metadata:
   name: churn-server
   tag: ''
   hash: 805b4583ab8fa8df90c71d97eef54bbccf8729e8
-  project: default
+  project: ''
   labels:
     author: Iguazio
     framework: churn

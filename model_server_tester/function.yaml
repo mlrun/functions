@@ -3,7 +3,7 @@ metadata:
   name: model-server-tester
   tag: ''
   hash: 3b203a2799e44992539eafd32a4b8979bbcc8001
-  project: default
+  project: ''
   labels:
     author: yaronh
   categories:

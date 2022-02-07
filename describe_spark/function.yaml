@@ -3,7 +3,7 @@ metadata:
   name: describe-spark
   tag: ''
   hash: bd54bbf6350fb0dc392ff7f91b4aa6ea3c742e93
-  project: default
+  project: ''
   categories:
   - data-analysis
 spec:

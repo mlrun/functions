@@ -3,7 +3,7 @@ metadata:
   name: coxph-trainer
   tag: ''
   hash: 65292d47d13eba9327a2b402066d9d76408a7985
-  project: default
+  project: ''
   labels:
     author: yjb
     framework: survival

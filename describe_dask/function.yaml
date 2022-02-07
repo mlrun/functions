@@ -3,7 +3,7 @@ metadata:
   name: describe-dask
   tag: ''
   hash: 1ac500a28694c381499f7cc866921fd32c0ab643
-  project: default
+  project: ''
   labels:
     author: Iguazio
   categories:

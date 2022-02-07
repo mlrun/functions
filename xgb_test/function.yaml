@@ -3,7 +3,7 @@ metadata:
   name: xgb-test
   tag: ''
   hash: 3f3368b15f934eba5f6f6b23972da804b6eb88d4
-  project: default
+  project: ''
   labels:
     author: Daniel
     framework: xgboost

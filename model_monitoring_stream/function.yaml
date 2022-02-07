@@ -3,7 +3,7 @@ metadata:
   name: model-monitoring-stream
   tag: ''
   hash: 33f4d6de0858b3dfc9d150fc82fbed6feb05534c
-  project: default
+  project: ''
   categories:
   - monitoring
 spec:

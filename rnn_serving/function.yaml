@@ -3,7 +3,7 @@ metadata:
   name: rnn-serving
   tag: ''
   hash: 548cd27edfdc49aed0b069d94bd049435d484722
-  project: default
+  project: ''
   labels:
     author: Daniel
   categories:

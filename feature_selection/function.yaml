@@ -3,7 +3,7 @@ metadata:
   name: feature-selection
   tag: ''
   hash: 2edce38d8b7359dc3bdab530dc1abb197335d33c
-  project: default
+  project: ''
   labels:
     author: orz
   categories:

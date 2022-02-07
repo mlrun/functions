@@ -3,7 +3,7 @@ metadata:
   name: pandas-profiling-report
   tag: ''
   hash: 79fe77fb2920a8ffecfef2f614a0be494c2ea43b
-  project: default
+  project: ''
   labels:
     author: nicks
   categories:

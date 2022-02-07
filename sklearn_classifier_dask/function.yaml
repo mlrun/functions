@@ -3,7 +3,7 @@ metadata:
   name: sklearn-classifier-dask
   tag: ''
   hash: 9eda6a55463782ab74a8661bf0cd0fa8042c0069
-  project: default
+  project: ''
   labels:
     author: yjb
     framework: sklearn

@@ -3,7 +3,7 @@ metadata:
   name: v2-model-server
   tag: ''
   hash: ad85919d3b9cf2acae43a3434ba56e01b005755e
-  project: default
+  project: ''
   labels:
     author: yaronh
     framework: sklearn

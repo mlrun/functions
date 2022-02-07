@@ -3,7 +3,7 @@ metadata:
   name: tf1-serving
   tag: ''
   hash: 20cdeb2119a67fc51e55474ac84d386c7b658db3
-  project: default
+  project: ''
   labels:
     author: yaronh
   categories:

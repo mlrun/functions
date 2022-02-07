@@ -3,7 +3,7 @@ metadata:
   name: load-dask
   tag: ''
   hash: 2af86b4c6ce0bc3e3d0468c1b66a5358482f383e
-  project: default
+  project: ''
   labels:
     author: yjb
   categories:

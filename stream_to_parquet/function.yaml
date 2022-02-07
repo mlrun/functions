@@ -3,7 +3,7 @@ metadata:
   name: stream-to-parquet
   tag: ''
   hash: 78316bfbe731714715c19f0bc6deabf8652f15c4
-  project: default
+  project: ''
   labels:
     author: orz
   categories:

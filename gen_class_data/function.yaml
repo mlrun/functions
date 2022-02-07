@@ -3,7 +3,7 @@ metadata:
   name: gen-class-data
   tag: ''
   hash: 70518725b61fa173d5ece8f6bdad0daa9a721e9e
-  project: default
+  project: ''
   labels:
     author: Daniel
   categories:

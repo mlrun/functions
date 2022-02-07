@@ -3,7 +3,7 @@ metadata:
   name: model-monitoring-batch
   tag: ''
   hash: 0a07259a35b487d80169a53e31ce0c62dc288c2c
-  project: default
+  project: ''
   categories:
   - monitoring
 spec:

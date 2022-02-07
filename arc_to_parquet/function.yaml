@@ -3,7 +3,7 @@ metadata:
   name: arc-to-parquet
   tag: ''
   hash: 279c3883ef04eeaaf53559094200cf842a790d91
-  project: default
+  project: ''
   labels:
     author: yjb
   categories:

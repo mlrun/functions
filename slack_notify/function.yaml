@@ -3,7 +3,7 @@ metadata:
   name: slack-notify
   tag: ''
   hash: 3de7e78ed9b7928af192badf988055086431fb58
-  project: default
+  project: ''
   labels:
     author: mdl
   categories:

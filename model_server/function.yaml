@@ -2,7 +2,7 @@ kind: remote
 metadata:
   name: model-server
   hash: a69f8e7d0b5c54aa5a189cdd67bf8fd1e664721b
-  project: default
+  project: ''
   labels:
     author: yaronh
     framework: sklearn

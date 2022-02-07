@@ -3,7 +3,7 @@ metadata:
   name: feature-perms
   tag: ''
   hash: 2e32234a73e2e48f029cf6c957b150ec2ffd4bc7
-  project: default
+  project: ''
   labels:
     author: yjb
   categories:

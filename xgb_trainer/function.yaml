@@ -3,7 +3,7 @@ metadata:
   name: xgb-trainer
   tag: ''
   hash: 74f26135df3322a88554136c4c5dbe8d95a5fadc
-  project: default
+  project: ''
   labels:
     author: Daniel
   categories:

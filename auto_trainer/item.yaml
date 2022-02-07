@@ -4,7 +4,7 @@ categories:
 - model-training
 description: ''
 doc: ''
-example: auto_trainer.ipynb
+example: ''
 generationDate: 2022-02-06:10-18
 icon: ''
 labels:
@@ -17,7 +17,6 @@ platformVersion: ''
 spec:
   filename: auto_trainer.py
   handler: train
-  commands:
   image: ''
   kind: job
   requirements: []

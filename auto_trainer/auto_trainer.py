@@ -1,142 +1,97 @@
-import mlrun
-import warnings
-
-from typing import List
+from typing import List, Dict, Optional, Union, Tuple, Any
 from sklearn.model_selection import train_test_split
-from importlib import import_module
+
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.frameworks.auto_mlrun import AutoMLRun
 from mlrun import feature_store as fs
 from mlrun.api.schemas import ObjectKind
-from inspect import _empty, signature
-
-warnings.simplefilter(action="ignore", category=FutureWarning)
-warnings.filterwarnings("ignore")
+from mlrun.utils.helpers import create_class, create_function
 
 
-def get_class_fit(module_pkg_class: str):
-    """generate a model config
-    :param module_pkg_class:  str description of model, e.g.
-        `sklearn.ensemble.RandomForestClassifier`
-    """
-    splits = module_pkg_class.split(".")
-    package_module, klass = ".".join(splits[:-1]), splits[-1]
-    # getting the model:
-    model = getattr(import_module(package_module), klass)
+def _parse_kwargs(kwargs: Dict) -> Tuple[Dict, Dict, Dict]:
+    train_kw, fit_kw, model_class_kw = {}, {}, {}
 
-    # model.fit() signature:
-    fit_signature = dict(signature(model().fit).parameters)
+    for key, val in kwargs.items():
+        if key.startswith("TRAIN_"):
+            train_kw[key.replace("TRAIN_", "")] = val
 
-    # TODO: How do we know the difference between default = None, and no default?
-    for parameter, val in fit_signature.items():
-        fit_signature[parameter] = None if val.default is _empty else val.default
+        elif key.startswith("FIT_"):
+            train_kw[key.replace("FIT_", "")] = val
 
-    return {
-        "CLASS": model().get_params(),
-        "FIT": fit_signature,
-        "META": {
-            "package_version": import_module(package_module).__version__,
-            "class": module_pkg_class,
-        },
-    }
+        elif key.startswith("MODEL_CLASS_"):
+            model_class_kw[key.replace("MODEL_CLASS_", "")] = val
+
+    return train_kw, fit_kw, model_class_kw
 
 
-def create_class(pkg_class: str):
-    """Create a class from a package.module.class string
-    :param pkg_class:  full class location,
-                       e.g. "sklearn.model_selection.GroupKFold"
-    """
-    package, module, klass = pkg_class.split(".")
-    class_ = getattr(import_module(f"{package}.{module}"), klass)
-    return class_
+def train(
+    context: MLClientCtx,
+    dataset: DataItem,
+    drop_columns: List[str] = None,
+    model_class: str = None,
+    model_name: str = "model",
+    tag: str = "",
+    label_columns: Optional[Union[str, List[str]]] = None,
+    sample_set: DataItem = None,
+    test_set: DataItem = None,
+    train_test_split_size: float = None,
+    artifacts: Dict = None,
+    kwargs: Dict[str, Any] = None,
+):
+    # Validate inputs:
+    # Check if only one of them is supplied:
+    if (test_set is None) == (train_test_split_size is None):
+        raise TypeError(
+            f"Provide only one of test_set model and train_test_split_size"
+        )
 
-
-def _gen_model_config(model_class, model_params):
-    model_config = get_class_fit(model_class)
-
-    for param in model_params:
-        if param.startswith("CLASS_"):
-            model_config["CLASS"][param[6:]] = model_params[param]
-
-        if param.startswith("FIT_"):
-            model_config["FIT"][param[4:]] = model_params[param]
-    return model_config
-
-
-def train(context: MLClientCtx,
-          dataset: DataItem,
-          model_class: str,
-          label_column: str = 'label',
-          model_name: str = 'trained_model',
-          test_size: float = 0.2,
-          artifacts: List[str] = []):
-    """
-    """
-
-    # Set model config file
-    model_config = _gen_model_config(model_class, dict(context.parameters.items()))
-
-    # Pull DataFrame from DataItem
     if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
         # feature-vector case:
-        dataset = fs.get_offline_features(dataset.meta.uri).to_dataframe()
+        dataset = fs.get_offline_features(dataset.meta.uri, drop_columns=drop_columns).to_dataframe()
+        label_columns = label_columns or dataset.meta.status.label_column
     else:
         # simple URL case:
         dataset = dataset.as_df()
+        if drop_columns:
+            dataset = dataset.drop(drop_columns, axis=1)
 
-    # Split according to test_size
-    x = dataset[dataset.columns[dataset.columns != label_column]]
-    y = dataset[label_column]
+    # Parsing kwargs:
+    train_kw, fit_kw, model_class_kw = _parse_kwargs(kwargs)
 
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size)
+    # Check if model or function:
+    if hasattr(model_class, 'train'):
+        # TODO: Need to call: model(), afterwards to start the train function.
+        model = create_function(f'{model_class}.train')
+    else:
+        # Creating model instance:
+        model = create_class(model_class)(**model_class_kw)
 
-    # Update config with the new split
-    model_config["FIT"].update({"X": x_train, "y": y_train})
+    x = dataset.drop(label_columns, axis=1)
+    y = dataset[label_columns]
+    if train_test_split_size:
+        x_train, x_test, y_train, y_test = train_test_split(
+            x, y, test_size=train_test_split_size
+        )
+    else:
+        x_train, y_train = x, y
 
-    # ?
-    model_class = create_class(model_config["META"]["class"])
-    model = model_class(**model_config["CLASS"])
+        test_set = test_set.as_df()
+        if drop_columns:
+            test_set = dataset.drop(drop_columns, axis=1)
 
-    # Wrap our model with Mlrun features, specify the test dataset for analysis and accuracy measurements
+        x_test, y_test = test_set.drop(label_columns, axis=1), test_set[label_columns]
+
     AutoMLRun.apply_mlrun(
-        model_name=model_name, model=model, context=context, x_validation=X_test, y_validation=y_test
+        model=model,
+        model_name=model_name,
+        context=context,
+        tag=tag,
+        sample_set=sample_set,
+        test_set=test_set,
+        X_test=x_test,
+        y_test=y_test,
+        artifacts=artifacts,
     )
 
-    # Train our model
-    model.fit(model_config["FIT"]["X"], model_config["FIT"]["y"])
-
-
-def evaluate(context: MLClientCtx,
-             dataset: DataItem,
-             model_path: str,
-             artifacts: List[str],
-             label_column: str = 'label'):
-
-    # Pull DataFrame from DataItem
-    dataset = dataset.as_df() if type(dataset) == mlrun.datastore.base.DataItem else dataset
-
-    model_handler = AutoMLRun.load_model(model_path)
-
-    X_test = dataset[dataset.columns[dataset.columns != label_column]]
-    y_test = dataset[label_column]
-
-    AutoMLRun.apply_mlrun(model_handler.model, y_test=y_test, model_path=model_path)
-
-    model_handler.model.predict(X_test)
-
-
-def predict(context: MLClientCtx,
-            dataset: DataItem,
-            model_path: str,
-            artifacts: List[str],
-            label_column: str = None):
-
-    # Pull DataFrame from DataItem
-    dataset = dataset.as_df() if type(dataset) == mlrun.datastore.base.DataItem else dataset
-
-    if label_column:
-        dataset = dataset[dataset.columns[dataset.columns != label_column]]
-
-    model_handler = AutoMLRun.load_model(model_path)
-    model_handler.model.predict(dataset)
+    model = model.fit(x_train, y_train, **fit_kw)

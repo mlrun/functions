@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: auto-trainer
   tag: ''
-  hash: f30f9626ff9032cc95816d44cb9dd77a6368a5f8
+  hash: d25f46e6e845aba54ddfd8191cb1b8a5495dc457
   project: ''
   labels:
     author: yonish
@@ -13,34 +13,15 @@ spec:
   command: ''
   args: []
   image: ''
-  env: []
-  default_handler: train
+  build:
+    functionSourceCode: ZnJvbSB0eXBpbmcgaW1wb3J0IExpc3QsIERpY3QsIE9wdGlvbmFsLCBVbmlvbiwgVHVwbGUsIEFueQpmcm9tIHNrbGVhcm4ubW9kZWxfc2VsZWN0aW9uIGltcG9ydCB0cmFpbl90ZXN0X3NwbGl0Cgpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCmZyb20gbWxydW4uZnJhbWV3b3Jrcy5hdXRvX21scnVuIGltcG9ydCBBdXRvTUxSdW4KZnJvbSBtbHJ1biBpbXBvcnQgZmVhdHVyZV9zdG9yZSBhcyBmcwpmcm9tIG1scnVuLmFwaS5zY2hlbWFzIGltcG9ydCBPYmplY3RLaW5kCmZyb20gbWxydW4udXRpbHMuaGVscGVycyBpbXBvcnQgY3JlYXRlX2NsYXNzLCBjcmVhdGVfZnVuY3Rpb24KCgpkZWYgX3BhcnNlX2t3YXJncyhrd2FyZ3M6IERpY3QpIC0+IFR1cGxlW0RpY3QsIERpY3QsIERpY3RdOgogICAgdHJhaW5fa3csIGZpdF9rdywgbW9kZWxfY2xhc3Nfa3cgPSB7fSwge30sIHt9CgogICAgZm9yIGtleSwgdmFsIGluIGt3YXJncy5pdGVtcygpOgogICAgICAgIGlmIGtleS5zdGFydHN3aXRoKCJUUkFJTl8iKToKICAgICAgICAgICAgdHJhaW5fa3dba2V5LnJlcGxhY2UoIlRSQUlOXyIsICIiKV0gPSB2YWwKCiAgICAgICAgZWxpZiBrZXkuc3RhcnRzd2l0aCgiRklUXyIpOgogICAgICAgICAgICB0cmFpbl9rd1trZXkucmVwbGFjZSgiRklUXyIsICIiKV0gPSB2YWwKCiAgICAgICAgZWxpZiBrZXkuc3RhcnRzd2l0aCgiTU9ERUxfQ0xBU1NfIik6CiAgICAgICAgICAgIG1vZGVsX2NsYXNzX2t3W2tleS5yZXBsYWNlKCJNT0RFTF9DTEFTU18iLCAiIildID0gdmFsCgogICAgcmV0dXJuIHRyYWluX2t3LCBmaXRfa3csIG1vZGVsX2NsYXNzX2t3CgoKZGVmIHRyYWluKAogICAgY29udGV4dDogTUxDbGllbnRDdHgsCiAgICBkYXRhc2V0OiBEYXRhSXRlbSwKICAgIGRyb3BfY29sdW1uczogTGlzdFtzdHJdID0gTm9uZSwKICAgIG1vZGVsX2NsYXNzOiBzdHIgPSBOb25lLAogICAgbW9kZWxfbmFtZTogc3RyID0gIm1vZGVsIiwKICAgIHRhZzogc3RyID0gIiIsCiAgICBsYWJlbF9jb2x1bW5zOiBPcHRpb25hbFtVbmlvbltzdHIsIExpc3Rbc3RyXV1dID0gTm9uZSwKICAgIHNhbXBsZV9zZXQ6IERhdGFJdGVtID0gTm9uZSwKICAgIHRlc3Rfc2V0OiBEYXRhSXRlbSA9IE5vbmUsCiAgICB0cmFpbl90ZXN0X3NwbGl0X3NpemU6IGZsb2F0ID0gTm9uZSwKICAgIGFydGlmYWN0czogRGljdCA9IE5vbmUsCiAgICBrd2FyZ3M6IERpY3Rbc3RyLCBBbnldID0gTm9uZSwKKToKICAgICMgVmFsaWRhdGUgaW5wdXRzOgogICAgIyBDaGVjayBpZiBvbmx5IG9uZSBvZiB0aGVtIGlzIHN1cHBsaWVkOgogICAgaWYgKHRlc3Rfc2V0IGlzIE5vbmUpID09ICh0cmFpbl90ZXN0X3NwbGl0X3NpemUgaXMgTm9uZSk6CiAgICAgICAgcmFpc2UgVHlwZUVycm9yKAogICAgICAgICAgICBmIlByb3ZpZGUgb25seSBvbmUgb2YgdGVzdF9zZXQgbW9kZWwgYW5kIHRyYWluX3Rlc3Rfc3BsaXRfc2l6ZSIKICAgICAgICApCgogICAgaWYgZGF0YXNldC5tZXRhIGFuZCBkYXRhc2V0Lm1ldGEua2luZCA9PSBPYmplY3RLaW5kLmZlYXR1cmVfdmVjdG9yOgogICAgICAgICMgZmVhdHVyZS12ZWN0b3IgY2FzZToKICAgICAgICBkYXRhc2V0ID0gZnMuZ2V0X29mZmxpbmVfZmVhdHVyZXMoZGF0YXNldC5tZXRhLnVyaSwgZHJvcF9jb2x1bW5zPWRyb3BfY29sdW1ucykudG9fZGF0YWZyYW1lKCkKICAgICAgICBsYWJlbF9jb2x1bW5zID0gbGFiZWxfY29sdW1ucyBvciBkYXRhc2V0Lm1ldGEuc3RhdHVzLmxhYmVsX2NvbHVtbgogICAgZWxzZToKICAgICAgICAjIHNpbXBsZSBVUkwgY2FzZToKICAgICAgICBkYXRhc2V0ID0gZGF0YXNldC5hc19kZigpCiAgICAgICAgaWYgZHJvcF9jb2x1bW5zOgogICAgICAgICAgICBkYXRhc2V0ID0gZGF0YXNldC5kcm9wKGRyb3BfY29sdW1ucywgYXhpcz0xKQoKICAgICMgUGFyc2luZyBrd2FyZ3M6CiAgICB0cmFpbl9rdywgZml0X2t3LCBtb2RlbF9jbGFzc19rdyA9IF9wYXJzZV9rd2FyZ3Moa3dhcmdzKQoKICAgICMgQ2hlY2sgaWYgbW9kZWwgb3IgZnVuY3Rpb246CiAgICBpZiBoYXNhdHRyKG1vZGVsX2NsYXNzLCAndHJhaW4nKToKICAgICAgICAjIFRPRE86IE5lZWQgdG8gY2FsbDogbW9kZWwoKSwgYWZ0ZXJ3YXJkcyB0byBzdGFydCB0aGUgdHJhaW4gZnVuY3Rpb24uCiAgICAgICAgbW9kZWwgPSBjcmVhdGVfZnVuY3Rpb24oZid7bW9kZWxfY2xhc3N9LnRyYWluJykKICAgIGVsc2U6CiAgICAgICAgIyBDcmVhdGluZyBtb2RlbCBpbnN0YW5jZToKICAgICAgICBtb2RlbCA9IGNyZWF0ZV9jbGFzcyhtb2RlbF9jbGFzcykoKiptb2RlbF9jbGFzc19rdykKCiAgICB4ID0gZGF0YXNldC5kcm9wKGxhYmVsX2NvbHVtbnMsIGF4aXM9MSkKICAgIHkgPSBkYXRhc2V0W2xhYmVsX2NvbHVtbnNdCiAgICBpZiB0cmFpbl90ZXN0X3NwbGl0X3NpemU6CiAgICAgICAgeF90cmFpbiwgeF90ZXN0LCB5X3RyYWluLCB5X3Rlc3QgPSB0cmFpbl90ZXN0X3NwbGl0KAogICAgICAgICAgICB4LCB5LCB0ZXN0X3NpemU9dHJhaW5fdGVzdF9zcGxpdF9zaXplCiAgICAgICAgKQogICAgZWxzZToKICAgICAgICB4X3RyYWluLCB5X3RyYWluID0geCwgeQoKICAgICAgICB0ZXN0X3NldCA9IHRlc3Rfc2V0LmFzX2RmKCkKICAgICAgICBpZiBkcm9wX2NvbHVtbnM6CiAgICAgICAgICAgIHRlc3Rfc2V0ID0gZGF0YXNldC5kcm9wKGRyb3BfY29sdW1ucywgYXhpcz0xKQoKICAgICAgICB4X3Rlc3QsIHlfdGVzdCA9IHRlc3Rfc2V0LmRyb3AobGFiZWxfY29sdW1ucywgYXhpcz0xKSwgdGVzdF9zZXRbbGFiZWxfY29sdW1uc10KCiAgICBBdXRvTUxSdW4uYXBwbHlfbWxydW4oCiAgICAgICAgbW9kZWw9bW9kZWwsCiAgICAgICAgbW9kZWxfbmFtZT1tb2RlbF9uYW1lLAogICAgICAgIGNvbnRleHQ9Y29udGV4dCwKICAgICAgICB0YWc9dGFnLAogICAgICAgIHNhbXBsZV9zZXQ9c2FtcGxlX3NldCwKICAgICAgICB0ZXN0X3NldD10ZXN0X3NldCwKICAgICAgICBYX3Rlc3Q9eF90ZXN0LAogICAgICAgIHlfdGVzdD15X3Rlc3QsCiAgICAgICAgYXJ0aWZhY3RzPWFydGlmYWN0cywKICAgICkKCiAgICBtb2RlbC5maXQoeF90cmFpbiwgeV90cmFpbiwgKipmaXRfa3cpCg==
+    commands: []
+    code_origin: https://github.com/mlrun/functions.git#0d491653d71a31d17aa5f6b42e79e5af3de26aa9:C:\Users\yonatans\projects\functions\auto_trainer\auto_trainer.py
+    origin_filename: C:\Users\yonatans\projects\functions\auto_trainer\auto_trainer.py
   entry_points:
-    get_class_fit:
-      name: get_class_fit
-      doc: generate a model config
-      parameters:
-      - name: module_pkg_class
-        type: str
-        doc: str description of model, e.g. `sklearn.ensemble.RandomForestClassifier`
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 16
-    create_class:
-      name: create_class
-      doc: Create a class from a package.module.class string
-      parameters:
-      - name: pkg_class
-        type: str
-        doc: full class location, e.g. "sklearn.model_selection.GroupKFold"
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 43
     train:
       name: train
-      doc: '    '
+      doc: ''
       parameters:
       - name: context
         type: MLClientCtx
@@ -48,75 +29,43 @@ spec:
       - name: dataset
         type: DataItem
         default: ''
+      - name: drop_columns
+        type: List[str]
+        default: null
       - name: model_class
         type: str
-        default: ''
-      - name: label_column
-        type: str
-        default: label
+        default: null
       - name: model_name
         type: str
-        default: trained_model
-      - name: test_size
+        default: model
+      - name: tag
+        type: str
+        default: ''
+      - name: label_columns
+        type: Optional[Union[str, List[str]]]
+        default: null
+      - name: sample_set
+        type: DataItem
+        default: null
+      - name: test_set
+        type: DataItem
+        default: null
+      - name: train_test_split_size
         type: float
-        default: 0.2
+        default: null
       - name: artifacts
-        type: List[str]
-        default: []
-      outputs:
-      - default: ''
-      lineno: 65
-    evaluate:
-      name: evaluate
-      doc: ''
-      parameters:
-      - name: context
-        type: MLClientCtx
-        default: ''
-      - name: dataset
-        type: DataItem
-        default: ''
-      - name: model_path
-        type: str
-        default: ''
-      - name: artifacts
-        type: List[str]
-        default: ''
-      - name: label_column
-        type: str
-        default: label
-      outputs:
-      - default: ''
-      lineno: 103
-    predict:
-      name: predict
-      doc: ''
-      parameters:
-      - name: context
-        type: MLClientCtx
-        default: ''
-      - name: dataset
-        type: DataItem
-        default: ''
-      - name: model_path
-        type: str
-        default: ''
-      - name: artifacts
-        type: List[str]
-        default: ''
-      - name: label_column
-        type: str
+        type: Dict
+        default: null
+      - name: kwargs
+        type: Dict[str, Any]
         default: null
       outputs:
       - default: ''
-      lineno: 122
+      lineno: 28
   description: ''
-  build:
-    functionSourceCode: aW1wb3J0IG1scnVuCmltcG9ydCB3YXJuaW5ncwoKZnJvbSB0eXBpbmcgaW1wb3J0IExpc3QKZnJvbSBza2xlYXJuLm1vZGVsX3NlbGVjdGlvbiBpbXBvcnQgdHJhaW5fdGVzdF9zcGxpdApmcm9tIGltcG9ydGxpYiBpbXBvcnQgaW1wb3J0X21vZHVsZQpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCmZyb20gbWxydW4uZnJhbWV3b3Jrcy5hdXRvX21scnVuIGltcG9ydCBBdXRvTUxSdW4KZnJvbSBpbnNwZWN0IGltcG9ydCBfZW1wdHksIHNpZ25hdHVyZQoKd2FybmluZ3Muc2ltcGxlZmlsdGVyKGFjdGlvbj0iaWdub3JlIiwgY2F0ZWdvcnk9RnV0dXJlV2FybmluZykKd2FybmluZ3MuZmlsdGVyd2FybmluZ3MoImlnbm9yZSIpCgoKZGVmIGdldF9jbGFzc19maXQobW9kdWxlX3BrZ19jbGFzczogc3RyKToKICAgICIiImdlbmVyYXRlIGEgbW9kZWwgY29uZmlnCiAgICA6cGFyYW0gbW9kdWxlX3BrZ19jbGFzczogIHN0ciBkZXNjcmlwdGlvbiBvZiBtb2RlbCwgZS5nLgogICAgICAgIGBza2xlYXJuLmVuc2VtYmxlLlJhbmRvbUZvcmVzdENsYXNzaWZpZXJgCiAgICAiIiIKICAgIHNwbGl0cyA9IG1vZHVsZV9wa2dfY2xhc3Muc3BsaXQoIi4iKQogICAgcGFja2FnZV9tb2R1bGUsIGtsYXNzID0gIi4iLmpvaW4oc3BsaXRzWzotMV0pLCBzcGxpdHNbLTFdCiAgICAjIGdldHRpbmcgdGhlIG1vZGVsOgogICAgbW9kZWwgPSBnZXRhdHRyKGltcG9ydF9tb2R1bGUocGFja2FnZV9tb2R1bGUpLCBrbGFzcykKCiAgICAjIG1vZGVsLmZpdCgpIHNpZ25hdHVyZToKICAgIGZpdF9zaWduYXR1cmUgPSBkaWN0KHNpZ25hdHVyZShtb2RlbCgpLmZpdCkucGFyYW1ldGVycykKCiAgICAjIFRPRE86IEhvdyBkbyB3ZSBrbm93IHRoZSBkaWZmZXJlbmNlIGJldHdlZW4gZGVmYXVsdCA9IE5vbmUsIGFuZCBubyBkZWZhdWx0PwogICAgZm9yIHBhcmFtZXRlciwgdmFsIGluIGZpdF9zaWduYXR1cmUuaXRlbXMoKToKICAgICAgICBmaXRfc2lnbmF0dXJlW3BhcmFtZXRlcl0gPSBOb25lIGlmIHZhbC5kZWZhdWx0IGlzIF9lbXB0eSBlbHNlIHZhbC5kZWZhdWx0CgogICAgcmV0dXJuIHsKICAgICAgICAiQ0xBU1MiOiBtb2RlbCgpLmdldF9wYXJhbXMoKSwKICAgICAgICAiRklUIjogZml0X3NpZ25hdHVyZSwKICAgICAgICAiTUVUQSI6IHsKICAgICAgICAgICAgInBhY2thZ2VfdmVyc2lvbiI6IGltcG9ydF9tb2R1bGUocGFja2FnZV9tb2R1bGUpLl9fdmVyc2lvbl9fLAogICAgICAgICAgICAiY2xhc3MiOiBtb2R1bGVfcGtnX2NsYXNzLAogICAgICAgIH0sCiAgICB9CgoKZGVmIGNyZWF0ZV9jbGFzcyhwa2dfY2xhc3M6IHN0cik6CiAgICAiIiJDcmVhdGUgYSBjbGFzcyBmcm9tIGEgcGFja2FnZS5tb2R1bGUuY2xhc3Mgc3RyaW5nCiAgICA6cGFyYW0gcGtnX2NsYXNzOiAgZnVsbCBjbGFzcyBsb2NhdGlvbiwKICAgICAgICAgICAgICAgICAgICAgICBlLmcuICJza2xlYXJuLm1vZGVsX3NlbGVjdGlvbi5Hcm91cEtGb2xkIgogICAgIiIiCiAgICBwYWNrYWdlLCBtb2R1bGUsIGtsYXNzID0gcGtnX2NsYXNzLnNwbGl0KCIuIikKICAgIGNsYXNzXyA9IGdldGF0dHIoaW1wb3J0X21vZHVsZShmIntwYWNrYWdlfS57bW9kdWxlfSIpLCBrbGFzcykKICAgIHJldHVybiBjbGFzc18KCgpkZWYgX2dlbl9tb2RlbF9jb25maWcobW9kZWxfY2xhc3MsIG1vZGVsX3BhcmFtcyk6CiAgICBtb2RlbF9jb25maWcgPSBnZXRfY2xhc3NfZml0KG1vZGVsX2NsYXNzKQoKICAgIGZvciBwYXJhbSBpbiBtb2RlbF9wYXJhbXM6CiAgICAgICAgaWYgcGFyYW0uc3RhcnRzd2l0aCgiQ0xBU1NfIik6CiAgICAgICAgICAgIG1vZGVsX2NvbmZpZ1siQ0xBU1MiXVtwYXJhbVs2Ol1dID0gbW9kZWxfcGFyYW1zW3BhcmFtXQoKICAgICAgICBpZiBwYXJhbS5zdGFydHN3aXRoKCJGSVRfIik6CiAgICAgICAgICAgIG1vZGVsX2NvbmZpZ1siRklUIl1bcGFyYW1bNDpdXSA9IG1vZGVsX3BhcmFtc1twYXJhbV0KICAgIHJldHVybiBtb2RlbF9jb25maWcKCgpkZWYgdHJhaW4oY29udGV4dDogTUxDbGllbnRDdHgsCiAgICAgICAgICBkYXRhc2V0OiBEYXRhSXRlbSwKICAgICAgICAgIG1vZGVsX2NsYXNzOiBzdHIsCiAgICAgICAgICBsYWJlbF9jb2x1bW46IHN0ciA9ICdsYWJlbCcsCiAgICAgICAgICBtb2RlbF9uYW1lOiBzdHIgPSAndHJhaW5lZF9tb2RlbCcsCiAgICAgICAgICB0ZXN0X3NpemU6IGZsb2F0ID0gMC4yLAogICAgICAgICAgYXJ0aWZhY3RzOiBMaXN0W3N0cl0gPSBbXSk6CiAgICAiIiIKICAgICIiIgoKICAgICMgU2V0IG1vZGVsIGNvbmZpZyBmaWxlCiAgICBtb2RlbF9jb25maWcgPSBfZ2VuX21vZGVsX2NvbmZpZyhtb2RlbF9jbGFzcywgZGljdChjb250ZXh0LnBhcmFtZXRlcnMuaXRlbXMoKSkpCgogICAgIyBQdWxsIERhdGFGcmFtZSBmcm9tIERhdGFJdGVtCiAgICBkYXRhc2V0ID0gZGF0YXNldC5hc19kZigpIGlmIHR5cGUoZGF0YXNldCkgPT0gbWxydW4uZGF0YXN0b3JlLmJhc2UuRGF0YUl0ZW0gZWxzZSBkYXRhc2V0CgogICAgIyBTcGxpdCBhY2NvcmRpbmcgdG8gdGVzdF9zaXplCiAgICBYID0gZGF0YXNldFtkYXRhc2V0LmNvbHVtbnNbZGF0YXNldC5jb2x1bW5zICE9IGxhYmVsX2NvbHVtbl1dCiAgICB5ID0gZGF0YXNldFtsYWJlbF9jb2x1bW5dCgogICAgWF90cmFpbiwgWF90ZXN0LCB5X3RyYWluLCB5X3Rlc3QgPSB0cmFpbl90ZXN0X3NwbGl0KFgsIHksIHRlc3Rfc2l6ZT10ZXN0X3NpemUpCgogICAgIyBVcGRhdGUgY29uZmlnIHdpdGggdGhlIG5ldyBzcGxpdAogICAgbW9kZWxfY29uZmlnWyJGSVQiXS51cGRhdGUoeyJYIjogWF90cmFpbiwgInkiOiB5X3RyYWlufSkKCiAgICAjID8KICAgIG1vZGVsX2NsYXNzID0gY3JlYXRlX2NsYXNzKG1vZGVsX2NvbmZpZ1siTUVUQSJdWyJjbGFzcyJdKQogICAgbW9kZWwgPSBtb2RlbF9jbGFzcygqKm1vZGVsX2NvbmZpZ1siQ0xBU1MiXSkKCiAgICAjIFdyYXAgb3VyIG1vZGVsIHdpdGggTWxydW4gZmVhdHVyZXMsIHNwZWNpZnkgdGhlIHRlc3QgZGF0YXNldCBmb3IgYW5hbHlzaXMgYW5kIGFjY3VyYWN5IG1lYXN1cmVtZW50cwogICAgQXV0b01MUnVuLmFwcGx5X21scnVuKAogICAgICAgIG1vZGVsX25hbWU9bW9kZWxfbmFtZSwgbW9kZWw9bW9kZWwsIGNvbnRleHQ9Y29udGV4dCwgeF92YWxpZGF0aW9uPVhfdGVzdCwgeV92YWxpZGF0aW9uPXlfdGVzdAogICAgKQoKICAgICMgVHJhaW4gb3VyIG1vZGVsCiAgICBtb2RlbC5maXQobW9kZWxfY29uZmlnWyJGSVQiXVsiWCJdLCBtb2RlbF9jb25maWdbIkZJVCJdWyJ5Il0pCgoKZGVmIGV2YWx1YXRlKGNvbnRleHQ6IE1MQ2xpZW50Q3R4LAogICAgICAgICAgICAgZGF0YXNldDogRGF0YUl0ZW0sCiAgICAgICAgICAgICBtb2RlbF9wYXRoOiBzdHIsCiAgICAgICAgICAgICBhcnRpZmFjdHM6IExpc3Rbc3RyXSwKICAgICAgICAgICAgIGxhYmVsX2NvbHVtbjogc3RyID0gJ2xhYmVsJyk6CgogICAgIyBQdWxsIERhdGFGcmFtZSBmcm9tIERhdGFJdGVtCiAgICBkYXRhc2V0ID0gZGF0YXNldC5hc19kZigpIGlmIHR5cGUoZGF0YXNldCkgPT0gbWxydW4uZGF0YXN0b3JlLmJhc2UuRGF0YUl0ZW0gZWxzZSBkYXRhc2V0CgogICAgbW9kZWxfaGFuZGxlciA9IEF1dG9NTFJ1bi5sb2FkX21vZGVsKG1vZGVsX3BhdGgpCgogICAgWF90ZXN0ID0gZGF0YXNldFtkYXRhc2V0LmNvbHVtbnNbZGF0YXNldC5jb2x1bW5zICE9IGxhYmVsX2NvbHVtbl1dCiAgICB5X3Rlc3QgPSBkYXRhc2V0W2xhYmVsX2NvbHVtbl0KCiAgICBBdXRvTUxSdW4uYXBwbHlfbWxydW4obW9kZWxfaGFuZGxlci5tb2RlbCwgeV90ZXN0PXlfdGVzdCwgbW9kZWxfcGF0aD1tb2RlbF9wYXRoKQoKICAgIG1vZGVsX2hhbmRsZXIubW9kZWwucHJlZGljdChYX3Rlc3QpCgoKZGVmIHByZWRpY3QoY29udGV4dDogTUxDbGllbnRDdHgsCiAgICAgICAgICAgIGRhdGFzZXQ6IERhdGFJdGVtLAogICAgICAgICAgICBtb2RlbF9wYXRoOiBzdHIsCiAgICAgICAgICAgIGFydGlmYWN0czogTGlzdFtzdHJdLAogICAgICAgICAgICBsYWJlbF9jb2x1bW46IHN0ciA9IE5vbmUpOgoKICAgICMgUHVsbCBEYXRhRnJhbWUgZnJvbSBEYXRhSXRlbQogICAgZGF0YXNldCA9IGRhdGFzZXQuYXNfZGYoKSBpZiB0eXBlKGRhdGFzZXQpID09IG1scnVuLmRhdGFzdG9yZS5iYXNlLkRhdGFJdGVtIGVsc2UgZGF0YXNldAoKICAgIGlmIGxhYmVsX2NvbHVtbjoKICAgICAgICBkYXRhc2V0ID0gZGF0YXNldFtkYXRhc2V0LmNvbHVtbnNbZGF0YXNldC5jb2x1bW5zICE9IGxhYmVsX2NvbHVtbl1dCgogICAgbW9kZWxfaGFuZGxlciA9IEF1dG9NTFJ1bi5sb2FkX21vZGVsKG1vZGVsX3BhdGgpCiAgICBtb2RlbF9oYW5kbGVyLm1vZGVsLnByZWRpY3QoZGF0YXNldCk=
-    commands: []
-    code_origin: https://github.com/mlrun/functions.git#58bee498066628d0a1afbb3539378fea5947d463:C:\Users\yonatans\projects\functions\auto_trainer\auto_trainer.py
-    origin_filename: C:\Users\yonatans\projects\functions\auto_trainer\auto_trainer.py
+  default_handler: train
   disable_auto_mount: false
+  env: []
   priority_class_name: ''
   affinity: null
 verbose: false

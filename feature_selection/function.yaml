@@ -14,7 +14,7 @@ spec:
   args: []
   image: mlrun/ml-models
   env: []
-  default_handler: feature_selection/feature_selection
+  default_handler: feature_selection
   entry_points:
     show_values_on_bars:
       name: show_values_on_bars

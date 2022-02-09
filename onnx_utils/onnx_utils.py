@@ -136,8 +136,8 @@ class _ToONNXConversions:
 
 # Map for getting the conversion function according to the provided framework:
 _CONVERSION_MAP = {
-    "tf.keras": _ToONNXConversions.tf_keras_to_onnx,
-    "pytorch": _ToONNXConversions.pytorch_to_onnx,
+    "tensorflow.keras": _ToONNXConversions.tf_keras_to_onnx,
+    "torch": _ToONNXConversions.pytorch_to_onnx,
 }  # type: Dict[str, Callable]
 
 

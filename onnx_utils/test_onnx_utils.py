@@ -269,7 +269,7 @@ def test_pytorch_to_onnx():
             ],  # <- Take the logged model from the previous function.
             "onnx_model_name": ONNX_MODEL_NAME,
             "framework_kwargs": {
-                "input_signature": [((3, 224, 224), "float32")]
+                "input_signature": [((32, 3, 224, 224), "float32")]
             },
         },
         local=True,

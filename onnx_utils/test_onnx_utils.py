@@ -165,7 +165,7 @@ def test_to_onnx_help():
             artifact_path=artifact_path,
             params={
                 "model_path": log_model_run.outputs[
-                    MODEL_NAME
+                    "model"
                 ],  # <- Take the logged model from the previous function.
                 "framework_kwargs": "help",
             },
@@ -215,7 +215,7 @@ def test_tf_keras_to_onnx():
         artifact_path=artifact_path,
         params={
             "model_path": log_model_run.outputs[
-                MODEL_NAME
+                "model"
             ],  # <- Take the logged model from the previous function.
             "onnx_model_name": ONNX_MODEL_NAME,
         },
@@ -265,7 +265,7 @@ def test_pytorch_to_onnx():
         artifact_path=artifact_path,
         params={
             "model_path": log_model_run.outputs[
-                MODEL_NAME
+                "model"
             ],  # <- Take the logged model from the previous function.
             "onnx_model_name": ONNX_MODEL_NAME,
             "framework_kwargs": {
@@ -352,7 +352,7 @@ def test_optimize():
         artifact_path=artifact_path,
         params={
             "model_path": log_model_run.outputs[
-                MODEL_NAME
+                "model"
             ],  # <- Take the logged model from the previous function.
             "optimized_model_name": OPTIMIZED_ONNX_MODEL_NAME,
         },

@@ -4,3 +4,4 @@ azureml-train-automl-client==1.33.0
 azureml-automl-runtime==1.33.1
 azureml-contrib-aisc==1.36.0
 mlrun[azure-blob-storage]
+plotly~=5.4

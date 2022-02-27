@@ -1,4 +1,6 @@
 from typing import List, Dict, Optional, Union, Tuple, Any
+
+import mlrun
 from cloudpickle import dumps
 from sklearn.model_selection import train_test_split
 
@@ -14,24 +16,41 @@ class KWArgsPrefixes:
     MODEL_CLASS = "CLASS_"
     FIT = "FIT_"
     TRAIN = "TRAIN_"
+    PREDICT = "PREDICT_"
 
 
 def _parse_kwargs(
     kwargs: Dict,
-) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
-    train_kw, fit_kw, model_class_kw = {}, {}, {}
+    prefix_key: str
+) -> Dict[str, Any]:
+    result_dict = {}
 
     for key, val in kwargs.items():
-        if key.startswith(KWArgsPrefixes.TRAIN):
-            train_kw[key.replace(KWArgsPrefixes.TRAIN, "")] = val
+        if key.startswith(prefix_key):
+            result_dict[key.replace(prefix_key, "")] = val
 
-        elif key.startswith(KWArgsPrefixes.FIT):
-            fit_kw[key.replace(KWArgsPrefixes.FIT, "")] = val
+    return result_dict
 
-        elif key.startswith(KWArgsPrefixes.MODEL_CLASS):
-            model_class_kw[key.replace(KWArgsPrefixes.MODEL_CLASS, "")] = val
 
-    return train_kw, fit_kw, model_class_kw
+def _get_dataset(
+        context: MLClientCtx,
+        dataset: DataItem,
+        label_columns: Optional[Union[str, List[str]]] = None,
+        drop_columns: List[str] = None
+):
+    if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
+        # feature-vector case:
+        dataset = fs.get_offline_features(
+            dataset.meta.uri, drop_columns=drop_columns
+        ).to_dataframe()
+        label_columns = label_columns or dataset.meta.status.label_column
+        context.logger.info(f"label columns: {label_columns}")
+    else:
+        # simple URL case:
+        dataset = dataset.as_df()
+        if drop_columns:
+            dataset = dataset.drop(drop_columns, axis=1)
+    return dataset, label_columns
 
 
 def train(
@@ -47,25 +66,22 @@ def train(
     train_test_split_size: float = None,
 ):
     # Validate inputs:
-    # Check if only one of them is supplied:
+    # Check if exactly one of them is supplied:
     if (test_set is None) == (train_test_split_size is None):
-        raise TypeError(f"Provide only one of test_set model and train_test_split_size")
+        raise TypeError(f"Provide exactly one of test_set model and train_test_split_size")
 
-    if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
-        # feature-vector case:
-        dataset = fs.get_offline_features(
-            dataset.meta.uri, drop_columns=drop_columns
-        ).to_dataframe()
-        label_columns = label_columns or dataset.meta.status.label_column
-        context.logger.info(f"label columns: {label_columns}")
-    else:
-        # simple URL case:
-        dataset = dataset.as_df()
-        if drop_columns:
-            dataset = dataset.drop(drop_columns, axis=1)
+    # Get dataset by URL or by FeatureVector:
+    dataset, label_columns = _get_dataset(
+        context=context,
+        dataset=dataset,
+        label_columns=label_columns,
+        drop_columns=drop_columns
+    )
 
     # Parsing kwargs:
-    train_kw, fit_kw, model_class_kw = _parse_kwargs(context.parameters)
+    train_kw = _parse_kwargs(kwargs=context.parameters, prefix_key=KWArgsPrefixes.TRAIN)  # TODO: Use in xgb or lgbm train function.
+    fit_kw = _parse_kwargs(kwargs=context.parameters, prefix_key=KWArgsPrefixes.FIT)
+    model_class_kw = _parse_kwargs(kwargs=context.parameters, prefix_key=KWArgsPrefixes.MODEL_CLASS)
 
     # Check if model or function:
     if hasattr(model_class, "train"):
@@ -106,10 +122,24 @@ def train(
     pass
 
 
-# def evaluate(
-#     context: MLClientCtx,
-# ):
-#     pass
+def evaluate(
+    context: MLClientCtx,
+    model: str,
+    dataset: mlrun.DataItem,
+    drop_columns: List[str] = None,
+    label_columns: Optional[Union[str, List[str]]] = None,
+):
+    # Get dataset by URL or by FeatureVector:
+    dataset, label_columns = _get_dataset(
+        context=context,
+        dataset=dataset,
+        label_columns=label_columns,
+        drop_columns=drop_columns
+    )
+
+    predict_kw = _parse_kwargs(kwargs=context.parameters, prefix_key=KWArgsPrefixes.PREDICT)
+
+    pass
 #
 #
 # def predict():

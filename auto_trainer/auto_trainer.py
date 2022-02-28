@@ -1,7 +1,7 @@
 from typing import List, Dict, Optional, Union, Tuple, Any
 
 import mlrun
-from cloudpickle import dumps
+import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from mlrun.execution import MLClientCtx
@@ -19,25 +19,33 @@ class KWArgsPrefixes:
     PREDICT = "PREDICT_"
 
 
-def _parse_kwargs(
-    kwargs: Dict,
-    prefix_key: str
-) -> Dict[str, Any]:
-    result_dict = {}
+def _get_sub_dict_by_prefix(src: Dict, prefix_key: str) -> Dict[str, Any]:
+    """
+    Collect all the keys from the given dict that starts with the given prefix and creates a new dictionary with these
+    keys.
 
-    for key, val in kwargs.items():
-        if key.startswith(prefix_key):
-            result_dict[key.replace(prefix_key, "")] = val
+    :param src:         The source dict to extract the values from.
+    :param prefix_key:  Only keys with this prefix will be returned. The keys in the result dict will be without this
+                        prefix.
+    """
+    return {key.replace(prefix_key, ""): val for key, val in src.items() if key.startswith(prefix_key)}
 
-    return result_dict
 
-
-def _get_dataset(
+def _get_dataframe(
         context: MLClientCtx,
         dataset: DataItem,
         label_columns: Optional[Union[str, List[str]]] = None,
         drop_columns: List[str] = None
-):
+) -> Tuple[pd.DataFrame, Optional[Union[str, List[str]]]]:
+    """
+    Getting the DataFrame of the dataset and drop the columns accordingly.
+
+    :param context:         MLRun context.
+    :param dataset:         The dataset to train the model on. Can be either a URI or a FeatureVector.
+    :param label_columns:   The target label(s) of the column(s) in the dataset. for Regression or
+                            Classification tasks.
+    :param drop_columns:    str or a list of strings that represent the columns to drop.
+    """
     if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
         # feature-vector case:
         dataset = fs.get_offline_features(
@@ -65,13 +73,31 @@ def train(
     test_set: DataItem = None,
     train_test_split_size: float = None,
 ):
+    """
+    Training the given model on the given dataset.
+
+    :param context:                 MLRun context.
+    :param dataset:                 The dataset to train the model on. Can be either a URI or a FeatureVector.
+    :param drop_columns:            str or a list of strings that represent the columns to drop.
+    :param model_class:             The class of the model, e.g. `sklearn.linear_model.LogisticRegression`.
+    :param model_name:              The model's name to use for storing the model artifact, default to 'model'.
+    :param tag:                     The model's tag to log with.
+    :param label_columns:           The target label(s) of the column(s) in the dataset. for Regression or
+                                    Classification tasks.
+    :param sample_set:              A sample set of inputs for the model for logging its stats along the model in favour
+                                    of model monitoring.
+    :param test_set:                The test set to train the model with.
+    :param train_test_split_size:   Should be between 0.0 and 1.0 and represent the proportion of the dataset to include
+                                    in the test split. The size of the Training set is set to the complement of this
+                                    value.
+    """
     # Validate inputs:
     # Check if exactly one of them is supplied:
     if (test_set is None) == (train_test_split_size is None):
         raise TypeError(f"Provide exactly one of test_set model and train_test_split_size")
 
-    # Get dataset by URL or by FeatureVector:
-    dataset, label_columns = _get_dataset(
+    # Get DataFrame by URL or by FeatureVector:
+    dataset, label_columns = _get_dataframe(
         context=context,
         dataset=dataset,
         label_columns=label_columns,
@@ -79,9 +105,10 @@ def train(
     )
 
     # Parsing kwargs:
-    train_kw = _parse_kwargs(kwargs=context.parameters, prefix_key=KWArgsPrefixes.TRAIN)  # TODO: Use in xgb or lgbm train function.
-    fit_kw = _parse_kwargs(kwargs=context.parameters, prefix_key=KWArgsPrefixes.FIT)
-    model_class_kw = _parse_kwargs(kwargs=context.parameters, prefix_key=KWArgsPrefixes.MODEL_CLASS)
+    # TODO: Use in xgb or lgbm train function.
+    train_kwargs = _get_sub_dict_by_prefix(src=context.parameters, prefix_key=KWArgsPrefixes.TRAIN)
+    fit_kwargs = _get_sub_dict_by_prefix(src=context.parameters, prefix_key=KWArgsPrefixes.FIT)
+    model_class_kwargs = _get_sub_dict_by_prefix(src=context.parameters, prefix_key=KWArgsPrefixes.MODEL_CLASS)
 
     # Check if model or function:
     if hasattr(model_class, "train"):
@@ -89,7 +116,7 @@ def train(
         model = create_function(f"{model_class}.train")
     else:
         # Creating model instance:
-        model = create_class(model_class)(**model_class_kw)
+        model = create_class(model_class)(**model_class_kwargs)
 
     x = dataset.drop(label_columns, axis=1)
     y = dataset[label_columns]
@@ -117,9 +144,8 @@ def train(
         y_test=y_test,
         artifacts=context.artifacts,
     )
-    context.logger.info(f'training model = {model_name}')
-    model = model.fit(x_train, y_train, **fit_kw)
-    pass
+    context.logger.info(f"training '{model_name}'")
+    model.fit(x_train, y_train, **fit_kwargs)
 
 
 def evaluate(
@@ -129,18 +155,76 @@ def evaluate(
     drop_columns: List[str] = None,
     label_columns: Optional[Union[str, List[str]]] = None,
 ):
+    """
+    Evaluating a model.Artifacts generated by the MLHandler.
+
+    :param context:                 MLRun context.
+    :param model:                   The model Store path.
+    :param dataset:                 The dataset to evaluate the model on. Can be either a URI or a FeatureVector.
+    :param drop_columns:            str or a list of strings that represent the columns to drop.
+    :param label_columns:           The target label(s) of the column(s) in the dataset. for Regression or
+                                    Classification tasks.
+    """
     # Get dataset by URL or by FeatureVector:
-    dataset, label_columns = _get_dataset(
+    dataset, label_columns = _get_dataframe(
         context=context,
         dataset=dataset,
         label_columns=label_columns,
         drop_columns=drop_columns
     )
 
-    predict_kw = _parse_kwargs(kwargs=context.parameters, prefix_key=KWArgsPrefixes.PREDICT)
+    # Parsing kwargs:
+    predict_kwargs = _get_sub_dict_by_prefix(src=context.parameters, prefix_key=KWArgsPrefixes.PREDICT)
 
-    pass
-#
-#
-# def predict():
-#     pass
+    context.logger.info(f"model: {model}")
+
+    x = dataset.drop(label_columns, axis=1)
+    y = dataset[label_columns]
+
+    # Loading the model and predicting:
+    model_handler = AutoMLRun.load_model(model_path=model, context=context)
+    AutoMLRun.apply_mlrun(model_handler.model, y_test=y, model_path=model)
+
+    context.logger.info(f"evaluating model '{model_handler.model_name}'")
+    model_handler.model.predict(x, **predict_kwargs)
+
+
+def predict(
+    context: MLClientCtx,
+    model: str,
+    dataset: mlrun.DataItem,
+    drop_columns: List[str] = None,
+    label_columns: Optional[Union[str, List[str]]] = None,
+):
+    """
+    Predicting dataset by a model.
+
+    :param context:                 MLRun context.
+    :param model:                   The model Store path.
+    :param dataset:                 The dataset to evaluate the model on. Can be either a URI or a FeatureVector.
+    :param drop_columns:            str or a list of strings that represent the columns to drop.
+    :param label_columns:           The target label(s) of the column(s) in the dataset. for Regression or
+                                    Classification tasks.
+    """
+    # Get dataset by URL or by FeatureVector:
+    dataset, label_columns = _get_dataframe(
+        context=context,
+        dataset=dataset,
+        label_columns=label_columns,
+        drop_columns=drop_columns
+    )
+
+    # Parsing kwargs:
+    predict_kwargs = _get_sub_dict_by_prefix(src=context.parameters, prefix_key=KWArgsPrefixes.PREDICT)
+
+    # loading the model, and getting the model handler:
+    model_handler = AutoMLRun.load_model(model_path=model, context=context)
+
+    # Dropping label columns if necessary:
+    if label_columns and label_columns in dataset.columns:
+        dataset = dataset.drop(label_columns, axis=1)
+
+    # Predicting:
+    context.logger.info(f"making prediction by '{model_handler.model_name}'")
+    prediction = model_handler.model.predict(dataset, **predict_kwargs)
+    context.log_result('prediction', prediction)

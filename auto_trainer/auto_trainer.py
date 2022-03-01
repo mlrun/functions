@@ -57,7 +57,10 @@ def _get_dataframe(
         # simple URL case:
         dataset = dataset.as_df()
         if drop_columns:
-            dataset = dataset.drop(drop_columns, axis=1)
+            if all(col in dataset for col in drop_columns):
+                dataset = dataset.drop(drop_columns, axis=1)
+            else:
+                context.logger.info('not all of the columns to drop in the dataset, drop columns process skipped')
     return dataset, label_columns
 
 
@@ -72,6 +75,7 @@ def train(
     sample_set: DataItem = None,
     test_set: DataItem = None,
     train_test_split_size: float = None,
+    random_state: int = None,
 ):
     """
     Training the given model on the given dataset.
@@ -90,6 +94,7 @@ def train(
     :param train_test_split_size:   Should be between 0.0 and 1.0 and represent the proportion of the dataset to include
                                     in the test split. The size of the Training set is set to the complement of this
                                     value.
+    :param random_state:            Random state for `train_test_split`
     """
     # Validate inputs:
     # Check if exactly one of them is supplied:
@@ -113,7 +118,8 @@ def train(
     # Check if model or function:
     if hasattr(model_class, "train"):
         # TODO: Need to call: model(), afterwards to start the train function.
-        model = create_function(f"{model_class}.train")
+        # model = create_function(f"{model_class}.train")
+        raise NotImplementedError
     else:
         # Creating model instance:
         model = create_class(model_class)(**model_class_kwargs)
@@ -122,7 +128,7 @@ def train(
     y = dataset[label_columns]
     if train_test_split_size:
         x_train, x_test, y_train, y_test = train_test_split(
-            x, y, test_size=train_test_split_size
+            x, y, test_size=train_test_split_size, random_state=random_state
         )
     else:
         x_train, y_train = x, y
@@ -176,8 +182,6 @@ def evaluate(
     # Parsing kwargs:
     predict_kwargs = _get_sub_dict_by_prefix(src=context.parameters, prefix_key=KWArgsPrefixes.PREDICT)
 
-    context.logger.info(f"model: {model}")
-
     x = dataset.drop(label_columns, axis=1)
     y = dataset[label_columns]
 
@@ -185,7 +189,7 @@ def evaluate(
     model_handler = AutoMLRun.load_model(model_path=model, context=context)
     AutoMLRun.apply_mlrun(model_handler.model, y_test=y, model_path=model)
 
-    context.logger.info(f"evaluating model '{model_handler.model_name}'")
+    context.logger.info(f"evaluating '{model_handler.model_name}'")
     model_handler.model.predict(x, **predict_kwargs)
 
 
@@ -221,10 +225,20 @@ def predict(
     model_handler = AutoMLRun.load_model(model_path=model, context=context)
 
     # Dropping label columns if necessary:
-    if label_columns and label_columns in dataset.columns:
+    if label_columns and all(label in dataset.columns for label in label_columns):
         dataset = dataset.drop(label_columns, axis=1)
 
     # Predicting:
     context.logger.info(f"making prediction by '{model_handler.model_name}'")
-    prediction = model_handler.model.predict(dataset, **predict_kwargs)
-    context.log_result('prediction', prediction)
+    y_pred = model_handler.model.predict(dataset, **predict_kwargs)
+
+    if not label_columns:
+        if y_pred.shape[1] == 1:
+            label_columns = ['predicted_labels']
+        else:
+            label_columns = [f'predicted_label_{i}' for i in range(y_pred.shape[1])]
+    elif isinstance(label_columns, str):
+        label_columns = [label_columns]
+
+    pred_df = pd.concat([dataset, pd.DataFrame(y_pred, columns=label_columns)], axis=1)
+    context.log_dataset('prediction', pred_df)

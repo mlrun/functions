@@ -1,108 +1,163 @@
-import os
-
-# List of servers:
+from typing import Tuple
 import mlrun
+import pandas as pd
+import pytest
+from mlrun import import_function
 
-SERVERS = [
-    #            Server's suffix            |   User name   |             Access key               |    Index
-    # ______________________________________|_______________|______________________________________|_____________
-    ("yh38.iguazio-cd2.com",                 "admin",        "a75e2980-a003-420a-b14a-458e7fc8907a"),  # 0
-    ("yh41.iguazio-cd1.com",                 "yonatan",        "3be37c76-6c7d-4472-8ec2-96cddcc6b010"),  # 1
+
+from sklearn.datasets import (
+    make_classification,
+    make_multilabel_classification,
+    make_regression,
+)
+
+
+MODELS = [
+    ("sklearn.linear_model.LinearRegression", "regression"),
+    ("sklearn.ensemble.RandomForestClassifier", "classification"),
+    ("xgboost.XGBRegressor", "regression"),
+    ("lightgbm.LGBMClassifier", "classification"),
 ]
 
-# Chosen server:
-SERVER_INDEX = 1
 
-# Setup environment to use MLRun in the chosen server:
-os.environ["PYTHONUNBUFFERED"] = "1"
-os.environ["MLRUN_DBPATH"] = "https://mlrun-api.default-tenant.app.{}".format(
-    SERVERS[SERVER_INDEX][0]
-)  # MUST
-os.environ["MLRUN_ARTIFACT_PATH"] = "/User/artifacts/{{project}}/{{run.uid}}"
-os.environ["V3IO_USERNAME"] = SERVERS[SERVER_INDEX][1]  # MUST
-os.environ["V3IO_API"] = "https://webapi.default-tenant.app.{}".format(
-    SERVERS[SERVER_INDEX][0]
-)  # MUST
-os.environ["V3IO_ACCESS_KEY"] = SERVERS[SERVER_INDEX][2]  # MUST
+def _get_dataset(problem_type: str, filepath: str = ".", n_classes: int = 2):
+    if problem_type == "classification":
+        x, y = make_classification(n_classes=n_classes)
+    elif problem_type == "regression":
+        x, y = make_regression(n_targets=1)
+    elif problem_type == "multilabel_classification":
+        x, y = make_multilabel_classification(n_classes=n_classes)
+    else:
+        raise ValueError(f"Not supporting problem type = {problem_type}")
 
-import pandas as pd
-from mlrun import import_function
-from sklearn.svm import SVC
-import pickle
+    features = [f"f_{i}" for i in range(x.shape[1])]
+    if y.ndim == 1:
+        labels = ["labels"]
+    else:
+        labels = [f"label_{i}" for i in range(y.shape[1])]
+    dataset = pd.concat(
+        [pd.DataFrame(x, columns=features), pd.DataFrame(y, columns=labels)], axis=1
+    )
+    filename = f"{filepath}/{problem_type}_dataset.csv"
+    dataset.to_csv(filename, index=False)
+    return filename, labels
 
 
-DATASET_URL = "https://s3.wasabisys.com/iguazio/data/function-marketplace-data/xgb_trainer/classifier-data.csv"
+def _set_environment():
+    mlrun.set_env_from_file("mlrun.env")
+    mlrun.get_or_create_project("auto-trainer-test", context="./", user_project=True)
 
 
-def test_train():
-    mlrun.get_or_create_project('auto-trainer', context="./", user_project=True)
+@pytest.mark.parametrize("model", MODELS)
+def test_train(model: Tuple[str, str]):
+    _set_environment()
+
+    dataset, label_columns = _get_dataset(model[1])
+
     # Importing function:
     fn = import_function("function.yaml")
 
-    # Creating model classes as inputs to the run:
-    model_classes = {
-        "sklearn.linear_model.LogisticRegression": {
-            "CLASS_penalty": "l2",
-            "CLASS_C": 0.1,
-        },
-        "xgboost.XGBRegressor": {
-            "CLASS_max_depth": 3,
-        },
-        "lightgbm.LGBMClassifier": {
-            "CLASS_max_depth": 3,
-        },
-    }
-
+    train_run = None
+    model_name = model[0].split(".")[-1]
     try:
-        for i, (model_class, kwargs) in enumerate(model_classes.items()):
-            train_run = fn.run(
-                inputs={"dataset": DATASET_URL},
-                params={
-                    "drop_columns": ["feat_0", "feat_2"],
-                    "model_class": model_class,
-                    "model_name": f"model_{i}",
-                    # "tag": "",
-                    "label_columns": "labels",
-                    # "test_set": ''
-                    "train_test_split_size": 0.2,
-                    **kwargs,
-                },
-                handler="train",
-                local=True,
-            )
+        train_run = fn.run(
+            inputs={"dataset": dataset},
+            params={
+                "drop_columns": ["f_0", "f_2"],
+                "model_class": model[0],
+                "model_name": f"model_{model_name}",
+                "label_columns": label_columns,
+                "train_test_split_size": 0.2,
+            },
+            handler="train",
+            local=True,
+        )
     except Exception as exception:
         print(f"- The test failed - raised the following error:\n- {exception}")
+    assert train_run and all(
+        key in train_run.outputs for key in ["model", "test_set"]
+    ), "outputs should include more data"
 
 
-def test_evaluate():
-    dataset = pd.read_csv(DATASET_URL)
-    label = "labels"
-    x, y = dataset.drop(labels=label, axis=1), dataset[label]
-    model = SVC()
-    model = model.fit(x, y)
-    model_path = 'model.pkl'
-    pickle.dump(model, open(model_path, 'wb'))
+@pytest.mark.parametrize("model", MODELS)
+def test_train_evaluate(model: Tuple[str, str]):
+    _set_environment()
+
+    dataset, label_columns = _get_dataset(model[1])
 
     # Importing function:
     fn = import_function("function.yaml")
 
+    evaluate_run = None
+    model_name = model[0].split(".")[-1]
     try:
-        evaluate_run = fn.run(
-            inputs={"dataset": DATASET_URL},
+        train_run = fn.run(
+            inputs={"dataset": dataset},
             params={
-                "model": model_path,
+                "drop_columns": ["f_0", "f_2"],
+                "model_class": model[0],
+                "model_name": f"model_{model_name}",
+                "label_columns": label_columns,
+                "train_test_split_size": 0.2,
+            },
+            handler="train",
+            local=True,
+        )
 
-                "drop_columns": ["feat_0", "feat_2"],
-                "label_columns": "labels",
+        evaluate_run = fn.run(
+            inputs={"dataset": train_run.outputs["test_set"]},
+            params={
+                "model": train_run.outputs["model"],
+                "drop_columns": ["f_0", "f_2"],
+                "label_columns": label_columns,
             },
             handler="evaluate",
             local=True,
         )
-
     except Exception as exception:
         print(f"- The test failed - raised the following error:\n- {exception}")
-    pass
+    assert (
+        evaluate_run and "evaluation-test_set" in evaluate_run.outputs
+    ), "Missing fields in evaluate_run"
 
 
-def test_predict():
-    pass
+@pytest.mark.parametrize("model", MODELS)
+def test_train_predict(model: Tuple[str, str]):
+    _set_environment()
+
+    dataset, label_columns = _get_dataset(model[1])
+
+    # Importing function:
+    fn = import_function("function.yaml")
+
+    predict_run = None
+    model_name = model[0].split(".")[-1]
+    try:
+        train_run = fn.run(
+            inputs={"dataset": dataset},
+            params={
+                "drop_columns": ["f_0", "f_2"],
+                "model_class": model[0],
+                "model_name": f"model_{model_name}",
+                "label_columns": label_columns,
+                "train_test_split_size": 0.2,
+            },
+            handler="train",
+            local=True,
+        )
+
+        predict_run = fn.run(
+            inputs={"dataset": train_run.outputs["test_set"]},
+            params={
+                "model": train_run.outputs["model"],
+                "drop_columns": ["f_0", "f_2"],
+                "label_columns": label_columns,
+            },
+            handler="predict",
+            local=True,
+        )
+    except Exception as exception:
+        print(f"- The test failed - raised the following error:\n- {exception}")
+    assert (
+        predict_run and "prediction" in predict_run.outputs
+    ), "Prediction field must be in the output"

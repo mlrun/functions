@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: azureml-utils
   tag: ''
-  hash: 1fc5be8a055e4365db21d18a323f3bad03dc25aa
+  hash: d96d59b9cc516abfc1af1a931d31d4162e01a894
   project: ''
   labels:
     author: yonish
@@ -20,8 +20,11 @@ spec:
     - python -m pip install pip==21.2.4
     - apt-get update && apt-get install -y --no-install-recommends git
     - python -m pip install azureml-core==1.33.0 azureml-train-automl-client==1.33.0
-    code_origin: https://github.com/mlrun/functions.git#aa290ed845242924547b007ecd44637582acf152:C:\Users\yonatans\projects\functions\azureml_utils\azureml_utils.py
+      plotly~=5.4
+    code_origin: https://github.com/mlrun/functions.git#31e5f9b9a03b07a8c59da6c64e08e04a54de4266:C:\Users\yonatans\projects\functions\azureml_utils\azureml_utils.py
     origin_filename: C:\Users\yonatans\projects\functions\azureml_utils\azureml_utils.py
+    with_mlrun: true
+    auto_build: true
   entry_points:
     init_compute:
       name: init_compute
@@ -255,6 +258,7 @@ spec:
     models on Azure AutoML platfrom.
   default_handler: train
   disable_auto_mount: false
+  allow_empty_resources: true
   env: []
   priority_class_name: ''
   affinity: null

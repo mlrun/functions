@@ -73,7 +73,7 @@ def set_nested(parent, key, value):
                 setattr(parent, key, value)
                 return
             set_nested(getattr(parent, key), k, v)
-            return
+        return
     if hasattr(parent, key) and isinstance(value, list):
         old_value = getattr(parent, key)
         setattr(parent, key, value + old_value)

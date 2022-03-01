@@ -22,10 +22,14 @@ spec:
       commands:
       - python -m pip install pip==21.2.4
       - apt-get update && apt-get install -y --no-install-recommends git
+      with_mlrun: True
+      auto_build: True
+    allow_empty_resources: True
   image: python:3.7.9-slim
   kind: job
   requirements:
   - azureml-core==1.33.0
   - azureml-train-automl-client==1.33.0
+  - plotly~=5.4
 url: ''
-version: 0.9.1
+version: 0.9.3

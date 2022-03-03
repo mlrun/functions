@@ -13,6 +13,7 @@ The functions will require the following parameters:
 :param plot_hist:       (True) set this to False for large tables
 :param plots_dest:      destination folder of summary plots (relative to artifact_path)
 :param update_dataset:  when the table is a registered dataset update the charts in-place
+:param frac:  when the table has more than 5000 samples, the function will execute on random frac from the data
 
 ```
 
@@ -20,7 +21,7 @@ The function will output the following artifacts per column within the data fram
 
 1. histogram chart
 2. violin chart
-3. imbalance chart
+3. imbalance pie chart
 4. correlation-matrix chart
 5. correlation-matrix csv
 6. imbalance-weights-vec csv

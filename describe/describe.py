@@ -4,16 +4,15 @@ import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
-import os
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
-from mlrun.artifacts import PlotArtifact, TableArtifact
-from mlrun.mlutils.plots import gcf_clear
+from mlrun.artifacts import TableArtifact, PlotlyArtifact
+import plotly.figure_factory as ff
+import plotly.express as px
+import plotly.graph_objects as go
 
 from typing import List
 
@@ -21,13 +20,14 @@ pd.set_option("display.float_format", lambda x: "%.2f" % x)
 
 
 def summarize(
-    context: MLClientCtx,
-    table: DataItem,
-    label_column: str = None,
-    class_labels: List[str] = [],
-    plot_hist: bool = True,
-    plots_dest: str = "plots",
-    update_dataset=False,
+        context: MLClientCtx,
+        table: DataItem,
+        label_column: str = None,
+        class_labels: List[str] = [],
+        plot_hist: bool = True,
+        plots_dest: str = "plots",
+        update_dataset=False,
+        frac: float = 0.10
 ) -> None:
     """Summarize a table
 
@@ -38,76 +38,73 @@ def summarize(
     :param plot_hist:       (True) set this to False for large tables
     :param plots_dest:      destination folder of summary plots (relative to artifact_path)
     :param update_dataset:  when the table is a registered dataset update the charts in-place
+    :param frac:  when the table has more than 5000 samples, the function will execute on random frac from the data
     """
+
     df = table.as_df()
-    header = df.columns.values
+    if df.shape[0] > 5000:
+        df = df.sample(frac=frac)
     extra_data = {}
 
+    # histograms
     try:
-        gcf_clear(plt)
-        snsplt = sns.pairplot(df, hue=label_column)  # , diag_kws={"bw": 1.5})
+        df[label_column] = df[label_column].apply(str)
+        fig = ff.create_scatterplotmatrix(df, diag='histogram', index=label_column, width=2500, height=2500)
+        fig.update_layout(title_text='<i><b>Histograms matrix</b></i>')
         extra_data["histograms"] = context.log_artifact(
-            PlotArtifact("histograms", body=plt.gcf()),
+            PlotlyArtifact(key="histograms", figure=fig),
             local_path=f"{plots_dest}/hist.html",
             db_key=False,
         )
     except Exception as e:
         context.logger.error(f"Failed to create pairplot histograms due to: {e}")
+    df[label_column] = df[label_column].astype(np.float64)
 
+    # violin
     try:
-        gcf_clear(plt)
-        plot_cols = 3
-        plot_rows = int((len(header) - 1) / plot_cols) + 1
-        fig, ax = plt.subplots(plot_rows, plot_cols, figsize=(15, 4))
-        fig.tight_layout(pad=2.0)
-        for i in range(plot_rows * plot_cols):
-            if i < len(header):
-                sns.violinplot(
-                    x=df[header[i]],
-                    ax=ax[int(i / plot_cols)][i % plot_cols],
-                    orient="h",
-                    width=0.7,
-                    inner="quartile",
-                )
-            else:
-                fig.delaxes(ax[int(i / plot_cols)][i % plot_cols])
-            i += 1
+        fig = go.Figure()
+        for (columnName, columnData) in df.iteritems():
+            fig.add_trace(go.Violin(x=[columnName]*columnData.shape[0],
+                                    y=columnData,
+                                    name=columnName,
+                                    box_visible=True,
+                                    meanline_visible=True))
+
+        fig.update_layout(title_text='<i><b>Violin Plot</b></i>')
         extra_data["violin"] = context.log_artifact(
-            PlotArtifact("violin", body=plt.gcf(), title="Violin Plot"),
+            PlotlyArtifact(key="violin", figure=fig),
             local_path=f"{plots_dest}/violin.html",
             db_key=False,
         )
     except Exception as e:
         context.logger.warn(f"Failed to create violin distribution plots due to: {e}")
 
+    # imbalance
     if label_column:
-        labels = df.pop(label_column)
-        imbtable = labels.value_counts(normalize=True).sort_index()
+        labels_count = df[label_column].value_counts().sort_index()
+        df_labels_count = pd.DataFrame(labels_count)
+        df_labels_count.rename(columns={label_column: "Total"}, inplace=True)
+        df_labels_count[label_column] = labels_count.index
         try:
-            gcf_clear(plt)
-            balancebar = imbtable.plot(kind="bar", title="class imbalance - labels")
-            balancebar.set_xlabel("class")
-            balancebar.set_ylabel("proportion of total")
+            fig = px.pie(df_labels_count, names=label_column, values="Total")
+            fig.update_layout(title_text='<i><b>Labels balance</b></i>')
             extra_data["imbalance"] = context.log_artifact(
-                PlotArtifact("imbalance", body=plt.gcf()),
+                PlotlyArtifact(key="imbalance", figure=fig),
                 local_path=f"{plots_dest}/imbalance.html",
             )
         except Exception as e:
             context.logger.warn(f"Failed to create class imbalance plot due to: {e}")
         context.log_artifact(
             TableArtifact(
-                "imbalance-weights-vec", df=pd.DataFrame({"weights": imbtable})
+                "imbalance-weights-vec", df=pd.DataFrame({"weights": labels_count})
             ),
             local_path=f"{plots_dest}/imbalance-weights-vec.csv",
             db_key=False,
         )
 
+    # correlation - matrix
+    df.drop([label_column], axis=1, inplace=True)
     tblcorr = df.corr()
-    mask = np.zeros_like(tblcorr, dtype=np.bool)
-    mask[np.triu_indices_from(mask)] = True
-
-    dfcorr = pd.DataFrame(data=tblcorr, columns=header, index=header)
-    dfcorr = dfcorr[np.arange(dfcorr.shape[0])[:, None] > np.arange(dfcorr.shape[1])]
     context.log_artifact(
         TableArtifact("correlation-matrix", df=tblcorr, visible=True),
         local_path=f"{plots_dest}/correlation-matrix.csv",
@@ -115,20 +112,29 @@ def summarize(
     )
 
     try:
-        gcf_clear(plt)
-        ax = plt.axes()
-        sns.heatmap(tblcorr, ax=ax, mask=mask, annot=False, cmap=plt.cm.Reds)
-        ax.set_title("features correlation")
+        z = tblcorr.values.tolist()
+        z_text = [["{:.2f}".format(y) for y in x] for x in z]
+        fig = ff.create_annotated_heatmap(z, x=list(df.columns),
+                                          y=list(df.columns),
+                                          annotation_text=z_text, colorscale='agsunset')
+        fig['layout']['yaxis']['autorange'] = "reversed"  # l -> r
+        fig.update_layout(title_text='<i><b>Correlation matrix</b></i>')
+        fig['data'][0]['showscale'] = True
+
         extra_data["correlation"] = context.log_artifact(
-            PlotArtifact("correlation", body=plt.gcf(), title="Correlation Matrix"),
+            PlotlyArtifact(key="correlation", figure=fig),
             local_path=f"{plots_dest}/corr.html",
             db_key=False,
         )
     except Exception as e:
         context.logger.warn(f"Failed to create features correlation plot due to: {e}")
-
-    gcf_clear(plt)
     if update_dataset and table.meta and table.meta.kind == "dataset":
         from mlrun.artifacts import update_dataset_meta
 
         update_dataset_meta(table.meta, extra_data=extra_data)
+
+    # TODO : Plots according to client wishes - like preform histogram on selected features.
+    # TODO : 3-D plot on on selected features.
+    # TODO : Reintegration plot on on selected features.
+
+

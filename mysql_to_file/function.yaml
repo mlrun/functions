@@ -1,0 +1,62 @@
+kind: job
+metadata:
+  name: sql-to-file
+  tag: ''
+  hash: ec914b3071626f878134db936a7d0b25fd6ef446
+  project: functions
+  labels:
+    author: xingsheng
+  categories:
+  - data-prep
+  credentials:
+    access_key: 8a666262-887d-49b3-934e-092f6f8d3a89
+spec:
+  command: ''
+  args: []
+  image: .mlrun/sqltofile
+  env:
+  - name: V3IO_API
+    value: ''
+  - name: V3IO_USERNAME
+    value: ''
+  - name: V3IO_ACCESS_KEY
+    value: ''
+  - name: V3IO_FRAMESD
+    value: ''
+  default_handler: sql_to_file
+  entry_points:
+    sql_to_file:
+      name: sql_to_file
+      doc: SQL Ingest - Ingest data using SQL query
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+        default: ''
+      - name: sql_query
+        type: str
+        doc: the sql query used to retrieve the data
+        default: ''
+      - name: database_url
+        type: str
+        doc: database connection URL
+        default: ''
+      - name: file_ext
+        type: str
+        doc: ("parquet") format for result file
+        default: parquet
+      outputs:
+      - default: ''
+      lineno: 8
+  description: SQL To File - Ingest data using SQL query
+  build:
+    functionSourceCode: CmltcG9ydCBwYW5kYXMgYXMgcGQKaW1wb3J0IHB5aGl2ZQpmcm9tIHNxbGFsY2hlbXkuZW5naW5lIGltcG9ydCBjcmVhdGVfZW5naW5lCmZyb20gbWxydW4uZXhlY3V0aW9uIGltcG9ydCBNTENsaWVudEN0eAoKCmRlZiBzcWxfdG9fZmlsZSgKICAgIGNvbnRleHQ6IE1MQ2xpZW50Q3R4LAogICAgc3FsX3F1ZXJ5OiBzdHIsCiAgICBkYXRhYmFzZV91cmw6IHN0ciwKICAgIGZpbGVfZXh0OiBzdHIgPSAicGFycXVldCIsCikgLT4gTm9uZToKICAgICIiIlNRTCBJbmdlc3QgLSBJbmdlc3QgZGF0YSB1c2luZyBTUUwgcXVlcnkKCiAgICA6cGFyYW0gY29udGV4dDogICAgICAgICAgIHRoZSBmdW5jdGlvbiBjb250ZXh0CiAgICA6cGFyYW0gc3FsX3F1ZXJ5OiAgICAgICAgIHRoZSBzcWwgcXVlcnkgdXNlZCB0byByZXRyaWV2ZSB0aGUgZGF0YQogICAgOnBhcmFtIGRhdGFiYXNlX3VybDogICAgICBkYXRhYmFzZSBjb25uZWN0aW9uIFVSTAogICAgOnBhcmFtIGZpbGVfZXh0OiAgICAgICAgICAoInBhcnF1ZXQiKSBmb3JtYXQgZm9yIHJlc3VsdCBmaWxlCgoiIiIKCiAgICBlbmdpbmUgPSBjcmVhdGVfZW5naW5lKGRhdGFiYXNlX3VybCkKICAgIGRmID0gcGQucmVhZF9zcWwoc3FsX3F1ZXJ5LCBlbmdpbmUpCgogICAgY29udGV4dC5sb2dfZGF0YXNldCgncXVlcnkgcmVzdWx0JywKICAgICAgICAgICAgICAgICAgICAgICAgZGY9ZGYsCiAgICAgICAgICAgICAgICAgICAgICAgIGZvcm1hdD1maWxlX2V4dCwKICAgICAgICAgICAgICAgICAgICAgICAgYXJ0aWZhY3RfcGF0aD1jb250ZXh0LmFydGlmYWN0X3N1YnBhdGgoJ2RhdGEnKSkK
+    image: .mlrun/sqltofile
+    commands:
+    - python -m pip install pyhive sqlalchemy PyMySQL
+    code_origin: https://github.com/xsqian/functions.git#cbbf8d4e69e71fb9e0f592425497cd05fbc0ed7b:sql_to_file.py
+    origin_filename: sql_to_file.py
+  disable_auto_mount: false
+  priority_class_name: igz-workload-medium
+  affinity: null
+verbose: false

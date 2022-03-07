@@ -4,7 +4,7 @@ categories:
 description: describe and visualizes dataset stats
 doc: ''
 example: describe.ipynb
-generationDate: 2022-03-03:14-20
+generationDate: 2022-03-07:14-20
 icon: ''
 labels:
   author: Davids
@@ -15,7 +15,7 @@ name: describe
 platformVersion: 3.2.0
 spec:
   filename: describe.py
-  handler: summarize
+  handler: analysis
   image: mlrun/mlrun
   kind: job
   requirements: []

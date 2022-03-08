@@ -98,5 +98,5 @@ def test_local_coxph_train():
            local=True)
     model = load(open("models/cox/km/model.pkl", "rb"))
     ans = model.predict([1, 10, 30, 100, 200])
-    assert (list(np.around(ans, 1)) == [0.0, 0.0, 0.0, 0.0, 0.0])
+    assert(sum([abs(x-y) for x,y in zip(list(np.around(ans, 2)),[0.95, 0.85, 0.77, 0.58, 0.58])])< 0.5)
 

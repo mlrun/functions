@@ -1,0 +1,53 @@
+kind: spark
+metadata:
+  name: read_snowflake
+  hash: bf36c1a7e5a76ecf41329c082da1c8d14e319356
+  categories: []
+spec:
+  command: https://raw.githubusercontent.com/brennanreese/functions/read_snowflake.py
+  args: []
+  image: .snow-spark
+  build:
+    commands: []
+  description: ''
+  disable_auto_mount: false
+  env:
+  - name: V3IO_API
+    value: ''
+  - name: V3IO_USERNAME
+    value: ''
+  - name: V3IO_ACCESS_KEY
+    value: ''
+  - name: V3IO_FRAMESD
+    value: ''
+  - name: CURRENT_NODE_IP
+    valueFrom:
+      fieldRef:
+        apiVersion: v1
+        fieldPath: status.hostIP
+  - name: IGZ_DATA_CONFIG_FILE
+    value: /igz/java/conf/v3io.conf
+  replicas: 1
+  image_pull_policy: Always
+  priority_class_name: igz-workload-high
+  driver_resources:
+    requests:
+      memory: 4096m
+  executor_resources:
+    requests:
+      memory: 4096m
+  deps:
+    jars:
+    - local:///spark/v3io-libs/v3io-hcfs_2.12.jar
+    - local:///spark/v3io-libs/v3io-spark3-streaming_2.12.jar
+    - local:///spark/v3io-libs/v3io-spark3-object-dataframe_2.12.jar
+    - local:///igz/java/libs/scala-library-2.12.14.jar
+    - local:///spark/jars/jmx_prometheus_javaagent-0.16.1.jar
+    files:
+    - local:///igz/java/libs/v3io-pyspark.zip
+  use_default_image: false
+  monitoring:
+    enabled: true
+    exporter_jar: /spark/jars/jmx_prometheus_javaagent-0.16.1.jar
+  affinity: null
+verbose: false

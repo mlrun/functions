@@ -4,7 +4,7 @@ metadata:
   hash: bf36c1a7e5a76ecf41329c082da1c8d14e319356
   categories: []
 spec:
-  command: https://raw.githubusercontent.com/brennanreese/functions/read_snowflake.py
+  command: https://raw.githubusercontent.com/brennanreese/functions/development/read_snowflake/read_snowflake.py
   args: []
   image: .snow-spark
   build:

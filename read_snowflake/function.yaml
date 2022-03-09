@@ -2,14 +2,16 @@ kind: spark
 metadata:
   name: read-snowflake
   tag: ''
-  hash: 5ed300658970d46ee5bf6bd9700f946ef5fa7e6c
+  hash: 934ae372aa36a4a66d9da2b511ea8c90031ac24e
   project: feature-store
+  credentials:
+    access_key: 4f4a4d69-949e-4453-b53a-03924898fe8b
 spec:
   command: ''
   args: []
   image: .snow-spark
   build:
-    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSBweXNwYXJrLnNxbCBpbXBvcnQgU3BhcmtTZXNzaW9uCgpkZWYgcmVhZF9zbm93Zmxha2UoZGIsIHNjaGVtYSwgd2FyZWhvdXNlLCBxdWVyeSwgdGFyZ2V0KToKICAgICIiIgogICAgUmVhZCBTbm93Zmxha2UgYW5kIHdyaXRlIHJlc3VsdHMgdG8gcGFycXVldAogICAgOnBhcmFtIGRiOiBTbm93Zmxha2UgZGF0YWJhc2UKICAgIDpwYXJhbSBzY2hlbWE6IFNub3dmbGFrZSBzY2hlbWEKICAgIDpwYXJhbSB3YXJlaG91c2U6IFNub3dmbGFrZSB3YXJlaG91c2UgaW5zdGFuY2UKICAgIDpwYXJhbSBxdWVyeTogU25vd2ZsYWtlIHF1ZXJ5IHN0cmluZwogICAgOnBhcmFtIHRhcmdldDogRnVsbCBwYXRoIHRvIHBhcnF1ZXQgb3V0cHV0IGVnOiAiL3YzaW8vYmlnZGF0YS9vdXRwdXQucGFycXVldCIKICAgICIiIgogICAgc3BhcmsgPSBTcGFya1Nlc3Npb24uYnVpbGRlci5hcHBOYW1lKCJyZWFkX3Nub3dmbGFrZSIpLmdldE9yQ3JlYXRlKCkKCiAgICBzZk9wdGlvbnMgPSB7CiAgICAgICJzZlVSTCIgOiAiJHNmVVJMIiwKICAgICAgInNmVXNlciIgOiAiJHNmVXNlciIsCiAgICAgICJzZlBhc3N3b3JkIiA6ICIkc2ZQYXNzd29yZCIsCiAgICAgICJzZkRhdGFiYXNlIiA6IGRiLAogICAgICAic2ZTY2hlbWEiIDogc2NoZW1hLAogICAgICAic2ZXYXJlaG91c2UiIDogd2FyZWhvdXNlCiAgICB9CgogICAgZGYgPSBzcGFyay5yZWFkLmZvcm1hdCgibmV0LnNub3dmbGFrZS5zcGFyay5zbm93Zmxha2UiKSAgICAgICAub3B0aW9ucygqKnNmT3B0aW9ucykgICAgICAgLm9wdGlvbigicXVlcnkiLCAgcXVlcnkpICAgICAgIC5sb2FkKCkKICAgIAogICAgZGYud3JpdGUucGFycXVldCh0YXJnZXQpCgoKCmZyb20gbWxydW4uZmVhdHVyZV9zdG9yZS5hcGkgaW1wb3J0IGluZ2VzdApkZWYgaW5nZXN0X2hhbmRsZXIoY29udGV4dCk6CiAgICBpbmdlc3QobWxydW5fY29udGV4dD1jb250ZXh0KSAjIFRoZSBoYW5kbGVyIGZ1bmN0aW9uIG11c3QgY2FsbCBpbmdlc3Qgd2l0aCB0aGUgbWxydW5fY29udGV4dAogICAgCmRlZiBteV9zcGFya19mdW5jKGRmLCBjb250ZXh0PU5vbmUpOgogICAgcmV0dXJuIGRmLmZpbHRlcigiYmlkPjU1IikgIyBQeVNwYXJrIGNvZGUKCg==
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSBweXNwYXJrLnNxbCBpbXBvcnQgU3BhcmtTZXNzaW9uCgpkZWYgcmVhZF9zbm93Zmxha2UoY29udGV4dCwgY29uZmlnLCBkYiwgc2NoZW1hLCB3YXJlaG91c2UsIHF1ZXJ5LCB0YXJnZXQpOgogICAgIiIiCiAgICBSZWFkIFNub3dmbGFrZSBhbmQgd3JpdGUgcmVzdWx0cyB0byBwYXJxdWV0CiAgICA6cGFyYW0gZGI6IFNub3dmbGFrZSBkYXRhYmFzZQogICAgOnBhcmFtIHNjaGVtYTogU25vd2ZsYWtlIHNjaGVtYQogICAgOnBhcmFtIHdhcmVob3VzZTogU25vd2ZsYWtlIHdhcmVob3VzZSBpbnN0YW5jZQogICAgOnBhcmFtIHF1ZXJ5OiBTbm93Zmxha2UgcXVlcnkgc3RyaW5nCiAgICA6cGFyYW0gdGFyZ2V0OiBGdWxsIHBhdGggdG8gcGFycXVldCBvdXRwdXQgZWc6ICIvdjNpby9iaWdkYXRhL291dHB1dC5wYXJxdWV0IgogICAgIiIiCiAgICBzcGFyayA9IFNwYXJrU2Vzc2lvbi5idWlsZGVyLmFwcE5hbWUoInJlYWRfc25vd2ZsYWtlIikuZ2V0T3JDcmVhdGUoKQogICAgCiAgICBzZlVSTCA9IGNvbmZpZ1sic2ZVUkwiXQogICAgc2ZVc2VyID0gY29uZmlnWyJzZlVzZXIiXQogICAgc2ZQYXNzd29yZCA9IGNvbmZpZ1sic2ZQYXNzd29yZCJdCiAgICAKICAgIHNmT3B0aW9ucyA9IHsKICAgICAgInNmVVJMIiA6IHNmVVJMLAogICAgICAic2ZVc2VyIiA6IHNmVXNlciwKICAgICAgInNmUGFzc3dvcmQiIDogc2ZQYXNzd29yZCwKICAgICAgInNmRGF0YWJhc2UiIDogZGIsCiAgICAgICJzZlNjaGVtYSIgOiBzY2hlbWEsCiAgICAgICJzZldhcmVob3VzZSIgOiB3YXJlaG91c2UKICAgIH0KCiAgICBkZiA9IHNwYXJrLnJlYWQuZm9ybWF0KCJuZXQuc25vd2ZsYWtlLnNwYXJrLnNub3dmbGFrZSIpICAgICAgIC5vcHRpb25zKCoqc2ZPcHRpb25zKSAgICAgICAub3B0aW9uKCJxdWVyeSIsICBxdWVyeSkgICAgICAgLmxvYWQoKQogICAgCiAgICBwcmludCh0YXJnZXQpCiAgICBkZi53cml0ZS5wYXJxdWV0KHRhcmdldCkKCgoKZnJvbSBtbHJ1bi5mZWF0dXJlX3N0b3JlLmFwaSBpbXBvcnQgaW5nZXN0CmRlZiBpbmdlc3RfaGFuZGxlcihjb250ZXh0KToKICAgIGluZ2VzdChtbHJ1bl9jb250ZXh0PWNvbnRleHQpICMgVGhlIGhhbmRsZXIgZnVuY3Rpb24gbXVzdCBjYWxsIGluZ2VzdCB3aXRoIHRoZSBtbHJ1bl9jb250ZXh0CiAgICAKZGVmIG15X3NwYXJrX2Z1bmMoZGYsIGNvbnRleHQ9Tm9uZSk6CiAgICByZXR1cm4gZGYuZmlsdGVyKCJiaWQ+NTUiKSAjIFB5U3BhcmsgY29kZQoK
     commands: []
     code_origin: https://github.com/igz-us-sales/igz-generic-demos.git#6a79a063f2920221888fbf9eefea098e0480ee03:read_snowflake.ipynb
     origin_filename: read-snowflake.ipynb
@@ -18,6 +20,10 @@ spec:
       name: read_snowflake
       doc: Read Snowflake and write results to parquet
       parameters:
+      - name: context
+        default: ''
+      - name: config
+        default: ''
       - name: db
         doc: Snowflake database
         default: ''
@@ -44,7 +50,7 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 32
+      lineno: 37
     my_spark_func:
       name: my_spark_func
       doc: ''
@@ -55,9 +61,9 @@ spec:
         default: null
       outputs:
       - default: ''
-      lineno: 35
+      lineno: 40
   description: ''
-  default_handler: ''
+  default_handler: read_snowflake
   disable_auto_mount: false
   env:
   - name: V3IO_API

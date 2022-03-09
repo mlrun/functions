@@ -1,15 +1,63 @@
 kind: spark
 metadata:
-  name: read_snowflake
-  hash: bf36c1a7e5a76ecf41329c082da1c8d14e319356
-  categories: []
+  name: read-snowflake
+  tag: ''
+  hash: 5ed300658970d46ee5bf6bd9700f946ef5fa7e6c
+  project: feature-store
 spec:
-  command: https://raw.githubusercontent.com/brennanreese/functions/development/read_snowflake/read_snowflake.py
+  command: ''
   args: []
   image: .snow-spark
   build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKZnJvbSBweXNwYXJrLnNxbCBpbXBvcnQgU3BhcmtTZXNzaW9uCgpkZWYgcmVhZF9zbm93Zmxha2UoZGIsIHNjaGVtYSwgd2FyZWhvdXNlLCBxdWVyeSwgdGFyZ2V0KToKICAgICIiIgogICAgUmVhZCBTbm93Zmxha2UgYW5kIHdyaXRlIHJlc3VsdHMgdG8gcGFycXVldAogICAgOnBhcmFtIGRiOiBTbm93Zmxha2UgZGF0YWJhc2UKICAgIDpwYXJhbSBzY2hlbWE6IFNub3dmbGFrZSBzY2hlbWEKICAgIDpwYXJhbSB3YXJlaG91c2U6IFNub3dmbGFrZSB3YXJlaG91c2UgaW5zdGFuY2UKICAgIDpwYXJhbSBxdWVyeTogU25vd2ZsYWtlIHF1ZXJ5IHN0cmluZwogICAgOnBhcmFtIHRhcmdldDogRnVsbCBwYXRoIHRvIHBhcnF1ZXQgb3V0cHV0IGVnOiAiL3YzaW8vYmlnZGF0YS9vdXRwdXQucGFycXVldCIKICAgICIiIgogICAgc3BhcmsgPSBTcGFya1Nlc3Npb24uYnVpbGRlci5hcHBOYW1lKCJyZWFkX3Nub3dmbGFrZSIpLmdldE9yQ3JlYXRlKCkKCiAgICBzZk9wdGlvbnMgPSB7CiAgICAgICJzZlVSTCIgOiAiJHNmVVJMIiwKICAgICAgInNmVXNlciIgOiAiJHNmVXNlciIsCiAgICAgICJzZlBhc3N3b3JkIiA6ICIkc2ZQYXNzd29yZCIsCiAgICAgICJzZkRhdGFiYXNlIiA6IGRiLAogICAgICAic2ZTY2hlbWEiIDogc2NoZW1hLAogICAgICAic2ZXYXJlaG91c2UiIDogd2FyZWhvdXNlCiAgICB9CgogICAgZGYgPSBzcGFyay5yZWFkLmZvcm1hdCgibmV0LnNub3dmbGFrZS5zcGFyay5zbm93Zmxha2UiKSAgICAgICAub3B0aW9ucygqKnNmT3B0aW9ucykgICAgICAgLm9wdGlvbigicXVlcnkiLCAgcXVlcnkpICAgICAgIC5sb2FkKCkKICAgIAogICAgZGYud3JpdGUucGFycXVldCh0YXJnZXQpCgoKCmZyb20gbWxydW4uZmVhdHVyZV9zdG9yZS5hcGkgaW1wb3J0IGluZ2VzdApkZWYgaW5nZXN0X2hhbmRsZXIoY29udGV4dCk6CiAgICBpbmdlc3QobWxydW5fY29udGV4dD1jb250ZXh0KSAjIFRoZSBoYW5kbGVyIGZ1bmN0aW9uIG11c3QgY2FsbCBpbmdlc3Qgd2l0aCB0aGUgbWxydW5fY29udGV4dAogICAgCmRlZiBteV9zcGFya19mdW5jKGRmLCBjb250ZXh0PU5vbmUpOgogICAgcmV0dXJuIGRmLmZpbHRlcigiYmlkPjU1IikgIyBQeVNwYXJrIGNvZGUKCg==
     commands: []
+    code_origin: https://github.com/igz-us-sales/igz-generic-demos.git#6a79a063f2920221888fbf9eefea098e0480ee03:read_snowflake.ipynb
+    origin_filename: read-snowflake.ipynb
+  entry_points:
+    read_snowflake:
+      name: read_snowflake
+      doc: Read Snowflake and write results to parquet
+      parameters:
+      - name: db
+        doc: Snowflake database
+        default: ''
+      - name: schema
+        doc: Snowflake schema
+        default: ''
+      - name: warehouse
+        doc: Snowflake warehouse instance
+        default: ''
+      - name: query
+        doc: Snowflake query string
+        default: ''
+      - name: target
+        doc: 'Full path to parquet output eg: "/v3io/bigdata/output.parquet"'
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 5
+    ingest_handler:
+      name: ingest_handler
+      doc: ''
+      parameters:
+      - name: context
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 32
+    my_spark_func:
+      name: my_spark_func
+      doc: ''
+      parameters:
+      - name: df
+        default: ''
+      - name: context
+        default: null
+      outputs:
+      - default: ''
+      lineno: 35
   description: ''
+  default_handler: ''
   disable_auto_mount: false
   env:
   - name: V3IO_API
@@ -27,9 +75,7 @@ spec:
         fieldPath: status.hostIP
   - name: IGZ_DATA_CONFIG_FILE
     value: /igz/java/conf/v3io.conf
-  replicas: 1
-  image_pull_policy: Always
-  priority_class_name: igz-workload-high
+  priority_class_name: igz-workload-medium
   driver_resources:
     requests:
       memory: 4096m

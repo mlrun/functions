@@ -57,13 +57,13 @@ def test_sanity_local():
     """
     describe_func = import_function("function.yaml")
     is_test_passed = True
-    _creat_data(n_samples=100, n_features=5, n_classes=3, n_informative=3)
+    _create_data(n_samples=100, n_features=5, n_classes=3, n_informative=3)
     try:
         describe_run = describe_func.run(
             name="task-describe",
-            handler="analysis",
+            handler="analyze",
             inputs={"table": DATA_PATH},
-            params={"update_dataset": True, "label_column": "label"},
+            params={"label_column": "label"},
             artifact_path=os.path.abspath("./artifacts"),
             local=True,
         )
@@ -83,15 +83,15 @@ def test_different_size_of_dataset(n_samples, n_features, n_classes, n_informati
     Test different size of data
     """
     is_test_passed = True
-    df = _creat_data(n_samples, n_features, n_classes, n_informative)
+    df = _create_data(n_samples, n_features, n_classes, n_informative)
     describe_func = import_function("function.yaml")
 
     try:
         describe_run = describe_func.run(
             name="task-describe",
-            handler="analysis",
+            handler="analyze",
             inputs={"table": DATA_PATH},
-            params={"update_dataset": True, "label_column": "label"},
+            params={"label_column": "label"},
             artifact_path=os.path.abspath("./artifacts"),
             local=True,
         )
@@ -114,7 +114,7 @@ def test_data_already_loaded():
         kind="job",
         image="mlrun/ml-models",
     )
-    df = _creat_data(n_samples=100, n_features=5, n_classes=3, n_informative=3)
+    df = _create_data(n_samples=100, n_features=5, n_classes=3, n_informative=3)
     log_data_run = log_data_function.run(
         handler="_log_data",
         params={"table": DATA_PATH},
@@ -125,9 +125,9 @@ def test_data_already_loaded():
     try:
         describe_run = describe_func.run(
             name="task-describe",
-            handler="analysis",
+            handler="analyze",
             inputs={"table": log_data_run.outputs["dataset"]},
-            params={"update_dataset": True, "label_column": "label"},
+            params={"label_column": "label"},
             artifact_path=os.path.abspath("./artifacts"),
             local=True,
         )
@@ -165,7 +165,7 @@ def _log_data(context: MLClientCtx, table: str):
     context.log_dataset(key="dataset", db_key="dataset", stats=True, df=df)
 
 
-def _creat_data(n_samples, n_features, n_classes, n_informative):
+def _create_data(n_samples, n_features, n_classes, n_informative):
     """
     Create df and save it as artifacts/random_dataset.parquet
     """

@@ -2,6 +2,7 @@ import os
 import tempfile
 import shutil
 import datetime
+import pytest
 
 import mlrun
 import mlrun.feature_store as fstore
@@ -9,6 +10,22 @@ from mlrun.datastore.sources import CSVSource
 from mlrun.feature_store.steps import *
 from mlrun.features import MinMaxValidator
 import pandas as pd
+
+REQUIRED_ENV_VARS = [
+    "MLRUN_DBPATH",
+    "MLRUN_ARTIFACT_PATH",
+    "V3IO_USERNAME",
+    "V3IO_API",
+    "V3IO_ACCESS_KEY",
+]
+
+
+def _validate_environment_variables() -> bool:
+    """
+    Checks that all required Environment variables are set.
+    """
+    environment_keys = os.environ.keys()
+    return all(key in environment_keys for key in REQUIRED_ENV_VARS)
 
 
 def _set_environment():
@@ -104,6 +121,10 @@ def _create_feature_set():
     return quotes_set
 
 
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
 def test_ingest():
     artifact_path, project = _set_environment()
     ingest_fn = mlrun.import_function("function.yaml")

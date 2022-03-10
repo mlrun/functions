@@ -153,17 +153,22 @@ class TestSuite(ABC):
                 print("a function name cannot start with test, please rename {} ".format(path))
 
         self.before_run()
-        pool = mp.Pool(process_count)
-        results = pool.map(self.directory_process, [directory for directory in discovered])
-        pool.close()
+
+        # pool = mp.Pool(process_count)
+        # pool.map(self.directory_process, [directory for directory in discovered])
+        for directory in discovered:
+            self.directory_process(directory)
         self.after_run()
-        exit(0)
+
+        #pool.close()
+        sys.exit(0)
 
     def directory_process(self, directory):
         self.before_each(directory)
         result = self.run(directory)
         self.test_results.append(result)
         self.after_each(directory, result)
+
 
 
 class TestPY(TestSuite):
@@ -199,7 +204,7 @@ class TestPY(TestSuite):
             click.echo(
                 "No tests found, make sure your test file names are structures as 'test_*.py')"
             )
-            exit(0)
+            sys.exit(0)
         testables.sort()
         return testables
 
@@ -287,7 +292,7 @@ class TestPY(TestSuite):
             click.echo("\n")
 
         if failed_tests:
-            exit(1)
+            sys.exit(1)
 
     @staticmethod
     def is_test_py(path: Union[str, Path]) -> bool:

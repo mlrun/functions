@@ -4,10 +4,10 @@ categories:
 description: describe and visualizes dataset stats
 doc: ''
 example: describe.ipynb
-generationDate: 2021-11-18:12-28
+generationDate: 2022-03-07:14-20
 icon: ''
 labels:
-  author: Iguazio
+  author: Davids
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 0.8.0
@@ -15,7 +15,7 @@ name: describe
 platformVersion: 3.2.0
 spec:
   filename: describe.py
-  handler: summarize
+  handler: analyze
   image: mlrun/mlrun
   kind: job
   requirements: []

@@ -100,6 +100,10 @@ def test_train(model: Tuple[str, str]):
 
 
 @pytest.mark.parametrize("model", MODELS)
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
 def test_train_evaluate(model: Tuple[str, str]):
     _set_environment()
 
@@ -142,6 +146,10 @@ def test_train_evaluate(model: Tuple[str, str]):
 
 
 @pytest.mark.parametrize("model", MODELS)
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
 def test_train_predict(model: Tuple[str, str]):
     _set_environment()
 

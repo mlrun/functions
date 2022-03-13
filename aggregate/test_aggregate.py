@@ -1,7 +1,9 @@
 from pathlib import Path
 from mlrun import code_to_function, import_function
+import os
+import shutil
 
-AGGREGATE_PATH = "artifacts/aggregate.pq"
+AGGREGATE_PATH = "artifacts/aggregated_metrics.pq"
 DATA = "https://s3.wasabisys.com/iguazio/data/market-palce/aggregate/metrics.pq"
 
 
@@ -23,10 +25,11 @@ def test_run_local_aggregate():
                    'save_to': AGGREGATE_PATH,
                    'files_to_select': 2}
            #, local=True
-           , inputs={'df_artifact': DATA}
+           , inputs={'df_artifact': DATA},
+           artifact_path = os.getcwd()
            )
-    assert Path(AGGREGATE_PATH).is_file()
-
+    assert Path(os.getcwd() + '/' + AGGREGATE_PATH).is_file()
+    shutil.rmtree(os.getcwd() + '/' + os.path.dirname(AGGREGATE_PATH))
 
 def test_import_function_aggregate():
     fn = import_function("function.yaml")
@@ -35,12 +38,14 @@ def test_import_function_aggregate():
                    'metric_aggs': ['mean', 'sum'],
                    'label_aggs': ['max'],
                    'suffix': 'daily',
-                   'inplace': False,
+                   'inplace': True,
                    'window': 5,
                    'center': True,
                    'save_to': AGGREGATE_PATH,
                    'files_to_select': 2}
            , local=True
-           , inputs={'df_artifact': DATA}
+           , inputs={'df_artifact': DATA},
+           artifact_path = os.getcwd()
            )
-    assert Path(AGGREGATE_PATH).is_file()
+    assert Path(os.getcwd() + '/' + AGGREGATE_PATH).is_file()
+    shutil.rmtree(os.getcwd() + '/' + os.path.dirname(AGGREGATE_PATH))

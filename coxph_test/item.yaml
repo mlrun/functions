@@ -5,16 +5,16 @@ categories:
 description: Test cox proportional hazards model
 doc: ''
 example: coxph_test.ipynb
-generationDate: 2021-05-19:22-41
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   author: Iguazio
   framework: survival
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: coxph-test
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: coxph_test.py
   handler: cox_test
@@ -22,4 +22,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.9.0

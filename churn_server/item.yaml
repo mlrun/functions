@@ -5,25 +5,27 @@ categories:
 description: churn classification and predictor
 doc: ''
 example: churn_server.ipynb
-generationDate: 2021-05-19:22-04
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   author: Iguazio
   framework: churn
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: churn-server
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
+  customFields:
+    default_class: ChurnModel
+  env:
+    ENABLE_EXPLAINER: 'False'
   filename: churn_server.py
   handler: handler
   image: mlrun/ml-models
   kind: serving
-  requirements: []
-  env:
-    ENABLE_EXPLAINER: 'False'
-  customFields:
-    default_class: ChurnModel
+  requirements:
+  - xgboost==1.3.1
+  - lifelines==0.22.8
 url: ''
-version: 0.0.1
+version: 0.9.0

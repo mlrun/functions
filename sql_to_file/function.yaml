@@ -3,7 +3,7 @@ metadata:
   name: sql-to-file
   tag: ''
   hash: 61f616fe697994e05cf018f2ee94c4ea25ed8863
-  project: default
+  project: ''
   labels:
     author: adih
   categories:

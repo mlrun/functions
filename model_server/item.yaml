@@ -5,21 +5,21 @@ categories:
 description: generic sklearn model server
 doc: ''
 example: model_server.ipynb
-generationDate: 2021-05-19:23-13
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   author: yaronh
   framework: sklearn
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: model-server
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: model_server.py
   handler: handler
   image: mlrun/mlrun
-  kind: serving
+  kind: nuclio:serving
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.9.0

@@ -1,6 +1,6 @@
 import mlrun
 import numpy as np
-import keras
+from tensorflow import keras
 import json
 
 

@@ -3,7 +3,7 @@ metadata:
   name: v2-model-tester
   tag: ''
   hash: 72d3f664ff2aa870109e44f52f975bda2ac13682
-  project: default
+  project: ''
   labels:
     author: yaronh
   categories:

@@ -3,7 +3,7 @@ metadata:
   name: open-archive
   tag: ''
   hash: ebabf774a193b8e95ef51cf0961d15599617954c
-  project: default
+  project: ''
   labels:
     author: yaronh
   categories:

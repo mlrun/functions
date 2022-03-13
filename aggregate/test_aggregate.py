@@ -1,5 +1,4 @@
 from pathlib import Path
-import shutil
 from mlrun import code_to_function, import_function
 
 AGGREGATE_PATH = "artifacts/aggregate.pq"

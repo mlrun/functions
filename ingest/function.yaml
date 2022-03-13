@@ -1,0 +1,87 @@
+kind: job
+metadata:
+  name: ingest
+  tag: ''
+  hash: 7e28700a86ebdd18d887fe588492201a1e3ef2f6
+  project: ''
+  labels:
+    author: yonish
+  categories:
+  - data-preparation
+  - data-analysis
+  - feature-store
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  build:
+    functionSourceCode: ZnJvbSB0eXBpbmcgaW1wb3J0IFVuaW9uLCBMaXN0LCBEaWN0CgppbXBvcnQgbWxydW4uZmVhdHVyZV9zdG9yZSBhcyBmcwpmcm9tIG1scnVuLmV4ZWN1dGlvbiBpbXBvcnQgTUxDbGllbnRDdHgKZnJvbSBtbHJ1bi5kYXRhX3R5cGVzIGltcG9ydCBJbmZlck9wdGlvbnMKCgpkZWYgaW5nZXN0KAogICAgY29udGV4dDogTUxDbGllbnRDdHgsCiAgICBmZWF0dXJlc2V0OiBzdHIsCiAgICBzb3VyY2U6IHN0ciwKICAgIHRhcmdldHM6IExpc3RbVW5pb25bc3RyLCBEaWN0XV0gPSBOb25lLAogICAgbmFtZXNwYWNlPU5vbmUsCiAgICBpbmZlcl9vcHRpb25zPU5vbmUsCiAgICBydW5fY29uZmlnOiBVbmlvbltzdHIsIERpY3RdID0gTm9uZSwKICAgIHNwYXJrX2NvbnRleHQ9Tm9uZSwKICAgIG92ZXJ3cml0ZT1Ob25lLAopOgogICAgIiIiUmVhZCBsb2NhbCBEYXRhRnJhbWUsIGZpbGUsIFVSTCwgb3Igc291cmNlIGludG8gdGhlIGZlYXR1cmUgc3RvcmUKICAgIEluZ2VzdCByZWFkcyBmcm9tIHRoZSBzb3VyY2UsIHJ1biB0aGUgZ3JhcGggdHJhbnNmb3JtYXRpb25zLCBpbmZlcnMgIG1ldGFkYXRhIGFuZCBzdGF0cwogICAgYW5kIHdyaXRlcyB0aGUgcmVzdWx0cyB0byB0aGUgZGVmYXVsdCBvZiBzcGVjaWZpZWQgdGFyZ2V0cwoKICAgIHdoZW4gdGFyZ2V0cyBhcmUgbm90IHNwZWNpZmllZCBkYXRhIGlzIHN0b3JlZCBpbiB0aGUgY29uZmlndXJlZCBkZWZhdWx0IHRhcmdldHMKICAgICh3aWxsIHVzdWFsbHkgYmUgTm9TUUwgZm9yIHJlYWwtdGltZSBhbmQgUGFycXVldCBmb3Igb2ZmbGluZSkuCgogICAgZXhhbXBsZTo6CgogICAgICAgIHN0b2Nrc19zZXQgPSBGZWF0dXJlU2V0KCJzdG9ja3MiLCBlbnRpdGllcz1bRW50aXR5KCJ0aWNrZXIiKV0pCiAgICAgICAgc3RvY2tzID0gcGQucmVhZF9jc3YoInN0b2Nrcy5jc3YiKQogICAgICAgIGRmID0gaW5nZXN0KHN0b2Nrc19zZXQsIHN0b2NrcywgaW5mZXJfb3B0aW9ucz1mc3RvcmUuSW5mZXJPcHRpb25zLmRlZmF1bHQoKSkKCiAgICAgICAgIyBmb3IgcnVubmluZyBhcyByZW1vdGUgam9iCiAgICAgICAgY29uZmlnID0gUnVuQ29uZmlnKGltYWdlPSdtbHJ1bi9tbHJ1bicpLmFwcGx5KG1vdW50X3YzaW8oKSkKICAgICAgICBkZiA9IGluZ2VzdChzdG9ja3Nfc2V0LCBzdG9ja3MsIHJ1bl9jb25maWc9Y29uZmlnKQoKICAgICAgICAjIHNwZWNpZnkgc291cmNlIGFuZCB0YXJnZXRzCiAgICAgICAgc291cmNlID0gQ1NWU291cmNlKCJteWNzdiIsIHBhdGg9Im1lYXN1cmVtZW50cy5jc3YiKQogICAgICAgIHRhcmdldHMgPSBbQ1NWVGFyZ2V0KCJteWNzdiIsIHBhdGg9Ii4vbXljc3YuY3N2IildCiAgICAgICAgaW5nZXN0KG1lYXN1cmVtZW50cywgc291cmNlLCB0YXJnZXRzKQoKICAgIDpwYXJhbSBjb250ZXh0OiAgICAgICBNTFJ1biBjb250ZXh0CiAgICA6cGFyYW0gZmVhdHVyZXNldDogICAgZmVhdHVyZSBzZXQgb2JqZWN0IG9yIGZlYXR1cmVzZXQudXJpLiAodXJpIG11c3QgYmUgb2YgYSBmZWF0dXJlIHNldCB0aGF0IGlzIGluIHRoZSBEQiwKICAgICAgICAgICAgICAgICAgICAgICAgICBjYWxsIGAuc2F2ZSgpYCBpZiBpdCdzIG5vdCkKICAgIDpwYXJhbSBzb3VyY2U6ICAgICAgICBzb3VyY2UgZGF0YWZyYW1lIG9yIGZpbGUgcGF0aAogICAgOnBhcmFtIHRhcmdldHM6ICAgICAgIG9wdGlvbmFsIGxpc3Qgb2YgZGF0YSB0YXJnZXQgb2JqZWN0cwogICAgOnBhcmFtIG5hbWVzcGFjZTogICAgIG5hbWVzcGFjZSBvciBtb2R1bGUgY29udGFpbmluZyBncmFwaCBjbGFzc2VzCiAgICA6cGFyYW0gaW5mZXJfb3B0aW9uczogc2NoZW1hIGFuZCBzdGF0cyBpbmZlciBvcHRpb25zCiAgICA6cGFyYW0gcnVuX2NvbmZpZzogICAgZnVuY3Rpb24gYW5kL29yIHJ1biBjb25maWd1cmF0aW9uIGZvciByZW1vdGUgam9icywKICAgICAgICAgICAgICAgICAgICAgICAgICBzZWUgOnB5OmNsYXNzOmB+bWxydW4uZmVhdHVyZV9zdG9yZS5SdW5Db25maWdgCiAgICA6cGFyYW0gc3BhcmtfY29udGV4dDogbG9jYWwgc3Bhcmsgc2Vzc2lvbiBmb3Igc3BhcmsgaW5nZXN0aW9uLCBleGFtcGxlIGZvciBjcmVhdGluZyB0aGUgc3BhcmsgY29udGV4dDoKICAgICAgICAgICAgICAgICAgICAgICAgICBgc3BhcmsgPSBTcGFya1Nlc3Npb24uYnVpbGRlci5hcHBOYW1lKCJTcGFyayBmdW5jdGlvbiIpLmdldE9yQ3JlYXRlKClgCiAgICAgICAgICAgICAgICAgICAgICAgICAgRm9yIHJlbW90ZSBzcGFyayBpbmdlc3Rpb24sIHRoaXMgc2hvdWxkIGNvbnRhaW4gdGhlIHJlbW90ZSBzcGFyayBzZXJ2aWNlIG5hbWUKICAgIDpwYXJhbSBvdmVyd3JpdGU6ICAgICBkZWxldGUgdGhlIHRhcmdldHMnIGRhdGEgcHJpb3IgdG8gaW5nZXN0aW9uCiAgICAgICAgICAgICAgICAgICAgICAgICAgKGRlZmF1bHQ6IFRydWUgZm9yIG5vbi1zY2hlZHVsZWQgaW5nZXN0IC0gZGVsZXRlcyB0aGUgdGFyZ2V0cyB0aGF0IGFyZSBhYm91dCB0byBiZSBpbmdlc3RlZC4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRmFsc2UgZm9yIHNjaGVkdWxlZCBpbmdlc3QgLSBkb2VzIG5vdCBkZWxldGUgdGhlIHRhcmdldCkKCiAgICAiIiIKICAgICMgU2V0dGluZyBpbmZlcl9vcHRpb25zIHRvIGRlZmF1bHQ6CiAgICBjb250ZXh0Ll9wYXJhbWV0ZXJzWyJpbmZlcl9vcHRpb25zIl0gPSBpbmZlcl9vcHRpb25zIG9yIEluZmVyT3B0aW9ucy5kZWZhdWx0KCkKCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYiQ2FsbGluZyBpbmdlc3Rpb24gdGFzayB3aXRoOiB7ZmVhdHVyZXNldH0iKQoKICAgICMgaW5nZXN0IGNhbGxlZCB3aXRoIG1scnVuX2NvbnRleHQsIGZlYXR1cmVfc2V0LCBzb3VyY2UgYW5kIHRhcmdldHMgcGFzc2VkIHdpdGggY29udGV4dAogICAgIyBUaGlzIHBhcmFtcyBoZXJlIGZvciBkb2N1bWVudGF0aW9uIHB1cnBvc2VzIG9ubHkKICAgIGZzLmluZ2VzdCgKICAgICAgICBtbHJ1bl9jb250ZXh0PWNvbnRleHQsCiAgICAgICAgbmFtZXNwYWNlPW5hbWVzcGFjZSwKICAgICAgICBzcGFya19jb250ZXh0PXNwYXJrX2NvbnRleHQsCiAgICApCiAgICBjb250ZXh0LmxvZ19yZXN1bHQoImZlYXR1cmVzZXQiLCBmZWF0dXJlc2V0KQo=
+    commands: []
+    code_origin: https://github.com/mlrun/functions.git#886a88217c2a2570c81a14877f9c1dfb1ac8a244:C:\Users\yonatans\projects\functions\ingest\ingest.py
+    origin_filename: C:\Users\yonatans\projects\functions\ingest\ingest.py
+  entry_points:
+    ingest:
+      name: ingest
+      doc: "Read local DataFrame, file, URL, or source into the feature store\nIngest\
+        \ reads from the source, run the graph transformations, infers  metadata and\
+        \ stats\nand writes the results to the default of specified targets\n\nwhen\
+        \ targets are not specified data is stored in the configured default targets\n\
+        (will usually be NoSQL for real-time and Parquet for offline).\n\nexample::\n\
+        \n    stocks_set = FeatureSet(\"stocks\", entities=[Entity(\"ticker\")])\n\
+        \    stocks = pd.read_csv(\"stocks.csv\")\n    df = ingest(stocks_set, stocks,\
+        \ infer_options=fstore.InferOptions.default())\n\n    # for running as remote\
+        \ job\n    config = RunConfig(image='mlrun/mlrun').apply(mount_v3io())\n \
+        \   df = ingest(stocks_set, stocks, run_config=config)\n\n    # specify source\
+        \ and targets\n    source = CSVSource(\"mycsv\", path=\"measurements.csv\"\
+        )\n    targets = [CSVTarget(\"mycsv\", path=\"./mycsv.csv\")]\n    ingest(measurements,\
+        \ source, targets)"
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: MLRun context
+        default: ''
+      - name: featureset
+        type: str
+        doc: feature set object or featureset.uri. (uri must be of a feature set that
+          is in the DB, call `.save()` if it's not)
+        default: ''
+      - name: source
+        type: str
+        doc: source dataframe or file path
+        default: ''
+      - name: targets
+        type: List[Union[str, Dict]]
+        doc: optional list of data target objects
+        default: null
+      - name: namespace
+        doc: namespace or module containing graph classes
+        default: null
+      - name: infer_options
+        doc: schema and stats infer options
+        default: null
+      - name: run_config
+        type: Union[str, Dict]
+        doc: function and/or run configuration for remote jobs, see :py:class:`~mlrun.feature_store.RunConfig`
+        default: null
+      - name: spark_context
+        doc: 'local spark session for spark ingestion, example for creating the spark
+          context: `spark = SparkSession.builder.appName("Spark function").getOrCreate()`
+          For remote spark ingestion, this should contain the remote spark service
+          name'
+        default: null
+      - name: overwrite
+        doc: 'delete the targets'' data prior to ingestion (default: True for non-scheduled
+          ingest - deletes the targets that are about to be ingested. False for scheduled
+          ingest - does not delete the target)'
+        default: null
+      outputs:
+      - default: ''
+      lineno: 8
+  description: Feature Store ingest function that runs the transformation graph on
+    the source of the featureset.
+  default_handler: ingest
+  disable_auto_mount: false
+  env: []
+  priority_class_name: ''
+  affinity: null
+verbose: false

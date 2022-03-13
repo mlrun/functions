@@ -3,7 +3,7 @@ metadata:
   name: bert-embeddings
   tag: ''
   hash: 77dd0921ea6d23ed5c0e944037e291e2cd6727fd
-  project: default
+  project: ''
   labels:
     framework: pytorch
   categories:

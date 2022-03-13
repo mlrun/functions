@@ -5,16 +5,16 @@ categories:
 description: BERT based sentiment classification model
 doc: ''
 example: sentiment_analysis_serving.ipynb
-generationDate: 2021-05-19:23-13
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   author: avia
   framework: pytorch
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.6.3
+mlrunVersion: 0.8.0
 name: sentiment-analysis-serving
-platformVersion: 3.0.0
+platformVersion: 3.2.0
 spec:
   filename: sentiment_analysis_serving.py
   handler: handler
@@ -23,4 +23,4 @@ spec:
   requirements:
   - transformers==3.0.2
 url: ''
-version: 0.0.1
+version: 0.9.0

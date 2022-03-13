@@ -2,12 +2,12 @@ kind: job
 metadata:
   name: pandas-profiling-report
   tag: ''
-  hash: c5707acf612f8b59a303dfa4dd717bcaa7667bc6
-  project: default
+  hash: 79fe77fb2920a8ffecfef2f614a0be494c2ea43b
+  project: ''
   labels:
     author: nicks
   categories:
-  - analysis
+  - data-analysis
 spec:
   command: ''
   args: []
@@ -29,12 +29,12 @@ spec:
         default: ''
       outputs:
       - default: ''
-      lineno: 9
+      lineno: 10
   description: Create Pandas Profiling Report from Dataset
   build:
-    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgcGFuZGFzX3Byb2ZpbGluZwoKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CmZyb20gbWxydW4uZGF0YXN0b3JlIGltcG9ydCBEYXRhSXRlbQoKZGVmIHBhbmRhc19wcm9maWxpbmdfcmVwb3J0KAogICAgY29udGV4dDogTUxDbGllbnRDdHgsCiAgICBkYXRhOiBEYXRhSXRlbSwKKSAtPiBOb25lOgogICAgIiIiQ3JlYXRlIGEgUGFuZGFzIFByb2ZpbGluZyBSZXBvcnQgZm9yIGEgZGF0YXNldC4KICAgIDpwYXJhbSBjb250ZXh0OiAgICAgICAgIHRoZSBmdW5jdGlvbiBjb250ZXh0CiAgICA6cGFyYW0gZGF0YTogICAgICAgICAgICBEYXRhc2V0IHRvIGNyZWF0ZSByZXBvcnQgZm9yCiAgICAiIiIKICAgIAogICAgZGYgPSBkYXRhLmFzX2RmKCkKICAgIAogICAgcHJvZmlsZSA9IGRmLnByb2ZpbGVfcmVwb3J0KHRpdGxlPSdQYW5kYXMgUHJvZmlsaW5nIFJlcG9ydCcpCiAgICAKICAgIGNvbnRleHQubG9nX2FydGlmYWN0KCdQYW5kYXMgUHJvZmlsaW5nIFJlcG9ydCcsCiAgICAgICAgICAgICAgICAgICAgICAgICBib2R5PXByb2ZpbGUudG9faHRtbCgpLAogICAgICAgICAgICAgICAgICAgICAgICAgbG9jYWxfcGF0aD0ncGFuZGFzX3Byb2ZpbGluZ19yZXBvcnQuaHRtbCcpCgo=
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgcGFuZGFzX3Byb2ZpbGluZwoKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CmZyb20gbWxydW4uZGF0YXN0b3JlIGltcG9ydCBEYXRhSXRlbQoKCmRlZiBwYW5kYXNfcHJvZmlsaW5nX3JlcG9ydCgKICAgIGNvbnRleHQ6IE1MQ2xpZW50Q3R4LAogICAgZGF0YTogRGF0YUl0ZW0sCikgLT4gTm9uZToKICAgICIiIkNyZWF0ZSBhIFBhbmRhcyBQcm9maWxpbmcgUmVwb3J0IGZvciBhIGRhdGFzZXQuCiAgICA6cGFyYW0gY29udGV4dDogICAgICAgICB0aGUgZnVuY3Rpb24gY29udGV4dAogICAgOnBhcmFtIGRhdGE6ICAgICAgICAgICAgRGF0YXNldCB0byBjcmVhdGUgcmVwb3J0IGZvcgogICAgIiIiCgogICAgZGYgPSBkYXRhLmFzX2RmKCkKCiAgICBwcm9maWxlID0gZGYucHJvZmlsZV9yZXBvcnQodGl0bGU9IlBhbmRhcyBQcm9maWxpbmcgUmVwb3J0IikKCiAgICBjb250ZXh0LmxvZ19hcnRpZmFjdCgKICAgICAgICAiUGFuZGFzIFByb2ZpbGluZyBSZXBvcnQiLAogICAgICAgIGJvZHk9cHJvZmlsZS50b19odG1sKCksCiAgICAgICAgbG9jYWxfcGF0aD0icGFuZGFzX3Byb2ZpbGluZ19yZXBvcnQuaHRtbCIsCiAgICApCg==
     commands:
-    - pip install pandas_profiling
     - python -m pip install pandas_profiling
-    code_origin: https://github.com/mlrun/functions.git#8a7816038d1e23362b562eb2229032d34320ecce:/home/michaell/projects/temp/functions/pandas_profiling_report/pandas_profiling_report.ipynb
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/pandas_profiling_report/pandas_profiling_report.py
+  affinity: null
 verbose: false

@@ -1,20 +1,20 @@
 apiVersion: v1
 categories:
-- ml
-- test
+- machine-learning
+- model-testing
 description: test a classifier using held-out or new data
 doc: README.md
 example: test_classifier.ipynb
-generationDate: 2021-05-19:23-13
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   author: yjb
   framework: sklearn
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: test-classifier
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: test_classifier.py
   handler: test_classifier
@@ -22,4 +22,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.9.0

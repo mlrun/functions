@@ -2,75 +2,18 @@ kind: serving
 metadata:
   name: sentiment-analysis-serving
   tag: ''
-  hash: 57f986a36042c46f266afcce1fc58d4a065bfd69
-  project: default
+  hash: 611580a53c5471a18097b1b9240fa1c2c8c1dcb6
+  project: ''
   labels:
     author: avia
     framework: pytorch
   categories:
-  - serving
-  - NLP
-  - BERT
-  - sentiment analysis
+  - model-serving
+  - machine-learning
 spec:
   command: ''
   args: []
   image: mlrun/ml-models
-  entry_points:
-    forward:
-      name: forward
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: input_ids
-        default: ''
-      - name: attention_mask
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 19
-    load:
-      name: load
-      doc: load bert model into class
-      parameters:
-      - name: self
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 30
-    predict:
-      name: predict
-      doc: predict function
-      parameters:
-      - name: self
-        default: ''
-      - name: body
-        doc: set of inputs for bert model to predict from
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 41
-    init_context:
-      name: init_context
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 64
-    handler:
-      name: handler
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      - name: event
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 67
   description: BERT based sentiment classification model
   min_replicas: 1
   max_replicas: 4
@@ -82,7 +25,7 @@ spec:
       name: sentiment-analysis-serving
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from /Users/aviasulin/PycharmProjects/mlrun/functions/sentiment_analysis_serving/sentiment_analysis_serving.py
+        nuclio.io/generated_by: function generated from /home/kali/functions/sentiment_analysis_serving/sentiment_analysis_serving.py
     spec:
       runtime: python:3.6
       handler: sentiment_analysis_serving:handler
@@ -97,7 +40,7 @@ spec:
   build:
     commands:
     - python -m pip install transformers==3.0.2
-    code_origin: http://github.com/aviaIguazio/functions.git#14dcd7dc800138844ca62ef9ac8ce1a3cbdf7dd1:/Users/aviasulin/PycharmProjects/mlrun/functions/sentiment_analysis_serving/sentiment_analysis_serving.py
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/sentiment_analysis_serving/sentiment_analysis_serving.py
   secret_sources: []
   affinity: null
 verbose: false

@@ -1,19 +1,19 @@
 apiVersion: v1
 categories:
-- data-movement
-- utils
+- data-preparation
+- etl
 description: load dask cluster with data
 doc: ''
 example: load_dask.ipynb
-generationDate: 2021-05-19:23-13
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   author: yjb
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: load-dask
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: load_dask.py
   handler: load_dask
@@ -21,4 +21,4 @@ spec:
   kind: dask
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.9.0

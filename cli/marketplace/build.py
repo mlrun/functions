@@ -147,11 +147,11 @@ def print_file_tree(title: str, path: Union[str, Path]):
 def write_change_log(readme_path: Path, change_log: ChangeLog):
     readme_path.touch(exist_ok=True)
     content = open(readme_path, "r").read()
-    with open(readme_path, "w") as f:
-        if change_log.changes_available:
+    if change_log.changes_available:
+        with open(readme_path, "w") as f:
             compiled_change_log = change_log.compile()
             f.write(compiled_change_log)
-        f.write(content)
+            f.write(content)
 
 
 def write_index_html(marketplace_root: Union[str, Path]):
@@ -210,7 +210,7 @@ def build_catalog_json(
             version = version_dir.name
 
             if version != "latest" and version != latest_version:
-                version_yaml_path = version_dir / "item.yaml"
+                version_yaml_path = version_dir / "src" / "item.yaml"
                 version_yaml = yaml.full_load(open(version_yaml_path, "r"))
                 version_yaml["generationDate"] = str(version_yaml["generationDate"])
                 catalog[source][channel][source_dir.name][version] = version_yaml

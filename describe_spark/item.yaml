@@ -1,16 +1,17 @@
 apiVersion: v1
-categories: []
+categories:
+- data-analysis
 description: ''
 doc: ''
 example: describe_spark.ipynb
-generationDate: 2021-05-19:22-41
+generationDate: 2021-11-18:12-28
 icon: ''
 labels: {}
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: describe-spark
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
   filename: describe-spark.py
   handler: describe_spark
@@ -18,4 +19,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.9.0

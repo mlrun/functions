@@ -1,10 +1,12 @@
 import json
+import os
 from collections import defaultdict
 from datetime import datetime
 from os import environ
 from typing import Dict, List, Set, Optional, Any, Union
 
 import pandas as pd
+import v3io
 from mlrun.config import config
 from mlrun.run import MLClientCtx
 from mlrun.utils import logger
@@ -30,8 +32,9 @@ from storey import (
 )
 from storey.dtypes import SlidingWindows
 from storey.steps import SampleWindow
-
 # Constants
+from v3io.dataplane import RaiseForStatus
+
 ISO_8061_UTC = "%Y-%m-%d %H:%M:%S.%f%z"
 FUNCTION_URI = "function_uri"
 MODEL = "model"
@@ -85,6 +88,7 @@ class EventStreamProcessor:
         aggregate_avg_period: str = "30s",
         v3io_access_key: Optional[str] = None,
         v3io_framesd: Optional[str] = None,
+        v3io_api: Optional[str] = None,
     ):
         self.project = project
         self.sample_window = sample_window
@@ -96,8 +100,14 @@ class EventStreamProcessor:
         self.aggregate_count_period = aggregate_count_period
         self.aggregate_avg_windows = aggregate_avg_windows or ["5m", "1h"]
         self.aggregate_avg_period = aggregate_avg_period
-        self.v3io_access_key = v3io_access_key or environ.get("V3IO_ACCESS_KEY")
+
         self.v3io_framesd = v3io_framesd or config.v3io_framesd
+        self.v3io_api = v3io_api or config.v3io_api
+
+        self.v3io_access_key = v3io_access_key or environ.get("V3IO_ACCESS_KEY")
+        self.model_monitoring_access_key = (
+            os.environ.get("MODEL_MONITORING_ACCESS_KEY") or self.v3io_access_key
+        )
 
         template = config.model_endpoint_monitoring.store_prefixes.default
 
@@ -110,11 +120,21 @@ class EventStreamProcessor:
         )
         self.tsdb_path = f"{self.tsdb_container}/{self.tsdb_path}"
 
-        self.parquet_path = template.format(project=project, kind="parquet")
+        self.parquet_path = config.model_endpoint_monitoring.store_prefixes.user_space.format(
+            project=project, kind="parquet"
+        )
 
         logger.info(
-            "Writer paths",
+            "V3IO Configuration",
+            v3io_access_key=self.v3io_access_key,
+            model_monitoring_access_key=self.model_monitoring_access_key,
+            default_store_prefix=config.model_endpoint_monitoring.store_prefixes.default,
+            user_space_store_prefix=config.model_endpoint_monitoring.store_prefixes.user_space,
+            v3io_api=self.v3io_api,
+            v3io_framesd=self.v3io_framesd,
+            kv_container=self.kv_container,
             kv_path=self.kv_path,
+            tsdb_container=self.tsdb_container,
             tsdb_path=self.tsdb_path,
             parquet_path=self.parquet_path,
         )
@@ -140,10 +160,18 @@ class EventStreamProcessor:
         self._flow = build_flow(
             [
                 SyncEmitSource(),
-                ProcessEndpointEvent(self.kv_container, self.kv_path),
+                ProcessEndpointEvent(
+                    kv_container=self.kv_container,
+                    kv_path=self.kv_path,
+                    v3io_access_key=self.v3io_access_key,
+                ),
                 FilterNotNone(),
                 FlatMap(lambda x: x),
-                MapFeatureNames(self.kv_container, self.kv_path),
+                MapFeatureNames(
+                    kv_container=self.kv_container,
+                    kv_path=self.kv_path,
+                    access_key=self.v3io_access_key,
+                ),
                 # Branch 1: Aggregate events, count averages and update TSDB and KV
                 [
                     AggregateByKey(
@@ -252,6 +280,11 @@ class EventStreamProcessor:
                         # Settings for _Batching
                         max_events=self.parquet_batching_max_events,
                         timeout_secs=self.parquet_batching_timeout_secs,
+                        # Settings for v3io storage
+                        storage_options={
+                            "v3io_api": self.v3io_api,
+                            "v3io_access_key": self.model_monitoring_access_key,
+                        },
                     ),
                 ],
             ]
@@ -350,10 +383,11 @@ class EventStreamProcessor:
 
 
 class ProcessEndpointEvent(MapClass):
-    def __init__(self, kv_container: str, kv_path: str, **kwargs):
+    def __init__(self, kv_container: str, kv_path: str, v3io_access_key: str, **kwargs):
         super().__init__(**kwargs)
         self.kv_container: str = kv_container
         self.kv_path: str = kv_path
+        self.v3io_access_key: str = v3io_access_key
         self.first_request: Dict[str, str] = dict()
         self.last_request: Dict[str, str] = dict()
         self.error_count: Dict[str, int] = defaultdict(int)
@@ -380,44 +414,23 @@ class ProcessEndpointEvent(MapClass):
         features = event.get("request", {}).get("inputs")
         predictions = event.get("resp", {}).get("outputs")
 
-        if not self.is_valid(
-            endpoint_id,
-            is_not_none,
-            timestamp,
-            ["when"],
-        ):
+        if not self.is_valid(endpoint_id, is_not_none, timestamp, ["when"],):
             return None
 
         if endpoint_id not in self.first_request:
             self.first_request[endpoint_id] = timestamp
         self.last_request[endpoint_id] = timestamp
 
+        if not self.is_valid(endpoint_id, is_not_none, request_id, ["request", "id"],):
+            return None
+        if not self.is_valid(endpoint_id, is_not_none, latency, ["microsec"],):
+            return None
         if not self.is_valid(
-            endpoint_id,
-            is_not_none,
-            request_id,
-            ["request", "id"],
+            endpoint_id, is_not_none, features, ["request", "inputs"],
         ):
             return None
         if not self.is_valid(
-            endpoint_id,
-            is_not_none,
-            latency,
-            ["microsec"],
-        ):
-            return None
-        if not self.is_valid(
-            endpoint_id,
-            is_not_none,
-            features,
-            ["request", "inputs"],
-        ):
-            return None
-        if not self.is_valid(
-            endpoint_id,
-            is_not_none,
-            predictions,
-            ["resp", "outputs"],
+            endpoint_id, is_not_none, predictions, ["resp", "outputs"],
         ):
             return None
 
@@ -468,6 +481,7 @@ class ProcessEndpointEvent(MapClass):
                 kv_container=self.kv_container,
                 kv_path=self.kv_path,
                 endpoint_id=endpoint_id,
+                access_key=self.v3io_access_key,
             )
             if endpoint_record:
                 first_request = endpoint_record.get(FIRST_REQUEST)
@@ -505,11 +519,10 @@ def enrich_even_details(event) -> Optional[dict]:
         return None
 
     version = event.get(VERSION)
-    versioned_model = f"{model}:{version}" if version else model
+    versioned_model = f"{model}:{version}" if version else f"{model}:latest"
 
     endpoint_id = create_model_endpoint_id(
-        function_uri=function_uri,
-        versioned_model=versioned_model,
+        function_uri=function_uri, versioned_model=versioned_model,
     )
 
     endpoint_id = str(endpoint_id)
@@ -575,10 +588,11 @@ class UnpackValues(MapClass):
 
 
 class MapFeatureNames(MapClass):
-    def __init__(self, kv_container: str, kv_path: str, **kwargs):
+    def __init__(self, kv_container: str, kv_path: str, access_key: str, **kwargs):
         super().__init__(**kwargs)
         self.kv_container = kv_container
         self.kv_path = kv_path
+        self.access_key = access_key
         self.feature_names = {}
         self.label_columns = {}
 
@@ -590,6 +604,7 @@ class MapFeatureNames(MapClass):
                 kv_container=self.kv_container,
                 kv_path=self.kv_path,
                 endpoint_id=endpoint_id,
+                access_key=self.access_key,
             )
             feature_names = endpoint_record.get(FEATURE_NAMES)
             feature_names = json.loads(feature_names) if feature_names else None
@@ -606,8 +621,10 @@ class MapFeatureNames(MapClass):
                 get_v3io_client().kv.update(
                     container=self.kv_container,
                     table_path=self.kv_path,
+                    access_key=self.access_key,
                     key=event[ENDPOINT_ID],
                     attributes={FEATURE_NAMES: json.dumps(feature_names)},
+                    raise_for_status=RaiseForStatus.always,
                 )
 
             if not label_columns:
@@ -619,12 +636,21 @@ class MapFeatureNames(MapClass):
                 get_v3io_client().kv.update(
                     container=self.kv_container,
                     table_path=self.kv_path,
+                    access_key=self.access_key,
                     key=event[ENDPOINT_ID],
                     attributes={LABEL_COLUMNS: json.dumps(label_columns)},
+                    raise_for_status=RaiseForStatus.always,
                 )
 
             self.label_columns[endpoint_id] = label_columns
             self.feature_names[endpoint_id] = feature_names
+
+            logger.info(
+                "Label columns", endpoint_id=endpoint_id, label_columns=label_columns
+            )
+            logger.info(
+                "Feature names", endpoint_id=endpoint_id, feature_names=feature_names
+            )
 
         feature_names = self.feature_names[endpoint_id]
         features = event[FEATURES]
@@ -637,6 +663,7 @@ class MapFeatureNames(MapClass):
         event[NAMED_PREDICTIONS] = {
             name: prediction for name, prediction in zip(label_columns, prediction)
         }
+        logger.info("Mapped event", event=event)
         return event
 
 
@@ -688,12 +715,13 @@ class InferSchema(MapClass):
 
 
 def get_endpoint_record(
-    kv_container: str, kv_path: str, endpoint_id: str
+    kv_container: str, kv_path: str, endpoint_id: str, access_key: str
 ) -> Optional[dict]:
     logger.info(
         f"Grabbing endpoint data",
-        endpoint_id=endpoint_id,
+        container=kv_container,
         table_path=kv_path,
+        key=endpoint_id,
     )
     try:
         endpoint_record = (
@@ -702,6 +730,8 @@ def get_endpoint_record(
                 container=kv_container,
                 table_path=kv_path,
                 key=endpoint_id,
+                access_key=access_key,
+                raise_for_status=v3io.dataplane.RaiseForStatus.always,
             )
             .output.item
         )
@@ -720,5 +750,5 @@ def init_context(context: MLClientCtx):
 
 def handler(context: MLClientCtx, event: Event):
     event_body = json.loads(event.body)
-    context.logger.info(event_body)
+    context.logger.debug(event_body)
     context.stream_processor.consume(event_body)

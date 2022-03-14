@@ -28,14 +28,18 @@ def _get_sub_dict_by_prefix(src: Dict, prefix_key: str) -> Dict[str, Any]:
     :param prefix_key:  Only keys with this prefix will be returned. The keys in the result dict will be without this
                         prefix.
     """
-    return {key.replace(prefix_key, ""): val for key, val in src.items() if key.startswith(prefix_key)}
+    return {
+        key.replace(prefix_key, ""): val
+        for key, val in src.items()
+        if key.startswith(prefix_key)
+    }
 
 
 def _get_dataframe(
-        context: MLClientCtx,
-        dataset: DataItem,
-        label_columns: Optional[Union[str, List[str]]] = None,
-        drop_columns: List[str] = None
+    context: MLClientCtx,
+    dataset: DataItem,
+    label_columns: Optional[Union[str, List[str]]] = None,
+    drop_columns: List[str] = None,
 ) -> Tuple[pd.DataFrame, Optional[Union[str, List[str]]]]:
     """
     Getting the DataFrame of the dataset and drop the columns accordingly.
@@ -60,7 +64,9 @@ def _get_dataframe(
             if all(col in dataset for col in drop_columns):
                 dataset = dataset.drop(drop_columns, axis=1)
             else:
-                context.logger.info('not all of the columns to drop in the dataset, drop columns process skipped')
+                context.logger.info(
+                    "not all of the columns to drop in the dataset, drop columns process skipped"
+                )
     return dataset, label_columns
 
 
@@ -99,21 +105,29 @@ def train(
     # Validate inputs:
     # Check if exactly one of them is supplied:
     if (test_set is None) == (train_test_split_size is None):
-        raise TypeError(f"Provide exactly one of test_set model and train_test_split_size")
+        raise TypeError(
+            f"Provide exactly one of test_set model and train_test_split_size"
+        )
 
     # Get DataFrame by URL or by FeatureVector:
     dataset, label_columns = _get_dataframe(
         context=context,
         dataset=dataset,
         label_columns=label_columns,
-        drop_columns=drop_columns
+        drop_columns=drop_columns,
     )
 
     # Parsing kwargs:
     # TODO: Use in xgb or lgbm train function.
-    train_kwargs = _get_sub_dict_by_prefix(src=context.parameters, prefix_key=KWArgsPrefixes.TRAIN)
-    fit_kwargs = _get_sub_dict_by_prefix(src=context.parameters, prefix_key=KWArgsPrefixes.FIT)
-    model_class_kwargs = _get_sub_dict_by_prefix(src=context.parameters, prefix_key=KWArgsPrefixes.MODEL_CLASS)
+    train_kwargs = _get_sub_dict_by_prefix(
+        src=context.parameters, prefix_key=KWArgsPrefixes.TRAIN
+    )
+    fit_kwargs = _get_sub_dict_by_prefix(
+        src=context.parameters, prefix_key=KWArgsPrefixes.FIT
+    )
+    model_class_kwargs = _get_sub_dict_by_prefix(
+        src=context.parameters, prefix_key=KWArgsPrefixes.MODEL_CLASS
+    )
 
     # Check if model or function:
     if hasattr(model_class, "train"):
@@ -176,11 +190,13 @@ def evaluate(
         context=context,
         dataset=dataset,
         label_columns=label_columns,
-        drop_columns=drop_columns
+        drop_columns=drop_columns,
     )
 
     # Parsing kwargs:
-    predict_kwargs = _get_sub_dict_by_prefix(src=context.parameters, prefix_key=KWArgsPrefixes.PREDICT)
+    predict_kwargs = _get_sub_dict_by_prefix(
+        src=context.parameters, prefix_key=KWArgsPrefixes.PREDICT
+    )
 
     x = dataset.drop(label_columns, axis=1)
     y = dataset[label_columns]
@@ -215,11 +231,13 @@ def predict(
         context=context,
         dataset=dataset,
         label_columns=label_columns,
-        drop_columns=drop_columns
+        drop_columns=drop_columns,
     )
 
     # Parsing kwargs:
-    predict_kwargs = _get_sub_dict_by_prefix(src=context.parameters, prefix_key=KWArgsPrefixes.PREDICT)
+    predict_kwargs = _get_sub_dict_by_prefix(
+        src=context.parameters, prefix_key=KWArgsPrefixes.PREDICT
+    )
 
     # loading the model, and getting the model handler:
     model_handler = AutoMLRun.load_model(model_path=model, context=context)
@@ -234,11 +252,11 @@ def predict(
 
     if not label_columns:
         if y_pred.shape[1] == 1:
-            label_columns = ['predicted_labels']
+            label_columns = ["predicted_labels"]
         else:
-            label_columns = [f'predicted_label_{i}' for i in range(y_pred.shape[1])]
+            label_columns = [f"predicted_label_{i}" for i in range(y_pred.shape[1])]
     elif isinstance(label_columns, str):
         label_columns = [label_columns]
 
     pred_df = pd.concat([dataset, pd.DataFrame(y_pred, columns=label_columns)], axis=1)
-    context.log_dataset('prediction', pred_df)
+    context.log_dataset("prediction", pred_df)

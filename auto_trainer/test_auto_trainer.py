@@ -1,9 +1,9 @@
 from typing import Tuple
+import os
 import mlrun
 import pandas as pd
 import pytest
 from mlrun import import_function
-
 
 from sklearn.datasets import (
     make_classification,
@@ -18,6 +18,22 @@ MODELS = [
     ("xgboost.XGBRegressor", "regression"),
     ("lightgbm.LGBMClassifier", "classification"),
 ]
+
+REQUIRED_ENV_VARS = [
+    "MLRUN_DBPATH",
+    "MLRUN_ARTIFACT_PATH",
+    "V3IO_USERNAME",
+    "V3IO_API",
+    "V3IO_ACCESS_KEY",
+]
+
+
+def _validate_environment_variables() -> bool:
+    """
+    Checks that all required Environment variables are set.
+    """
+    environment_keys = os.environ.keys()
+    return all(key in environment_keys for key in REQUIRED_ENV_VARS)
 
 
 def _get_dataset(problem_type: str, filepath: str = ".", n_classes: int = 2):
@@ -49,6 +65,10 @@ def _set_environment():
 
 
 @pytest.mark.parametrize("model", MODELS)
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
 def test_train(model: Tuple[str, str]):
     _set_environment()
 
@@ -80,6 +100,10 @@ def test_train(model: Tuple[str, str]):
 
 
 @pytest.mark.parametrize("model", MODELS)
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
 def test_train_evaluate(model: Tuple[str, str]):
     _set_environment()
 
@@ -122,6 +146,10 @@ def test_train_evaluate(model: Tuple[str, str]):
 
 
 @pytest.mark.parametrize("model", MODELS)
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
 def test_train_predict(model: Tuple[str, str]):
     _set_environment()
 

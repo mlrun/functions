@@ -4,18 +4,15 @@ import pandas as pd
 
 
 def get_class_data():
-    fn = code_to_function(name='test_gen_class_data',
-                          filename= os.path.dirname(os.path.dirname(__file__)) + "/gen_class_data/gen_class_data.py",
-                          handler="gen_class_data",
-                          kind="job",
-                          )
+    fn = import_function("hub://gen_class_data")
     fn.run(params={
         "n_samples": 10_000,
         "m_features": 5,
         "k_classes": 2,
+        "header": None,
         "weight": [0.5, 0.5],
         "sk_params": {"n_informative": 2},
-        "file_ext": "csv"}, local=True,artifact_path="./artifacts/inputs")
+        "file_ext": "csv"}, local=True, artifact_path="./artifacts/inputs")
 
 
 def xgb_trainer():
@@ -54,11 +51,12 @@ def test_xgb_test_code_to_function():
 
 def test_local_xgb_test_import_local_function():
     # importing data preparation function (gen_class_data) locally
-    fn = import_function("../gen_class_data/function.yaml")
+    fn = import_function("hub://gen_class_data")
     fn.run(params={
         "n_samples": 10_000,
         "m_features": 5,
         "k_classes": 2,
+        "header": None,
         "weight": [0.5, 0.5],
         "sk_params": {"n_informative": 2},
         "file_ext": "csv"}, local=True, artifact_path="./artifacts/inputs")

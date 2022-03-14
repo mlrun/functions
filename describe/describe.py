@@ -8,7 +8,12 @@ import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
-from mlrun.artifacts import PlotlyArtifact, TableArtifact, update_dataset_meta
+from mlrun.artifacts import (
+    DatasetArtifact,
+    PlotlyArtifact,
+    TableArtifact,
+    update_dataset_meta,
+)
 from mlrun.datastore import DataItem
 from mlrun.execution import MLClientCtx
 from plotly.subplots import make_subplots
@@ -77,13 +82,18 @@ def analyze(
     except Exception as e:
         context.logger.warn(f"Failed to create features correlation plot due to: {e}")
 
+    update = True
     artifact = table._artifact_url
     if artifact is None:  # dataset not stored
-        artifact = context.log_dataset(key="dataset", db_key=name, stats=True, df=df)
+        artifact = DatasetArtifact(
+            key="dataset", stats=True, df=df, extra_data=extra_data
+        )
+        artifact = context.log_artifact(artifact, db_key=name)
+        update = False
 
-    update_dataset_meta(artifact, extra_data=extra_data)
+    if update:
+        update_dataset_meta(artifact, extra_data=extra_data)
 
-    # TODO : log_dataset with extra data after bug fixing
     # TODO : Plots according to client wishes - like preform histogram on selected features.
     # TODO : 3-D plot on on selected features.
     # TODO : Reintegration plot on on selected features.

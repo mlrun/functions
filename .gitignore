@@ -140,6 +140,3 @@ dmypy.json
 .pyre/
 conda-setup-cpu
 conda-setup-gpu
-
-.config.yaml
-

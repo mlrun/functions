@@ -2,7 +2,7 @@ kind: spark
 metadata:
   name: read-snowflake
   tag: ''
-  hash: 07d8134b5c11256bd3f61c22dc6f8afe805ac319
+  hash: 6b3136745877a0939a768aad1843d33ca3d09be6
   project: default
 spec:
   command: ''

@@ -1,4 +1,5 @@
 import json
+import re
 import shutil
 import subprocess
 import uuid
@@ -323,7 +324,7 @@ def update_or_create_item(
 
 def update_html_resource_paths(html_path: Path, relative_path: str):
     if html_path.exists():
-        with open(html_path, "r") as html:
+        with open(html_path, "r", encoding='utf8') as html:
             parsed = BeautifulSoup(html.read(), features="html.parser")
 
         nodes = parsed.find_all(
@@ -339,7 +340,7 @@ def update_html_resource_paths(html_path: Path, relative_path: str):
         for node in nodes:
             node["src"] = f"{relative_path}{node['src']}"
 
-        with open(html_path, "w") as new_html:
+        with open(html_path, "w", encoding='utf8') as new_html:
             new_html.write(str(parsed))
 
 
@@ -397,23 +398,43 @@ def build_temp_project(source_dir, temp_root):
 
 
 def collect_temp_requirements(source_dir) -> Set[str]:
-    click.echo("[Temporary project] Starting to collect requirements...")
-    requirements = set()
+    """
+    Collecting all the packages requirements from all the directories inside the source dir.
+    Each package will be parsed without version constraints.
+    The requirements will be pulled from item.yaml requirements field and from requirements.txt files.
 
+    :param source_dir:  The source directory that contains all the MLRun functions.
+    :returns:           A set contains all the requirements.
+    """
+
+    click.echo("[Temporary project] Starting to collect requirements...")
+    requirements = set('mlrun')
+    version_chars = ['==', '~=', '<=', '>=', '<', '>', '!=']
+    mlrun_pkgs_regex = re.compile(r'^mlrun\[.+]$')
+    # Scanning all directories:
     for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
-        item_requirements = get_item_yaml_requirements(directory)
-        for item_requirement in item_requirements:
-            requirements.add(item_requirement)
+        # Getting the requirements from the item.yal requirements field:
+        function_requirements = get_item_yaml_requirements(directory)
+
+        # Getting the requirements from the requirements.txt file:
         requirements_txt = directory / "requirements.txt"
         if requirements_txt.exists():
             with open(requirements_txt, "r") as f:
-                lines = f.read().split("\n")
-                for line in filter(lambda l: l, lines):
-                    requirements.add(line)
+                function_requirements.extend(f.read().split("\n"))
 
-    parsed = set()
-    for req in requirements:
-        parsed.add(req.split("==")[0])
+        # Parsing the requirements by removing version constraints:
+        for requirement in function_requirements:
+            # For the case of mlrun[]
+            if mlrun_pkgs_regex.search(requirement):
+                continue
+            else:
+                # Looking for version constraint case:
+                for version_char in version_chars:
+                    if version_char in requirement:
+                        # Found version constraint and dropping the constraint:
+                        requirement = requirement.split(version_char)[0]
+                        break
+            requirements.add(requirement)
 
     if _verbose:
         click.echo(f"[Temporary project] Done requirements ({', '.join(requirements)})")
@@ -467,4 +488,5 @@ def build_temp_docs(temp_root, temp_docs):
 
 if __name__ == "__main__":
     # build_marketplace_cli()
+    # collect_temp_requirements('../../')
     build_marketplace("../../", "../../../marketp")

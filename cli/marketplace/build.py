@@ -408,7 +408,7 @@ def collect_temp_requirements(source_dir) -> Set[str]:
     """
 
     click.echo("[Temporary project] Starting to collect requirements...")
-    requirements = set('mlrun')
+    requirements = {'mlrun'}
     version_chars = ['==', '~=', '<=', '>=', '<', '>', '!=']
     mlrun_pkgs_regex = re.compile(r'^mlrun\[.+]$')
     # Scanning all directories:
@@ -420,7 +420,9 @@ def collect_temp_requirements(source_dir) -> Set[str]:
         requirements_txt = directory / "requirements.txt"
         if requirements_txt.exists():
             with open(requirements_txt, "r") as f:
-                function_requirements.extend(f.read().split("\n"))
+                # removing empty lines:
+                txt_file_requirements = list(filter(None, f.read().split("\n")))
+                function_requirements.extend(txt_file_requirements)
 
         # Parsing the requirements by removing version constraints:
         for requirement in function_requirements:

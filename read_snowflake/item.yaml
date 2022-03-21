@@ -1,0 +1,25 @@
+apiVersion: v1
+categories:
+- data-preparation
+- etl
+description: Query Snowflake and write results to parquet file
+doc: ''
+example: read_snowflake.ipynb
+generationDate: 2022-03-21:12-28
+icon: ''
+labels:
+  author: brennans
+  framework: spark
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 0.10.1
+name: read_snowflake
+platformVersion: 3.2.2
+spec:
+  filename: read_snowflake.py
+  handler: read_snowflake
+  image: .remote-spark-default-image
+  kind: spark
+  requirements:
+url: ''
+version: 0.10.1

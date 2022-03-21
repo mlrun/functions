@@ -2,42 +2,61 @@ kind: spark
 metadata:
   name: read-snowflake
   tag: ''
-  hash: 602943ec3228bba05d97cbc444d299ac168bfc32
+  hash: 07d8134b5c11256bd3f61c22dc6f8afe805ac319
   project: default
 spec:
   command: ''
   args: []
-  image: .snow-spark
+  image: '.remote-spark-default-image'
   build:
-    functionSourceCode: ZnJvbSBweXNwYXJrLnNxbCBpbXBvcnQgU3BhcmtTZXNzaW9uCgpkZWYgcmVhZF9zbm93Zmxha2UoY29uZmlnLCBkYiwgc2NoZW1hLCB3YXJlaG91c2UsIHF1ZXJ5LCB0YXJnZXQpOgogICAgIiIiCiAgICBSZWFkIFNub3dmbGFrZSBhbmQgd3JpdGUgcmVzdWx0cyB0byBwYXJxdWV0CiAgICA6cGFyYW0gZGI6IFNub3dmbGFrZSBkYXRhYmFzZQogICAgOnBhcmFtIHNjaGVtYTogU25vd2ZsYWtlIHNjaGVtYQogICAgOnBhcmFtIHdhcmVob3VzZTogU25vd2ZsYWtlIHdhcmVob3VzZSBpbnN0YW5jZQogICAgOnBhcmFtIHF1ZXJ5OiBTbm93Zmxha2UgcXVlcnkgc3RyaW5nCiAgICA6cGFyYW0gdGFyZ2V0OiBGdWxsIHBhdGggdG8gcGFycXVldCBvdXRwdXQgZWc6ICJ2M2lvOi8vYmlnZGF0YS9vdXRwdXQucGFycXVldCIKICAgICIiIgogICAgc3BhcmsgPSBTcGFya1Nlc3Npb24uYnVpbGRlci5hcHBOYW1lKCJyZWFkX3Nub3dmbGFrZSIpLmdldE9yQ3JlYXRlKCkKCiAgICBzZlVSTCA9IGNvbmZpZ1sic2ZVUkwiXQogICAgc2ZVc2VyID0gY29uZmlnWyJzZlVzZXIiXQogICAgc2ZQYXNzd29yZCA9IGNvbmZpZ1sic2ZQYXNzd29yZCJdCiAgICAKICAgIHNmT3B0aW9ucyA9IHsKICAgICAgInNmVVJMIiA6IHNmVVJMLAogICAgICAic2ZVc2VyIiA6IHNmVXNlciwKICAgICAgInNmUGFzc3dvcmQiIDogc2ZQYXNzd29yZCwKICAgICAgInNmRGF0YWJhc2UiIDogZGIsCiAgICAgICJzZlNjaGVtYSIgOiBzY2hlbWEsCiAgICAgICJzZldhcmVob3VzZSIgOiB3YXJlaG91c2UKICAgIH0KCiAgICBkZiA9IHNwYXJrLnJlYWQuZm9ybWF0KCJuZXQuc25vd2ZsYWtlLnNwYXJrLnNub3dmbGFrZSIpIFwKICAgICAgLm9wdGlvbnMoKipzZk9wdGlvbnMpIFwKICAgICAgLm9wdGlvbigicXVlcnkiLCAgcXVlcnkpIFwKICAgICAgLmxvYWQoKQogICAgCiAgICBkZi53cml0ZS5wYXJxdWV0KHRhcmdldCk=
+    functionSourceCode: aW1wb3J0IG9zCmZyb20gbWxydW4uZXhlY3V0aW9uIGltcG9ydCBNTENsaWVudEN0eApmcm9tIHB5c3Bhcmsuc3FsIGltcG9ydCBTcGFya1Nlc3Npb24KCmRlZiByZWFkX3Nub3dmbGFrZShjb250ZXh0OiBNTENsaWVudEN0eCwgCiAgICAgICAgICAgICAgICAgICB1cmw6IHN0ciwgCiAgICAgICAgICAgICAgICAgICB1c2VyOiBzdHIsIAogICAgICAgICAgICAgICAgICAgcGFzc3dvcmQ6c3RyLCAKICAgICAgICAgICAgICAgICAgIGRiOnN0ciwgCiAgICAgICAgICAgICAgICAgICBzY2hlbWE6c3RyLCAKICAgICAgICAgICAgICAgICAgIHdhcmVob3VzZTpzdHIsIAogICAgICAgICAgICAgICAgICAgcXVlcnk6c3RyLCAKICAgICAgICAgICAgICAgICAgIHRhcmdldDpzdHIpIC0+IE5vbmU6CiAgICAiIiIKICAgIFJlYWQgU25vd2ZsYWtlIGFuZCB3cml0ZSByZXN1bHRzIHRvIHBhcnF1ZXQKICAgIDpwYXJhbSBjb250ZXh0OiBNTFJ1biBmdW5jdGlvbiBjb250ZXh0CiAgICA6cGFyYW0gdXJsOiBTbm93Zmxha2UgVVJMIHNlY3JldAogICAgOnBhcmFtIHVzZXI6IFNub3dmbGFrZSB1c2VyIHNlY3JldAogICAgOnBhcmFtIHBhc3N3b3JkOiBTbm93Zmxha2UgdXNlciBwYXNzd29yZCBzZWNyZXQKICAgIDpwYXJhbSBkYjogU25vd2ZsYWtlIGRhdGFiYXNlCiAgICA6cGFyYW0gc2NoZW1hOiBTbm93Zmxha2Ugc2NoZW1hCiAgICA6cGFyYW0gd2FyZWhvdXNlOiBTbm93Zmxha2Ugd2FyZWhvdXNlIGluc3RhbmNlIGVnOiAiY29tcHV0ZV93aCIKICAgIDpwYXJhbSBxdWVyeTogU25vd2ZsYWtlIHF1ZXJ5IHN0cmluZyBlZzogInNlbGVjdCAqIGZyb20gY3VzdG9tZXIiCiAgICA6cGFyYW0gdGFyZ2V0OiBGdWxsIHBhdGggdG8gcGFycXVldCBvdXRwdXQgZWc6ICJ2M2lvOi8vYmlnZGF0YS9vdXRwdXQucGFycXVldCIKICAgICIiIgogICAgc3BhcmsgPSBTcGFya1Nlc3Npb24uYnVpbGRlci5hcHBOYW1lKCJyZWFkX3Nub3dmbGFrZSIpLmdldE9yQ3JlYXRlKCkKCiAgICBzZlVSTCA9IGNvbnRleHQuZ2V0X3NlY3JldCh1cmwpCiAgICBzZlVzZXIgPSBjb250ZXh0LmdldF9zZWNyZXQodXNlcikKICAgIHNmUGFzc3dvcmQgPSBjb250ZXh0LmdldF9zZWNyZXQocGFzc3dvcmQpCiAgICAKICAgIHNmT3B0aW9ucyA9IHsKICAgICAgInNmVVJMIiA6IHNmVVJMLAogICAgICAic2ZVc2VyIiA6IHNmVXNlciwKICAgICAgInNmUGFzc3dvcmQiIDogc2ZQYXNzd29yZCwKICAgICAgInNmRGF0YWJhc2UiIDogZGIsCiAgICAgICJzZlNjaGVtYSIgOiBzY2hlbWEsCiAgICAgICJzZldhcmVob3VzZSIgOiB3YXJlaG91c2UsCiAgICAgICJhcHBsaWNhdGlvbiIgOiBmIklndWF6aW8te29zLmdldGVudignU05PV0ZMQUtFX0FQUExJQ0FUSU9OJywgJ2FwcGxpY2F0aW9uJyl9IgogICAgfQoKICAgIGRmID0gc3BhcmsucmVhZC5mb3JtYXQoIm5ldC5zbm93Zmxha2Uuc3Bhcmsuc25vd2ZsYWtlIikgXAogICAgICAub3B0aW9ucygqKnNmT3B0aW9ucykgXAogICAgICAub3B0aW9uKCJxdWVyeSIsICBxdWVyeSkgXAogICAgICAubG9hZCgpCiAgICAKICAgIGRmLndyaXRlLnBhcnF1ZXQodGFyZ2V0KQ==
     commands: []
-    code_origin: https://github.com/brennanreese/functions.git#374880a8193858a9b903a92cc9fe057c52839666:read_snowflake.py
+    code_origin: https://github.com/brennanreese/functions.git#d0ad2d7efd40bda2cfe91a8b0b961b7927daf65b:read_snowflake.py
     origin_filename: read_snowflake.py
   entry_points:
     read_snowflake:
       name: read_snowflake
       doc: Read Snowflake and write results to parquet
       parameters:
-      - name: config
+      - name: context
+        type: MLClientCtx
+        doc: MLRun function context
+        default: ''
+      - name: url
+        type: str
+        doc: Snowflake URL secret
+        default: ''
+      - name: user
+        type: str
+        doc: Snowflake user secret
+        default: ''
+      - name: password
+        type: str
+        doc: Snowflake user password secret
         default: ''
       - name: db
+        type: str
         doc: Snowflake database
         default: ''
       - name: schema
+        type: str
         doc: Snowflake schema
         default: ''
       - name: warehouse
-        doc: Snowflake warehouse instance
+        type: str
+        doc: 'Snowflake warehouse instance eg: "compute_wh"'
         default: ''
       - name: query
-        doc: Snowflake query string
+        type: str
+        doc: 'Snowflake query string eg: "select * from customer"'
         default: ''
       - name: target
+        type: str
         doc: 'Full path to parquet output eg: "v3io://bigdata/output.parquet"'
         default: ''
       outputs:
       - default: ''
-      lineno: 3
+      lineno: 5
   description: ''
   default_handler: read_snowflake
   disable_auto_mount: false
@@ -73,7 +92,7 @@ spec:
     - local:///spark/jars/jmx_prometheus_javaagent-0.16.1.jar
     files:
     - local:///igz/java/libs/v3io-pyspark.zip
-  use_default_image: false
+  use_default_image: true
   monitoring:
     enabled: true
     exporter_jar: /spark/jars/jmx_prometheus_javaagent-0.16.1.jar

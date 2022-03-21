@@ -488,5 +488,4 @@ def build_temp_docs(temp_root, temp_docs):
 
 if __name__ == "__main__":
     # build_marketplace_cli()
-    # collect_temp_requirements('../../')
     build_marketplace("../../", "../../../marketp")

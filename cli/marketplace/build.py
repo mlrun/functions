@@ -1,4 +1,5 @@
 import json
+import pathlib
 import re
 import shutil
 import subprocess
@@ -96,6 +97,7 @@ def build_marketplace(
     marketplace_root = Path(marketplace_dir).resolve()
     marketplace_dir = marketplace_root / (source_name or source_dir.name) / channel
 
+    # Creating directories temp_root/functions, temp_root/docs and marketplace_root/functions/(development or master):
     temp_root.mkdir(parents=True)
     temp_docs.mkdir(parents=True)
     marketplace_dir.mkdir(parents=True, exist_ok=True)
@@ -104,7 +106,9 @@ def build_marketplace(
         print_file_tree("Source project structure", source_dir)
         print_file_tree("Current marketplace structure", marketplace_dir)
 
+    # Collecting all necessary requirements from requirement.txt files and item.yaml requirements:
     requirements = collect_temp_requirements(source_dir)
+    #
     sphinx_quickstart(temp_docs, requirements)
 
     build_temp_project(source_dir, temp_root)
@@ -121,6 +125,10 @@ def build_marketplace(
 
     update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log)
     build_catalog_json(marketplace_dir, (marketplace_root / "catalog.json"))
+    build_catalog_json(marketplace_dir, (marketplace_dir / "catalog.json"),
+                       with_functions_legacy=False,
+                       artifacts=True
+                       )
 
     if _verbose:
         print_file_tree("Resulting marketplace structure", marketplace_dir)
@@ -179,8 +187,34 @@ def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
         update_or_create_item(item_dir, marketplace_dir, temp_docs, change_log)
 
 
+def create_artifacts_section(
+    version_dir: Path,
+    function_name: str
+):
+    artifacts = {}
+
+    assert (version_dir / 'src').exists() and (version_dir / 'static').exists(),\
+        'Each version must contain src and static directories'
+
+    files_to_add = {
+        'doc': version_dir / 'static' / 'documentation.html',
+        'object': version_dir / 'src' / 'function.yaml',
+        'example': version_dir / 'src' / f'{function_name}.ipynb',
+        'source': version_dir / 'src' / f'{function_name}.py',
+    }
+
+    for field, path in files_to_add.items():
+        if path.exists():
+            artifacts[field] = '/'.join(path.parts[-2:])
+
+    return artifacts
+
+
 def build_catalog_json(
-    marketplace_dir: Union[str, Path], catalog_path: Union[str, Path]
+    marketplace_dir: Union[str, Path],
+    catalog_path: Union[str, Path],
+    with_functions_legacy: bool = True,
+    artifacts: bool = False,
 ):
     click.echo("Building catalog.json...")
 
@@ -190,10 +224,11 @@ def build_catalog_json(
 
     catalog = json.load(open(catalog_path, "r")) if catalog_path.exists() else {}
 
-    if source not in catalog:
-        catalog[source] = {}
-    if channel not in catalog[source]:
-        catalog[source][channel] = {}
+    if with_functions_legacy:
+        if source not in catalog:
+            catalog[source] = {}
+        if channel not in catalog[source]:
+            catalog[source][channel] = {}
     for source_dir in marketplace_dir.iterdir():
         if not source_dir.is_dir() or source_dir.name == "_static":
             continue
@@ -205,8 +240,15 @@ def build_catalog_json(
         latest_yaml["generationDate"] = str(latest_yaml["generationDate"])
 
         latest_version = latest_yaml["version"]
-
-        catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
+        if artifacts:
+            latest_yaml['artifacts'] = create_artifacts_section(
+                version_dir=latest_dir,
+                function_name=source_dir.name
+            )
+        if with_functions_legacy:
+            catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
+        else:
+            catalog[source_dir.name] = {"latest": latest_yaml}
         for version_dir in source_dir.iterdir():
             version = version_dir.name
 
@@ -214,7 +256,15 @@ def build_catalog_json(
                 version_yaml_path = version_dir / "src" / "item.yaml"
                 version_yaml = yaml.full_load(open(version_yaml_path, "r"))
                 version_yaml["generationDate"] = str(version_yaml["generationDate"])
-                catalog[source][channel][source_dir.name][version] = version_yaml
+                if artifacts:
+                    version_yaml['artifacts'] = create_artifacts_section(
+                        version_dir=version_dir,
+                        function_name=source_dir.name
+                    )
+                if with_functions_legacy:
+                    catalog[source][channel][source_dir.name][version] = version_yaml
+                else:
+                    catalog[source_dir.name][version] = version_yaml
 
     json.dump(catalog, open(catalog_path, "w"))
 
@@ -340,6 +390,12 @@ def update_html_resource_paths(html_path: Path, relative_path: str):
         for node in nodes:
             node["src"] = f"{relative_path}{node['src']}"
 
+        nodes = parsed.find_all(
+            lambda node: "_sources" in node.get("href", "")
+        )
+        for node in nodes:
+            node["href"] = f'../{node["href"].replace("_sources", "src").replace("_example", "")}'
+
         with open(html_path, "w", encoding='utf8') as new_html:
             new_html.write(str(parsed))
 
@@ -411,6 +467,7 @@ def collect_temp_requirements(source_dir) -> Set[str]:
     requirements = {'mlrun'}
     version_chars = ['==', '~=', '<=', '>=', '<', '>', '!=']
     mlrun_pkgs_regex = re.compile(r'^mlrun\[.+]$')
+
     # Scanning all directories:
     for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
         # Getting the requirements from the item.yal requirements field:
@@ -447,8 +504,21 @@ def collect_temp_requirements(source_dir) -> Set[str]:
 def sphinx_quickstart(
     temp_root: Union[str, Path], requirements: Optional[Set[str]] = None
 ):
+    """
+    Generate required files for a Sphinx project. sphinx-quickstart is an
+    interactive tool that asks some questions about your project and then
+    generates a complete documentation directory and sample Makefile to be used
+    with `sphinx-build`.
+
+    This function creates the conf.py configuration file for Sphinx-build based on
+    the conf.template file that located in cli/marketplace.
+
+    :param temp_root:       The project's temporary docs root.
+    :param requirements:    The set of requirements generated from `collect_temp_requirements`
+    """
     click.echo("[Sphinx] Running quickstart...")
 
+    # Executing sphinx-quickstart:
     subprocess.run(
         f"sphinx-quickstart --no-sep -p Marketplace -a Iguazio -l en -r '' {temp_root}",
         stdout=subprocess.PIPE,
@@ -456,14 +526,17 @@ def sphinx_quickstart(
         shell=True,
     )
 
+    # Editing requirements to the necessary format:
     requirements = requirements or ""
     if requirements:
         requirements = '", "'.join(requirements)
         requirements = f'"{requirements}"'
 
+    # Preparing target for conf.py:
     conf_py_target = temp_root / "conf.py"
     conf_py_target.unlink()
 
+    # Rendering the conf.template with the parameters into conf.py target:
     render_jinja(
         template_path=PROJECT_ROOT / "cli" / "marketplace" / "conf.template",
         output_path=conf_py_target,
@@ -478,6 +551,16 @@ def sphinx_quickstart(
 
 
 def build_temp_docs(temp_root, temp_docs):
+    """
+    Look recursively in <MODULE_PATH> for Python modules and packages and create
+    one reST file with automodule directives per package in the <OUTPUT_PATH>. The
+    <EXCLUDE_PATTERN>s can be file and/or directory patterns that will be excluded
+    from generation. Note: By default this script will not overwrite already
+    created files.
+
+    :param temp_root:   The project's temporary functions root.
+    :param temp_docs:   The project's temporary docs root.
+    """
     click.echo("[Sphinx] Running autodoc...")
 
     cmd = f"-F -o {temp_docs} {temp_root}"

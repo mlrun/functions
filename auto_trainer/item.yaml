@@ -4,7 +4,7 @@ categories:
 - model-training
 description: Automatic train, evaluate and predict functions for the ML frameworks - Scikit-Learn, XGBoost and LightGBM.
 doc: ''
-example: ''
+example: auto_trainer.ipynb
 generationDate: 2022-02-06:10-18
 icon: ''
 labels:

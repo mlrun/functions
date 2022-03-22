@@ -2,6 +2,8 @@
 
 ## `Snowflake_dask`
 
+![](img/snowflake-dask.png)
+
 This function query the data from a snowflake database and process the results 
 in parallel in a Dask cluster. 
 It will publish the dask dataframe in the cluster for other process to use.

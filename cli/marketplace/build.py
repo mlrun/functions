@@ -108,7 +108,7 @@ def build_marketplace(
 
     requirements = build_tags_json_and_collect_requirements(
         source_dir=source_dir,
-        marketplace_dir=marketplace_root,
+        marketplace_dir=marketplace_dir,
         tags_set={"categories", "kind"},
     )
 
@@ -135,7 +135,7 @@ def build_marketplace(
         marketplace_dir=marketplace_dir,
         catalog_path=(marketplace_dir / "catalog.json"),
         with_functions_legacy=False,
-        artifacts=True,
+        add_artifacts=True,
     )
 
     if _verbose:
@@ -195,32 +195,17 @@ def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
         update_or_create_item(item_dir, marketplace_dir, temp_docs, change_log)
 
 
-def create_artifacts_section(version_dir: Path, function_name: str):
-    artifacts = {}
-
-    assert (version_dir / "src").exists() and (
-        version_dir / "static"
-    ).exists(), "Each version must contain src and static directories"
-
-    files_to_add = {
-        "doc": version_dir / "static" / "documentation.html",
-        "object": version_dir / "src" / "function.yaml",
-        "example": version_dir / "src" / f"{function_name}.ipynb",
-        "source": version_dir / "src" / f"{function_name}.py",
-    }
-
-    for field, path in files_to_add.items():
-        if path.exists():
-            artifacts[field] = "/".join(path.parts[-2:])
-
-    return artifacts
+def add_object_and_source(function_name: str, yaml_obj):
+    yaml_obj["object"] = "src/function.yaml"
+    yaml_obj["source"] = f"src/{function_name}.py"
+    return yaml_obj
 
 
 def build_catalog_json(
     marketplace_dir: Union[str, Path],
     catalog_path: Union[str, Path],
     with_functions_legacy: bool = True,
-    artifacts: bool = False,
+    add_artifacts: bool = False,
 ):
     click.echo("Building catalog.json...")
 
@@ -246,10 +231,11 @@ def build_catalog_json(
         latest_yaml["generationDate"] = str(latest_yaml["generationDate"])
 
         latest_version = latest_yaml["version"]
-        if artifacts:
-            latest_yaml["artifacts"] = create_artifacts_section(
-                version_dir=latest_dir, function_name=source_dir.name
-            )
+        if add_artifacts:
+            latest_yaml = add_object_and_source(function_name=source_dir.name, yaml_obj=latest_yaml)
+            # latest_yaml["artifacts"] = create_artifacts_section(
+            #     version_dir=latest_dir, function_name=source_dir.name
+            # )
         if with_functions_legacy:
             catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
         else:
@@ -261,10 +247,8 @@ def build_catalog_json(
                 version_yaml_path = version_dir / "src" / "item.yaml"
                 version_yaml = yaml.full_load(open(version_yaml_path, "r"))
                 version_yaml["generationDate"] = str(version_yaml["generationDate"])
-                if artifacts:
-                    version_yaml["artifacts"] = create_artifacts_section(
-                        version_dir=version_dir, function_name=source_dir.name
-                    )
+                if add_artifacts:
+                    version_yaml = add_object_and_source(function_name=source_dir.name, yaml_obj=version_yaml)
                 if with_functions_legacy:
                     catalog[source][channel][source_dir.name][version] = version_yaml
                 else:

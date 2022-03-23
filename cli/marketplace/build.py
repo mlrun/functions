@@ -1,11 +1,9 @@
 import json
-import pathlib
-import re
 import shutil
 import subprocess
 import uuid
 from pathlib import Path
-from typing import Union, Optional, Set
+from typing import Union, Optional, Set, Dict, Tuple, List
 
 import click
 import yaml
@@ -17,7 +15,9 @@ from cli.helpers import (
     is_item_dir,
     render_jinja,
     PROJECT_ROOT,
-    get_item_yaml_requirements,
+    get_requirements_from_txt,
+    get_item_yaml_values,
+    remove_version_constraints,
 )
 from cli.marketplace.changelog import ChangeLog
 from cli.path_iterator import PathIterator
@@ -106,9 +106,12 @@ def build_marketplace(
         print_file_tree("Source project structure", source_dir)
         print_file_tree("Current marketplace structure", marketplace_dir)
 
-    # Collecting all necessary requirements from requirement.txt files and item.yaml requirements:
-    requirements = collect_temp_requirements(source_dir)
-    #
+    requirements = build_tags_json_and_collect_requirements(
+        source_dir=source_dir,
+        marketplace_dir=marketplace_root,
+        tags_set={"categories", "kind"},
+    )
+
     sphinx_quickstart(temp_docs, requirements)
 
     build_temp_project(source_dir, temp_root)
@@ -124,11 +127,16 @@ def build_marketplace(
     copy_static_resources(marketplace_dir, temp_docs)
 
     update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log)
-    build_catalog_json(marketplace_dir, (marketplace_root / "catalog.json"))
-    build_catalog_json(marketplace_dir, (marketplace_dir / "catalog.json"),
-                       with_functions_legacy=False,
-                       artifacts=True
-                       )
+    build_catalog_json(
+        marketplace_dir=marketplace_dir,
+        catalog_path=(marketplace_root / "catalog.json"),
+    )
+    build_catalog_json(
+        marketplace_dir=marketplace_dir,
+        catalog_path=(marketplace_dir / "catalog.json"),
+        with_functions_legacy=False,
+        artifacts=True,
+    )
 
     if _verbose:
         print_file_tree("Resulting marketplace structure", marketplace_dir)
@@ -187,25 +195,23 @@ def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
         update_or_create_item(item_dir, marketplace_dir, temp_docs, change_log)
 
 
-def create_artifacts_section(
-    version_dir: Path,
-    function_name: str
-):
+def create_artifacts_section(version_dir: Path, function_name: str):
     artifacts = {}
 
-    assert (version_dir / 'src').exists() and (version_dir / 'static').exists(),\
-        'Each version must contain src and static directories'
+    assert (version_dir / "src").exists() and (
+        version_dir / "static"
+    ).exists(), "Each version must contain src and static directories"
 
     files_to_add = {
-        'doc': version_dir / 'static' / 'documentation.html',
-        'object': version_dir / 'src' / 'function.yaml',
-        'example': version_dir / 'src' / f'{function_name}.ipynb',
-        'source': version_dir / 'src' / f'{function_name}.py',
+        "doc": version_dir / "static" / "documentation.html",
+        "object": version_dir / "src" / "function.yaml",
+        "example": version_dir / "src" / f"{function_name}.ipynb",
+        "source": version_dir / "src" / f"{function_name}.py",
     }
 
     for field, path in files_to_add.items():
         if path.exists():
-            artifacts[field] = '/'.join(path.parts[-2:])
+            artifacts[field] = "/".join(path.parts[-2:])
 
     return artifacts
 
@@ -241,9 +247,8 @@ def build_catalog_json(
 
         latest_version = latest_yaml["version"]
         if artifacts:
-            latest_yaml['artifacts'] = create_artifacts_section(
-                version_dir=latest_dir,
-                function_name=source_dir.name
+            latest_yaml["artifacts"] = create_artifacts_section(
+                version_dir=latest_dir, function_name=source_dir.name
             )
         if with_functions_legacy:
             catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
@@ -257,9 +262,8 @@ def build_catalog_json(
                 version_yaml = yaml.full_load(open(version_yaml_path, "r"))
                 version_yaml["generationDate"] = str(version_yaml["generationDate"])
                 if artifacts:
-                    version_yaml['artifacts'] = create_artifacts_section(
-                        version_dir=version_dir,
-                        function_name=source_dir.name
+                    version_yaml["artifacts"] = create_artifacts_section(
+                        version_dir=version_dir, function_name=source_dir.name
                     )
                 if with_functions_legacy:
                     catalog[source][channel][source_dir.name][version] = version_yaml
@@ -374,7 +378,7 @@ def update_or_create_item(
 
 def update_html_resource_paths(html_path: Path, relative_path: str):
     if html_path.exists():
-        with open(html_path, "r", encoding='utf8') as html:
+        with open(html_path, "r", encoding="utf8") as html:
             parsed = BeautifulSoup(html.read(), features="html.parser")
 
         nodes = parsed.find_all(
@@ -390,13 +394,13 @@ def update_html_resource_paths(html_path: Path, relative_path: str):
         for node in nodes:
             node["src"] = f"{relative_path}{node['src']}"
 
-        nodes = parsed.find_all(
-            lambda node: "_sources" in node.get("href", "")
-        )
+        nodes = parsed.find_all(lambda node: "_sources" in node.get("href", ""))
         for node in nodes:
-            node["href"] = f'../{node["href"].replace("_sources", "src").replace("_example", "")}'
+            node[
+                "href"
+            ] = f'../{node["href"].replace("_sources", "src").replace("_example", "")}'
 
-        with open(html_path, "w", encoding='utf8') as new_html:
+        with open(html_path, "w", encoding="utf8") as new_html:
             new_html.write(str(parsed))
 
 
@@ -453,52 +457,84 @@ def build_temp_project(source_dir, temp_root):
         click.echo(f"[Temporary project] Done project (item count: {item_count})")
 
 
-def collect_temp_requirements(source_dir) -> Set[str]:
+def build_tags_json_and_collect_requirements(
+    source_dir: Union[Path, str],
+    marketplace_dir: Union[Path, str],
+    tags_set: Set[str],
+) -> Set[str]:
     """
-    Collecting all the packages requirements from all the directories inside the source dir.
-    Each package will be parsed without version constraints.
-    The requirements will be pulled from item.yaml requirements field and from requirements.txt files.
+    Building tags.json by collecting values from item.yaml files
+    and collecting requirements from txt and item.yaml files.
 
-    :param source_dir:  The source directory that contains all the MLRun functions.
-    :returns:           A set contains all the requirements.
+    :param source_dir:          The source directory that contains all the MLRun functions.
+    :param marketplace_dir:     The marketplace directory, tags.json will be placed in it.
+    :param tags_set:            Set of tags to collect from item.yaml files.
+
+    :returns:                   A set of all the requirements.
+    """
+    tags, requirements = collect_values(source_dir=source_dir, tags_set=tags_set)
+
+    click.echo("Building tags.json...")
+    json.dump(tags, open(marketplace_dir / "tags.json", "w"))
+    return requirements
+
+
+def collect_values(
+    source_dir: Union[Path, str], tags_set: Set[str], with_requirements: bool = True
+) -> Union[Dict[str, List[str]], Tuple[Dict[str, List[str]], Set[str]]]:
+    """
+    Collecting all tags values from item.yaml files.
+    If the `with_requirements` flag is on than also collecting requirements from ite.yaml and requirements.txt files.
+
+    :param source_dir:          The source directory that contains all the MLRun functions.
+    :param tags_set:            Set of tags to collect from item.yaml files.
+    :param with_requirements:   flag for collecting requirements from item.yaml and requirements.txt files.
+
+    :returns:                   A dictionary contains the tags and requirements.
     """
 
-    click.echo("[Temporary project] Starting to collect requirements...")
-    requirements = {'mlrun'}
-    version_chars = ['==', '~=', '<=', '>=', '<', '>', '!=']
-    mlrun_pkgs_regex = re.compile(r'^mlrun\[.+]$')
+    tags = {t: set() for t in tags_set}
+    requirements = None
+
+    if with_requirements:
+        requirements = {"mlrun"}
+        tags_set.update({"requirements"})
+
+    values_to_collect = ", ".join(tags_set)
+    click.echo(f"[Temporary project] Starting to collect {values_to_collect}...")
 
     # Scanning all directories:
     for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
-        # Getting the requirements from the item.yal requirements field:
-        function_requirements = get_item_yaml_requirements(directory)
-
-        # Getting the requirements from the requirements.txt file:
-        requirements_txt = directory / "requirements.txt"
-        if requirements_txt.exists():
-            with open(requirements_txt, "r") as f:
-                # removing empty lines:
-                txt_file_requirements = list(filter(None, f.read().split("\n")))
-                function_requirements.extend(txt_file_requirements)
-
-        # Parsing the requirements by removing version constraints:
-        for requirement in function_requirements:
-            # For the case of mlrun[]
-            if mlrun_pkgs_regex.search(requirement):
-                continue
+        # Getting the values from item.yaml
+        item_yaml_values = get_item_yaml_values(item_path=directory, keys=tags_set)
+        for key, values in item_yaml_values.items():
+            if key == "requirements":
+                # Getting the requirements from the requirements.txt file:
+                txt_requirements = get_requirements_from_txt(
+                    requirements_path=directory
+                )
+                parsed_requirements = remove_version_constraints(
+                    values.union(txt_requirements)
+                )
+                requirements.update(parsed_requirements)
             else:
-                # Looking for version constraint case:
-                for version_char in version_chars:
-                    if version_char in requirement:
-                        # Found version constraint and dropping the constraint:
-                        requirement = requirement.split(version_char)[0]
-                        break
-            requirements.add(requirement)
+                tags[key] = tags[key].union(values)
 
     if _verbose:
-        click.echo(f"[Temporary project] Done requirements ({', '.join(requirements)})")
+        if with_requirements:
+            click.echo(
+                f"[Temporary project] Done requirements ({', '.join(requirements)})"
+            )
+        for tag_name, values in tags.items():
+            click.echo(f"[Temporary project] Done {tag_name} ({', '.join(values)})")
 
-    return requirements
+    # Change each value from set to list (to be json serializable):
+    tags = {key: list(val) for key, val in tags.items()}
+
+    if with_requirements:
+        return tags, requirements
+
+    return tags
 
 
 def sphinx_quickstart(

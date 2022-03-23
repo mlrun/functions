@@ -1,7 +1,9 @@
+import pathlib
 import subprocess
 from pathlib import Path
-from typing import Union, List, Set
+from typing import Union, List, Set, Iterable, Dict
 import sys
+import re
 
 import yaml
 from jinja2 import Template
@@ -38,7 +40,10 @@ def render_jinja(
 def install_pipenv():
     print("Installing pipenv...")
     pipenv_install: subprocess.CompletedProcess = subprocess.run(
-        f"export PIP_NO_INPUT=1;pip install pipenv", stdout=sys.stdout, stderr=subprocess.PIPE, shell=True
+        f"export PIP_NO_INPUT=1;pip install pipenv",
+        stdout=sys.stdout,
+        stderr=subprocess.PIPE,
+        shell=True,
     )
     exit_on_non_zero_return(pipenv_install)
 
@@ -81,14 +86,91 @@ def install_requirements(directory: str, requirements: Union[List[str], Set[str]
     exit_on_non_zero_return(requirements_install)
 
 
-def get_item_yaml_requirements(item_path: str):
-    item_path = Path(item_path)
-    if item_path.is_dir():
-        item_path = item_path / "item.yaml"
-    with open(item_path, "r") as f:
-        item = yaml.full_load(f)
-    requirements = item.get("spec", {}).get("requirements", [])
-    requirements = requirements or []
+def get_item_yaml_values(
+    item_path: pathlib.Path, keys: Union[str, Set[str]]
+) -> Dict[str, Set[str]]:
+    """
+    Getting value from item.yaml requested field.
+
+    :param item_path:       The path to the item.yaml file or the parent dir of the item.yaml.
+    :param keys:            The fields names that contains the required values to collect,
+                            also looks for the fields inside `spec` inside dict.
+
+    :returns:               Set with all the values inside key.
+    """
+    if isinstance(keys, str):
+        keys = {keys}
+    values_dict = {}
+
+    for key in keys:
+        values_set = set()
+        item_path = Path(item_path)
+        if item_path.is_dir():
+            item_path = item_path / "item.yaml"
+        with open(item_path, "r") as f:
+            item = yaml.full_load(f)
+        if key in item:
+            values = item.get(key, "")
+        elif "spec" in item and key in item["spec"]:
+            values = item["spec"].get(key, "") or ""
+        else:
+            values = ""
+
+        if values:
+            if isinstance(values, list):
+                values_set = set(values)
+            else:
+                values_set.add(values)
+        values_dict[key] = values_set
+    return values_dict
+
+
+def remove_version_constraints(requirements: Iterable) -> Set[str]:
+    """
+    Remove version constraints from requirements.
+    For example:
+        pytorch==1.2.3 -> pytorch
+    Also ignores mlrun[] requirements.
+
+    :param requirements:    An iterable that contains all the requirements as strings.
+
+    :returns:                A set with all the parsed requirements.
+    """
+    version_chars = ["==", "~=", "<=", ">=", "<", ">", "!="]
+    mlrun_pkgs_regex = re.compile(r"^mlrun\[.+]$")
+    parsed_requirements = set()
+    # Parsing the requirements by removing version constraints:
+    for requirement in requirements:
+        # For the case of mlrun[]
+        if mlrun_pkgs_regex.search(requirement):
+            continue
+        else:
+            # Looking for version constraint case:
+            for version_char in version_chars:
+                if version_char in requirement:
+                    # Found version constraint and dropping the constraint:
+                    requirement = requirement.split(version_char)[0]
+                    break
+        parsed_requirements.add(requirement)
+
+    return parsed_requirements
+
+
+def get_requirements_from_txt(requirements_path: str):
+    """
+    Collecting all requirements from requirements.txt.
+
+    :param requirements_path:   The path to the requirements.txt or the parent dir of this file.
+    """
+    requirements_path = Path(requirements_path)
+    if requirements_path.is_dir():
+        requirements_path = requirements_path / "requirements.txt"
+    if not requirements_path.exists():
+        return set()
+    with open(requirements_path, "r") as f:
+        # removing empty lines:
+        requirements = set(filter(None, f.read().split("\n")))
+
     return requirements
 
 

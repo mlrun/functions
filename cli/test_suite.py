@@ -66,7 +66,7 @@ def test_example(root_dir="."):
     #         continue
     #
     #     # install_python(directory)
-    #     item_requirements = list(get_item_yaml_values(directory, 'requirements'))
+    #     item_requirements = list(get_item_yaml_values(directory, 'requirements')['requirements'])
     #     install_requirements(directory, ["papermill", "jupyter"] + item_requirements)
     #
     #     # for notebook in notebooks:
@@ -217,7 +217,7 @@ class TestPY(TestSuite):
     def run(self, path: Union[str, Path]):
         print("PY run path {}".format(path))
         install_python(path)
-        item_requirements = list(get_item_yaml_values(path, 'requirements'))
+        item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
         install_requirements(path, ["pytest"] + item_requirements)
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
@@ -353,7 +353,7 @@ class TestIPYNB(TestSuite):
     def run(self, path: Union[str, Path]) -> TestResult:
         print("IPYNB run path {}".format(path))
         install_python(path)
-        item_requirements = list(get_item_yaml_values(path, 'requirements'))
+        item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
         #install_requirements(path, ["papermill", "jupyter"] + item_requirements)
         install_requirements(path, ["papermill"] + item_requirements)
 

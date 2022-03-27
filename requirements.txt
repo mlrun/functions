@@ -9,5 +9,6 @@ nuclio-jupyter
 myst_nb
 black
 isort
+markupsafe
 sphinx==3.5.4
 sphinx-book-theme==0.1.2

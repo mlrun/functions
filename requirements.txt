@@ -1,12 +1,12 @@
 wheel
 bs4
-mlrun
 jinja2==3.0.1
 pyyaml
 click
 pipenv
 nuclio-jupyter
 myst_nb
+black
 isort
 sphinx==3.5.4
 sphinx-book-theme==0.1.2

@@ -278,7 +278,7 @@ def update_or_create_item(
     build_path = temp_docs / "_build"
 
     documentation_html = build_path / documentation_html_name
-    update_html_resource_paths(documentation_html, relative_path="../../../")
+    update_html_resource_paths(documentation_html, relative_path="../../../", with_download=False)
 
     example_html = build_path / example_html_name
     update_html_resource_paths(example_html, relative_path="../../../")
@@ -360,7 +360,7 @@ def update_or_create_item(
     pass
 
 
-def update_html_resource_paths(html_path: Path, relative_path: str):
+def update_html_resource_paths(html_path: Path, relative_path: str, with_download: bool = True):
     if html_path.exists():
         with open(html_path, "r", encoding="utf8") as html:
             parsed = BeautifulSoup(html.read(), features="html.parser")
@@ -377,12 +377,17 @@ def update_html_resource_paths(html_path: Path, relative_path: str):
         )
         for node in nodes:
             node["src"] = f"{relative_path}{node['src']}"
-
-        nodes = parsed.find_all(lambda node: "_sources" in node.get("href", ""))
-        for node in nodes:
-            node[
-                "href"
-            ] = f'../{node["href"].replace("_sources", "src").replace("_example", "")}'
+        if not with_download:
+            # Removing download option from documentation:
+            nodes = [node for node in parsed(['a']) if 'dropdown-buttons' in node.get('class')]
+            for node in nodes:
+                node.decompose()
+        else:
+            nodes = parsed.find_all(lambda node: "_sources" in node.get("href", ""))
+            for node in nodes:
+                node[
+                    "href"
+                ] = f'../{node["href"].replace("_sources", "src").replace("_example", "")}'
 
         with open(html_path, "w", encoding="utf8") as new_html:
             new_html.write(str(parsed))

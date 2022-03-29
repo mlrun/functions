@@ -1,6 +1,5 @@
 wheel
 bs4
-mlrun
 jinja2==3.0.1
 pyyaml
 click

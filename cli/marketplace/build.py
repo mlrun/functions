@@ -243,7 +243,7 @@ def build_catalog_json(
         for version_dir in source_dir.iterdir():
             version = version_dir.name
 
-            if version != "latest" and version != latest_version:
+            if version != "latest":
                 version_yaml_path = version_dir / "src" / "item.yaml"
                 version_yaml = yaml.full_load(open(version_yaml_path, "r"))
                 version_yaml["generationDate"] = str(version_yaml["generationDate"])

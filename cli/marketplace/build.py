@@ -486,7 +486,8 @@ def collect_values(
     requirements = None
 
     if with_requirements:
-        requirements = {"mlrun"}
+        # Initialize with special requirements:
+        requirements = {"mlrun", "azureml"}
         tags_set.update({"requirements"})
 
     values_to_collect = ", ".join(tags_set)

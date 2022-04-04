@@ -18,6 +18,7 @@ from cli.helpers import (
     get_requirements_from_txt,
     get_item_yaml_values,
     remove_version_constraints,
+    get_mock_requirements
 )
 from cli.marketplace.changelog import ChangeLog
 from cli.path_iterator import PathIterator
@@ -106,12 +107,19 @@ def build_marketplace(
         print_file_tree("Source project structure", source_dir)
         print_file_tree("Current marketplace structure", marketplace_dir)
 
-    requirements = build_tags_json_and_collect_requirements(
+    tags = collect_values_from_items(
         source_dir=source_dir,
-        marketplace_dir=marketplace_dir,
         tags_set={"categories", "kind"},
     )
+    click.echo("Building tags.json...")
+    json.dump(tags, open(marketplace_dir / "tags.json", "w"))
 
+    requirements = get_mock_requirements(source_dir)
+
+    if _verbose:
+        click.echo(
+            f"[Temporary project] Done requirements ({', '.join(requirements)})"
+        )
     sphinx_quickstart(temp_docs, requirements)
 
     build_temp_project(source_dir, temp_root)
@@ -446,89 +454,41 @@ def build_temp_project(source_dir, temp_root):
         click.echo(f"[Temporary project] Done project (item count: {item_count})")
 
 
-def build_tags_json_and_collect_requirements(
-    source_dir: Union[Path, str],
-    marketplace_dir: Union[Path, str],
-    tags_set: Set[str],
-) -> Set[str]:
-    """
-    Building tags.json by collecting values from item.yaml files
-    and collecting requirements from txt and item.yaml files.
-
-    :param source_dir:          The source directory that contains all the MLRun functions.
-    :param marketplace_dir:     The marketplace directory, tags.json will be placed in it.
-    :param tags_set:            Set of tags to collect from item.yaml files.
-
-    :returns:                   A set of all the requirements.
-    """
-    tags, requirements = collect_values(source_dir=source_dir, tags_set=tags_set)
-
-    click.echo("Building tags.json...")
-    json.dump(tags, open(marketplace_dir / "tags.json", "w"))
-    return requirements
-
-
-def collect_values(
-    source_dir: Union[Path, str], tags_set: Set[str], with_requirements: bool = True
-) -> Union[Dict[str, List[str]], Tuple[Dict[str, List[str]], Set[str]]]:
+def collect_values_from_items(
+    source_dir: Union[Path, str], tags_set: Set[str]
+) -> Dict[str, List[str]]:
     """
     Collecting all tags values from item.yaml files.
     If the `with_requirements` flag is on than also collecting requirements from ite.yaml and requirements.txt files.
 
     :param source_dir:          The source directory that contains all the MLRun functions.
     :param tags_set:            Set of tags to collect from item.yaml files.
-    :param with_requirements:   flag for collecting requirements from item.yaml and requirements.txt files.
 
     :returns:                   A dictionary contains the tags and requirements.
     """
 
     tags = {t: set() for t in tags_set}
-    requirements = None
 
-    if with_requirements:
-        # Initialize with special requirements:
-        requirements = {"mlrun", "azureml"}
-        tags_set.update({"requirements"})
-
-    values_to_collect = ", ".join(tags_set)
-    click.echo(f"[Temporary project] Starting to collect {values_to_collect}...")
+    click.echo(f"[Temporary project] Starting to collect {', '.join(tags_set)}...")
 
     # Scanning all directories:
     for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
         # Getting the values from item.yaml
         item_yaml_values = get_item_yaml_values(item_path=directory, keys=tags_set)
         for key, values in item_yaml_values.items():
-            if key == "requirements":
-                # Getting the requirements from the requirements.txt file:
-                txt_requirements = get_requirements_from_txt(
-                    requirements_path=directory
-                )
-                parsed_requirements = remove_version_constraints(
-                    values.union(txt_requirements)
-                )
-                requirements.update(parsed_requirements)
-            else:
-                tags[key] = tags[key].union(values)
+            tags[key] = tags[key].union(values)
 
-    if _verbose:
-        if with_requirements:
-            click.echo(
-                f"[Temporary project] Done requirements ({', '.join(requirements)})"
-            )
-        for tag_name, values in tags.items():
-            click.echo(f"[Temporary project] Done {tag_name} ({', '.join(values)})")
+    for tag_name, values in tags.items():
+        click.echo(f"[Temporary project] Done {tag_name} ({', '.join(values)})")
 
     # Change each value from set to list (to be json serializable):
     tags = {key: list(val) for key, val in tags.items()}
-
-    if with_requirements:
-        return tags, requirements
 
     return tags
 
 
 def sphinx_quickstart(
-    temp_root: Union[str, Path], requirements: Optional[Set[str]] = None
+    temp_root: Union[str, Path], requirements: Optional[List[str]] = None
 ):
     """
     Generate required files for a Sphinx project. sphinx-quickstart is an
@@ -540,7 +500,7 @@ def sphinx_quickstart(
     the conf.template file that located in cli/marketplace.
 
     :param temp_root:       The project's temporary docs root.
-    :param requirements:    The set of requirements generated from `collect_temp_requirements`
+    :param requirements:    The list of requirements generated from `get_mock_requirements`
     """
     click.echo("[Sphinx] Running quickstart...")
 
@@ -599,4 +559,4 @@ def build_temp_docs(temp_root, temp_docs):
 
 if __name__ == "__main__":
     # build_marketplace_cli()
-    build_marketplace("../../", "../../../marketp")
+    build_marketplace("../../", "../../../marketp", verbose=True)

@@ -4,7 +4,8 @@ from pathlib import Path
 from typing import Union, List, Set, Iterable, Dict
 import sys
 import re
-
+from glob import iglob
+import itertools as it
 import yaml
 from jinja2 import Template
 
@@ -125,6 +126,40 @@ def get_item_yaml_values(
     return values_dict
 
 
+def get_mock_requirements(source_dir: Union[str, Path]) -> List[str]:
+    """
+    Getting all requirements from .py files inside all the subdirectories of the given source dir.
+    Only the files with the same name as their parent directory are taken in consideration.
+    The requirements are being collected from rows inside the files that starts with `from` or `import`
+    and parsed only to the base package.
+
+    :param source_dir: The directory that contains all the functions.
+
+    :return: A list of all the requirements.
+    """
+    mock_reqs = set()
+
+    if isinstance(source_dir, Path):
+        source_dir = source_dir.__str__()
+
+    # Iterating over all .py files in the subdirectories:
+    for filename in iglob(f"{source_dir}/**/*.py"):
+        file_path = Path(filename)
+        if file_path.parent.name != file_path.stem:
+            # Skipping test files
+            continue
+        # Getting all packages:
+        with open(filename, 'r') as f:
+            lines = list(filter(None, f.read().split("\n")))
+            for line in lines:
+                words = line.split(' ')
+                words = [w for w in words if w]
+                if words and (words[0] == 'from' or words[0] == 'import'):
+                    mock_reqs.add(words[1].split('.')[0])
+
+    return sorted(mock_reqs)
+
+
 def remove_version_constraints(requirements: Iterable) -> Set[str]:
     """
     Remove version constraints from requirements.
@@ -162,6 +197,7 @@ def get_requirements_from_txt(requirements_path: str):
 
     :param requirements_path:   The path to the requirements.txt or the parent dir of this file.
     """
+    requirements = set()
     requirements_path = Path(requirements_path)
     if requirements_path.is_dir():
         requirements_path = requirements_path / "requirements.txt"
@@ -169,9 +205,11 @@ def get_requirements_from_txt(requirements_path: str):
         return set()
     with open(requirements_path, "r") as f:
         # removing empty lines:
-        requirements = set(filter(None, f.read().split("\n")))
+        reqs = set(filter(None, f.read().split("\n")))
 
-    return requirements
+    for req in reqs:
+        requirements.update({req, get_base_pkg(req)})
+    return sorted(requirements)
 
 
 def exit_on_non_zero_return(completed_process: subprocess.CompletedProcess):

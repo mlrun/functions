@@ -32,4 +32,4 @@ spec:
   - azureml-train-automl-client==1.33.0
   - plotly~=5.4
 url: ''
-version: 0.9.3
+version: 0.9.4

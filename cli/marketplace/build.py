@@ -16,7 +16,7 @@ from cli.helpers import (
     render_jinja,
     PROJECT_ROOT,
     get_item_yaml_values,
-    get_mock_requirements
+    get_mock_requirements,
 )
 from cli.marketplace.changelog import ChangeLog
 from cli.path_iterator import PathIterator
@@ -115,9 +115,7 @@ def build_marketplace(
     requirements = get_mock_requirements(source_dir)
 
     if _verbose:
-        click.echo(
-            f"[Temporary project] Done requirements ({', '.join(requirements)})"
-        )
+        click.echo(f"[Temporary project] Done requirements ({', '.join(requirements)})")
     sphinx_quickstart(temp_docs, requirements)
 
     build_temp_project(source_dir, temp_root)
@@ -238,10 +236,10 @@ def build_catalog_json(
 
         latest_version = latest_yaml["version"]
         if add_artifacts:
-            latest_yaml = add_object_and_source(function_name=source_dir.name, yaml_obj=latest_yaml)
-            # latest_yaml["artifacts"] = create_artifacts_section(
-            #     version_dir=latest_dir, function_name=source_dir.name
-            # )
+            latest_yaml = add_object_and_source(
+                function_name=source_dir.name, yaml_obj=latest_yaml
+            )
+
         if with_functions_legacy:
             catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
         else:
@@ -254,7 +252,9 @@ def build_catalog_json(
                 version_yaml = yaml.full_load(open(version_yaml_path, "r"))
                 version_yaml["generationDate"] = str(version_yaml["generationDate"])
                 if add_artifacts:
-                    version_yaml = add_object_and_source(function_name=source_dir.name, yaml_obj=version_yaml)
+                    version_yaml = add_object_and_source(
+                        function_name=source_dir.name, yaml_obj=version_yaml
+                    )
                 if with_functions_legacy:
                     catalog[source][channel][source_dir.name][version] = version_yaml
                 else:
@@ -284,7 +284,9 @@ def update_or_create_item(
     build_path = temp_docs / "_build"
 
     documentation_html = build_path / documentation_html_name
-    update_html_resource_paths(documentation_html, relative_path="../../../", with_download=False)
+    update_html_resource_paths(
+        documentation_html, relative_path="../../../", with_download=False
+    )
 
     example_html = build_path / example_html_name
     update_html_resource_paths(example_html, relative_path="../../../")
@@ -366,7 +368,9 @@ def update_or_create_item(
     pass
 
 
-def update_html_resource_paths(html_path: Path, relative_path: str, with_download: bool = True):
+def update_html_resource_paths(
+    html_path: Path, relative_path: str, with_download: bool = True
+):
     if html_path.exists():
         with open(html_path, "r", encoding="utf8") as html:
             parsed = BeautifulSoup(html.read(), features="html.parser")
@@ -383,9 +387,12 @@ def update_html_resource_paths(html_path: Path, relative_path: str, with_downloa
         )
         for node in nodes:
             node["src"] = f"{relative_path}{node['src']}"
-        if not with_download and hasattr(parsed, 'a'):
+        if not with_download:
             # Removing download option from documentation:
-            nodes = [node for node in parsed(['a']) if 'dropdown-buttons' in node.get('class')]
+            nodes = parsed.find_all(
+                lambda node: node.name == "a"
+                and "dropdown-buttons" in node.get("class")
+            )
             for node in nodes:
                 node.decompose()
         else:

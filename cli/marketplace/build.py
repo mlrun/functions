@@ -15,9 +15,7 @@ from cli.helpers import (
     is_item_dir,
     render_jinja,
     PROJECT_ROOT,
-    get_requirements_from_txt,
     get_item_yaml_values,
-    remove_version_constraints,
     get_mock_requirements
 )
 from cli.marketplace.changelog import ChangeLog
@@ -385,7 +383,7 @@ def update_html_resource_paths(html_path: Path, relative_path: str, with_downloa
         )
         for node in nodes:
             node["src"] = f"{relative_path}{node['src']}"
-        if not with_download:
+        if not with_download and hasattr(parsed, 'a'):
             # Removing download option from documentation:
             nodes = [node for node in parsed(['a']) if 'dropdown-buttons' in node.get('class')]
             for node in nodes:

@@ -1,11 +1,9 @@
 import pathlib
 import subprocess
 from pathlib import Path
-from typing import Union, List, Set, Iterable, Dict
+from typing import Union, List, Set, Dict
 import sys
-import re
 from glob import iglob
-import itertools as it
 import yaml
 from jinja2 import Template
 
@@ -158,58 +156,6 @@ def get_mock_requirements(source_dir: Union[str, Path]) -> List[str]:
                     mock_reqs.add(words[1].split('.')[0])
 
     return sorted(mock_reqs)
-
-
-def remove_version_constraints(requirements: Iterable) -> Set[str]:
-    """
-    Remove version constraints from requirements.
-    For example:
-        pytorch==1.2.3 -> pytorch
-    Also ignores mlrun[] requirements.
-
-    :param requirements:    An iterable that contains all the requirements as strings.
-
-    :returns:                A set with all the parsed requirements.
-    """
-    version_chars = ["==", "~=", "<=", ">=", "<", ">", "!="]
-    mlrun_pkgs_regex = re.compile(r"^mlrun\[.+]$")
-    parsed_requirements = set()
-    # Parsing the requirements by removing version constraints:
-    for requirement in requirements:
-        # For the case of mlrun[]
-        if mlrun_pkgs_regex.search(requirement):
-            continue
-        else:
-            # Looking for version constraint case:
-            for version_char in version_chars:
-                if version_char in requirement:
-                    # Found version constraint and dropping the constraint:
-                    requirement = requirement.split(version_char)[0]
-                    break
-        parsed_requirements.add(requirement)
-
-    return parsed_requirements
-
-
-def get_requirements_from_txt(requirements_path: str):
-    """
-    Collecting all requirements from requirements.txt.
-
-    :param requirements_path:   The path to the requirements.txt or the parent dir of this file.
-    """
-    requirements = set()
-    requirements_path = Path(requirements_path)
-    if requirements_path.is_dir():
-        requirements_path = requirements_path / "requirements.txt"
-    if not requirements_path.exists():
-        return set()
-    with open(requirements_path, "r") as f:
-        # removing empty lines:
-        reqs = set(filter(None, f.read().split("\n")))
-
-    for req in reqs:
-        requirements.update({req, get_base_pkg(req)})
-    return sorted(requirements)
 
 
 def exit_on_non_zero_return(completed_process: subprocess.CompletedProcess):

@@ -391,7 +391,7 @@ def update_html_resource_paths(
             # Removing download option from documentation:
             nodes = parsed.find_all(
                 lambda node: node.name == "a"
-                and "dropdown-buttons" in node.get("class")
+                and "dropdown-buttons" in node.get("class", "")
             )
             for node in nodes:
                 node.decompose()

@@ -103,6 +103,8 @@ jupyter_execute_notebooks = "off"
 
 autodoc_mock_imports = [{{mock_imports}}]
 
+html_sourcelink_suffix = ''
+
 # -- Extension configuration -------------------------------------------------
 {% raw %}
 def copy_doc(src, dest, title=""):

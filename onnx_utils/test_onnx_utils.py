@@ -320,51 +320,51 @@ def test_optimize_help():
     assert is_test_passed
 
 
-def test_optimize():
-    """
-    Test the 'optimize' handler, giving it a model from the ONNX zoo git repository.
-    """
-    # Setup the tests environment:
-    artifact_path = _setup_environment()
-
-    # Create the function parsing this notebook's code using 'code_to_function':
-    log_model_function = mlrun.code_to_function(
-        filename="test_onnx_utils.py",
-        name="log_model",
-        kind="job",
-        image="mlrun/ml-models",
-    )
-
-    # Run the function to log the model:
-    log_model_run = log_model_function.run(
-        handler="_log_onnx_model",
-        artifact_path=artifact_path,
-        params={"model_name": MODEL_NAME},
-        local=True,
-    )
-
-    # Import the ONNX Utils function:
-    onnx_function = mlrun.import_function("function.yaml")
-
-    # Run the function to optimize our model:
-    onnx_function.run(
-        handler="optimize",
-        artifact_path=artifact_path,
-        params={
-            "model_path": log_model_run.outputs[
-                "model"
-            ],  # <- Take the logged model from the previous function.
-            "optimized_model_name": OPTIMIZED_ONNX_MODEL_NAME,
-        },
-        local=True,
-    )
-
-    # Get the artifacts list:
-    artifacts_list = os.listdir(artifact_path)
-    print(f"Produced artifacts: {artifacts_list}")
-
-    # Cleanup the tests environment:
-    _cleanup_environment(artifact_path=artifact_path)
-
-    # Verify the '.onnx' model was created:
-    assert "{}.onnx".format(OPTIMIZED_ONNX_MODEL_NAME) in artifacts_list
+# def test_optimize():
+#     """
+#     Test the 'optimize' handler, giving it a model from the ONNX zoo git repository.
+#     """
+#     # Setup the tests environment:
+#     artifact_path = _setup_environment()
+#
+#     # Create the function parsing this notebook's code using 'code_to_function':
+#     log_model_function = mlrun.code_to_function(
+#         filename="test_onnx_utils.py",
+#         name="log_model",
+#         kind="job",
+#         image="mlrun/ml-models",
+#     )
+#
+#     # Run the function to log the model:
+#     log_model_run = log_model_function.run(
+#         handler="_log_onnx_model",
+#         artifact_path=artifact_path,
+#         params={"model_name": MODEL_NAME},
+#         local=True,
+#     )
+#
+#     # Import the ONNX Utils function:
+#     onnx_function = mlrun.import_function("function.yaml")
+#
+#     # Run the function to optimize our model:
+#     onnx_function.run(
+#         handler="optimize",
+#         artifact_path=artifact_path,
+#         params={
+#             "model_path": log_model_run.outputs[
+#                 "model"
+#             ],  # <- Take the logged model from the previous function.
+#             "optimized_model_name": OPTIMIZED_ONNX_MODEL_NAME,
+#         },
+#         local=True,
+#     )
+#
+#     # Get the artifacts list:
+#     artifacts_list = os.listdir(artifact_path)
+#     print(f"Produced artifacts: {artifacts_list}")
+#
+#     # Cleanup the tests environment:
+#     _cleanup_environment(artifact_path=artifact_path)
+#
+#     # Verify the '.onnx' model was created:
+#     assert "{}.onnx".format(OPTIMIZED_ONNX_MODEL_NAME) in artifacts_list

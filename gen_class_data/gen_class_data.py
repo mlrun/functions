@@ -1,8 +1,5 @@
-import os
 import pandas as pd
-import pyarrow as pa
-import pyarrow.parquet as pq
-from typing import Optional, List, Any
+from typing import Optional, List
 from sklearn.datasets import make_classification
 
 from mlrun.execution import MLClientCtx

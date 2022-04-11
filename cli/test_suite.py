@@ -14,7 +14,7 @@ from cli.helpers import (
     install_pipenv,
     install_python,
     install_requirements,
-    get_item_yaml_requirements,
+    get_item_yaml_values,
 )
 from cli.path_iterator import PathIterator
 
@@ -66,7 +66,7 @@ def test_example(root_dir="."):
     #         continue
     #
     #     # install_python(directory)
-    #     item_requirements = get_item_yaml_requirements(directory)
+    #     item_requirements = list(get_item_yaml_values(directory, 'requirements')['requirements'])
     #     install_requirements(directory, ["papermill", "jupyter"] + item_requirements)
     #
     #     # for notebook in notebooks:
@@ -153,17 +153,22 @@ class TestSuite(ABC):
                 print("a function name cannot start with test, please rename {} ".format(path))
 
         self.before_run()
-        pool = mp.Pool(process_count)
-        results = pool.map(self.directory_process, [directory for directory in discovered])
-        pool.close()
+
+        # pool = mp.Pool(process_count)
+        # pool.map(self.directory_process, [directory for directory in discovered])
+        for directory in discovered:
+            self.directory_process(directory)
         self.after_run()
-        exit(0)
+
+        #pool.close()
+        sys.exit(0)
 
     def directory_process(self, directory):
         self.before_each(directory)
         result = self.run(directory)
         self.test_results.append(result)
         self.after_each(directory, result)
+
 
 
 class TestPY(TestSuite):
@@ -199,7 +204,7 @@ class TestPY(TestSuite):
             click.echo(
                 "No tests found, make sure your test file names are structures as 'test_*.py')"
             )
-            exit(0)
+            sys.exit(0)
         testables.sort()
         return testables
 
@@ -212,7 +217,7 @@ class TestPY(TestSuite):
     def run(self, path: Union[str, Path]):
         print("PY run path {}".format(path))
         install_python(path)
-        item_requirements = get_item_yaml_requirements(path)
+        item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
         install_requirements(path, ["pytest"] + item_requirements)
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
@@ -287,7 +292,7 @@ class TestPY(TestSuite):
             click.echo("\n")
 
         if failed_tests:
-            exit(1)
+            sys.exit(1)
 
     @staticmethod
     def is_test_py(path: Union[str, Path]) -> bool:
@@ -348,7 +353,7 @@ class TestIPYNB(TestSuite):
     def run(self, path: Union[str, Path]) -> TestResult:
         print("IPYNB run path {}".format(path))
         install_python(path)
-        item_requirements = get_item_yaml_requirements(path)
+        item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
         #install_requirements(path, ["papermill", "jupyter"] + item_requirements)
         install_requirements(path, ["papermill"] + item_requirements)
 

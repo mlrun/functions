@@ -1,8 +1,9 @@
+import pathlib
 import subprocess
 from pathlib import Path
-from typing import Union, List, Set
+from typing import Union, List, Set, Dict
 import sys
-
+from glob import iglob
 import yaml
 from jinja2 import Template
 
@@ -38,7 +39,10 @@ def render_jinja(
 def install_pipenv():
     print("Installing pipenv...")
     pipenv_install: subprocess.CompletedProcess = subprocess.run(
-        f"export PIP_NO_INPUT=1;pip install pipenv", stdout=sys.stdout, stderr=subprocess.PIPE, shell=True
+        f"export PIP_NO_INPUT=1;pip install pipenv",
+        stdout=sys.stdout,
+        stderr=subprocess.PIPE,
+        shell=True,
     )
     exit_on_non_zero_return(pipenv_install)
 
@@ -81,15 +85,77 @@ def install_requirements(directory: str, requirements: Union[List[str], Set[str]
     exit_on_non_zero_return(requirements_install)
 
 
-def get_item_yaml_requirements(item_path: str):
-    item_path = Path(item_path)
-    if item_path.is_dir():
-        item_path = item_path / "item.yaml"
-    with open(item_path, "r") as f:
-        item = yaml.full_load(f)
-    requirements = item.get("spec", {}).get("requirements", [])
-    requirements = requirements or []
-    return requirements
+def get_item_yaml_values(
+    item_path: pathlib.Path, keys: Union[str, Set[str]]
+) -> Dict[str, Set[str]]:
+    """
+    Getting value from item.yaml requested field.
+
+    :param item_path:       The path to the item.yaml file or the parent dir of the item.yaml.
+    :param keys:            The fields names that contains the required values to collect,
+                            also looks for the fields inside `spec` inside dict.
+
+    :returns:               Set with all the values inside key.
+    """
+    if isinstance(keys, str):
+        keys = {keys}
+    values_dict = {}
+
+    for key in keys:
+        values_set = set()
+        item_path = Path(item_path)
+        if item_path.is_dir():
+            item_path = item_path / "item.yaml"
+        with open(item_path, "r") as f:
+            item = yaml.full_load(f)
+        if key in item:
+            values = item.get(key, "")
+        elif "spec" in item and key in item["spec"]:
+            values = item["spec"].get(key, "") or ""
+        else:
+            values = ""
+
+        if values:
+            if isinstance(values, list):
+                values_set = set(values)
+            else:
+                values_set.add(values)
+        values_dict[key] = values_set
+    return values_dict
+
+
+def get_mock_requirements(source_dir: Union[str, Path]) -> List[str]:
+    """
+    Getting all requirements from .py files inside all the subdirectories of the given source dir.
+    Only the files with the same name as their parent directory are taken in consideration.
+    The requirements are being collected from rows inside the files that starts with `from` or `import`
+    and parsed only to the base package.
+
+    :param source_dir: The directory that contains all the functions.
+
+    :return: A list of all the requirements.
+    """
+    mock_reqs = set()
+
+    if isinstance(source_dir, Path):
+        source_dir = source_dir.__str__()
+
+    # Iterating over all .py files in the subdirectories:
+    for filename in iglob(f"{source_dir}/**/*.py"):
+        file_path = Path(filename)
+        if file_path.parent.name != file_path.stem:
+            # Skipping test files
+            continue
+        # Getting all packages:
+        with open(filename, 'r') as f:
+            lines = list(filter(None, f.read().split("\n")))
+            for line in lines:
+                words = line.split(' ')
+                words = [w for w in words if w]
+                if words and (words[0] == 'from' or words[0] == 'import'):
+                    mock_reqs.add(words[1].split('.')[0])
+
+    return sorted(mock_reqs)
 
 
 def exit_on_non_zero_return(completed_process: subprocess.CompletedProcess):

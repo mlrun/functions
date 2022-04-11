@@ -3,7 +3,7 @@ import shutil
 import subprocess
 import uuid
 from pathlib import Path
-from typing import Union, Optional, Set
+from typing import Union, Optional, Set, Dict, Tuple, List
 
 import click
 import yaml
@@ -15,7 +15,8 @@ from cli.helpers import (
     is_item_dir,
     render_jinja,
     PROJECT_ROOT,
-    get_item_yaml_requirements,
+    get_item_yaml_values,
+    get_mock_requirements,
 )
 from cli.marketplace.changelog import ChangeLog
 from cli.path_iterator import PathIterator
@@ -95,6 +96,7 @@ def build_marketplace(
     marketplace_root = Path(marketplace_dir).resolve()
     marketplace_dir = marketplace_root / (source_name or source_dir.name) / channel
 
+    # Creating directories temp_root/functions, temp_root/docs and marketplace_root/functions/(development or master):
     temp_root.mkdir(parents=True)
     temp_docs.mkdir(parents=True)
     marketplace_dir.mkdir(parents=True, exist_ok=True)
@@ -103,7 +105,17 @@ def build_marketplace(
         print_file_tree("Source project structure", source_dir)
         print_file_tree("Current marketplace structure", marketplace_dir)
 
-    requirements = collect_temp_requirements(source_dir)
+    tags = collect_values_from_items(
+        source_dir=source_dir,
+        tags_set={"categories", "kind"},
+    )
+    click.echo("Building tags.json...")
+    json.dump(tags, open(marketplace_dir / "tags.json", "w"))
+
+    requirements = get_mock_requirements(source_dir)
+
+    if _verbose:
+        click.echo(f"[Temporary project] Done requirements ({', '.join(requirements)})")
     sphinx_quickstart(temp_docs, requirements)
 
     build_temp_project(source_dir, temp_root)
@@ -119,7 +131,16 @@ def build_marketplace(
     copy_static_resources(marketplace_dir, temp_docs)
 
     update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log)
-    build_catalog_json(marketplace_dir, (marketplace_root / "catalog.json"))
+    build_catalog_json(
+        marketplace_dir=marketplace_dir,
+        catalog_path=(marketplace_root / "catalog.json"),
+    )
+    build_catalog_json(
+        marketplace_dir=marketplace_dir,
+        catalog_path=(marketplace_dir / "catalog.json"),
+        with_functions_legacy=False,
+        add_artifacts=True,
+    )
 
     if _verbose:
         print_file_tree("Resulting marketplace structure", marketplace_dir)
@@ -178,8 +199,17 @@ def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
         update_or_create_item(item_dir, marketplace_dir, temp_docs, change_log)
 
 
+def add_object_and_source(function_name: str, yaml_obj):
+    yaml_obj["object"] = "src/function.yaml"
+    yaml_obj["source"] = f"src/{function_name}.py"
+    return yaml_obj
+
+
 def build_catalog_json(
-    marketplace_dir: Union[str, Path], catalog_path: Union[str, Path]
+    marketplace_dir: Union[str, Path],
+    catalog_path: Union[str, Path],
+    with_functions_legacy: bool = True,
+    add_artifacts: bool = False,
 ):
     click.echo("Building catalog.json...")
 
@@ -189,10 +219,11 @@ def build_catalog_json(
 
     catalog = json.load(open(catalog_path, "r")) if catalog_path.exists() else {}
 
-    if source not in catalog:
-        catalog[source] = {}
-    if channel not in catalog[source]:
-        catalog[source][channel] = {}
+    if with_functions_legacy:
+        if source not in catalog:
+            catalog[source] = {}
+        if channel not in catalog[source]:
+            catalog[source][channel] = {}
     for source_dir in marketplace_dir.iterdir():
         if not source_dir.is_dir() or source_dir.name == "_static":
             continue
@@ -204,16 +235,30 @@ def build_catalog_json(
         latest_yaml["generationDate"] = str(latest_yaml["generationDate"])
 
         latest_version = latest_yaml["version"]
+        if add_artifacts:
+            latest_yaml = add_object_and_source(
+                function_name=source_dir.name, yaml_obj=latest_yaml
+            )
 
-        catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
+        if with_functions_legacy:
+            catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
+        else:
+            catalog[source_dir.name] = {"latest": latest_yaml}
         for version_dir in source_dir.iterdir():
             version = version_dir.name
 
-            if version != "latest" and version != latest_version:
+            if version != "latest":
                 version_yaml_path = version_dir / "src" / "item.yaml"
                 version_yaml = yaml.full_load(open(version_yaml_path, "r"))
                 version_yaml["generationDate"] = str(version_yaml["generationDate"])
-                catalog[source][channel][source_dir.name][version] = version_yaml
+                if add_artifacts:
+                    version_yaml = add_object_and_source(
+                        function_name=source_dir.name, yaml_obj=version_yaml
+                    )
+                if with_functions_legacy:
+                    catalog[source][channel][source_dir.name][version] = version_yaml
+                else:
+                    catalog[source_dir.name][version] = version_yaml
 
     json.dump(catalog, open(catalog_path, "w"))
 
@@ -239,7 +284,9 @@ def update_or_create_item(
     build_path = temp_docs / "_build"
 
     documentation_html = build_path / documentation_html_name
-    update_html_resource_paths(documentation_html, relative_path="../../../")
+    update_html_resource_paths(
+        documentation_html, relative_path="../../../", with_download=False
+    )
 
     example_html = build_path / example_html_name
     update_html_resource_paths(example_html, relative_path="../../../")
@@ -321,9 +368,11 @@ def update_or_create_item(
     pass
 
 
-def update_html_resource_paths(html_path: Path, relative_path: str):
+def update_html_resource_paths(
+    html_path: Path, relative_path: str, with_download: bool = True
+):
     if html_path.exists():
-        with open(html_path, "r") as html:
+        with open(html_path, "r", encoding="utf8") as html:
             parsed = BeautifulSoup(html.read(), features="html.parser")
 
         nodes = parsed.find_all(
@@ -338,8 +387,22 @@ def update_html_resource_paths(html_path: Path, relative_path: str):
         )
         for node in nodes:
             node["src"] = f"{relative_path}{node['src']}"
+        if not with_download:
+            # Removing download option from documentation:
+            nodes = parsed.find_all(
+                lambda node: node.name == "a"
+                and "dropdown-buttons" in node.get("class", "")
+            )
+            for node in nodes:
+                node.decompose()
+        else:
+            nodes = parsed.find_all(lambda node: "_sources" in node.get("href", ""))
+            for node in nodes:
+                node[
+                    "href"
+                ] = f'../{node["href"].replace("_sources", "src").replace("_example", "")}'
 
-        with open(html_path, "w") as new_html:
+        with open(html_path, "w", encoding="utf8") as new_html:
             new_html.write(str(parsed))
 
 
@@ -396,36 +459,57 @@ def build_temp_project(source_dir, temp_root):
         click.echo(f"[Temporary project] Done project (item count: {item_count})")
 
 
-def collect_temp_requirements(source_dir) -> Set[str]:
-    click.echo("[Temporary project] Starting to collect requirements...")
-    requirements = set()
+def collect_values_from_items(
+    source_dir: Union[Path, str], tags_set: Set[str]
+) -> Dict[str, List[str]]:
+    """
+    Collecting all tags values from item.yaml files.
+    If the `with_requirements` flag is on than also collecting requirements from ite.yaml and requirements.txt files.
 
+    :param source_dir:          The source directory that contains all the MLRun functions.
+    :param tags_set:            Set of tags to collect from item.yaml files.
+
+    :returns:                   A dictionary contains the tags and requirements.
+    """
+
+    tags = {t: set() for t in tags_set}
+
+    click.echo(f"[Temporary project] Starting to collect {', '.join(tags_set)}...")
+
+    # Scanning all directories:
     for directory in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
-        item_requirements = get_item_yaml_requirements(directory)
-        for item_requirement in item_requirements:
-            requirements.add(item_requirement)
-        requirements_txt = directory / "requirements.txt"
-        if requirements_txt.exists():
-            with open(requirements_txt, "r") as f:
-                lines = f.read().split("\n")
-                for line in filter(lambda l: l, lines):
-                    requirements.add(line)
+        # Getting the values from item.yaml
+        item_yaml_values = get_item_yaml_values(item_path=directory, keys=tags_set)
+        for key, values in item_yaml_values.items():
+            tags[key] = tags[key].union(values)
 
-    parsed = set()
-    for req in requirements:
-        parsed.add(req.split("==")[0])
+    for tag_name, values in tags.items():
+        click.echo(f"[Temporary project] Done {tag_name} ({', '.join(values)})")
 
-    if _verbose:
-        click.echo(f"[Temporary project] Done requirements ({', '.join(requirements)})")
+    # Change each value from set to list (to be json serializable):
+    tags = {key: list(val) for key, val in tags.items()}
 
-    return requirements
+    return tags
 
 
 def sphinx_quickstart(
-    temp_root: Union[str, Path], requirements: Optional[Set[str]] = None
+    temp_root: Union[str, Path], requirements: Optional[List[str]] = None
 ):
+    """
+    Generate required files for a Sphinx project. sphinx-quickstart is an
+    interactive tool that asks some questions about your project and then
+    generates a complete documentation directory and sample Makefile to be used
+    with `sphinx-build`.
+
+    This function creates the conf.py configuration file for Sphinx-build based on
+    the conf.template file that located in cli/marketplace.
+
+    :param temp_root:       The project's temporary docs root.
+    :param requirements:    The list of requirements generated from `get_mock_requirements`
+    """
     click.echo("[Sphinx] Running quickstart...")
 
+    # Executing sphinx-quickstart:
     subprocess.run(
         f"sphinx-quickstart --no-sep -p Marketplace -a Iguazio -l en -r '' {temp_root}",
         stdout=subprocess.PIPE,
@@ -433,14 +517,17 @@ def sphinx_quickstart(
         shell=True,
     )
 
+    # Editing requirements to the necessary format:
     requirements = requirements or ""
     if requirements:
         requirements = '", "'.join(requirements)
         requirements = f'"{requirements}"'
 
+    # Preparing target for conf.py:
     conf_py_target = temp_root / "conf.py"
     conf_py_target.unlink()
 
+    # Rendering the conf.template with the parameters into conf.py target:
     render_jinja(
         template_path=PROJECT_ROOT / "cli" / "marketplace" / "conf.template",
         output_path=conf_py_target,
@@ -455,6 +542,16 @@ def sphinx_quickstart(
 
 
 def build_temp_docs(temp_root, temp_docs):
+    """
+    Look recursively in <MODULE_PATH> for Python modules and packages and create
+    one reST file with automodule directives per package in the <OUTPUT_PATH>. The
+    <EXCLUDE_PATTERN>s can be file and/or directory patterns that will be excluded
+    from generation. Note: By default this script will not overwrite already
+    created files.
+
+    :param temp_root:   The project's temporary functions root.
+    :param temp_docs:   The project's temporary docs root.
+    """
     click.echo("[Sphinx] Running autodoc...")
 
     cmd = f"-F -o {temp_docs} {temp_root}"
@@ -467,4 +564,4 @@ def build_temp_docs(temp_root, temp_docs):
 
 if __name__ == "__main__":
     # build_marketplace_cli()
-    build_marketplace("../../", "../../../marketp")
+    build_marketplace("../../", "../../../marketp", verbose=True)

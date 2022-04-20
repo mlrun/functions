@@ -3,6 +3,8 @@
 import warnings
 from typing import Union
 
+import numpy as np
+
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import mlrun.feature_store as fstore
@@ -26,12 +28,12 @@ MAX_SIZE_OF_DF = 5000 * 10
 
 
 def analyze(
-    context: MLClientCtx,
-    name: str = "dataset",
-    table: Union[FeatureSet, DataItem] = None,
-    label_column: str = None,
-    plots_dest: str = "plots",
-    frac: float = 0.10,
+        context: MLClientCtx,
+        name: str = "dataset",
+        table: Union[FeatureSet, DataItem] = None,
+        label_column: str = None,
+        plots_dest: str = "plots",
+        frac: float = 0.10,
 ) -> None:
     """
     The function will output the following artifacts per
@@ -136,11 +138,11 @@ def analyze(
 
 
 def _create_histogram_mat_artifact(
-    context: MLClientCtx,
-    df: pd.DataFrame,
-    extra_data: dict,
-    label_column: str,
-    plots_dest: str,
+        context: MLClientCtx,
+        df: pd.DataFrame,
+        extra_data: dict,
+        label_column: str,
+        plots_dest: str,
 ):
     """
     Create and log a histogram matrix artifact
@@ -161,29 +163,34 @@ def _create_histogram_mat_artifact(
 
 
 def _create_features_histogram_artifacts(
-    context: MLClientCtx,
-    df: pd.DataFrame,
-    extra_data: dict,
-    label_column: str,
-    plots_dest: str,
+        context: MLClientCtx,
+        df: pd.DataFrame,
+        extra_data: dict,
+        label_column: str,
+        plots_dest: str,
 ):
     """
     Create and log a histogram artifact for each feature
     """
 
     figs = dict()
+    all_labels = df[label_column].unique()
     for (columnName, _) in df.iteritems():
         if columnName == label_column:
             continue
-        sub_fig = go.Histogram(x=df[columnName])
-        figs[columnName] = sub_fig
+        # sub_fig = go.Histogram(x=df[columnName])
+        for label in all_labels:
+            sub_fig = go.Histogram(histfunc="count",
+                                   x=df.loc[df[label_column] == label][columnName],
+                                   name=str(label)
+                                   )
+            figs[f'{columnName}@?@{label}'] = sub_fig
 
     fig = go.Figure()
     for k in figs.keys():
         fig.add_trace(figs[k])
 
     fig.update_traces(visible=False)
-    all_buttons = [""] + list(figs.keys())
     fig.update_layout(
         updatemenus=[
             {
@@ -192,11 +199,11 @@ def _create_features_histogram_artifacts(
                         "label": column_name,
                         "method": "update",
                         "args": [
-                            {"visible": [key == column_name for key in figs.keys()]},
+                            {"visible": [key.split("@?@")[0] == column_name for key in figs.keys()]},
                             {"title": f"<i><b>Histogram of {column_name}</b></i>"},
                         ],
                     }
-                    for column_name in all_buttons
+                    for column_name in df.columns if column_name != label_column
                 ]
             }
         ],
@@ -218,7 +225,7 @@ def _create_features_histogram_artifacts(
 
 
 def _create_violin_artifact(
-    context: MLClientCtx, df: pd.DataFrame, extra_data: dict, plots_dest: str
+        context: MLClientCtx, df: pd.DataFrame, extra_data: dict, plots_dest: str
 ):
     """
     Create and log a violin artifact
@@ -256,11 +263,11 @@ def _create_violin_artifact(
 
 
 def _create_imbalance_artifact(
-    context: MLClientCtx,
-    df: pd.DataFrame,
-    extra_data: dict,
-    label_column: str,
-    plots_dest: str,
+        context: MLClientCtx,
+        df: pd.DataFrame,
+        extra_data: dict,
+        label_column: str,
+        plots_dest: str,
 ):
     """
     Create and log an imbalance class artifact (csv + plot)
@@ -286,11 +293,11 @@ def _create_imbalance_artifact(
 
 
 def _create_corr_artifact(
-    context: MLClientCtx,
-    df: pd.DataFrame,
-    extra_data: dict,
-    label_column: str,
-    plots_dest: str,
+        context: MLClientCtx,
+        df: pd.DataFrame,
+        extra_data: dict,
+        label_column: str,
+        plots_dest: str,
 ):
     """
     Create and log an correlation-matrix artifact (csv + plot)

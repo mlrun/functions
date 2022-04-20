@@ -155,7 +155,7 @@ def _create_histogram_mat_artifact(
         )
     fig.update_layout(title_text="<i><b>Histograms matrix</b></i>")
     extra_data["histogram-matrix"] = context.log_artifact(
-        PlotlyArtifact(key="histograms matrix", figure=fig),
+        PlotlyArtifact(key="histograms-matrix", figure=fig),
         local_path=f"{plots_dest}/hist_mat.html",
     )
 

@@ -162,9 +162,9 @@ def test_data_already_loaded():
     created_artifact = [*describe_run.outputs.keys()]
 
     expected_artifacts = [
-        "correlation-matrix csv",
-        "correlation-matrix",
-        "histograms matrix",
+        "correlation-matrix-csv",
+        "correlation",
+        "histograms-matrix",
         "imbalance",
         "imbalance-weights-vec",
         "violin",

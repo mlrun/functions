@@ -5,7 +5,7 @@ categories:
 description: Azure AutoML integration in MLRun, including utils functions for training models on Azure AutoML platfrom.
 doc: ''
 example: azureml_utils.ipynb
-generationDate: 2021-11-13:00-15
+generationDate: 2021-04-20:15-18
 icon: ''
 labels:
   author: yonish
@@ -28,8 +28,8 @@ spec:
   image: python:3.7.9-slim
   kind: job
   requirements:
-  - azureml-core==1.33.0
-  - azureml-train-automl-client==1.33.0
+  - azureml-core==1.40.0
+  - azureml-train-automl-client==1.40.0
   - plotly~=5.4
 url: ''
-version: 0.9.4
+version: 0.9.5

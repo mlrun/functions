@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: azureml-utils
   tag: ''
-  hash: d96d59b9cc516abfc1af1a931d31d4162e01a894
+  hash: 2da8298aaff0813f54ee3d863bac06bab59b10ba
   project: ''
   labels:
     author: yonish
@@ -19,9 +19,9 @@ spec:
     commands:
     - python -m pip install pip==21.2.4
     - apt-get update && apt-get install -y --no-install-recommends git
-    - python -m pip install azureml-core==1.33.0 azureml-train-automl-client==1.33.0
+    - python -m pip install azureml-core==1.40.0 azureml-train-automl-client==1.40.0
       plotly~=5.4
-    code_origin: https://github.com/mlrun/functions.git#31e5f9b9a03b07a8c59da6c64e08e04a54de4266:C:\Users\yonatans\projects\functions\azureml_utils\azureml_utils.py
+    code_origin: https://github.com/mlrun/functions.git#fa1d4b56688dbcff1a378686a41661e00e23936b:C:\Users\yonatans\projects\functions\azureml_utils\azureml_utils.py
     origin_filename: C:\Users\yonatans\projects\functions\azureml_utils\azureml_utils.py
     with_mlrun: true
     auto_build: true
@@ -261,5 +261,7 @@ spec:
   allow_empty_resources: true
   env: []
   priority_class_name: ''
+  preemption_mode: prevent
   affinity: null
+  tolerations: null
 verbose: false

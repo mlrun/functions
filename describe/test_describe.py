@@ -47,6 +47,7 @@ def run_around_tests():
             "imbalance.html",
             "imbalance-weights-vec.csv",
             "violin.html",
+            "describe.csv" "histograms.html",
         }
     )
 
@@ -64,6 +65,29 @@ def test_sanity_local():
             handler="analyze",
             inputs={"table": DATA_PATH},
             params={"label_column": "label"},
+            artifact_path=os.path.abspath("./artifacts"),
+            local=True,
+        )
+
+    except Exception as exception:
+        print(f"- The test failed - raised the following error:\n- {exception}")
+        is_test_passed = False
+    assert is_test_passed
+
+
+def test_None_label():
+    """
+    Test simple scenario
+    """
+    describe_func = import_function("function.yaml")
+    is_test_passed = True
+    _create_data(n_samples=100, n_features=5, n_classes=3, n_informative=3)
+    try:
+        describe_run = describe_func.run(
+            name="task-describe",
+            handler="analyze",
+            inputs={"table": DATA_PATH},
+            params={"label_column": ""},
             artifact_path=os.path.abspath("./artifacts"),
             local=True,
         )
@@ -99,7 +123,6 @@ def test_different_size_of_dataset(n_samples, n_features, n_classes, n_informati
         print(f" The test failed - raised the following error:\n- {exception}")
         is_test_passed = False
 
-    _validate_paths({f"hist_{col}.html" for col in df.columns if col is not "label"})
     assert is_test_passed
 
 
@@ -139,14 +162,13 @@ def test_data_already_loaded():
     created_artifact = [*describe_run.outputs.keys()]
 
     expected_artifacts = [
-        f"histogram_{col}" for col in df.columns if col is not "label"
-    ] + [
-        "correlation-matrix csv",
-        "correlation-matrix",
-        "histograms matrix",
+        "correlation-matrix-csv",
+        "correlation",
+        "histograms-matrix",
         "imbalance",
         "imbalance-weights-vec",
         "violin",
+        "histograms",
     ]
     for artifact in expected_artifacts:
         if artifact not in created_artifact:

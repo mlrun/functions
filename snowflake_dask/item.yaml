@@ -19,6 +19,6 @@ spec:
   handler: load_results
   image: mlrun/mlrun
   kind: job
-  requirements: [??]
+  requirements: []
 url: ''
 version: 0.9.0

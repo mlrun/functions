@@ -5,7 +5,7 @@ categories:
 description: Automatic train, evaluate and predict functions for the ML frameworks - Scikit-Learn, XGBoost and LightGBM.
 doc: ''
 example: auto_trainer.ipynb
-generationDate: 2022-02-06:10-18
+generationDate: 2022-04-26:10-43
 icon: ''
 labels:
   author: yonish
@@ -21,4 +21,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.10.2
+version: 0.10.3

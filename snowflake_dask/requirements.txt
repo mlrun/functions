@@ -1,2 +1,3 @@
 bokeh
 snowflake-connector-python[pandas]
+mlrun~=0.9.1

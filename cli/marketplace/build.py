@@ -260,6 +260,16 @@ def build_catalog_json(
                 else:
                     catalog[source_dir.name][version] = version_yaml
 
+    # Remove deleted directories from catalog:
+    if with_functions_legacy:
+        for function_dir in list(catalog[source][channel].keys()):
+            if not (marketplace_dir / function_dir).exists():
+                del catalog[source][channel][function_dir]
+    else:
+        for function_dir in list(catalog.keys()):
+            if not (marketplace_dir / function_dir).exists():
+                del catalog[function_dir]
+
     json.dump(catalog, open(catalog_path, "w"))
 
 
@@ -564,4 +574,4 @@ def build_temp_docs(temp_root, temp_docs):
 
 if __name__ == "__main__":
     # build_marketplace_cli()
-    build_marketplace("../../", "../../../marketp", verbose=True)
+    build_marketplace("../../", "../../../marketplace", verbose=False)

@@ -44,13 +44,12 @@ def analyze(
     column within the data frame (based on data types):
 
     describe csv
-    histogram per feature chart
+    histogram matrix
     violin chart
     correlation-matrix chart
     correlation-matrix csv
     imbalance pie chart
     imbalance-weights-vec csv
-    2d-scatter plot between paris of features
 
     :param context:                 The function context
     :param name:                    Key of dataset to database ("dataset" for default)

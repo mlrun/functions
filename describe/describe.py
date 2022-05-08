@@ -3,8 +3,10 @@
 import warnings
 from typing import Union
 
+import matplotlib.pyplot as plt
 import mlrun
 import numpy as np
+import seaborn as sns
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
@@ -13,12 +15,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
-from mlrun.artifacts import (
-    DatasetArtifact,
-    PlotlyArtifact,
-    TableArtifact,
-    update_dataset_meta,
-)
+from mlrun.artifacts import (DatasetArtifact, PlotArtifact, PlotlyArtifact,
+                             TableArtifact, update_dataset_meta)
 from mlrun.datastore import DataItem
 from mlrun.execution import MLClientCtx
 from mlrun.feature_store import FeatureSet, FeatureVector
@@ -39,6 +37,7 @@ def analyze(
     dask_key: str = "dask_key",
     dask_function: str = None,
     dask_client=None,
+    produce_histogram_mat: bool = None,
 ) -> None:
     """
     The function will output the following artifacts per
@@ -67,6 +66,8 @@ def analyze(
     :param dask_key:                Key of dataframe in dask client "datasets" attribute
     :param dask_function:           Dask function url (db://..)
     :param dask_client:             Dask client object
+    :param produce_histogram_mat    If produce_histogram_mat isTrue or None(default) and num of columns is less when 10
+                                    the histogram matrix will be created otherwise it wouldn't.
     """
     data_item, featureset, creat, update = False, False, False, False
     get_from_table = True
@@ -129,24 +130,24 @@ def analyze(
         local_path=f"{plots_dest}/describe.csv",
     )
 
+    try:
+        _create_histogram_mat_artifact(
+            context, produce_histogram_mat, df, extra_data, label_column, plots_dest
+        )
+    except Exception as e:
+        context.logger.warn(f"Failed to create histogram matrix artifact due to: {e}")
     # try:
-    #     _create_histogram_mat_artifact(
-    #         context, df, extra_data, label_column, plots_dest
+    #     _create_features_histogram_artifacts(
+    #         context, df, extra_data, label_column, plots_dest, problem_type
     #     )
     # except Exception as e:
-    #     context.logger.warn(f"Failed to create histogram matrix artifact due to: {e}")
-    try:
-        _create_features_histogram_artifacts(
-            context, df, extra_data, label_column, plots_dest, problem_type
-        )
-    except Exception as e:
-        context.logger.warn(f"Failed to create pairplot histograms due to: {e}")
-    try:
-        _create_features_2d_scatter_artifacts(
-            context, df, extra_data, label_column, plots_dest, problem_type
-        )
-    except Exception as e:
-        context.logger.warn(f"Failed to create pairplot 2d_scatter due to: {e}")
+    #     context.logger.warn(f"Failed to create pairplot histograms due to: {e}")
+    # try:
+    #     _create_features_2d_scatter_artifacts(
+    #         context, df, extra_data, label_column, plots_dest, problem_type
+    #     )
+    # except Exception as e:
+    #     context.logger.warn(f"Failed to create pairplot 2d_scatter due to: {e}")
     try:
         _create_violin_artifact(context, df, extra_data, plots_dest)
     except Exception as e:
@@ -184,6 +185,7 @@ def analyze(
 
 def _create_histogram_mat_artifact(
     context: MLClientCtx,
+    produce_histogram_mat: bool,
     df: pd.DataFrame,
     extra_data: dict,
     label_column: str,
@@ -193,18 +195,29 @@ def _create_histogram_mat_artifact(
     Create and log a histogram matrix artifact
     """
 
-    fig = ff.create_scatterplotmatrix(df, diag="box", width=2500, height=2500)
-    if label_column is not None:
-        df_new = df.copy()
-        df_new[label_column] = df_new[label_column].apply(str)
-        fig = ff.create_scatterplotmatrix(
-            df_new, diag="box", index=label_column, width=2500, height=2500
+    # fig = ff.create_scatterplotmatrix(df, diag="box", width=2500, height=2500)
+    # if label_column is not None:
+    #     df_new = df.copy()
+    #     df_new[label_column] = df_new[label_column].apply(str)
+    #     fig = ff.create_scatterplotmatrix(
+    #         df_new, diag="box", index=label_column, width=2500, height=2500
+    #     )
+    # fig.update_layout(title_text="<i><b>Histograms matrix</b></i>")
+    # extra_data["histogram-matrix"] = context.log_artifact(
+    #     PlotlyArtifact(key="histograms-matrix", figure=fig),
+    #     local_path=f"{plots_dest}/hist_mat.html",
+    # )
+    if produce_histogram_mat is None and df.shape[1] <= 11:
+        produce_histogram_mat = True
+    else:
+        produce_histogram_mat = False
+    if produce_histogram_mat:
+        snsplt = sns.pairplot(df, hue=label_column)  # , diag_kws={"bw": 1.5})
+        extra_data["histograms-matrix"] = context.log_artifact(
+            PlotArtifact("histograms-matrix", body=plt.gcf()),
+            local_path=f"{plots_dest}/hist.html",
+            db_key=False,
         )
-    fig.update_layout(title_text="<i><b>Histograms matrix</b></i>")
-    extra_data["histogram-matrix"] = context.log_artifact(
-        PlotlyArtifact(key="histograms-matrix", figure=fig),
-        local_path=f"{plots_dest}/hist_mat.html",
-    )
 
 
 def _create_features_histogram_artifacts(

@@ -23,7 +23,7 @@ from mlrun.feature_store import FeatureSet, FeatureVector
 from plotly.subplots import make_subplots
 
 pd.set_option("display.float_format", lambda x: "%.2f" % x)
-MAX_SIZE_OF_DF = 5000 * 10
+MAX_SIZE_OF_DF = 500000
 
 
 def analyze(
@@ -32,19 +32,21 @@ def analyze(
     table: Union[FeatureSet, DataItem] = None,
     label_column: str = None,
     plots_dest: str = "plots",
-    frac: float = 0.10,
+    random_state: int = 1,
     problem_type: str = "classification",
     dask_key: str = "dask_key",
     dask_function: str = None,
     dask_client=None,
-    produce_histogram_mat: bool = None,
 ) -> None:
     """
     The function will output the following artifacts per
-    column within the data frame (based on data types):
+    column within the data frame (based on data types)
+    If the data has more than 500,000 sample we
+    sample randomly 500,000 samples:
 
     describe csv
-    histogram matrix
+    histograms
+    scatter-2d
     violin chart
     correlation-matrix chart
     correlation-matrix csv
@@ -58,15 +60,12 @@ def analyze(
     :param label_column:            Ground truth column label
     :param plots_dest:              Destination folder of summary plots (relative to artifact_path)
                                     ("plots" for default)
-    :param frac:                    When the table has more than 5000 samples,
-                                    the function will execute on random frac from the data (0.1 default)
+    :param random_state:            When the table has more than 500,000 samples, we sample randomly 500,000 samples
     :param problem_type             The type of the ML problem the data facing - regression, classification or None
                                     (classification for default)
     :param dask_key:                Key of dataframe in dask client "datasets" attribute
     :param dask_function:           Dask function url (db://..)
     :param dask_client:             Dask client object
-    :param produce_histogram_mat    If produce_histogram_mat isTrue or None(default) and num of columns is less when 10
-                                    the histogram matrix will be created otherwise it wouldn't.
     """
     data_item, featureset, creat, update = False, False, False, False
     get_from_table = True
@@ -104,7 +103,6 @@ def analyze(
         if data_item:
             df = table.as_df()
         elif featureset:
-            print("in")
             project_name, set_name = (
                 table._path.split("/")[2],
                 table._path.split("/")[4],
@@ -118,7 +116,7 @@ def analyze(
             return
 
     if df.size > MAX_SIZE_OF_DF:
-        df = df.sample(frac=frac)
+        df = df.sample(n=MAX_SIZE_OF_DF, random_state=random_state)
     extra_data = {}
 
     if label_column not in df.columns:
@@ -131,22 +129,22 @@ def analyze(
 
     try:
         _create_histogram_mat_artifact(
-            context, produce_histogram_mat, df, extra_data, label_column, plots_dest
+            context, df, extra_data, label_column, plots_dest
         )
     except Exception as e:
         context.logger.warn(f"Failed to create histogram matrix artifact due to: {e}")
-    # try:
-    #     _create_features_histogram_artifacts(
-    #         context, df, extra_data, label_column, plots_dest, problem_type
-    #     )
-    # except Exception as e:
-    #     context.logger.warn(f"Failed to create pairplot histograms due to: {e}")
-    # try:
-    #     _create_features_2d_scatter_artifacts(
-    #         context, df, extra_data, label_column, plots_dest, problem_type
-    #     )
-    # except Exception as e:
-    #     context.logger.warn(f"Failed to create pairplot 2d_scatter due to: {e}")
+    try:
+        _create_features_histogram_artifacts(
+            context, df, extra_data, label_column, plots_dest, problem_type
+        )
+    except Exception as e:
+        context.logger.warn(f"Failed to create pairplot histograms due to: {e}")
+    try:
+        _create_features_2d_scatter_artifacts(
+            context, df, extra_data, label_column, plots_dest, problem_type
+        )
+    except Exception as e:
+        context.logger.warn(f"Failed to create pairplot 2d_scatter due to: {e}")
     try:
         _create_violin_artifact(context, df, extra_data, plots_dest)
     except Exception as e:
@@ -184,7 +182,6 @@ def analyze(
 
 def _create_histogram_mat_artifact(
     context: MLClientCtx,
-    produce_histogram_mat: bool,
     df: pd.DataFrame,
     extra_data: dict,
     label_column: str,
@@ -206,17 +203,15 @@ def _create_histogram_mat_artifact(
     #     PlotlyArtifact(key="histograms-matrix", figure=fig),
     #     local_path=f"{plots_dest}/hist_mat.html",
     # )
-    if produce_histogram_mat is None and df.shape[1] <= 11:
-        produce_histogram_mat = True
-    else:
-        produce_histogram_mat = False
-    if produce_histogram_mat:
-        snsplt = sns.pairplot(df, hue=label_column)  # , diag_kws={"bw": 1.5})
-        extra_data["histograms-matrix"] = context.log_artifact(
-            PlotArtifact("histograms-matrix", body=plt.gcf()),
-            local_path=f"{plots_dest}/hist.html",
-            db_key=False,
-        )
+    context.log_artifact(f"{plots_dest}/hist.html", body=b'<b> Deprecated, see the artifacts scatter-2d and '
+                                                         b'histograms instead<b>', viewer='web-app')
+
+#     snsplt = sns.pairplot(df, hue=label_column)  # , diag_kws={"bw": 1.5})
+#     extra_data["histograms-matrix"] = context.log_artifact(
+#         PlotArtifact("histograms-matrix", body=plt.gcf()),
+#         local_path=f"{plots_dest}/hist.html",
+#         db_key=False,
+#     )
 
 
 def _create_features_histogram_artifacts(

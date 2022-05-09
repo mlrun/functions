@@ -43,11 +43,11 @@ def run_around_tests():
         {
             "correlation.html",
             "correlation-matrix.csv",
-            # "scatter-2d.html",
+            "scatter-2d.html",
             "violin.html",
             "describe.csv",
             # "hist.html",
-            # "histograms.html",
+            "histograms.html",
         }
     )
 
@@ -60,7 +60,7 @@ def test_sanity_local(problem_type):
     describe_func = import_function("function.yaml")
     is_test_passed = True
     _create_data(
-        n_samples=10000,
+        n_samples=1000,
         n_features=10,
         n_classes=3,
         n_informative=3,

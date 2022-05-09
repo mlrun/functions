@@ -1,6 +1,6 @@
 wheel
 bs4
-mlrun==1.0.0-rc11
+mlrun>=1.0.0
 jinja2==3.0.1
 pipenv
 myst_nb

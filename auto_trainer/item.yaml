@@ -11,7 +11,7 @@ labels:
   author: yonish
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.10.0
+mlrunVersion: 1.0.0
 name: auto_trainer
 platformVersion: ''
 spec:
@@ -21,4 +21,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.10.3
+version: 1.0.0

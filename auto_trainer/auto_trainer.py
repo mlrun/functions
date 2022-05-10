@@ -296,7 +296,7 @@ def predict(
     y_pred = model_handler.model.predict(dataset, **predict_kwargs)
 
     if not label_columns:
-        if y_pred.shape[1] == 1:
+        if len(y_pred.shape) == 1 or y_pred.shape[1] == 1:
             label_columns = ["predicted_labels"]
         else:
             label_columns = [f"predicted_label_{i}" for i in range(y_pred.shape[1])]

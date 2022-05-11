@@ -1,4 +1,4 @@
-"""Snowflake Dask - Ingest Snaowflake data with Dask"""
+"""Snowflake Dask - Ingest Snowflake data with Dask"""
 import warnings
 import mlrun
 from mlrun.execution import MLClientCtx
@@ -33,7 +33,7 @@ def load_results(context: MLClientCtx,
                  publish_name = None
                 ) -> None:
 
-    """Snowflake Dask - Ingest Snaowflake data with Dask
+    """Snowflake Dask - Ingest Snowflake data with Dask
 
     :param context:           the function context
     :param dask_client:       dask cluster function name

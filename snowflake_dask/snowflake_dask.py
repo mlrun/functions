@@ -7,6 +7,8 @@ from dask.distributed import Client
 from dask.dataframe import from_delayed
 from dask import delayed
 from dask import dataframe as dd
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 
 warnings.filterwarnings("ignore")
 
@@ -44,6 +46,28 @@ def load_results(context: MLClientCtx,
 
     """
     context = mlrun.get_or_create_ctx('snawflake-dask-cluster')
+    sf_password = context.get_secret('sfPassword')
+    pk_path =  context.get_secret('pkPath')
+    pk_password =  context.get_secret('pkPassword')
+
+    if pk_path and pk_password:
+        with open(pk_path, "rb") as key:
+            p_key= serialization.load_pem_private_key(
+                key.read(),
+                password=str(pk_password).encode(),
+                backend=default_backend()
+            )
+        pkb = p_key.private_bytes(
+            encoding=serialization.Encoding.DER,
+            format=serialization.PrivateFormat.PKCS8
+            ,encryption_algorithm=serialization.NoEncryption()
+        )
+        connection_info.pop('password', 'No password found')
+        connection_info['private_key'] = pkb
+    elif sf_password:
+        connection_info['password'] = sf_password
+    else:
+        raise Exception("\nPlease set up the secret for Snowflake in your project!\n")
 
     # setup dask client from the MLRun dask cluster function
     if dask_client:

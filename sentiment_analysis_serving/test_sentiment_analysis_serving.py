@@ -3,10 +3,8 @@ import wget
 from mlrun import import_function
 import os.path
 from os import path
-import mlrun
 from pygit2 import Repository
 from sentiment_analysis_serving import *
-
 
 MODEL_PATH = os.path.join(os.path.abspath('./'), 'models')
 MODEL = MODEL_PATH + "model.pt"
@@ -25,11 +23,10 @@ def download_pretrained_model(model_path):
 
 def test_local_sentiment_analysis_serving():
     model_path = os.path.join(os.path.abspath('./'), 'models')
-    model = model_path+'/model.pt'
+    model = model_path + '/model.pt'
     if not path.exists(model):
         download_pretrained_model(model_path)
-    branch = Repository('.').head.shorthand
-    fn = import_function('hub://sentiment_analysis_serving:{}'.format(branch))
+    fn = import_function('function.yaml')
     fn.add_model('model1', model_path=model, class_name='SentimentClassifierServing')
     # create an emulator (mock server) from the function configuration)
     server = fn.to_mock_server()
@@ -37,4 +34,22 @@ def test_local_sentiment_analysis_serving():
     instances = ['I had a pleasure to work with such dedicated team. Looking forward to \
                  cooperate with each and every one of them again.']
     result = server.test("/v2/models/model1/infer", {"inputs": instances})
-    assert result['outputs'][0] == 2
+    assert result['outputs']['predictions'][0] == 2
+
+
+def test_meta_data():
+    model_path = os.path.join(os.path.abspath('./'), 'models')
+    model = model_path + '/model.pt'
+    if not path.exists(model):
+        download_pretrained_model(model_path)
+    fn = import_function('function.yaml')
+    fn.add_model('model1', model_path=model, class_name='SentimentClassifierServing')
+    # create an emulator (mock server) from the function configuration)
+    server = fn.to_mock_server()
+
+    instances = ['I had a pleasure to work with such dedicated team. Looking forward to \
+                 cooperate with each and every one of them again.']
+    metadata = ['I AM VERY IMPORTANT']
+    result = server.test("/v2/models/model1/infer", {"inputs": instances, "meta_data": metadata})
+    assert result['outputs']['predictions'][0] == 2
+    assert result['outputs']['meta_data'] == metadata

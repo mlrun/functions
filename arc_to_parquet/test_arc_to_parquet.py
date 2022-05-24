@@ -1,33 +1,33 @@
-from mlrun import code_to_function
-from pathlib import Path
-import shutil
-import os
+from mlrun import code_to_function, import_function
 
-ARCHIVE = "https://archive.ics.uci.edu/ml/machine-learning-databases/00280/HIGGS.csv.gz"
-ARTIFACTS_PATH = 'artifacts'
-RUNS_PATH = 'runs'
-SCHEDULES_PATH = 'schedules'
+DATA_URL = "https://s3.wasabisys.com/iguazio/data/market-palce/arc_to_parquet/higgs-sample.csv.gz"
 
-
-def _delete_outputs(paths):
-    for path in paths:
-        if Path(path).is_dir():
-            shutil.rmtree(path)
-
-
-def test_arc_to_parquet():
-    cwd = os.getcwd()
+def test_run_local_arc_to_parquet():
     fn = code_to_function(name='test_arc_to_parquet',
                           filename="arc_to_parquet.py",
                           handler="arc_to_parquet",
-                          kind="job",
+                          kind="local",
                           )
-    fn.run(params={'archive_url': ARCHIVE,
-                   'key': 'HIGGS'},
-           artifact_path=cwd,
-           local=True
+    fn.spec.command = "arc_to_parquet.py"
+    fn.run(params={"key": "higgs-sample"},
+           handler="arc_to_parquet",
+           inputs={"archive_url": DATA_URL},
+           artifact_path='artifacts'
+           #, local=True
 
            )
-    _delete_outputs({ARTIFACTS_PATH, RUNS_PATH, SCHEDULES_PATH})
+
+
+def test_run_local_arc_to_parquet():
+    import os
+    os.getcwd()
+    fn = import_function("function.yaml")
+    fn.run(params={"key": "higgs-sample"},
+           handler="arc_to_parquet",
+           inputs={"archive_url": DATA_URL},
+           artifact_path=os.getcwd()+'/artifacts'
+           , local=True
+
+           )
 
 

@@ -2,13 +2,13 @@ kind: dask
 metadata:
   name: load-dask
   tag: ''
-  hash: fa3e9476e2a9d3fd5f2f952ce9d45bdd3561a386
-  project: default
+  hash: 2af86b4c6ce0bc3e3d0468c1b66a5358482f383e
+  project: ''
   labels:
     author: yjb
   categories:
-  - data-movement
-  - utils
+  - data-preparation
+  - etl
 spec:
   command: ''
   image: mlrun/ml-models
@@ -16,11 +16,60 @@ spec:
   build:
     functionSourceCode: ZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CmZyb20gbWxydW4uZGF0YXN0b3JlIGltcG9ydCBEYXRhSXRlbQoKZnJvbSB0eXBpbmcgaW1wb3J0IExpc3QsIE9wdGlvbmFsCgoKZGVmIGxvYWRfZGFzaygKICAgICAgICBjb250ZXh0OiBNTENsaWVudEN0eCwKICAgICAgICBzcmNfZGF0YTogRGF0YUl0ZW0sCiAgICAgICAgZGFza19rZXk6IHN0ciA9ICJkYXNrX2tleSIsCiAgICAgICAgaW5jX2NvbHM6IE9wdGlvbmFsW0xpc3Rbc3RyXV0gPSBOb25lLAogICAgICAgIGluZGV4X2NvbHM6IE9wdGlvbmFsW0xpc3Rbc3RyXV0gPSBOb25lLAogICAgICAgIGRhc2tfcGVyc2lzdDogYm9vbCA9IFRydWUsCiAgICAgICAgcmVmcmVzaF9kYXRhOiBib29sID0gVHJ1ZSwKICAgICAgICBzY2hlZHVsZXJfa2V5OiBzdHIgPSAic2NoZWR1bGVyIgopIC0+IE5vbmU6CiAgICAiIiJMb2FkIGRhdGFzZXQgaW50byBhbiBleGlzdGluZyBkYXNrIGNsdXN0ZXIKCiAgICBkYXNrIGpvYnMgZGVmaW5lIHRoZSBkYXNrIGNsaWVudCBwYXJhbWV0ZXJzIGF0IHRoZSBqb2IgbGV2ZWwsIHRoaXMgbWV0aG9kIHdpbGwgcmFpc2UgYW4gZXJyb3IgaWYgbm8gY2xpZW50IGlzIGRldGVjdGVkLgoKICAgIDpwYXJhbSBjb250ZXh0OiAgICAgICAgIHRoZSBmdW5jdGlvbiBjb250ZXh0CiAgICA6cGFyYW0gc3JjX2RhdGE6ICAgICAgICB1cmwgb2YgdGhlIGRhdGEgZmlsZSBvciBwYXJ0aXRpb25lZCBkYXRhc2V0IGFzIGVpdGhlcgogICAgICAgICAgICAgICAgICAgICAgICAgICAgYXJ0aWZhY3QgRGF0YUl0ZW0sIHN0cmluZywgb3IgcGF0aCBvYmplY3QgKHNpbWlsYXIgdG8KICAgICAgICAgICAgICAgICAgICAgICAgICAgIHBhbmRhcyByZWFkX2NzdikKICAgIDpwYXJhbSBkYXNrX2tleTogICAgICAgIGRlc3RpbmF0aW9uIGtleSBvZiBkYXRhIG9uIGRhc2sgY2x1c3RlciBhbmQgYXJ0aWZhY3Qgc3RvcmUKICAgIDpwYXJhbSBpbmNfY29sczogICAgICAgIGluY2x1ZGUgb25seSB0aGVzZSBjb2x1bW5zICh2ZXJ5IGZhc3QpCiAgICA6cGFyYW0gaW5kZXhfY29sczogICAgICBsaXN0IG9mIGluZGV4IGNvbHVtbiBuYW1lcyAoY2FuIGJlIGEgbG9uZy1ydW5uaW5nIHByb2Nlc3MpCiAgICA6cGFyYW0gZGFza19wZXJzaXN0OiAgICAoVHJ1ZSkgc2hvdWxkIHRoZSBkYXRhIGJlIHBlcnNpc3RlZCAodGhyb3VnaCB0aGUgYGNsaWVudC5wZXJzaXN0YCBvcCkKICAgIDpwYXJhbSByZWZyZXNoX2RhdGE6ICAgIChGYWxzZSkgaWYgdGhlIGRhc2tfa2V5IGFscmVhZHkgZXhpc3RzIGluIHRoZSBkYXNrIGNsdXN0ZXIsIHRoaXMgd2lsbAogICAgICAgICAgICAgICAgICAgICAgICAgICAgcmFpc2UgYW4gRXhjZXB0aW9uLiAgU2V0IHRvIFRydWUgdG8gcmVwbGFjZSB0aGUgZXhpc3RpbmcgY2x1c3RlciBkYXRhLgogICAgOnBhcmFtIHNjaGVkdWxlcl9rZXk6ICAgKHNjaGVkdWxlcikgdGhlIGRhc2sgc2NoZWR1bGVyIGNvbmZpZ3VyYXRpb24sIGpzb24gYWxzbyBsb2dnZWQgYXMgYW4gYXJ0aWZhY3QKICAgICIiIgogICAgaWYgaGFzYXR0cihjb250ZXh0LCAiZGFza19jbGllbnQiKToKICAgICAgICBkYXNrX2NsaWVudCA9IGNvbnRleHQuZGFza19jbGllbnQKICAgIGVsc2U6CiAgICAgICAgcmFpc2UgRXhjZXB0aW9uKCJhIGRhc2sgY2xpZW50IHdhcyBub3QgZm91bmQgaW4gdGhlIGV4ZWN1dGlvbiBjb250ZXh0IikKCiAgICBkZiA9IHNyY19kYXRhLmFzX2RmKGRmX21vZHVsZT1kZCkKCiAgICBpZiBkYXNrX3BlcnNpc3Q6CiAgICAgICAgZGYgPSBkYXNrX2NsaWVudC5wZXJzaXN0KGRmKQogICAgICAgIGlmIGRhc2tfY2xpZW50LmRhdGFzZXRzIGFuZCBkYXNrX2tleSBpbiBkYXNrX2NsaWVudC5kYXRhc2V0czoKICAgICAgICAgICAgZGFza19jbGllbnQudW5wdWJsaXNoX2RhdGFzZXQoZGFza19rZXkpCiAgICAgICAgZGFza19jbGllbnQucHVibGlzaF9kYXRhc2V0KGRmLCBuYW1lPWRhc2tfa2V5KQoKICAgIGlmIGNvbnRleHQ6CiAgICAgICAgY29udGV4dC5kYXNrX2NsaWVudCA9IGRhc2tfY2xpZW50CgogICAgIyBzaGFyZSB0aGUgc2NoZWR1bGVyLCB3aGV0aGVyIGRhdGEgaXMgcGVyc2lzdGVkIG9yIG5vdAogICAgZGFza19jbGllbnQud3JpdGVfc2NoZWR1bGVyX2ZpbGUoc2NoZWR1bGVyX2tleSArICIuanNvbiIpCgogICAgIyB3ZSBkb24ndCB1c2UgbG9nX2RhdGFzZXQgaGVyZSB1bnRpbCBpdCBjYW4gdGFrZSBpbnRvIGFjY291bnQKICAgICMgZGFzayBvcmlnaW4gYW5kIGFwcGx5IGRhc2sgZGVzY3JpYmUuCiAgICBjb250ZXh0LmxvZ19hcnRpZmFjdChzY2hlZHVsZXJfa2V5LCBsb2NhbF9wYXRoPXNjaGVkdWxlcl9rZXkgKyAiLmpzb24iKQ==
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#b6d661b4f8ad3f3a632a5024f679a4babbb04395:/home/michaell/projects/functions/load_dask/load_dask.py
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/load_dask/load_dask.py
   default_handler: load_dask
+  entry_points:
+    load_dask:
+      name: load_dask
+      doc: 'Load dataset into an existing dask cluster
+
+
+        dask jobs define the dask client parameters at the job level, this method
+        will raise an error if no client is detected.'
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+        default: ''
+      - name: src_data
+        type: DataItem
+        doc: url of the data file or partitioned dataset as either artifact DataItem,
+          string, or path object (similar to pandas read_csv)
+        default: ''
+      - name: dask_key
+        type: str
+        doc: destination key of data on dask cluster and artifact store
+        default: dask_key
+      - name: inc_cols
+        type: Optional[List[str]]
+        doc: include only these columns (very fast)
+        default: null
+      - name: index_cols
+        type: Optional[List[str]]
+        doc: list of index column names (can be a long-running process)
+        default: null
+      - name: dask_persist
+        type: bool
+        doc: (True) should the data be persisted (through the `client.persist` op)
+        default: true
+      - name: refresh_data
+        type: bool
+        doc: (False) if the dask_key already exists in the dask cluster, this will
+          raise an Exception.  Set to True to replace the existing cluster data.
+        default: true
+      - name: scheduler_key
+        type: str
+        doc: (scheduler) the dask scheduler configuration, json also logged as an
+          artifact
+        default: scheduler
+      outputs:
+      - default: ''
+      lineno: 7
   description: load dask cluster with data
+  remote: true
   nthreads: 1
   min_replicas: 0
   max_replicas: 16
   scheduler_timeout: 60 minutes
+  affinity: null
 verbose: false

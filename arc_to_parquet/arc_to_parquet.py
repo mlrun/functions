@@ -1,12 +1,15 @@
-import os
 import pandas as pd
 import pyarrow.parquet as pq
 import pyarrow as pa
+import numpy as np
+
 
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 
 from typing import List
+import os
+
 
 
 def _chunk_readwrite(
@@ -15,7 +18,8 @@ def _chunk_readwrite(
         chunksize,
         header,
         encoding,
-        dtype
+        dtype,
+        dataset
 ):
     """stream read and write archives
 
@@ -34,7 +38,7 @@ def _chunk_readwrite(
         table = pa.Table.from_pandas(df)
         if i == 0:
             if dataset:
-                header = copy(table.schema)
+                header = np.copy(table.schema)
             else:
                 pqwriter = pq.ParquetWriter(dest_path, table.schema)
         if dataset:
@@ -106,7 +110,7 @@ def arc_to_parquet(
         context.logger.info("destination file does not exist, downloading")
         if chunksize > 0:
             header = _chunk_readwrite(archive_url, dest_path, chunksize,
-                                      encoding, dtype)
+                                      encoding, dtype, dataset)
             context.log_dataset(key=key, stats=stats, format='parquet',
                                 target_path=dest_path)
         else:

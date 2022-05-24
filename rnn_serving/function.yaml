@@ -2,57 +2,17 @@ kind: serving
 metadata:
   name: rnn-serving
   tag: ''
-  hash: cea1b8c57736611107343fa65e7690fd9c4b7f6b
-  project: default
+  hash: 548cd27edfdc49aed0b069d94bd049435d484722
+  project: ''
   labels:
     author: Daniel
   categories:
   - model-serving
+  - machine-learning
 spec:
   command: ''
   args: []
-  image: mlrun/ml-model
-  entry_points:
-    load:
-      name: load
-      doc: load and initialize the model and/or other elements
-      parameters:
-      - name: self
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 8
-    predict:
-      name: predict
-      doc: ''
-      parameters:
-      - name: self
-        default: ''
-      - name: body
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 13
-    init_context:
-      name: init_context
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 23
-    handler:
-      name: handler
-      doc: ''
-      parameters:
-      - name: context
-        default: ''
-      - name: event
-        default: ''
-      outputs:
-      - default: ''
-      lineno: 26
+  image: mlrun/ml-models
   description: deploy an rnn based stock analysis model server.
   min_replicas: 1
   max_replicas: 4
@@ -64,7 +24,7 @@ spec:
       name: rnn-serving
       labels: {}
       annotations:
-        nuclio.io/generated_by: function generated from rnn_serving.py
+        nuclio.io/generated_by: function generated from /User/test/functions/rnn_serving/rnn_serving.py
     spec:
       runtime: python:3.6
       handler: rnn_serving:handler
@@ -73,13 +33,14 @@ spec:
       build:
         commands: []
         noBaseImagesPull: true
-        functionSourceCode: aW1wb3J0IG1scnVuCmltcG9ydCBudW1weSBhcyBucAppbXBvcnQga2VyYXMKaW1wb3J0IGpzb24KCgpjbGFzcyBSTk5fTW9kZWxfU2VydmluZyhtbHJ1bi5zZXJ2aW5nLlYyTW9kZWxTZXJ2ZXIpOgogICAgZGVmIGxvYWQoc2VsZik6CiAgICAgICAgIiIibG9hZCBhbmQgaW5pdGlhbGl6ZSB0aGUgbW9kZWwgYW5kL29yIG90aGVyIGVsZW1lbnRzIiIiCiAgICAgICAgbW9kZWxfZmlsZSwgZXh0cmFfZGF0YSA9IHNlbGYuZ2V0X21vZGVsKHN1ZmZpeD0iLmg1IikKICAgICAgICBzZWxmLm1vZGVsID0ga2VyYXMubW9kZWxzLmxvYWRfbW9kZWwobW9kZWxfZmlsZSkKCiAgICBkZWYgcHJlZGljdChzZWxmLCBib2R5KToKICAgICAgICB0cnk6CiAgICAgICAgICAgICIiIkdlbmVyYXRlIG1vZGVsIHByZWRpY3Rpb25zIGZyb20gc2FtcGxlLiIiIgogICAgICAgICAgICBmZWF0cyA9IG5wLmFzYXJyYXkoYm9keVsnaW5wdXRzJ10pCiAgICAgICAgICAgIHJlc3VsdCA9IHNlbGYubW9kZWwucHJlZGljdChmZWF0cykKICAgICAgICAgICAgcmVzdWx0ID0ganNvbi5kdW1wcyhyZXN1bHQudG9saXN0KCkpCiAgICAgICAgICAgIHJldHVybiByZXN1bHQKICAgICAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgICAgIHJhaXNlIEV4Y2VwdGlvbigiRmFpbGVkIHRvIHByZWRpY3QgJXMiICUgZSkKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nX3YyJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
+        functionSourceCode: aW1wb3J0IG1scnVuCmltcG9ydCBudW1weSBhcyBucApmcm9tIHRlbnNvcmZsb3cgaW1wb3J0IGtlcmFzCmltcG9ydCBqc29uCgoKY2xhc3MgUk5OX01vZGVsX1NlcnZpbmcobWxydW4uc2VydmluZy5WMk1vZGVsU2VydmVyKToKICAgIGRlZiBsb2FkKHNlbGYpOgogICAgICAgICIiImxvYWQgYW5kIGluaXRpYWxpemUgdGhlIG1vZGVsIGFuZC9vciBvdGhlciBlbGVtZW50cyIiIgogICAgICAgIG1vZGVsX2ZpbGUsIGV4dHJhX2RhdGEgPSBzZWxmLmdldF9tb2RlbChzdWZmaXg9Ii5oNSIpCiAgICAgICAgc2VsZi5tb2RlbCA9IGtlcmFzLm1vZGVscy5sb2FkX21vZGVsKG1vZGVsX2ZpbGUpCgogICAgZGVmIHByZWRpY3Qoc2VsZiwgYm9keSk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICAiIiJHZW5lcmF0ZSBtb2RlbCBwcmVkaWN0aW9ucyBmcm9tIHNhbXBsZS4iIiIKICAgICAgICAgICAgZmVhdHMgPSBucC5hc2FycmF5KGJvZHlbJ2lucHV0cyddKQogICAgICAgICAgICByZXN1bHQgPSBzZWxmLm1vZGVsLnByZWRpY3QoZmVhdHMpCiAgICAgICAgICAgIHJlc3VsdCA9IGpzb24uZHVtcHMocmVzdWx0LnRvbGlzdCgpKQogICAgICAgICAgICByZXR1cm4gcmVzdWx0CiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByYWlzZSBFeGNlcHRpb24oIkZhaWxlZCB0byBwcmVkaWN0ICVzIiAlIGUpCmZyb20gbWxydW4ucnVudGltZXMgaW1wb3J0IG51Y2xpb19pbml0X2hvb2sKZGVmIGluaXRfY29udGV4dChjb250ZXh0KToKICAgIG51Y2xpb19pbml0X2hvb2soY29udGV4dCwgZ2xvYmFscygpLCAnc2VydmluZ192MicpCgpkZWYgaGFuZGxlcihjb250ZXh0LCBldmVudCk6CiAgICByZXR1cm4gY29udGV4dC5tbHJ1bl9oYW5kbGVyKGNvbnRleHQsIGV2ZW50KQo=
   source: ''
   function_kind: serving_v2
   build:
-    commands:
-    - python -m pip install mlrun==0.6.2 keras tensorflow wget pygit2
-    code_origin: http://github.com/aviaIguazio/functions.git#8d48032f1a1f807c1aac5e6b88448ec470d63fc7:rnn_serving.py
+    commands: []
+    code_origin: https://github.com/daniels290813/functions.git#97b63199864dd95681bca5af86835d177bf9d67b:/User/test/functions/rnn_serving/rnn_serving.py
+    origin_filename: /User/test/functions/rnn_serving/rnn_serving.py
   secret_sources: []
+  mount_applied: false
   affinity: null
 verbose: false

@@ -1,16 +1,18 @@
 import json
+import os
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Optional, List, Dict
 
 import numpy as np
 import pandas as pd
+import v3io
 from mlrun import get_run_db
 from mlrun import store_manager
 from mlrun.data_types.infer import DFDataInfer, InferOptions
 from mlrun.run import MLClientCtx
 from mlrun.utils import logger, config
-from mlrun.utils.model_monitoring import parse_model_endpoint_store_prefix
+from mlrun.utils.model_monitoring import EndpointType, parse_model_endpoint_store_prefix
 from mlrun.utils.v3io_clients import get_v3io_client, get_frames_client
 from sklearn.preprocessing import KBinsDiscretizer
 
@@ -144,14 +146,26 @@ class VirtualDrift:
         # Verify all the features exist between datasets
         base_features = set(base_histogram.columns)
         latest_features = set(latest_histogram.columns)
-        if not base_features == latest_features:
+
+        features_common = list(base_features.intersection(latest_features))
+        feature_difference = list(base_features ^ latest_features)
+
+        if not features_common:
             raise ValueError(
-                f"Base dataset and latest dataset have different featuers: {base_features} <> {latest_features}"
+                f"No common features found: {base_features} <> {latest_features}"
             )
+
+        base_histogram = base_histogram.drop(
+            feature_difference, axis=1, errors="ignore"
+        )
+        latest_histogram = latest_histogram.drop(
+            feature_difference, axis=1, errors="ignore"
+        )
 
         # Compute the drift per feature
         features_drift_measures = self.compute_metrics_over_df(
-            base_histogram.loc[:, base_features], latest_histogram.loc[:, base_features]
+            base_histogram.loc[:, features_common],
+            latest_histogram.loc[:, features_common],
         )
 
         # Compute total drift measures for features
@@ -168,7 +182,7 @@ class VirtualDrift:
 
         drift_result = defaultdict(dict)
 
-        for feature in base_features:
+        for feature in features_common:
             for metric, values in features_drift_measures.items():
                 drift_result[feature][metric] = values[feature]
                 sum = features_drift_measures[metric]["total_sum"]
@@ -200,14 +214,24 @@ class VirtualDrift:
 
 
 class BatchProcessor:
-    def __init__(self, context: MLClientCtx, project: str):
+    def __init__(
+        self,
+        context: MLClientCtx,
+        project: str,
+        model_monitoring_access_key: str,
+        v3io_access_key: str,
+    ):
         self.context = context
         self.project = project
+
+        self.v3io_access_key = v3io_access_key
+        self.model_monitoring_access_key = (
+                model_monitoring_access_key or v3io_access_key
+        )
+
         self.virtual_drift = VirtualDrift(inf_capping=10)
 
         template = config.model_endpoint_monitoring.store_prefixes.default
-
-        self.parquet_path = template.format(project=self.project, kind="parquet")
 
         kv_path = template.format(project=self.project, kind="endpoints")
         _, self.kv_container, self.kv_path = parse_model_endpoint_store_prefix(kv_path)
@@ -222,8 +246,15 @@ class BatchProcessor:
             stream_path
         )
 
+        self.parquet_path = config.model_endpoint_monitoring.store_prefixes.user_space.format(
+            project=project, kind="parquet"
+        )
+
         logger.info(
             "Initializing BatchProcessor",
+            project=project,
+            model_monitoring_access_key_initalized=bool(model_monitoring_access_key),
+            v3io_access_key_initialized=bool(v3io_access_key),
             parquet_path=self.parquet_path,
             kv_container=self.kv_container,
             kv_path=self.kv_path,
@@ -241,28 +272,30 @@ class BatchProcessor:
         )
 
         self.db = get_run_db()
-        self.v3io = get_v3io_client()
+        self.v3io = get_v3io_client(access_key=self.v3io_access_key)
         self.frames = get_frames_client(
-            address=config.v3io_framesd, container=self.tsdb_container
+            address=config.v3io_framesd,
+            container=self.tsdb_container,
+            token=self.v3io_access_key,
         )
+        self.exception = None
 
     def post_init(self):
-        try:
-            self.v3io.stream.create(
-                container=self.stream_container,
-                stream_path=self.stream_path,
-                shard_count=1,
-            )
-        except Exception as e:
-            if "ResourceInUseException" in str(e):
-                logger.error("Stream already exsits...")
-            else:
-                raise e
+        response = self.v3io.create_stream(
+            container=self.stream_container,
+            path=self.stream_path,
+            shard_count=1,
+            raise_for_status=v3io.dataplane.RaiseForStatus.never,
+            access_key=self.v3io_access_key,
+        )
+
+        if not (response.status_code == 400 and "ResourceInUse" in str(response.body)):
+            response.raise_for_status([409, 204, 403])
 
     def run(self):
 
         try:
-            endpoints = self.db.list_endpoints(self.project)
+            endpoints = self.db.list_model_endpoints(self.project)
         except Exception as e:
             logger.error("Failed to list endpoints", exc=e)
             return
@@ -276,6 +309,12 @@ class BatchProcessor:
         prefix = self.parquet_path.replace(sub, "")
         fs = store.get_filesystem(silent=False)
 
+        if not fs.exists(sub):
+            logger.warn(
+                f"{sub} does not exist"
+            )
+            return
+
         for endpoint_dir in fs.ls(sub):
             endpoint_id = endpoint_dir["name"].split("=")[-1]
             if endpoint_id not in active_endpoints:
@@ -287,16 +326,18 @@ class BatchProcessor:
                 last_day = self.get_last_created_dir(fs, last_month)
                 last_hour = self.get_last_created_dir(fs, last_day)
 
-                parquet_files = fs.ls(last_hour["name"])
-                last_parquet = sorted(parquet_files, key=lambda k: k["mtime"])[-1]
-                parquet_name = last_parquet["name"]
-                full_path = f"{prefix}{parquet_name}"
+                full_path = f"{prefix}{last_hour['name']}"
 
                 logger.info(f"Now processing {full_path}")
 
-                endpoint = self.db.get_endpoint(
+                endpoint = self.db.get_model_endpoint(
                     project=self.project, endpoint_id=endpoint_id
                 )
+
+                if endpoint.status.endpoint_type == EndpointType.ROUTER:
+                    # endpoint.status.feature_stats is None
+                    logger.info(f"{endpoint_id} is router skipping")
+                    continue
 
                 df = pd.read_parquet(full_path)
                 timestamp = df["timestamp"].iloc[-1]
@@ -330,7 +371,18 @@ class BatchProcessor:
                     self.v3io.stream.put_records(
                         container=self.stream_container,
                         stream_path=self.stream_path,
-                        records=[{"drift_status": drift_status, **drift_result}],
+                        records=[
+                            {
+                                "data": json.dumps(
+                                    {
+                                        "endpoint_id": endpoint_id,
+                                        "drift_status": drift_status,
+                                        "drift_measure": drift_measure,
+                                        "drift_per_feature": {**drift_result},
+                                    }
+                                )
+                            }
+                        ],
                     )
 
                 self.v3io.kv.update(
@@ -363,7 +415,8 @@ class BatchProcessor:
                 logger.info(f"Done updating drift measures {full_path}")
 
             except Exception as e:
-                logger.error(e)
+                logger.error(f"Exception for endpoint {endpoint_id}")
+                self.exception = e
 
     def check_for_drift(self, drift_result, endpoint):
         tvd_mean = drift_result.get("tvd_mean")
@@ -397,7 +450,14 @@ class BatchProcessor:
         return last_dir
 
 
-def handler(context: MLClientCtx, project: str):
-    batch_processor = BatchProcessor(context, project)
+def handler(context: MLClientCtx):
+    batch_processor = BatchProcessor(
+        context=context,
+        project=context.project,
+        model_monitoring_access_key=os.environ.get("MODEL_MONITORING_ACCESS_KEY"),
+        v3io_access_key=os.environ.get("V3IO_ACCESS_KEY"),
+    )
     batch_processor.post_init()
     batch_processor.run()
+    if batch_processor.exception:
+        raise batch_processor.exception

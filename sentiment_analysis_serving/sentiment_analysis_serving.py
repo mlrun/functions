@@ -36,7 +36,7 @@ class SentimentClassifierServing(mlrun.serving.V2ModelServer):
         model = BertSentimentClassifier(n_classes=3)
         model.load_state_dict(torch.load(model_file, map_location=device))
         model.eval()
-        return model
+        self.model = model
 
     def predict(self, body):
         """

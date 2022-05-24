@@ -1,24 +1,24 @@
 apiVersion: v1
 categories:
-- ml
-- test
+- monitoring
+- model-serving
 description: test model servers
 doc: ''
 example: model_server_tester.ipynb
-generationDate: 2021-05-19:23-13
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   author: yaronh
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: model-server-tester
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
-  filename: ''
+  filename: model_server_tester.py
   handler: model_server_tester
   image: mlrun/mlrun
   kind: job
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.9.0

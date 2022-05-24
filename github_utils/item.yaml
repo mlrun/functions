@@ -1,24 +1,23 @@
 apiVersion: v1
 categories:
-- notifications
 - utils
 description: add comments to github pull request
 doc: ''
 example: github_utils.ipynb
-generationDate: 2021-05-19:22-41
+generationDate: 2021-11-18:12-28
 icon: ''
 labels:
   author: yaronh
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 0.8.0
 name: github-utils
-platformVersion: ''
+platformVersion: 3.2.0
 spec:
-  filename: ''
+  filename: github_utils.py
   handler: run_summary_comment
   image: mlrun/mlrun
   kind: job
   requirements: []
 url: ''
-version: 0.0.1
+version: 0.9.0

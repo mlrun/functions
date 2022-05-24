@@ -2,12 +2,12 @@ kind: remote
 metadata:
   name: tf2-serving
   hash: 134293b94996e74275d90546f8d4ef96198af679
-  project: default
+  project: ''
   labels:
     author: yaronh
   categories:
-  - serving
-  - dl
+  - model-serving
+  - machine-learning
 spec:
   command: ''
   args: []

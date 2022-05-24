@@ -4,16 +4,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from subprocess import CompletedProcess
 from typing import List, Union, Optional
-
+import sys
 import click
 import yaml
+import re
 
 from cli.helpers import (
     is_item_dir,
     install_pipenv,
     install_python,
     install_requirements,
-    get_item_yaml_requirements,
+    get_item_yaml_values,
 )
 from cli.path_iterator import PathIterator
 
@@ -21,6 +22,8 @@ from cli.path_iterator import PathIterator
 @click.command()
 @click.option("-r", "--root-directory", default=".", help="Path to root directory")
 @click.option("-s", "--suite", help="Type of suite to run [py/ipynb/examples/items]")
+@click.option("-mp", "--multi-processing", help="run multiple tests")
+@click.option("-fn", "--function-name", help="run specific function by name")
 @click.option(
     "-f",
     "--stop-on-failure",
@@ -28,18 +31,22 @@ from cli.path_iterator import PathIterator
     default=False,
     help="When true, test suite will stop running after the first test ran",
 )
-def test_suite(root_directory: str, suite: str, stop_on_failure: bool):
+def test_suite(root_directory: str,
+               suite: str,
+               stop_on_failure: bool,
+               multi_processing: bool = False,
+               function_name: str = None):
     if not suite:
         click.echo("-s/--suite is required")
         exit(1)
 
     if suite == "py":
         TestPY(stop_on_failure=stop_on_failure, clean_env_artifacts=True)._run(
-            root_directory
+            root_directory, multi_processing, function_name
         )
     elif suite == "ipynb":
         TestIPYNB(stop_on_failure=stop_on_failure, clean_env_artifacts=True)._run(
-            root_directory
+            root_directory, multi_processing, function_name
         )
     elif suite == "examples":
         test_example(root_directory)
@@ -59,7 +66,7 @@ def test_example(root_dir="."):
     #         continue
     #
     #     # install_python(directory)
-    #     item_requirements = get_item_yaml_requirements(directory)
+    #     item_requirements = list(get_item_yaml_values(directory, 'requirements')['requirements'])
     #     install_requirements(directory, ["papermill", "jupyter"] + item_requirements)
     #
     #     # for notebook in notebooks:
@@ -131,20 +138,41 @@ class TestSuite(ABC):
     def after_each(self, path: Union[str, Path], test_result: TestResult):
         pass
 
-    def _run(self, path: Union[str, Path]):
+    def _run(self, path: Union[str, Path], multiprocess, function_name):
+        import multiprocessing as mp
+        process_count = 1
+        if multiprocess:
+            process_count = mp.cpu_count()-1
+        print("running tests with {} process".format(process_count))
         discovered = self.discover(path)
+        if function_name is not None:
+            discovered = [string for string in discovered if function_name in string]
+        for path in discovered:
+            if re.match(".+/test_*", path):
+                discovered.remove(path)
+                print("a function name cannot start with test, please rename {} ".format(path))
+
         self.before_run()
+
+        # pool = mp.Pool(process_count)
+        # pool.map(self.directory_process, [directory for directory in discovered])
         for directory in discovered:
-            self.before_each(directory)
-            result = self.run(directory)
-            self.test_results.append(result)
-            self.after_each(directory, result)
+            self.directory_process(directory)
         self.after_run()
-        exit(0)
+
+        #pool.close()
+        sys.exit(0)
+
+    def directory_process(self, directory):
+        self.before_each(directory)
+        result = self.run(directory)
+        self.test_results.append(result)
+        self.after_each(directory, result)
+
 
 
 class TestPY(TestSuite):
-    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True):
+    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True, multi_process: bool= False):
         super().__init__(stop_on_failure)
         self.clean_env_artifacts = clean_env_artifacts
         self.results = []
@@ -176,8 +204,8 @@ class TestPY(TestSuite):
             click.echo(
                 "No tests found, make sure your test file names are structures as 'test_*.py')"
             )
-            exit(0)
-
+            sys.exit(0)
+        testables.sort()
         return testables
 
     def before_run(self):
@@ -187,13 +215,14 @@ class TestPY(TestSuite):
         pass
 
     def run(self, path: Union[str, Path]):
+        print("PY run path {}".format(path))
         install_python(path)
-        item_requirements = get_item_yaml_requirements(path)
+        item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
         install_requirements(path, ["pytest"] + item_requirements)
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ; pipenv run python -m pytest",
-            stdout=subprocess.PIPE,
+            stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
             shell=True,
@@ -263,7 +292,7 @@ class TestPY(TestSuite):
             click.echo("\n")
 
         if failed_tests:
-            exit(1)
+            sys.exit(1)
 
     @staticmethod
     def is_test_py(path: Union[str, Path]) -> bool:
@@ -297,8 +326,10 @@ class TestIPYNB(TestSuite):
             for inner_dir in item_iterator:
                 # Iterate individual files in each directory
                 for inner_file in inner_dir.iterdir():
+                    #click.echo("test inner file"+str(inner_file))
                     if self.is_test_ipynb(inner_file):
-                        testables.append(str(inner_file.resolve()))
+                        #click.echo("adding "+str(inner_file))
+                        testables.append(str(inner_dir.resolve()))
             click.echo(f"Found {len(testables)} testable items...")
 
         if not testables:
@@ -306,7 +337,10 @@ class TestIPYNB(TestSuite):
                 "No tests found, make sure your test file names are structures as 'test_*.py')"
             )
             exit(0)
-
+        testables.sort()
+        click.echo(
+            "tests list "+str(testables)
+        )
         return testables
 
     def before_run(self):
@@ -315,22 +349,28 @@ class TestIPYNB(TestSuite):
     def before_each(self, path: Union[str, Path]):
         pass
 
+#    def run(self, path: Union[str, Path]) -> TestResult:
     def run(self, path: Union[str, Path]) -> TestResult:
+        print("IPYNB run path {}".format(path))
         install_python(path)
-        item_requirements = get_item_yaml_requirements(path)
-        install_requirements(path, ["papermill", "jupyter"] + item_requirements)
+        item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
+        #install_requirements(path, ["papermill", "jupyter"] + item_requirements)
+        install_requirements(path, ["papermill"] + item_requirements)
 
         click.echo(f"Running tests for {path}...")
+        running_ipynb = Path(path).name+".ipynb"
+        click.echo(f"Running notebook {running_ipynb}")
+        command = f'pipenv run papermill {running_ipynb} out.ipynb --log-output'
         completed_process: CompletedProcess = subprocess.run(
-            f"cd {path.parent.resolve()} ; pipenv run papermill {path.name} -",
-            stdout=subprocess.PIPE,
+            f"cd {path} ;echo {command} ; {command}",
+            stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
-            shell=True,
+            shell=True
         )
 
         meta_data = {"completed_process": completed_process, "test_path": path}
-
+        click.echo(completed_process)
         if completed_process.returncode == 0:
             return TestResult.passed(status_code=0, meta_data=meta_data)
 
@@ -395,15 +435,14 @@ class TestIPYNB(TestSuite):
                 click.echo(complete_subprocess.stderr.decode("utf-8"))
                 exit(test_result.status_code)
 
-    def _run(self, path: Union[str, Path]):
-        super()._run(path)
+    def _run(self, path: Union[str, Path], multi_processing, function_name):
+        super()._run(path, multi_processing, function_name )
 
     @staticmethod
     def is_test_ipynb(path: Path):
         return (
             path.is_file()
-            and path.name.startswith("test_")
-            and path.name.endswith(".py")
+            and path.name.endswith(".ipynb")
         )
 
 

@@ -2,22 +2,62 @@ kind: job
 metadata:
   name: xgb-test
   tag: ''
-  hash: 09a9ff6d677a4c86a08e102742113ad6de3485f5
-  project: default
+  hash: 3f3368b15f934eba5f6f6b23972da804b6eb88d4
+  project: ''
   labels:
     author: Daniel
     framework: xgboost
   categories:
-  - model-test
+  - model-testing
 spec:
   command: ''
   args: []
   image: mlrun/ml-models
   env: []
   default_handler: xgb_test
+  entry_points:
+    xgb_test:
+      name: xgb_test
+      doc: 'Test one or more classifier models against held-out dataset
+
+
+        Using held-out test features, evaluates the peformance of the estimated model
+
+
+        Can be part of a kubeflow pipeline as a test step that is run post EDA and
+
+        training/validation cycles'
+      parameters:
+      - name: context
+        doc: the function context
+        default: ''
+      - name: models_path
+        type: DataItem
+        doc: model artifact to be tested
+        default: ''
+      - name: test_set
+        type: DataItem
+        doc: test features and labels
+        default: ''
+      - name: label_column
+        type: str
+        doc: column name for ground truth labels
+        default: ''
+      - name: plots_dest
+        type: str
+        doc: dir for test plots
+        default: plots
+      - name: default_model
+        type: str
+        doc: '''model.pkl'', default model artifact file name'
+        default: model.pkl
+      outputs:
+      - default: ''
+      lineno: 16
   description: Test one or more classifier models against held-out dataset.
   build:
-    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHdhcm5pbmdzCndhcm5pbmdzLnNpbXBsZWZpbHRlcihhY3Rpb249Imlnbm9yZSIsIGNhdGVnb3J5PUZ1dHVyZVdhcm5pbmcpCgppbXBvcnQgb3MKaW1wb3J0IHBhbmRhcyBhcyBwZApmcm9tIG1scnVuLmRhdGFzdG9yZSBpbXBvcnQgRGF0YUl0ZW0KZnJvbSBtbHJ1bi5hcnRpZmFjdHMgaW1wb3J0IGdldF9tb2RlbApmcm9tIGNsb3VkcGlja2xlIGltcG9ydCBsb2FkCgpmcm9tIG1scnVuLm1sdXRpbHMubW9kZWxzIGltcG9ydCBldmFsX21vZGVsX3YyCgpkZWYgeGdiX3Rlc3QoCiAgICBjb250ZXh0LAogICAgbW9kZWxzX3BhdGg6IERhdGFJdGVtLCAKICAgIHRlc3Rfc2V0OiBEYXRhSXRlbSwKICAgIGxhYmVsX2NvbHVtbjogc3RyLAogICAgcGxvdHNfZGVzdDogc3RyID0gInBsb3RzIiwKICAgIGRlZmF1bHRfbW9kZWw6IHN0ciA9ICJtb2RlbC5wa2wiCikgLT4gTm9uZToKICAgICIiIlRlc3Qgb25lIG9yIG1vcmUgY2xhc3NpZmllciBtb2RlbHMgYWdhaW5zdCBoZWxkLW91dCBkYXRhc2V0CiAgICAKICAgIFVzaW5nIGhlbGQtb3V0IHRlc3QgZmVhdHVyZXMsIGV2YWx1YXRlcyB0aGUgcGVmb3JtYW5jZSBvZiB0aGUgZXN0aW1hdGVkIG1vZGVsCiAgICAKICAgIENhbiBiZSBwYXJ0IG9mIGEga3ViZWZsb3cgcGlwZWxpbmUgYXMgYSB0ZXN0IHN0ZXAgdGhhdCBpcyBydW4gcG9zdCBFREEgYW5kIAogICAgdHJhaW5pbmcvdmFsaWRhdGlvbiBjeWNsZXMKICAgIAogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgICAgdGhlIGZ1bmN0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBtb2RlbHNfcGF0aDogICAgIG1vZGVsIGFydGlmYWN0IHRvIGJlIHRlc3RlZAogICAgOnBhcmFtIHRlc3Rfc2V0OiAgICAgICAgdGVzdCBmZWF0dXJlcyBhbmQgbGFiZWxzCiAgICA6cGFyYW0gbGFiZWxfY29sdW1uOiAgICBjb2x1bW4gbmFtZSBmb3IgZ3JvdW5kIHRydXRoIGxhYmVscwogICAgOnBhcmFtIHBsb3RzX2Rlc3Q6ICAgICAgZGlyIGZvciB0ZXN0IHBsb3RzCiAgICA6cGFyYW0gZGVmYXVsdF9tb2RlbDogICAnbW9kZWwucGtsJywgZGVmYXVsdCBtb2RlbCBhcnRpZmFjdCBmaWxlIG5hbWUKICAgICIiIgogICAgeHRlc3QgPSB0ZXN0X3NldC5hc19kZigpCiAgICB5dGVzdCA9IHh0ZXN0LnBvcChsYWJlbF9jb2x1bW4pCiAgICAKICAgIHRyeToKICAgICAgICBtb2RlbF9maWxlLCBtb2RlbF9vYmosIF8gPSBnZXRfbW9kZWwobW9kZWxzX3BhdGgudXJsLCBzdWZmaXg9Jy5wa2wnKQogICAgICAgIG1vZGVsX29iaiA9IGxvYWQob3Blbihtb2RlbF9maWxlLCAicmIiKSkKICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgYToKICAgICAgICByYWlzZSBFeGNlcHRpb24oIm1vZGVsIGxvY2F0aW9uIGxpa2VseSBtaXNzcGVjaWZpZWQiKQoKICAgIGV2YWxfbWV0cmljcyA9IGV2YWxfbW9kZWxfdjIoY29udGV4dCwgeHRlc3QsIHl0ZXN0LnZhbHVlcywgbW9kZWxfb2JqKQoK
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHdhcm5pbmdzCgp3YXJuaW5ncy5zaW1wbGVmaWx0ZXIoYWN0aW9uPSJpZ25vcmUiLCBjYXRlZ29yeT1GdXR1cmVXYXJuaW5nKQoKaW1wb3J0IG9zCmltcG9ydCBwYW5kYXMgYXMgcGQKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCmZyb20gbWxydW4uYXJ0aWZhY3RzIGltcG9ydCBnZXRfbW9kZWwKZnJvbSBjbG91ZHBpY2tsZSBpbXBvcnQgbG9hZAoKZnJvbSBtbHJ1bi5tbHV0aWxzLm1vZGVscyBpbXBvcnQgZXZhbF9tb2RlbF92MgoKCmRlZiB4Z2JfdGVzdCgKICAgIGNvbnRleHQsCiAgICBtb2RlbHNfcGF0aDogRGF0YUl0ZW0sCiAgICB0ZXN0X3NldDogRGF0YUl0ZW0sCiAgICBsYWJlbF9jb2x1bW46IHN0ciwKICAgIHBsb3RzX2Rlc3Q6IHN0ciA9ICJwbG90cyIsCiAgICBkZWZhdWx0X21vZGVsOiBzdHIgPSAibW9kZWwucGtsIiwKKSAtPiBOb25lOgogICAgIiIiVGVzdCBvbmUgb3IgbW9yZSBjbGFzc2lmaWVyIG1vZGVscyBhZ2FpbnN0IGhlbGQtb3V0IGRhdGFzZXQKCiAgICBVc2luZyBoZWxkLW91dCB0ZXN0IGZlYXR1cmVzLCBldmFsdWF0ZXMgdGhlIHBlZm9ybWFuY2Ugb2YgdGhlIGVzdGltYXRlZCBtb2RlbAoKICAgIENhbiBiZSBwYXJ0IG9mIGEga3ViZWZsb3cgcGlwZWxpbmUgYXMgYSB0ZXN0IHN0ZXAgdGhhdCBpcyBydW4gcG9zdCBFREEgYW5kCiAgICB0cmFpbmluZy92YWxpZGF0aW9uIGN5Y2xlcwoKICAgIDpwYXJhbSBjb250ZXh0OiAgICAgICAgIHRoZSBmdW5jdGlvbiBjb250ZXh0CiAgICA6cGFyYW0gbW9kZWxzX3BhdGg6ICAgICBtb2RlbCBhcnRpZmFjdCB0byBiZSB0ZXN0ZWQKICAgIDpwYXJhbSB0ZXN0X3NldDogICAgICAgIHRlc3QgZmVhdHVyZXMgYW5kIGxhYmVscwogICAgOnBhcmFtIGxhYmVsX2NvbHVtbjogICAgY29sdW1uIG5hbWUgZm9yIGdyb3VuZCB0cnV0aCBsYWJlbHMKICAgIDpwYXJhbSBwbG90c19kZXN0OiAgICAgIGRpciBmb3IgdGVzdCBwbG90cwogICAgOnBhcmFtIGRlZmF1bHRfbW9kZWw6ICAgJ21vZGVsLnBrbCcsIGRlZmF1bHQgbW9kZWwgYXJ0aWZhY3QgZmlsZSBuYW1lCiAgICAiIiIKICAgIHh0ZXN0ID0gdGVzdF9zZXQuYXNfZGYoKQogICAgeXRlc3QgPSB4dGVzdC5wb3AobGFiZWxfY29sdW1uKQoKICAgIHRyeToKICAgICAgICBtb2RlbF9maWxlLCBtb2RlbF9vYmosIF8gPSBnZXRfbW9kZWwobW9kZWxzX3BhdGgudXJsLCBzdWZmaXg9Ii5wa2wiKQogICAgICAgIG1vZGVsX29iaiA9IGxvYWQob3Blbihtb2RlbF9maWxlLCAicmIiKSkKICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgYToKICAgICAgICByYWlzZSBFeGNlcHRpb24oIm1vZGVsIGxvY2F0aW9uIGxpa2VseSBtaXNzcGVjaWZpZWQiKQoKICAgIGV2YWxfbWV0cmljcyA9IGV2YWxfbW9kZWxfdjIoY29udGV4dCwgeHRlc3QsIHl0ZXN0LnZhbHVlcywgbW9kZWxfb2JqKQo=
     commands: []
-    code_origin: https://github.com/Michaelliv/functions.git#1a62aabd940ceb46a8a96e6bb124b4abcfdd23c1:/home/michaell/projects/functions/xgb_test/xgb_test.ipynb
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/xgb_test/xgb_test.py
+  affinity: null
 verbose: false

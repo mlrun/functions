@@ -218,8 +218,7 @@ class TestPY(TestSuite):
 
     def run(self, path: Union[str, Path]):
         print("PY run path {}".format(path))
-        # install_python(path)
-
+        install_python(path)
         txt_requirements = get_txt_requirements(path)
         item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
         print(["pytest"] + item_requirements + txt_requirements)

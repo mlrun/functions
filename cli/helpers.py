@@ -1,3 +1,4 @@
+import os
 import pathlib
 import subprocess
 from pathlib import Path
@@ -83,6 +84,16 @@ def install_requirements(directory: str, requirements: Union[List[str], Set[str]
     )
 
     exit_on_non_zero_return(requirements_install)
+
+
+def get_txt_requirements(path: Union[Path, str]) -> List[str]:
+    txt_requirements = []
+    if (Path(path) / 'requirements.txt').exists():
+        with open(os.path.join(path, 'requirements.txt'), 'r') as req_file:
+            for req in req_file:
+                txt_requirements.append(req.strip('\n'))
+
+    return txt_requirements
 
 
 def get_item_yaml_values(

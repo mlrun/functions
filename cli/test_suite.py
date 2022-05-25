@@ -1,3 +1,4 @@
+import os.path
 import subprocess
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -15,6 +16,7 @@ from cli.helpers import (
     install_python,
     install_requirements,
     get_item_yaml_values,
+    get_txt_requirements
 )
 from cli.path_iterator import PathIterator
 
@@ -216,9 +218,12 @@ class TestPY(TestSuite):
 
     def run(self, path: Union[str, Path]):
         print("PY run path {}".format(path))
-        install_python(path)
+        # install_python(path)
+
+        txt_requirements = get_txt_requirements(path)
         item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
-        install_requirements(path, ["pytest"] + item_requirements)
+        print(["pytest"] + item_requirements + txt_requirements)
+        install_requirements(path, ["pytest"] + item_requirements + txt_requirements)
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ; pipenv run python -m pytest",

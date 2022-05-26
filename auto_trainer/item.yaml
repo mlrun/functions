@@ -17,8 +17,8 @@ platformVersion: ''
 spec:
   filename: auto_trainer.py
   handler: train
-  image: ''
+  image: mlrun/mlrun
   kind: job
   requirements: []
 url: ''
-version: 1.0.1
+version: 1.0.2

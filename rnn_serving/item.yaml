@@ -21,4 +21,4 @@ spec:
   kind: serving
   requirements: null
 url: ''
-version: 0.9.0
+version: 1.0.0

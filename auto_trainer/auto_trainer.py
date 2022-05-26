@@ -69,10 +69,11 @@ def _get_dataframe(
 
     if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
         # feature-vector case:
+        label_columns = label_columns or dataset.meta.status.label_column
         dataset = fs.get_offline_features(
             dataset.meta.uri, drop_columns=drop_columns
         ).to_dataframe()
-        label_columns = label_columns or dataset.meta.status.label_column
+
         context.logger.info(f"label columns: {label_columns}")
     else:
         # simple URL case:

@@ -93,7 +93,7 @@ def get_offline_features(
         name = target.name if hasattr(target, "name") else target["name"]
         context.logger.info(f"Preparing '{name}' target")
         target = get_target_driver(target)
-    if target.path:
+    if hasattr(target, 'path') and target.path:
         context.log_result("target", target.path)
 
     # Preparing run_config:

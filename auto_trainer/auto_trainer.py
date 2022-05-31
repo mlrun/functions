@@ -1,4 +1,5 @@
 from typing import List, Dict, Optional, Union, Tuple, Any
+from pathlib import Path
 
 import mlrun
 import pandas as pd
@@ -11,12 +12,18 @@ from mlrun import feature_store as fs
 from mlrun.api.schemas import ObjectKind
 from mlrun.utils.helpers import create_class, create_function
 
+PathType = Union[str, Path]
+
 
 class KWArgsPrefixes:
     MODEL_CLASS = "CLASS_"
     FIT = "FIT_"
     TRAIN = "TRAIN_"
     PREDICT = "PREDICT_"
+
+
+def _more_than_one(arg_list: List) -> bool:
+    return len([1 for arg in arg_list if arg is not None]) > 1
 
 
 def _get_sub_dict_by_prefix(src: Dict, prefix_key: str) -> Dict[str, Any]:
@@ -39,23 +46,41 @@ def _get_dataframe(
     context: MLClientCtx,
     dataset: DataItem,
     label_columns: Optional[Union[str, List[str]]] = None,
-    drop_columns: List[str] = None,
+    drop_columns: Union[str, List[str], int, List[int]] = None,
 ) -> Tuple[pd.DataFrame, Optional[Union[str, List[str]]]]:
     """
     Getting the DataFrame of the dataset and drop the columns accordingly.
 
     :param context:         MLRun context.
-    :param dataset:         The dataset to train the model on. Can be either a URI or a FeatureVector.
+    :param dataset:         The dataset to train the model on.
+                            Can be either a list of lists, dict, URI or a FeatureVector.
     :param label_columns:   The target label(s) of the column(s) in the dataset. for Regression or
                             Classification tasks.
-    :param drop_columns:    str or a list of strings that represent the columns to drop.
+    :param drop_columns:    str/int or a list of strings/ints that represent the column names/indices to drop.
     """
+    if isinstance(dataset, (list, dict)):
+        dataset = pd.DataFrame(dataset)
+        # Checking if drop_columns provided by integer type:
+        if drop_columns:
+            if isinstance(drop_columns, str) or (
+                isinstance(drop_columns, list)
+                and any(isinstance(col, str) for col in drop_columns)
+            ):
+                context.logger.error(
+                    "drop_columns must be an integer/list of integers if not provided with a URI/FeatureVector dataset"
+                )
+                raise ValueError
+            dataset.drop(drop_columns, axis=1, inplace=True)
+
+        return dataset, label_columns
+
     if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
         # feature-vector case:
+        label_columns = label_columns or dataset.meta.status.label_column
         dataset = fs.get_offline_features(
             dataset.meta.uri, drop_columns=drop_columns
         ).to_dataframe()
-        label_columns = label_columns or dataset.meta.status.label_column
+
         context.logger.info(f"label columns: {label_columns}")
     else:
         # simple URL case:
@@ -86,20 +111,20 @@ def train(
     """
     Training the given model on the given dataset.
 
-    :param context:                 MLRun context.
-    :param dataset:                 The dataset to train the model on. Can be either a URI or a FeatureVector.
-    :param drop_columns:            str or a list of strings that represent the columns to drop.
-    :param model_class:             The class of the model, e.g. `sklearn.linear_model.LogisticRegression`.
-    :param model_name:              The model's name to use for storing the model artifact, default to 'model'.
-    :param tag:                     The model's tag to log with.
+    :param context:                 MLRun context
+    :param dataset:                 The dataset to train the model on. Can be either a URI or a FeatureVector
+    :param drop_columns:            str or a list of strings that represent the columns to drop
+    :param model_class:             The class of the model, e.g. `sklearn.linear_model.LogisticRegression`
+    :param model_name:              The model's name to use for storing the model artifact, default to 'model'
+    :param tag:                     The model's tag to log with
     :param label_columns:           The target label(s) of the column(s) in the dataset. for Regression or
-                                    Classification tasks.
+                                    Classification tasks
     :param sample_set:              A sample set of inputs for the model for logging its stats along the model in favour
-                                    of model monitoring. Can be either a URI or a FeatureVector.
-    :param test_set:                The test set to train the model with.
+                                    of model monitoring. Can be either a URI or a FeatureVector
+    :param test_set:                The test set to train the model with
     :param train_test_split_size:   Should be between 0.0 and 1.0 and represent the proportion of the dataset to include
                                     in the test split. The size of the Training set is set to the complement of this
-                                    value. Default = 0.2.
+                                    value. Default = 0.2
     :param random_state:            Random state for `train_test_split`
     """
     # Validate inputs:
@@ -219,6 +244,16 @@ def evaluate(
         drop_columns=drop_columns,
     )
 
+    # Parsing label_columns:
+    parsed_label_columns = []
+    if label_columns:
+        for lc in label_columns:
+            if fs.common.feature_separator in lc:
+                feature_set_name, label_name, alias = fs.common.parse_feature_string(lc)
+                parsed_label_columns.append(alias or label_name)
+        if parsed_label_columns:
+            label_columns = parsed_label_columns
+
     # Parsing kwargs:
     predict_kwargs = _get_sub_dict_by_prefix(
         src=context.parameters, prefix_key=KWArgsPrefixes.PREDICT
@@ -239,7 +274,7 @@ def predict(
     context: MLClientCtx,
     model: str,
     dataset: mlrun.DataItem,
-    drop_columns: List[str] = None,
+    drop_columns: Union[str, List[str], int, List[int]] = None,
     label_columns: Optional[Union[str, List[str]]] = None,
 ):
     """
@@ -247,8 +282,10 @@ def predict(
 
     :param context:                 MLRun context.
     :param model:                   The model Store path.
-    :param dataset:                 The dataset to evaluate the model on. Can be either a URI or a FeatureVector.
-    :param drop_columns:            str or a list of strings that represent the columns to drop.
+    :param dataset:                 The dataset to evaluate the model on. Can be either a URI, a FeatureVector or a
+                                    sample in a shape of a list/dict.
+    :param drop_columns:            str/int or a list of strings/ints that represent the column names/indices to drop.
+                                    When the dataset is a list/dict this parameter should be represented by integers.
     :param label_columns:           The target label(s) of the column(s) in the dataset. for Regression or
                                     Classification tasks.
     """
@@ -277,7 +314,7 @@ def predict(
     y_pred = model_handler.model.predict(dataset, **predict_kwargs)
 
     if not label_columns:
-        if y_pred.shape[1] == 1:
+        if len(y_pred.shape) == 1 or y_pred.shape[1] == 1:
             label_columns = ["predicted_labels"]
         else:
             label_columns = [f"predicted_label_{i}" for i in range(y_pred.shape[1])]

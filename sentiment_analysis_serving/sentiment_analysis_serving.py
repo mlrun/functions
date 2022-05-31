@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from transformers import BertModel, BertTokenizer
 import mlrun
-from mlrun.runtimes import nuclio_init_hook
 
 PRETRAINED_MODEL = 'bert-base-cased'
 tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
@@ -48,14 +47,9 @@ class SentimentClassifierServing(mlrun.serving.V2ModelServer):
             enc = tokenizer.batch_encode_plus(instances, return_tensors='pt', pad_to_max_length=True)
             outputs = self.model(input_ids=enc['input_ids'], attention_mask=enc['attention_mask'])
             _, predicts = torch.max(outputs, dim=1)
-            return predicts.cpu().tolist()
+            prediction_return = {'predictions': predicts.cpu().tolist()}
+            if "meta_data" in body:
+                prediction_return['meta_data'] = body['meta_data']
+            return prediction_return
         except Exception as e:
             raise Exception("Failed to predict %s" % e)
-
-
-def init_context(context):
-    nuclio_init_hook(context, globals(), 'serving_v2')
-
-
-def handler(context, event):
-    return context.mlrun_handler(context, event)

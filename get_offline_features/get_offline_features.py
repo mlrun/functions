@@ -72,6 +72,7 @@ def get_offline_features(
                 )
             feature_vector = new_uri
 
+        context.logger.info(f"Creating FeatureVector {feature_vector}")
         project, name, tag, _ = parse_versioned_object_uri(feature_vector, mlrun.mlconf.default_project)
         vector = fs.FeatureVector(name, features, label_feature=label_feature, description=description)
         vector.metadata.project = project
@@ -92,7 +93,7 @@ def get_offline_features(
         name = target.name if hasattr(target, "name") else target["name"]
         context.logger.info(f"Preparing '{name}' target")
         target = get_target_driver(target)
-    if target.path:
+    if hasattr(target, 'path') and target.path:
         context.log_result("target", target.path)
 
     # Preparing run_config:

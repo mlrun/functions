@@ -1,4 +1,5 @@
 from typing import List, Dict, Optional, Union, Tuple, Any
+from pathlib import Path
 
 import mlrun
 import pandas as pd
@@ -11,12 +12,18 @@ from mlrun import feature_store as fs
 from mlrun.api.schemas import ObjectKind
 from mlrun.utils.helpers import create_class, create_function
 
+PathType = Union[str, Path]
+
 
 class KWArgsPrefixes:
     MODEL_CLASS = "CLASS_"
     FIT = "FIT_"
     TRAIN = "TRAIN_"
     PREDICT = "PREDICT_"
+
+
+def _more_than_one(arg_list: List) -> bool:
+    return len([1 for arg in arg_list if arg is not None]) > 1
 
 
 def _get_sub_dict_by_prefix(src: Dict, prefix_key: str) -> Dict[str, Any]:
@@ -104,20 +111,20 @@ def train(
     """
     Training the given model on the given dataset.
 
-    :param context:                 MLRun context.
-    :param dataset:                 The dataset to train the model on. Can be either a URI or a FeatureVector.
-    :param drop_columns:            str or a list of strings that represent the columns to drop.
-    :param model_class:             The class of the model, e.g. `sklearn.linear_model.LogisticRegression`.
-    :param model_name:              The model's name to use for storing the model artifact, default to 'model'.
-    :param tag:                     The model's tag to log with.
+    :param context:                 MLRun context
+    :param dataset:                 The dataset to train the model on. Can be either a URI or a FeatureVector
+    :param drop_columns:            str or a list of strings that represent the columns to drop
+    :param model_class:             The class of the model, e.g. `sklearn.linear_model.LogisticRegression`
+    :param model_name:              The model's name to use for storing the model artifact, default to 'model'
+    :param tag:                     The model's tag to log with
     :param label_columns:           The target label(s) of the column(s) in the dataset. for Regression or
-                                    Classification tasks.
+                                    Classification tasks
     :param sample_set:              A sample set of inputs for the model for logging its stats along the model in favour
-                                    of model monitoring. Can be either a URI or a FeatureVector.
-    :param test_set:                The test set to train the model with.
+                                    of model monitoring. Can be either a URI or a FeatureVector
+    :param test_set:                The test set to train the model with
     :param train_test_split_size:   Should be between 0.0 and 1.0 and represent the proportion of the dataset to include
                                     in the test split. The size of the Training set is set to the complement of this
-                                    value. Default = 0.2.
+                                    value. Default = 0.2
     :param random_state:            Random state for `train_test_split`
     """
     # Validate inputs:
@@ -236,6 +243,16 @@ def evaluate(
         label_columns=label_columns,
         drop_columns=drop_columns,
     )
+
+    # Parsing label_columns:
+    parsed_label_columns = []
+    if label_columns:
+        for lc in label_columns:
+            if fs.common.feature_separator in lc:
+                feature_set_name, label_name, alias = fs.common.parse_feature_string(lc)
+                parsed_label_columns.append(alias or label_name)
+        if parsed_label_columns:
+            label_columns = parsed_label_columns
 
     # Parsing kwargs:
     predict_kwargs = _get_sub_dict_by_prefix(

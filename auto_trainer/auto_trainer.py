@@ -247,7 +247,7 @@ def evaluate(
     # Parsing label_columns:
     parsed_label_columns = []
     if label_columns:
-        label_columns = list(label_columns)
+        label_columns = label_columns if isinstance(label_columns, list) else [label_columns]
         for lc in label_columns:
             if fs.common.feature_separator in lc:
                 feature_set_name, label_name, alias = fs.common.parse_feature_string(lc)

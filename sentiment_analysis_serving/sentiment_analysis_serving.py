@@ -50,6 +50,7 @@ class SentimentClassifierServing(mlrun.serving.V2ModelServer):
             prediction_return = {'predictions': predicts.cpu().tolist()}
             if "meta_data" in body:
                 prediction_return['meta_data'] = body['meta_data']
+            print("printing prediction return {}".format(prediction_return))
             return prediction_return
         except Exception as e:
             raise Exception("Failed to predict %s" % e)

@@ -13,7 +13,7 @@ from mlrun.errors import MLRunInvalidArgumentError
 def get_offline_features(
     context: MLClientCtx,
     feature_vector: str,
-    features: List[str] = None,
+    features: Union[List[str], None] = None,
     label_feature: str = None,
     description: str = None,
     entity_rows: DataItem = None,
@@ -62,7 +62,7 @@ def get_offline_features(
     :returns feature_vector input
     """
 
-    if features is not None:
+    if features:
         # Creating a new FeatureVector and saving:
         if is_store_uri(feature_vector):
             prefix, new_uri = parse_store_uri(feature_vector)

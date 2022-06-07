@@ -11,14 +11,24 @@ labels:
   author: guyl
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.10.0
+mlrunVersion: ''
 name: onnx_utils
-platformVersion: 3.2.0
+platformVersion: ''
 spec:
   filename: onnx_utils.py
   handler: to_onnx
+  extra_spec:
+    build:
+      with_mlrun: False
+      auto_build: True
+    allow_empty_resources: True
   image: mlrun/ml-models
   kind: job
-  requirements: []
+  requirements:
+  - onnx~=1.10.1
+  - onnxruntime~=1.8.1
+  - onnxoptimizer~=0.2.0
+  - onnxmltools~=1.9.0
+  - tf2onnx~=1.9.0
 url: ''
 version: 0.10.2

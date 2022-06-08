@@ -20,7 +20,7 @@ spec:
   extra_spec:
     build:
       commands:
-      - python -m pip install pip==21.2.4
+      - python -m pip install pip==22.1.2
       - apt-get update && apt-get install -y --no-install-recommends git
       with_mlrun: True
       auto_build: True
@@ -32,4 +32,4 @@ spec:
   - azureml-train-automl-client==1.40.0
   - plotly~=5.4
 url: ''
-version: 0.9.5
+version: 1.0.0

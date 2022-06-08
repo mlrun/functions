@@ -2,7 +2,7 @@ kind: serving
 metadata:
   name: azureml-serving
   tag: ''
-  hash: a55385aaa197f170c304abb3387bd31d46bf9d1c
+  hash: c0f404820b8f0fe92d2d1cfe9dbcc068be1a13bf
   project: ''
   labels:
     author: yonish
@@ -16,7 +16,7 @@ spec:
   build:
     commands:
     - python -m pip install azureml-automl-runtime~=1.38.1
-    code_origin: https://github.com/mlrun/functions.git#0676be90a3c0e4196d9ea3e2e90be41c01e6f3a3:/Users/yonatanshelach/yoni/projects/functions/azureml_serving/azureml_serving.py
+    code_origin: https://github.com/mlrun/functions.git#f9ba6e95866bb638e9e8b861430fcab5b52b2db5:/Users/yonatanshelach/yoni/projects/functions/azureml_serving/azureml_serving.py
     origin_filename: /Users/yonatanshelach/yoni/projects/functions/azureml_serving/azureml_serving.py
   description: AzureML serving function
   disable_auto_mount: false

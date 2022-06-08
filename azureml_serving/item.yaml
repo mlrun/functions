@@ -4,7 +4,7 @@ categories:
 - model-serving
 description: AzureML serving function
 doc: ''
-example: ''
+example: azureml_serving.ipynb
 generationDate: 2022-06-07:16-30
 icon: ''
 labels:

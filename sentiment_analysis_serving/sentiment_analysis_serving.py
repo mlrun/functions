@@ -44,13 +44,14 @@ class SentimentClassifierServing(mlrun.serving.V2ModelServer):
         """
         try:
             instances = body['inputs']
+            self.context.logger.info("inputs: {}".format(instances))
             enc = tokenizer.batch_encode_plus(instances, return_tensors='pt', pad_to_max_length=True)
             outputs = self.model(input_ids=enc['input_ids'], attention_mask=enc['attention_mask'])
             _, predicts = torch.max(outputs, dim=1)
             prediction_return = {'predictions': predicts.cpu().tolist()}
             if "meta_data" in body:
                 prediction_return['meta_data'] = body['meta_data']
-            print("printing prediction return {}".format(prediction_return))
+            self.context.logger.info("prediction: {}".format(prediction_return))
             return prediction_return
         except Exception as e:
             raise Exception("Failed to predict %s" % e)

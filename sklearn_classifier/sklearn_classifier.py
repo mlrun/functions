@@ -4,7 +4,6 @@ import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
-import os
 
 from cloudpickle import dumps
 import pandas as pd
@@ -14,7 +13,6 @@ from mlrun.datastore import DataItem
 from mlrun.mlutils.data import get_sample, get_splits
 from mlrun.mlutils.models import gen_sklearn_model, eval_model_v2
 from mlrun.utils.helpers import create_class
-from mlrun.artifacts.model import ModelArtifact
 
 
 def train_model(
@@ -109,16 +107,13 @@ def train_model(
             context, xvalid, yvalid, model, plots_artifact_path=plots_path
         )
 
-    kwargs = {}
-    if "algorithm" in ModelArtifact._dict_fields:
-        kwargs["training_set"] = test_set
-        kwargs["label_column"] = label_column
-        split = model_pkg_class.rsplit(".", 1)
-        if split and len(split) == 2:
-            kwargs["algorithm"] = split[1]
+    kwargs = {"training_set": test_set, "label_column": label_column}
+    split = model_pkg_class.rsplit(".", 1)
+    if split and len(split) == 2:
+        kwargs["algorithm"] = split[1]
 
-        if dataset.meta and dataset.meta.kind == "FeatureVector":
-            kwargs["feature_vector"] = dataset.meta.uri
+    if dataset.meta and dataset.meta.kind == "FeatureVector":
+        kwargs["feature_vector"] = dataset.meta.uri
 
     context.set_label("class", model_pkg_class)
     context.log_model(

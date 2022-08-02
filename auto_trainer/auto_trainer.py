@@ -1,13 +1,11 @@
 from typing import List, Dict, Optional, Union, Tuple, Any
 from pathlib import Path
-
+import json
 import mlrun
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from mlrun.artifacts import Artifact
-from mlrun.execution import MLClientCtx
-from mlrun.datastore import DataItem
 from mlrun.frameworks.auto_mlrun import AutoMLRun
 from mlrun import feature_store as fs
 from mlrun.api.schemas import ObjectKind
@@ -49,8 +47,8 @@ def _get_sub_dict_by_prefix(src: Dict, prefix_key: str) -> Dict[str, Any]:
 
 
 def _get_dataframe(
-    context: MLClientCtx,
-    dataset: DataItem,
+    context: mlrun.MLClientCtx,
+    dataset: mlrun.DataItem,
     label_columns: Optional[Union[str, List[str]]] = None,
     drop_columns: Union[str, List[str], int, List[int]] = None,
 ) -> Tuple[pd.DataFrame, Optional[Union[str, List[str]]]]:
@@ -102,15 +100,15 @@ def _get_dataframe(
 
 
 def train(
-    context: MLClientCtx,
-    dataset: DataItem,
+    context: mlrun.MLClientCtx,
+    dataset: mlrun.DataItem,
     drop_columns: List[str] = None,
     model_class: str = None,
     model_name: str = "model",
     tag: str = "",
     label_columns: Optional[Union[str, List[str]]] = None,
-    sample_set: DataItem = None,
-    test_set: DataItem = None,
+    sample_set: mlrun.DataItem = None,
+    test_set: mlrun.DataItem = None,
     train_test_split_size: float = None,
     random_state: int = None,
 ):
@@ -170,9 +168,6 @@ def train(
             drop_columns=drop_columns,
         )
 
-    # Remove labels from sample set:
-    sample_set = sample_set.drop(label_columns, axis=1, errors="ignore")
-
     # Parsing kwargs:
     # TODO: Use in xgb or lgbm train function.
     train_kwargs = _get_sub_dict_by_prefix(
@@ -215,18 +210,17 @@ def train(
         context=context,
         tag=tag,
         sample_set=sample_set,
-        y_column=label_columns,
+        y_columns=label_columns,
         test_set=test_set,
-        X_test=x_test,
+        x_test=x_test,
         y_test=y_test,
-        artifacts=context.artifacts,
     )
     context.logger.info(f"training '{model_name}'")
     model.fit(x_train, y_train, **fit_kwargs)
 
 
 def evaluate(
-    context: MLClientCtx,
+    context: mlrun.MLClientCtx,
     model: str,
     dataset: mlrun.DataItem,
     drop_columns: List[str] = None,
@@ -280,20 +274,22 @@ def evaluate(
 
 
 def _perform_drift_analysis(
+    context: mlrun.MLClientCtx,
     sample_set_statistics: dict,
     inputs: pd.DataFrame,
     drift_threshold: float,
     possible_drift_threshold: float,
-) -> Artifact:
+) -> Tuple[Artifact, Artifact, Artifact]:
     """
     Perform drift analysis, producing the drift table artifact for logging post prediction.
 
+    :param context:
     :param sample_set_statistics:    The statistics of the sample set logged along a model.
     :param inputs:                   Input dataset to perform the drift calculation on.
     :param drift_threshold:          The threshold of which to mark drifts. Defaulted to 0.7.
     :param possible_drift_threshold: The threshold of which to mark possible drifts. Defaulted to 0.5.
 
-    :return: An MLRun artifact holding the HTML code of the drift table plot.
+    :returns: An MLRun artifact holding the HTML code of the drift table plot.
     """
     # Calculate the inputs statistics:
     inputs_statistics = calculate_inputs_statistics(
@@ -313,7 +309,8 @@ def _perform_drift_analysis(
         drift_detected_threshold=drift_threshold,
     )
 
-    # Discover common features (in ideal scenario this check should not occur):
+    # Discover common features (in ideal scenario this check should not occur, data should be validated before getting
+    # into prediction):
     sample_features = set(
         [
             feature_name
@@ -321,28 +318,40 @@ def _perform_drift_analysis(
             if isinstance(feature_statistics, dict)
         ]
     )
-    inputs_features = set(
-        [
-            feature_name
-            for feature_name, feature_statistics in inputs_statistics.items()
-            if isinstance(feature_statistics, dict)
-        ]
-    )
+    features = inputs.columns
+    if len(sample_features & set(features)) == 0:
+        raise ValueError(
+            "No matching features (column names) provided "
+            "between the sample set in the model and the current inputs."
+        )
+    elif len(sample_features & set(features)) != len(features):
+        context.logger.warn(
+            f"Not all feature names were matching between the inputs and the sample set in the model. "
+            f"The following features won't be included in the drift analysis: "
+            f"{set(features) - sample_features | sample_features - set(features)}"
+        )
+        features = list(sample_features & set(features))
 
     # Plot:
     html_plot = FeaturesDriftTablePlot().produce(
-        features=list(sample_features & inputs_features),
+        features=features,
         sample_set_statistics=sample_set_statistics,
         inputs_statistics=inputs_statistics,
         metrics=metrics,
         drift_results=drift_results,
     )
 
-    return Artifact(body=html_plot, format="html", key="drift_table_plot")
+    return (
+        Artifact(body=html_plot, format="html", key="drift_table_plot"),
+        Artifact(body=json.dumps(metrics), format="json", key="drift_results"),
+        Artifact(
+            body=json.dumps(inputs_statistics), format="json", key="dataset_statistics"
+        ),
+    )
 
 
 def predict(
-    context: MLClientCtx,
+    context: mlrun.MLClientCtx,
     model: str,
     dataset: mlrun.DataItem,
     drop_columns: Union[str, List[str], int, List[int]] = None,
@@ -422,10 +431,12 @@ def predict(
         # Produce the artifact:
         # TODO: Replace `sample_set_statistics` to `model_handler._model_artifact.spec.feature_stats` when MLRun's
         #       version is released.
-        drift_analysis_artifact = _perform_drift_analysis(
+        drift_analysis_artifacts = _perform_drift_analysis(
+            context=context,
             sample_set_statistics=model_handler._model_artifact.feature_stats,
             inputs=pred_df,
             drift_threshold=drift_threshold,
             possible_drift_threshold=possible_drift_threshold,
         )
-        context.log_artifact(drift_analysis_artifact)
+        for artifact in drift_analysis_artifacts:
+            context.log_artifact(artifact)

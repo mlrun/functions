@@ -5,12 +5,18 @@ import mlrun
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from mlrun.artifacts import Artifact
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.frameworks.auto_mlrun import AutoMLRun
 from mlrun import feature_store as fs
 from mlrun.api.schemas import ObjectKind
 from mlrun.utils.helpers import create_class, create_function
+from mlrun.model_monitoring.features_drift_table import FeaturesDriftTablePlot
+from mlrun.model_monitoring.model_monitoring_batch import (
+    VirtualDrift,
+    calculate_inputs_statistics,
+)
 
 PathType = Union[str, Path]
 
@@ -247,7 +253,9 @@ def evaluate(
     # Parsing label_columns:
     parsed_label_columns = []
     if label_columns:
-        label_columns = label_columns if isinstance(label_columns, list) else [label_columns]
+        label_columns = (
+            label_columns if isinstance(label_columns, list) else [label_columns]
+        )
         for lc in label_columns:
             if fs.common.feature_separator in lc:
                 feature_set_name, label_name, alias = fs.common.parse_feature_string(lc)
@@ -271,24 +279,97 @@ def evaluate(
     model_handler.model.predict(x, **predict_kwargs)
 
 
+def _perform_drift_analysis(
+    sample_set_statistics: dict,
+    inputs: pd.DataFrame,
+    drift_threshold: float,
+    possible_drift_threshold: float,
+) -> Artifact:
+    """
+    Perform drift analysis, producing the drift table artifact for logging post prediction.
+
+    :param sample_set_statistics:    The statistics of the sample set logged along a model.
+    :param inputs:                   Input dataset to perform the drift calculation on.
+    :param drift_threshold:          The threshold of which to mark drifts. Defaulted to 0.7.
+    :param possible_drift_threshold: The threshold of which to mark possible drifts. Defaulted to 0.5.
+
+    :return: An MLRun artifact holding the HTML code of the drift table plot.
+    """
+    # Calculate the inputs statistics:
+    inputs_statistics = calculate_inputs_statistics(
+        sample_set_statistics=sample_set_statistics,
+        inputs=inputs,
+    )
+
+    # Calculate drift:
+    virtual_drift = VirtualDrift(inf_capping=10)
+    metrics = virtual_drift.compute_drift_from_histograms(
+        feature_stats=sample_set_statistics,
+        current_stats=inputs_statistics,
+    )
+    drift_results = virtual_drift.check_for_drift_per_feature(
+        metrics_results_dictionary=metrics,
+        possible_drift_threshold=possible_drift_threshold,
+        drift_detected_threshold=drift_threshold,
+    )
+
+    # Discover common features (in ideal scenario this check should not occur):
+    sample_features = set(
+        [
+            feature_name
+            for feature_name, feature_statistics in sample_set_statistics.items()
+            if isinstance(feature_statistics, dict)
+        ]
+    )
+    inputs_features = set(
+        [
+            feature_name
+            for feature_name, feature_statistics in inputs_statistics.items()
+            if isinstance(feature_statistics, dict)
+        ]
+    )
+
+    # Plot:
+    html_plot = FeaturesDriftTablePlot().produce(
+        features=list(sample_features & inputs_features),
+        sample_set_statistics=sample_set_statistics,
+        inputs_statistics=inputs_statistics,
+        metrics=metrics,
+        drift_results=drift_results,
+    )
+
+    return Artifact(body=html_plot, format="html", key="drift_table_plot")
+
+
 def predict(
     context: MLClientCtx,
     model: str,
     dataset: mlrun.DataItem,
     drop_columns: Union[str, List[str], int, List[int]] = None,
     label_columns: Optional[Union[str, List[str]]] = None,
+    perform_drift_analysis: bool = None,
+    drift_threshold: float = 0.7,
+    possible_drift_threshold: float = 0.5,
 ):
     """
-    Predicting dataset by a model.
+    Perform a prediction on a given dataset with the given model. Can perform drift analysis between the sample set
+    statistics stored in the model to the current input data. The drift rule is the value per-feature mean of the TVD
+    and Hellinger scores according to the thresholds configures here.
 
-    :param context:                 MLRun context.
-    :param model:                   The model Store path.
-    :param dataset:                 The dataset to evaluate the model on. Can be either a URI, a FeatureVector or a
-                                    sample in a shape of a list/dict.
-    :param drop_columns:            str/int or a list of strings/ints that represent the column names/indices to drop.
-                                    When the dataset is a list/dict this parameter should be represented by integers.
-    :param label_columns:           The target label(s) of the column(s) in the dataset. for Regression or
-                                    Classification tasks.
+    :param context:                  MLRun context.
+    :param model:                    The model Store path.
+    :param dataset:                  The dataset to evaluate the model on. Can be either a URI, a FeatureVector or a
+                                     sample in a shape of a list/dict.
+    :param drop_columns:             str/int or a list of strings/ints that represent the column names/indices to drop.
+                                     When the dataset is a list/dict this parameter should be represented by integers.
+    :param label_columns:            The target label(s) of the column(s) in the dataset. for Regression or
+                                     Classification tasks.
+    :param perform_drift_analysis:   Whether to perform drift analysis between the sample set of the model object to the
+                                     dataset given. By default, None, which means it will perform drift analysis if the
+                                     model has a sample set statistics. Perform drift analysis will produce a data drift
+                                     table artifact.
+    :param drift_threshold:          The threshold of which to mark drifts. Defaulted to 0.7.
+    :param possible_drift_threshold: The threshold of which to mark possible drifts. Defaulted to 0.5.
     """
     # Get dataset by URL or by FeatureVector:
     dataset, label_columns = _get_dataframe(
@@ -324,3 +405,27 @@ def predict(
 
     pred_df = pd.concat([dataset, pd.DataFrame(y_pred, columns=label_columns)], axis=1)
     context.log_dataset("prediction", pred_df)
+
+    # Drift Analysis:
+    if (
+        perform_drift_analysis is None
+        and model_handler._model_artifact.feature_stats is not None
+    ):
+        perform_drift_analysis = True
+    if perform_drift_analysis:
+        context.logger.info("Performing drift analysis.")
+        # Check if the model was logged with a sample set:
+        if model_handler._model_artifact.feature_stats is None:
+            raise ValueError(
+                "Cannot perform drift analysis as the model artifact was not logged with a sample set."
+            )
+        # Produce the artifact:
+        # TODO: Replace `sample_set_statistics` to `model_handler._model_artifact.spec.feature_stats` when MLRun's
+        #       version is released.
+        drift_analysis_artifact = _perform_drift_analysis(
+            sample_set_statistics=model_handler._model_artifact.feature_stats,
+            inputs=pred_df,
+            drift_threshold=drift_threshold,
+            possible_drift_threshold=possible_drift_threshold,
+        )
+        context.log_artifact(drift_analysis_artifact)

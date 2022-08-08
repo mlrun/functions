@@ -307,10 +307,6 @@ def predict(
     elif isinstance(label_columns, str):
         label_columns = [label_columns]
 
-    if any(label_column in dataset.columns for label_column in label_columns):
-        context.logger.warning("dropping label columns that found in the dataset")
-        dataset = dataset.drop(label_columns, axis=1, errors="ignore")
-
     # Predicting:
     context.logger.info(f"making prediction by '{model_handler.model_name}'")
     y_pred = model_handler.model.predict(dataset, **predict_kwargs)
@@ -335,5 +331,9 @@ def predict(
         raise ValueError
 
     artifact_name = 'prediction'
+    labels_inside_df = set(label_columns) & set(dataset.columns.tolist())
+    if labels_inside_df:
+        context.logger.error(f"The labels: {labels_inside_df} are already existed in the dataframe")
+        raise ValueError
     pred_df = pd.concat([dataset, pd.DataFrame(y_pred, columns=label_columns)], axis=1)
     context.log_dataset(artifact_name, pred_df, db_key=dataset_name or artifact_name)

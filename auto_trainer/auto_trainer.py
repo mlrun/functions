@@ -22,10 +22,6 @@ class KWArgsPrefixes:
     PREDICT = "PREDICT_"
 
 
-def _more_than_one(arg_list: List) -> bool:
-    return len([1 for arg in arg_list if arg is not None]) > 1
-
-
 def _get_sub_dict_by_prefix(src: Dict, prefix_key: str) -> Dict[str, Any]:
     """
     Collect all the keys from the given dict that starts with the given prefix and creates a new dictionary with these
@@ -164,9 +160,6 @@ def train(
             drop_columns=drop_columns,
         )
 
-    # Remove labels from sample set:
-    sample_set = sample_set.drop(label_columns, axis=1, errors="ignore")
-
     # Parsing kwargs:
     # TODO: Use in xgb or lgbm train function.
     train_kwargs = _get_sub_dict_by_prefix(
@@ -209,9 +202,9 @@ def train(
         context=context,
         tag=tag,
         sample_set=sample_set,
-        y_column=label_columns,
+        y_columns=label_columns,
         test_set=test_set,
-        X_test=x_test,
+        x_test=x_test,
         y_test=y_test,
         artifacts=context.artifacts,
     )
@@ -277,18 +270,20 @@ def predict(
     dataset: mlrun.DataItem,
     drop_columns: Union[str, List[str], int, List[int]] = None,
     label_columns: Optional[Union[str, List[str]]] = None,
+    dataset_name: Optional[str] = None,
 ):
     """
     Predicting dataset by a model.
 
     :param context:                 MLRun context.
     :param model:                   The model Store path.
-    :param dataset:                 The dataset to evaluate the model on. Can be either a URI, a FeatureVector or a
+    :param dataset:                 The dataset to predict the model on. Can be either a URI, a FeatureVector or a
                                     sample in a shape of a list/dict.
     :param drop_columns:            str/int or a list of strings/ints that represent the column names/indices to drop.
                                     When the dataset is a list/dict this parameter should be represented by integers.
     :param label_columns:           The target label(s) of the column(s) in the dataset. for Regression or
                                     Classification tasks.
+    :param dataset_name:             The file name of the prediction result. Default to 'prediction'.
     """
     # Get dataset by URL or by FeatureVector:
     dataset, label_columns = _get_dataframe(
@@ -307,20 +302,38 @@ def predict(
     model_handler = AutoMLRun.load_model(model_path=model, context=context)
 
     # Dropping label columns if necessary:
-    if label_columns and all(label in dataset.columns for label in label_columns):
-        dataset = dataset.drop(label_columns, axis=1)
+    if not label_columns:
+        label_columns = []
+    elif isinstance(label_columns, str):
+        label_columns = [label_columns]
+
+    if any(label_column in dataset.columns for label_column in label_columns):
+        context.logger.warning("dropping label columns that found in the dataset")
+        dataset = dataset.drop(label_columns, axis=1, errors="ignore")
 
     # Predicting:
     context.logger.info(f"making prediction by '{model_handler.model_name}'")
     y_pred = model_handler.model.predict(dataset, **predict_kwargs)
 
-    if not label_columns:
-        if len(y_pred.shape) == 1 or y_pred.shape[1] == 1:
-            label_columns = ["predicted_labels"]
-        else:
-            label_columns = [f"predicted_label_{i}" for i in range(y_pred.shape[1])]
-    elif isinstance(label_columns, str):
-        label_columns = [label_columns]
+    # Preparing and validating label columns for the dataframe of the prediction result:
+    num_predicted = 1 if len(y_pred.shape) == 1 else y_pred.shape[1]
 
+    if num_predicted > len(label_columns):
+        if num_predicted == 1:
+            label_columns = ["predicted labels"]
+        else:
+            label_columns.extend(
+                [
+                    f"predicted_label_{i + 1 + len(label_columns)}"
+                    for i in range(num_predicted - len(label_columns))
+                ]
+            )
+    elif num_predicted < len(label_columns):
+        context.logger.error(
+            f"number of predicted labels: {num_predicted} is smaller than number of label columns: {len(label_columns)}"
+        )
+        raise ValueError
+
+    artifact_name = 'prediction'
     pred_df = pd.concat([dataset, pd.DataFrame(y_pred, columns=label_columns)], axis=1)
-    context.log_dataset("prediction", pred_df)
+    context.log_dataset(artifact_name, pred_df, db_key=dataset_name or artifact_name)

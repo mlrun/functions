@@ -59,8 +59,9 @@ def _get_dataset(problem_type: str, filepath: str = ".", n_classes: int = 2):
     return filename, labels
 
 
-def _set_environment():
-    mlrun.set_env_from_file("mlrun.env")
+def _set_environment(env_file=None):
+    if env_file:
+        mlrun.set_env_from_file(env_file)
     mlrun.get_or_create_project("auto-trainer-test", context="./", user_project=True)
 
 
@@ -132,7 +133,6 @@ def test_train_evaluate(model: Tuple[str, str]):
             inputs={"dataset": train_run.outputs["test_set"]},
             params={
                 "model": train_run.outputs["model"],
-                "drop_columns": ["f_0", "f_2"],
                 "label_columns": label_columns,
             },
             handler="evaluate",
@@ -178,7 +178,6 @@ def test_train_predict(model: Tuple[str, str]):
             inputs={"dataset": train_run.outputs["test_set"]},
             params={
                 "model": train_run.outputs["model"],
-                "drop_columns": ["f_0", "f_2"],
                 "label_columns": label_columns,
             },
             handler="predict",

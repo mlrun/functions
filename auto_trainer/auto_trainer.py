@@ -270,7 +270,7 @@ def predict(
     dataset: mlrun.DataItem,
     drop_columns: Union[str, List[str], int, List[int]] = None,
     label_columns: Optional[Union[str, List[str]]] = None,
-    dataset_name: Optional[str] = None,
+    result_set: Optional[str] = None,
 ):
     """
     Predicting dataset by a model.
@@ -279,11 +279,13 @@ def predict(
     :param model:                   The model Store path.
     :param dataset:                 The dataset to predict the model on. Can be either a URI, a FeatureVector or a
                                     sample in a shape of a list/dict.
+                                    When passing a sample, pass the dataset as a field in `params` instead of `inputs`.
     :param drop_columns:            str/int or a list of strings/ints that represent the column names/indices to drop.
                                     When the dataset is a list/dict this parameter should be represented by integers.
     :param label_columns:           The target label(s) of the column(s) in the dataset. for Regression or
                                     Classification tasks.
-    :param dataset_name:             The file name of the prediction result. Default to 'prediction'.
+    :param result_set:              The db key to set name of the prediction result and the filename.
+                                    Default to 'prediction'.
     """
     # Get dataset by URL or by FeatureVector:
     dataset, label_columns = _get_dataframe(
@@ -330,10 +332,10 @@ def predict(
         )
         raise ValueError
 
-    artifact_name = 'prediction'
+    artifact_name = result_set or 'prediction'
     labels_inside_df = set(label_columns) & set(dataset.columns.tolist())
     if labels_inside_df:
         context.logger.error(f"The labels: {labels_inside_df} are already existed in the dataframe")
         raise ValueError
     pred_df = pd.concat([dataset, pd.DataFrame(y_pred, columns=label_columns)], axis=1)
-    context.log_dataset(artifact_name, pred_df, db_key=dataset_name or artifact_name)
+    context.log_dataset(artifact_name, pred_df, db_key=result_set)

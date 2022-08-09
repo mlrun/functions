@@ -59,8 +59,9 @@ def _get_dataset(problem_type: str, filepath: str = ".", n_classes: int = 2):
     return filename, labels
 
 
-def _set_environment():
-    mlrun.set_env_from_file("mlrun.env")
+def _set_environment(env_file=None):
+    if env_file:
+        mlrun.set_env_from_file(env_file)
     mlrun.get_or_create_project("auto-trainer-test", context="./", user_project=True)
 
 
@@ -132,11 +133,11 @@ def test_train_evaluate(model: Tuple[str, str]):
             inputs={"dataset": train_run.outputs["test_set"]},
             params={
                 "model": train_run.outputs["model"],
-                "drop_columns": ["f_0", "f_2"],
                 "label_columns": label_columns,
             },
             handler="evaluate",
             local=True,
+            artifact_path='./potato'
         )
     except Exception as exception:
         print(f"- The test failed - raised the following error:\n- {exception}")
@@ -154,7 +155,8 @@ def test_train_predict(model: Tuple[str, str]):
     _set_environment()
 
     dataset, label_columns = _get_dataset(model[1])
-
+    df = pd.read_csv(dataset)
+    sample = df.head().drop("labels", axis=1).values.tolist()
     # Importing function:
     fn = import_function("function.yaml")
 
@@ -175,10 +177,10 @@ def test_train_predict(model: Tuple[str, str]):
         )
 
         predict_run = fn.run(
-            inputs={"dataset": train_run.outputs["test_set"]},
             params={
+                "dataset": sample,
+                "drop_columns": [0, 2],
                 "model": train_run.outputs["model"],
-                "drop_columns": ["f_0", "f_2"],
                 "label_columns": label_columns,
             },
             handler="predict",

@@ -4,15 +4,15 @@ categories:
 description: describe and visualizes dataset stats
 doc: ''
 example: describe.ipynb
-generationDate: 2022-04-26:10-20
+generationDate: 2022-08-28:17-25
 icon: ''
 labels:
   author: Davids
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.8.0
+mlrunVersion: 1.1.0
 name: describe
-platformVersion: 3.2.0
+platformVersion: 3.5.0
 spec:
   filename: describe.py
   handler: analyze
@@ -20,4 +20,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.9.2
+version: 1.1.0

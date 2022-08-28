@@ -6,15 +6,15 @@ categories:
 description: retrieve offline feature vector results
 doc: ''
 example: get_offline_features.ipynb
-generationDate: 2022-05-25:10-58
+generationDate: 2022-08-28:17-25
 icon: ''
 labels:
   author: yonish
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.0.1
+mlrunVersion: 1.1.0
 name: get_offline_features
-platformVersion: ''
+platformVersion: 3.5.0
 spec:
   filename: get_offline_features.py
   handler: get_offline_features
@@ -22,4 +22,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 1.0.2
+version: 1.1.0

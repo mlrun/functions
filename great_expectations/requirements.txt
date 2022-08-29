@@ -1,1 +1,2 @@
 great-expectations==0.15.20
+mlrun~=1.0.0

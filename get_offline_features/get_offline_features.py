@@ -1,3 +1,17 @@
+# Copyright 2019 Iguazio
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 from typing import Union, List, Dict
 
 import mlrun
@@ -13,7 +27,7 @@ from mlrun.errors import MLRunInvalidArgumentError
 def get_offline_features(
     context: MLClientCtx,
     feature_vector: str,
-    features: List[str] = None,
+    features: Union[List[str], None] = None,
     label_feature: str = None,
     description: str = None,
     entity_rows: DataItem = None,
@@ -62,7 +76,7 @@ def get_offline_features(
     :returns feature_vector input
     """
 
-    if features is not None:
+    if features:
         # Creating a new FeatureVector and saving:
         if is_store_uri(feature_vector):
             prefix, new_uri = parse_store_uri(feature_vector)
@@ -72,6 +86,7 @@ def get_offline_features(
                 )
             feature_vector = new_uri
 
+        context.logger.info(f"Creating FeatureVector {feature_vector}")
         project, name, tag, _ = parse_versioned_object_uri(feature_vector, mlrun.mlconf.default_project)
         vector = fs.FeatureVector(name, features, label_feature=label_feature, description=description)
         vector.metadata.project = project
@@ -92,7 +107,7 @@ def get_offline_features(
         name = target.name if hasattr(target, "name") else target["name"]
         context.logger.info(f"Preparing '{name}' target")
         target = get_target_driver(target)
-    if target.path:
+    if hasattr(target, 'path') and target.path:
         context.log_result("target", target.path)
 
     # Preparing run_config:

@@ -33,7 +33,7 @@ jobs:
             echo '{ "package" : ['
             git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
             echo " ]}"
-          ) | jq -c .)
+          ) | jq 'del(.[][] | select(. == ""))'  -c)
           echo "::set-output name=matrix::$matrix"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}

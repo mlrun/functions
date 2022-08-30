@@ -5,16 +5,16 @@ categories:
 description: train any classifier using scikit-learn's API over Dask
 doc: ''
 example: sklearn_classifier_dask.ipynb
-generationDate: 2021-11-18:12-28
+generationDate: 2022-08-28:17-25
 icon: ''
 labels:
   author: yjb
   framework: sklearn
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.8.0
+mlrunVersion: 1.1.0
 name: sklearn-classifier-dask
-platformVersion: 3.2.0
+platformVersion: 3.5.0
 spec:
   filename: sklearn_classifier_dask.py
   handler: train_model
@@ -22,4 +22,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.9.1
+version: 1.1.0

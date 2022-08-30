@@ -6,15 +6,15 @@ categories:
 description: simulate data with outliers.
 doc: ''
 example: xgb_custom.ipynb
-generationDate: 2021-11-18:12-28
+generationDate: 2022-08-28:17-25
 icon: ''
 labels:
   author: Daniel
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.8.0
+mlrunVersion: 1.1.0
 name: xgb_custom
-platformVersion: 3.2.0
+platformVersion: 3.5.0
 spec:
   filename: xgb_custom.py
   handler: gen_outliers
@@ -22,4 +22,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.9.0
+version: 1.1.0

@@ -87,7 +87,8 @@ def install_requirements(directory: str, requirements: Union[List[str], Set[str]
     if not requirements:
         print(f"No requirements found for {directory}...")
         return
-
+    if 'mlrun' not in requirements:
+        requirements.append('mlrun')
     print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
     requirements_install: subprocess.CompletedProcess = subprocess.run(
         f"pipenv install --skip-lock {' '.join(requirements)}",

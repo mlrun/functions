@@ -1,0 +1,30 @@
+apiVersion: v1
+categories:
+- utils
+description: Batch prediction for the common ML frameworks (SciKit-Learn, XGBoost and LightGBM) while performing data 
+  drift analysis.
+doc: ''
+example: batch_predict.ipynb
+generationDate: 2022-08-28:17-25
+icon: ''
+labels:
+  author: guyl
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.1.0
+name: batch_predict
+platformVersion: 3.5.0
+spec:
+  extra_spec:
+    allow_empty_resources: true
+    build:
+      auto_build: true
+      with_mlrun: false
+  filename: batch_predict.py
+  handler: predict
+  image: mlrun/ml-models
+  kind: job
+  requirements:
+  - scikit-learn
+url: ''
+version: 1.1.0

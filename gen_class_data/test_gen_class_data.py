@@ -36,5 +36,4 @@ def test_gen_class_data():
         local=True,
         artifact_path="artifacts",
         )
-
-    assert(os.path.exists(f"artifacts/{run.metadata.name}/0/classifier-data.csv"))
+    assert run.artifact('classifier-data').get()

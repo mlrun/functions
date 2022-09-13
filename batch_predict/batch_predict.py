@@ -320,7 +320,7 @@ def predict(
     :param drop_columns:             A string / integer or a list of strings / integers that represent the column names
                                      / indices to drop. When the dataset is a list or a numpy array this parameter must
                                      be represented by integers.
-    :param label_columns:            The target label(s) of the column(s) in the dataset. for Regression or
+    :param label_columns:            The target label(s) of the column(s) in the dataset for Regression or
                                      Classification tasks.
     :param log_result_set:           Whether to log the result set - a DataFrame of the given inputs concatenated with
                                      the predictions. Defaulted to True.

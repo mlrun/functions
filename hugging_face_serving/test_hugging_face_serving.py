@@ -99,7 +99,7 @@ def test_local_model_serving():
         class_name=CLASS_NAME,
         model_path="123",  # This is not used, just for enabling the process.
         task="sentiment-analysis",
-        model_class="AutoModelForSequenceClassification",
+        model_class="TFAutoModelForSequenceClassification",
         model_name="nlptown/bert-base-multilingual-uncased-sentiment",
         tokenizer_class="AutoTokenizer",
         tokenizer_name="nlptown/bert-base-multilingual-uncased-sentiment",

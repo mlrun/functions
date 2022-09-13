@@ -345,7 +345,7 @@ def predict(
     )
 
     # Loading the model:
-    context.logger.info(f"Loading model...'")
+    context.logger.info(f"Loading model...")
     model_handler = AutoMLRun.load_model(model_path=model, context=context)
 
     # Predict:

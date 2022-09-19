@@ -173,6 +173,10 @@ def _get_sample_set_statistics(
         # Return the statistics logged with the model:
         return model_artifact_feature_stats
 
+    # Turn the DataItem to DataFrame:
+    if isinstance(sample_set, mlrun.DataItem):
+        sample_set, _ = _read_dataset_as_dataframe(dataset=sample_set)
+
     # Return the sample set statistics:
     return get_df_stats(df=sample_set, options=InferOptions.Histogram)
 

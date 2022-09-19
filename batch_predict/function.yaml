@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: batch-predict
   tag: ''
-  hash: fc5ebbdd9afc791efb505949cb8b0ee191391821
+  hash: 837ce1d1691424a2f9bd3a0d3f59f246381f1d61
   project: ''
   labels:
     author: guyl
@@ -17,7 +17,7 @@ spec:
     base_image: mlrun/ml-models
     commands:
     - python -m pip install scikit-learn
-    code_origin: https://github.com/guy1992l/functions.git#c16f301b8bfadb28635dc11053fb6a91e03ae607:/Users/guyl/Projects/functions/batch_predict/batch_predict.py
+    code_origin: https://github.com/guy1992l/functions.git#4f738a1f6a09d10de0cf1dc2d4a06a16de22305a:/Users/guyl/Projects/functions/batch_predict/batch_predict.py
     origin_filename: /Users/guyl/Projects/functions/batch_predict/batch_predict.py
     with_mlrun: false
     auto_build: true

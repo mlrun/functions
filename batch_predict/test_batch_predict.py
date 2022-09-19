@@ -27,13 +27,16 @@ from sklearn.tree import DecisionTreeClassifier
 @mlrun.handler(outputs=["training_set", "prediction_set"])
 def generate_data(n_samples: int = 5000, n_features: int = 20, n_classes: int = 2):
     # Generate a classification data:
-    x, y = make_classification(
-        n_samples=n_samples, n_features=n_features, n_classes=n_classes
-    )
+    x, y = make_classification(n_samples=n_samples, n_features=n_features, n_classes=2)
 
     # Split the data into a training set and a prediction set:
     x_train, x_prediction = x[: n_samples // 2], x[n_samples // 2 :]
     y_train = y[: n_samples // 2]
+
+    # Randomly drift some features:
+    x_prediction += np.random.uniform(
+        low=2, high=4, size=x_train.shape
+    ) * np.random.randint(low=0, high=2, size=x_train.shape[1], dtype=int)
 
     # Initialize dataframes:
     features = [f"feature_{i}" for i in range(n_features)]
@@ -42,13 +45,6 @@ def generate_data(n_samples: int = 5000, n_features: int = 20, n_classes: int = 
         loc=n_features, column="label", value=y_train, allow_duplicates=True
     )
     prediction_set = pd.DataFrame(data=x_prediction, columns=features)
-
-    # Randomly drift half of the features:
-    drifted_features = prediction_set.sample(n=n_features // 2, axis="columns")
-    drifted_features += np.random.uniform(
-        low=0, high=10, size=(n_samples // 2, n_features // 2)
-    )
-    prediction_set.update(drifted_features)
 
     return training_set, prediction_set
 

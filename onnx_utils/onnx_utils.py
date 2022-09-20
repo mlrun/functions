@@ -46,6 +46,7 @@ class _ToONNXConversions:
         """
         # Import the framework and handler:
         import tensorflow as tf
+        from mlrun.frameworks.tf_keras import TFKerasUtils
 
         # Check the given 'input_signature' parameter:
         if input_signature is None:
@@ -62,7 +63,7 @@ class _ToONNXConversions:
             input_signature = [
                 tf.TensorSpec(
                     shape=shape,
-                    dtype=model_handler.convert_value_type_to_tf_dtype(
+                    dtype=TFKerasUtils.convert_value_type_to_tf_dtype(
                         value_type=value_type
                     ),
                 )
@@ -121,6 +122,7 @@ class _ToONNXConversions:
         """
         # Import the framework and handler:
         import torch
+        from mlrun.frameworks.pytorch import PyTorchUtils
 
         # Parse the 'input_signature' parameter:
         if input_signature is not None:
@@ -128,7 +130,7 @@ class _ToONNXConversions:
                 [
                     torch.zeros(
                         size=shape,
-                        dtype=model_handler.convert_value_type_to_torch_dtype(
+                        dtype=PyTorchUtils.convert_value_type_to_torch_dtype(
                             value_type=value_type
                         ),
                     )

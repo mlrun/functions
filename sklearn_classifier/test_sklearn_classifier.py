@@ -41,7 +41,6 @@ def test_import_sklearn_classifier():
             "CLASS_oob_score": True}
 
     train_run = fn.run(params=params, inputs={"dataset": acquire_run.outputs["price"]},local=True,
-                       artifact_path="artifacts")
-    assert Path(CLASSIFIER_PATH).is_file()
-
-
+                       artifact_path="./")
+    
+    assert (train_run.artifact('model'))

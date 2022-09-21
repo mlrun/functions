@@ -17,10 +17,9 @@ from mlrun.execution import MLClientCtx
 import os
 
 
-def get_class_data(context: MLClientCtx):
+def get_class_data():
     fn = import_function('hub://gen_class_data')
-    run = fn.run(params={'context': context,
-                         'key': 'classifier-data',
+    run = fn.run(params={'key': 'classifier-data',
                          'n_samples': 10_000,
                          'm_features': 5,
                          'k_classes': 2,
@@ -30,8 +29,8 @@ def get_class_data(context: MLClientCtx):
                          'file_ext': 'csv'}, local=True, artifact_path='./')
     return run
 
-def test_xgb_trainer_code_to_function(context: MLClientCtx):
-    gen_data_run = get_class_data(context)
+def test_xgb_trainer_code_to_function():
+    gen_data_run = get_class_data()
     fn = code_to_function(name='test_xgb_trainer',
                           filename='xgb_trainer.py',
                           handler='train_model',
@@ -50,9 +49,9 @@ def test_xgb_trainer_code_to_function(context: MLClientCtx):
     assert (run.artifact('model'))
 
 
-def test_local_xgb_trainer_import_function(context: MLClientCtx):
+def test_local_xgb_trainer_import_function():
     # importing data preparation function locally
-    gen_data_run = get_class_data(context)
+    gen_data_run = get_class_data()
 
     fn = import_function('function.yaml')
     run = fn.run(params={'model_type': 'classifier',

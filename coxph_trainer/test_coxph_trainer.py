@@ -116,6 +116,7 @@ def test_local_coxph_train():
             "encoded_key": "encoded-data",
         },
         local=True,
+        artifact_path='./'
     )
 
     trainer_fn = import_function("function.yaml")
@@ -126,8 +127,10 @@ def test_local_coxph_train():
             "models_dest": 'models/cox'
         },
         inputs={"dataset": data_clean_run.artifact("encoded-data").url},
-        local=True
+        local=True,
+        artifact_path='./'
     )
+
     model = load(open(f"{trainer_run.artifact('km-model').url}model.pkl", "rb"))
     ans = model.predict([1, 10, 30, 100, 200])
     assert(sum([abs(x-y) for x, y in zip(list(np.around(ans, 2)), [0.95, 0.85, 0.77, 0.58, 0.58])]) < 0.5)

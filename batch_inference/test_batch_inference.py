@@ -42,7 +42,7 @@ def generate_data(n_samples: int = 5000, n_features: int = 20, n_classes: int = 
     features = [f"feature_{i}" for i in range(n_features)]
     training_set = pd.DataFrame(data=x_train, columns=features)
     training_set.insert(
-        loc=n_features, column="label", value=y_train, allow_duplicates=True
+        loc=n_features, column="target_label", value=y_train, allow_duplicates=True
     )
     prediction_set = pd.DataFrame(data=x_prediction, columns=features)
 
@@ -52,8 +52,8 @@ def generate_data(n_samples: int = 5000, n_features: int = 20, n_classes: int = 
 @mlrun.handler()
 def train(training_set: pd.DataFrame):
     # Get the data into x, y:
-    labels = pd.DataFrame(training_set["label"])
-    training_set.drop(columns=["label"], inplace=True)
+    labels = pd.DataFrame(training_set["target_label"])
+    training_set.drop(columns=["target_label"], inplace=True)
 
     # Initialize a model:
     model = DecisionTreeClassifier()
@@ -88,12 +88,12 @@ def test_batch_predict():
 
     batch_predict_function = mlrun.import_function("function.yaml")
     batch_predict_run = batch_predict_function.run(
-        handler="predict",
+        handler="infer",
         artifact_path=artifact_path.name,
         inputs={"dataset": generate_data_run.outputs["prediction_set"]},
         params={
             "model": train_run.outputs["model"],
-            "label_columns": "label",
+            # "label_columns": "label",
             "result_set_name": "result_set",
         },
         local=True,
@@ -102,7 +102,7 @@ def test_batch_predict():
     # Check the prediction set:
     result_set = batch_predict_run.artifact("result_set").as_df()
     assert result_set.shape == (n_samples // 2, n_features + 1)
-    assert "label" in result_set.columns
+    assert "target_label" in result_set.columns
 
     # Check the drift table plot:
     assert (

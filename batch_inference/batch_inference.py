@@ -29,6 +29,7 @@ from mlrun.model_monitoring.model_monitoring_batch import (
     calculate_inputs_statistics,
 )
 
+# A union of all supported dataset types:
 DatasetType = Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray]
 
 
@@ -62,7 +63,8 @@ def _read_dataset_as_dataframe(
     # Check if the dataset is in fact a Feature Vector:
     if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
         # Try to get the label columns if not provided:
-        label_columns = label_columns or dataset.meta.status.label_column
+        if label_columns is None:
+            label_columns = dataset.meta.status.label_column
         # Get the features and parse to DataFrame:
         dataset = fs.get_offline_features(
             dataset.meta.uri, drop_columns=drop_columns
@@ -295,7 +297,7 @@ def _perform_drift_analysis(
     )
 
 
-def predict(
+def infer(
     context: mlrun.MLClientCtx,
     model: str,
     dataset: DatasetType,
@@ -325,7 +327,8 @@ def predict(
                                      / indices to drop. When the dataset is a list or a numpy array this parameter must
                                      be represented by integers.
     :param label_columns:            The target label(s) of the column(s) in the dataset for Regression or
-                                     Classification tasks.
+                                     Classification tasks. The label column can be accessed from the model object, or
+                                     the feature vector provided if available.
     :param log_result_set:           Whether to log the result set - a DataFrame of the given inputs concatenated with
                                      the predictions. Defaulted to True.
     :param result_set_name:          The db key to set name of the prediction result and the filename. Defaulted to
@@ -341,16 +344,21 @@ def predict(
     :param inf_capping:              The value to set for when it reached infinity. Defaulted to 10.0.
     :param artifacts_tag:            Tag to use for all the artifacts resulted from the function.
     """
-    # Get dataset by URL or by FeatureVector:
+    # Loading the model:
+    context.logger.info(f"Loading model...")
+    model_handler = AutoMLRun.load_model(model_path=model, context=context)
+    if label_columns is None:
+        label_columns = [
+            output.name for output in model_handler._model_artifact.spec.outputs
+        ]
+
+    # Get dataset by object, URL or by FeatureVector:
+    context.logger.info(f"Loading data...")
     x, label_columns = _read_dataset_as_dataframe(
         dataset=dataset,
         label_columns=label_columns,
         drop_columns=drop_columns,
     )
-
-    # Loading the model:
-    context.logger.info(f"Loading model...")
-    model_handler = AutoMLRun.load_model(model_path=model, context=context)
 
     # Predict:
     context.logger.info(f"Calculating prediction...")
@@ -361,7 +369,7 @@ def predict(
 
     # Check for logging the result set:
     if log_result_set:
-        context.logger.info(f"Logging result set (x | prediction)...")
+        context.logger.info(f"\tLogging result set (x | prediction)...")
         context.log_dataset(
             key=result_set_name,
             df=result_set,

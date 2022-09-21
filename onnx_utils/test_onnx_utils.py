@@ -123,10 +123,9 @@ def _log_onnx_model(context: mlrun.MLClientCtx, model_name: str):
     import requests
 
     # Download the MNIST model:
-    mnist_model_name = "mnist-8"
+    mnist_model_name = "mnist-12"
     requested_model = requests.get(
-        f"https://github.com/onnx/models/blob/master/vision/classification/mnist/"
-        f"model/{mnist_model_name}.onnx?raw=true"
+        f"https://github.com/onnx/models/blob/main/vision/classification/mnist/model/{mnist_model_name}.onnx?raw=true"
     )
     with open(
         os.path.join(context.artifact_path, f"{model_name}.onnx"), "bw"
@@ -224,7 +223,7 @@ def test_tf_keras_to_onnx():
     onnx_function = mlrun.import_function("function.yaml")
 
     # Run the function to convert our model to ONNX:
-    onnx_function.run(
+    onnx_function_run = onnx_function.run(
         handler="to_onnx",
         artifact_path=artifact_path,
         params={
@@ -236,15 +235,14 @@ def test_tf_keras_to_onnx():
         local=True,
     )
 
-    # Get the artifacts list:
-    artifacts_list = os.listdir(artifact_path)
-    print(f"Produced artifacts: {artifacts_list}")
-
     # Cleanup the tests environment:
     _cleanup_environment(artifact_path=artifact_path)
 
+    # Print the outputs list:
+    print(f"Produced outputs: {onnx_function_run.outputs}")
+
     # Verify the '.onnx' model was created:
-    assert "{}.onnx".format(ONNX_MODEL_NAME) in artifacts_list
+    assert "model" in onnx_function_run.outputs
 
 
 def test_pytorch_to_onnx():
@@ -274,7 +272,7 @@ def test_pytorch_to_onnx():
     onnx_function = mlrun.import_function("function.yaml")
 
     # Run the function to convert our model to ONNX:
-    onnx_function.run(
+    onnx_function_run = onnx_function.run(
         handler="to_onnx",
         artifact_path=artifact_path,
         params={
@@ -282,22 +280,19 @@ def test_pytorch_to_onnx():
                 "model"
             ],  # <- Take the logged model from the previous function.
             "onnx_model_name": ONNX_MODEL_NAME,
-            "framework_kwargs": {
-                "input_signature": [((32, 3, 224, 224), "float32")]
-            },
+            "framework_kwargs": {"input_signature": [((32, 3, 224, 224), "float32")]},
         },
         local=True,
     )
 
-    # Get the artifacts list:
-    artifacts_list = os.listdir(artifact_path)
-    print(f"Produced artifacts: {artifacts_list}")
-
     # Cleanup the tests environment:
     _cleanup_environment(artifact_path=artifact_path)
 
+    # Print the outputs list:
+    print(f"Produced outputs: {onnx_function_run.outputs}")
+
     # Verify the '.onnx' model was created:
-    assert "{}.onnx".format(ONNX_MODEL_NAME) in artifacts_list
+    assert "model" in onnx_function_run.outputs
 
 
 def test_optimize_help():
@@ -334,51 +329,50 @@ def test_optimize_help():
     assert is_test_passed
 
 
-# def test_optimize():
-#     """
-#     Test the 'optimize' handler, giving it a model from the ONNX zoo git repository.
-#     """
-#     # Setup the tests environment:
-#     artifact_path = _setup_environment()
-#
-#     # Create the function parsing this notebook's code using 'code_to_function':
-#     log_model_function = mlrun.code_to_function(
-#         filename="test_onnx_utils.py",
-#         name="log_model",
-#         kind="job",
-#         image="mlrun/ml-models",
-#     )
-#
-#     # Run the function to log the model:
-#     log_model_run = log_model_function.run(
-#         handler="_log_onnx_model",
-#         artifact_path=artifact_path,
-#         params={"model_name": MODEL_NAME},
-#         local=True,
-#     )
-#
-#     # Import the ONNX Utils function:
-#     onnx_function = mlrun.import_function("function.yaml")
-#
-#     # Run the function to optimize our model:
-#     onnx_function.run(
-#         handler="optimize",
-#         artifact_path=artifact_path,
-#         params={
-#             "model_path": log_model_run.outputs[
-#                 "model"
-#             ],  # <- Take the logged model from the previous function.
-#             "optimized_model_name": OPTIMIZED_ONNX_MODEL_NAME,
-#         },
-#         local=True,
-#     )
-#
-#     # Get the artifacts list:
-#     artifacts_list = os.listdir(artifact_path)
-#     print(f"Produced artifacts: {artifacts_list}")
-#
-#     # Cleanup the tests environment:
-#     _cleanup_environment(artifact_path=artifact_path)
-#
-#     # Verify the '.onnx' model was created:
-#     assert "{}.onnx".format(OPTIMIZED_ONNX_MODEL_NAME) in artifacts_list
+def test_optimize():
+    """
+    Test the 'optimize' handler, giving it a model from the ONNX zoo git repository.
+    """
+    # Setup the tests environment:
+    artifact_path = _setup_environment()
+
+    # Create the function parsing this notebook's code using 'code_to_function':
+    log_model_function = mlrun.code_to_function(
+        filename="test_onnx_utils.py",
+        name="log_model",
+        kind="job",
+        image="mlrun/ml-models",
+    )
+
+    # Run the function to log the model:
+    log_model_run = log_model_function.run(
+        handler="_log_onnx_model",
+        artifact_path=artifact_path,
+        params={"model_name": MODEL_NAME},
+        local=True,
+    )
+
+    # Import the ONNX Utils function:
+    onnx_function = mlrun.import_function("function.yaml")
+
+    # Run the function to optimize our model:
+    onnx_function_run = onnx_function.run(
+        handler="optimize",
+        artifact_path=artifact_path,
+        params={
+            "model_path": log_model_run.outputs[
+                "model"
+            ],  # <- Take the logged model from the previous function.
+            "optimized_model_name": OPTIMIZED_ONNX_MODEL_NAME,
+        },
+        local=True,
+    )
+
+    # Cleanup the tests environment:
+    _cleanup_environment(artifact_path=artifact_path)
+
+    # Print the outputs list:
+    print(f"Produced outputs: {onnx_function_run.outputs}")
+
+    # Verify the '.onnx' model was created:
+    assert "model" in onnx_function_run.outputs

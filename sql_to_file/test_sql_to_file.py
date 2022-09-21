@@ -24,9 +24,8 @@ def test_run_sql_to_file():
                           handler="sql_to_file",
                           kind="job",
                           )
-    fn.run(params={'sql_query': mysql_query,
-                           'database_url': mysql_url}
-           , local=True
-
-           )
-
+    run = fn.run(params={'sql_query': mysql_query,
+                         'database_url': mysql_url},
+                 local=True)
+    
+    assert(run.artifact("query result"))

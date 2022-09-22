@@ -1,0 +1,5 @@
+numpy
+pandas
+mlrun
+scikit-learn
+plotly

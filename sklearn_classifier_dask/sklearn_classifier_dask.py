@@ -182,12 +182,12 @@ def train_model(context,
     
     context.log_artifact("standard_scaler", body=dumps(scaler),
                          artifact_path=artifact_path,
-                         model_file="scaler.gz",
+                         local_path="scaler.gz",
                          label="standard_scaler")
     
     context.log_artifact("label_encoder", body=dumps(encoder),
                          artifact_path=artifact_path,
-                         model_file="encoder.gz",
+                         local_path="encoder.gz",
                          label="label_encoder")
     
     df_to_save = delayed(np.column_stack)((X_test, y_test)).compute()

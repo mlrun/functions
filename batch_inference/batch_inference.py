@@ -146,7 +146,9 @@ def _prepare_result_set(
             f"The labels: {common_labels} are already existed in the given dataset."
         )
 
-    return pd.concat([x, pd.DataFrame(y_pred, columns=label_columns)], axis=1)
+    return pd.concat(
+        [x, pd.DataFrame(y_pred, columns=label_columns, index=x.index)], axis=1
+    )
 
 
 def _get_sample_set_statistics(
@@ -369,7 +371,7 @@ def infer(
 
     # Check for logging the result set:
     if log_result_set:
-        context.logger.info(f"\tLogging result set (x | prediction)...")
+        context.logger.info(f"Logging result set (x | prediction)...")
         context.log_dataset(
             key=result_set_name,
             df=result_set,

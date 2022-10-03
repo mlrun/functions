@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
 - utils
-description: Batch inference ( also knows as prediction) for the common ML frameworks (SciKit-Learn, XGBoost and 
+description: Batch inference (also knows as prediction) for the common ML frameworks (SciKit-Learn, XGBoost and 
   LightGBM) while performing data drift analysis.
 doc: ''
 example: batch_inference.ipynb

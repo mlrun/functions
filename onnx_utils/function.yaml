@@ -17,7 +17,7 @@ spec:
     base_image: mlrun/ml-models
     commands:
     - python -m pip install onnx~=1.10.1 onnxruntime~=1.8.1 onnxoptimizer~=0.2.0 onnxmltools~=1.9.0
-      tf2onnx~=1.9.0
+      tf2onnx~=1.9.0 torchvision==0.10.1
     code_origin: https://github.com/guy1992l/functions.git#eed5f29fd0e0631dca0dadac2a09212579cde7d5:/Users/guyl/Projects/functions/onnx_utils/onnx_utils.py
     origin_filename: /Users/guyl/Projects/functions/onnx_utils/onnx_utils.py
     with_mlrun: false

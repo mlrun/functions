@@ -99,10 +99,11 @@ def test_batch_predict():
         local=True,
     )
 
-    # Check the prediction set:
+    # Check the result set:
     result_set = batch_predict_run.artifact("result_set").as_df()
     assert result_set.shape == (n_samples // 2, n_features + 1)
     assert "target_label" in result_set.columns
+    assert "batch_id" in batch_predict_run.status.results
 
     # Check the drift table plot:
     assert (

@@ -148,10 +148,12 @@ def build_marketplace(
     build_catalog_json(
         marketplace_dir=marketplace_dir,
         catalog_path=(marketplace_root / "catalog.json"),
+        change_log=change_log,
     )
     build_catalog_json(
         marketplace_dir=marketplace_dir,
         catalog_path=(marketplace_dir / "catalog.json"),
+        change_log=change_log,
         with_functions_legacy=False,
         add_artifacts=True,
     )
@@ -222,6 +224,7 @@ def add_object_and_source(function_name: str, yaml_obj):
 def build_catalog_json(
     marketplace_dir: Union[str, Path],
     catalog_path: Union[str, Path],
+    change_log: ChangeLog,
     with_functions_legacy: bool = True,
     add_artifacts: bool = False,
 ):
@@ -247,17 +250,24 @@ def build_catalog_json(
 
         latest_yaml = yaml.full_load(open(source_yaml_path, "r"))
         latest_yaml["generationDate"] = str(latest_yaml["generationDate"])
-
         latest_version = latest_yaml["version"]
         if add_artifacts:
             latest_yaml = add_object_and_source(
                 function_name=source_dir.name, yaml_obj=latest_yaml
             )
-
+        hide = latest_yaml["hidden"]
         if with_functions_legacy:
-            catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
+            if hide:
+                change_log.hide_item(source_dir.name)
+                catalog[source][channel].pop(source_dir.name, None)
+            else:
+                catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
         else:
-            catalog[source_dir.name] = {"latest": latest_yaml}
+            if hide:
+                change_log.hide_item(source_dir.name)
+                catalog.pop(source_dir.name, None)
+            else:
+                catalog[source_dir.name] = {"latest": latest_yaml}
         for version_dir in source_dir.iterdir():
             version = version_dir.name
 
@@ -269,19 +279,24 @@ def build_catalog_json(
                     version_yaml = add_object_and_source(
                         function_name=source_dir.name, yaml_obj=version_yaml
                     )
-                if with_functions_legacy:
-                    catalog[source][channel][source_dir.name][version] = version_yaml
-                else:
-                    catalog[source_dir.name][version] = version_yaml
+                if not hide:
+                    if with_functions_legacy:
+                        catalog[source][channel][source_dir.name][
+                            version
+                        ] = version_yaml
+                    else:
+                        catalog[source_dir.name][version] = version_yaml
 
     # Remove deleted directories from catalog:
     if with_functions_legacy:
         for function_dir in list(catalog[source][channel].keys()):
             if not (marketplace_dir / function_dir).exists():
+                change_log.deleted_item(function_dir)
                 del catalog[source][channel][function_dir]
     else:
         for function_dir in list(catalog.keys()):
             if not (marketplace_dir / function_dir).exists():
+                change_log.deleted_item(function_dir)
                 del catalog[function_dir]
 
     json.dump(catalog, open(catalog_path, "w"))

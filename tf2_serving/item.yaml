@@ -6,6 +6,7 @@ description: tf2 image classification server
 doc: ''
 example: tf2_serving.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: yaronh

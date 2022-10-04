@@ -5,6 +5,7 @@ description: Rolling aggregation over Metrics and Lables according to specificat
 doc: ''
 example: aggregate.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: avia

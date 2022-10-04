@@ -314,8 +314,10 @@ def update_or_create_item(
     target_version = marketplace_item / source_version
 
     if target_version.exists():
-        click.echo("Source version already exists in target directory!")
-        return
+        latest_item_yaml = yaml.full_load(open(target_latest / "src" / "item.yaml", "r"))
+        if item_yaml['hidden'] == latest_item_yaml["hidden"]:
+            click.echo("Source version already exists in target directory!")
+            return
 
     documentation_html_name = f"{item_dir.stem}.html"
     example_html_name = f"{item_dir.stem}_example.html"
@@ -336,6 +338,8 @@ def update_or_create_item(
     # If its the first source is encountered, copy source to target
     if latest_src.exists():
         shutil.rmtree(latest_src)
+        if version_src.exists():
+            shutil.rmtree(version_src)
         change_log.update_item(item_dir.stem, source_version, target_version.name)
     else:
         change_log.new_item(item_dir.stem, source_version)

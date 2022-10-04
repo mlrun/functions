@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import hashlib
 import json
+from datetime import datetime
 from typing import Any, Dict, List, Tuple, Union
 
 import mlrun
@@ -307,6 +309,7 @@ def infer(
     label_columns: Union[str, List[str]] = None,
     log_result_set: bool = True,
     result_set_name: str = "prediction",
+    batch_id: str = None,
     perform_drift_analysis: bool = None,
     sample_set: DatasetType = None,
     drift_threshold: float = 0.7,
@@ -335,6 +338,8 @@ def infer(
                                      the predictions. Defaulted to True.
     :param result_set_name:          The db key to set name of the prediction result and the filename. Defaulted to
                                      'prediction'.
+    :param batch_id:                 The ID of the given batch (inference dataset). If `None`, it will be generated.
+                                     Will be logged as a result of the run.
     :param perform_drift_analysis:   Whether to perform drift analysis between the sample set of the model object to the
                                      dataset given. By default, None, which means it will perform drift analysis if the
                                      model has a sample set statistics. Perform drift analysis will produce a data drift
@@ -371,12 +376,20 @@ def infer(
 
     # Check for logging the result set:
     if log_result_set:
+        # Log the result set:
         context.logger.info(f"Logging result set (x | prediction)...")
         context.log_dataset(
             key=result_set_name,
             df=result_set,
             db_key=result_set_name,
             tag=artifacts_tag,
+        )
+        # Log the batch ID:
+        if batch_id is None:
+            batch_id = hashlib.sha224(str(datetime.now()).encode()).hexdigest()
+        context.log_result(
+            key="batch_id",
+            value=batch_id,
         )
 
     # Check for performing drift analysis:

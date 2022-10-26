@@ -3,7 +3,22 @@ name: System Tests Open Source
 on:
   push:
     branches:
-      - '.+-system-tests'
+      - 'add-cd-helm'
+      
+#       - '.+-system-tests'
+
+
+jobs:
+  create-cluster:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create k8s Kind Cluster
+        uses: helm/kind-action@v1.3.0
+      - name: Testing
+        run: |
+          export KUBECONFIG="$(kind get kubeconfig-path)"
+          kubectl cluster-info        
+
 
 #  schedule:
 #
@@ -11,103 +26,103 @@ on:
 #    # Run the system tests every 3 hours
 #    - cron:  '0 */3 * * *'
 
-  workflow_dispatch:
-    inputs:
-      mlrun_version:
-        description: 'mlrun version'
-        required: true
-        default: '0.7.1'
+#   workflow_dispatch:
+#     inputs:
+#       mlrun_version:
+#         description: 'mlrun version'
+#         required: true
+#         default: '0.7.1'
 
-env:
-  NAMESPACE: mlrun
-  MLRUN_API_NODE_PORT: 30070
+# env:
+#   NAMESPACE: mlrun
+#   MLRUN_API_NODE_PORT: 30070
 
-jobs:
-  run-system-tests-opensource-ci:
-    timeout-minutes: 60
-    name: Run System Tests Open Source
-    runs-on: ubuntu-latest
+# jobs:
+#   run-system-tests-opensource-ci:
+#     timeout-minutes: 60
+#     name: Run System Tests Open Source
+#     runs-on: ubuntu-latest
 
-    # let's not run this on every fork, change to your fork when developing
-    if: github.repository == 'mlrun/functions' || github.event_name == 'workflow_dispatch'
+#     # let's not run this on every fork, change to your fork when developing
+#     if: github.repository == 'mlrun/functions' || github.event_name == 'workflow_dispatch'
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
+#     steps:
+#     - uses: actions/checkout@v2
+#     - name: Set up python 3.7
+#       uses: actions/setup-python@v1
+#       with:
+#         python-version: 3.7
 
-    - uses: azure/setup-helm@v1
-      with:
-        version: "v3.3.4"
+#     - uses: azure/setup-helm@v1
+#       with:
+#         version: "v3.3.4"
 
-    - uses: manusa/actions-setup-minikube@v2.4.2
-      with:
-        minikube version: "v1.22.0"
-        kubernetes version: "v1.19.13"
-        driver: docker
-        github token: ${{ github.token }}
-        start args: '--addons registry'
+#     - uses: manusa/actions-setup-minikube@v2.4.2
+#       with:
+#         minikube version: "v1.22.0"
+#         kubernetes version: "v1.19.13"
+#         driver: docker
+#         github token: ${{ github.token }}
+#         start args: '--addons registry'
 
-    - name: Get mlrun kit charts and create namespace
-      run: |
-        helm repo add v3io-stable https://v3io.github.io/helm-charts/stable
-        helm repo update
-        minikube kubectl -- create namespace ${NAMESPACE}
-    - name: Install MLRun Kit helm chart
-      run: |
-        helm --namespace ${NAMESPACE} \
-            install mlrun-kit \
-            --debug \
-            --wait \
-            --set global.registry.url=localhost:5000 \
-            --set global.externalHostAddress=$(minikube ip) \
-            --set mlrun.api.image.tag=0.7.1 \
-            --set mlrun.ui.image.tag=0.7.1 \
-            v3io-stable/mlrun-kit
-    - name: Prepare system tests env
-      run: |
-        echo "MLRUN_DBPATH: http://$(minikube ip):${MLRUN_API_NODE_PORT}"
-    - name: Checkout current repo
-      uses: actions/checkout@v2
-      with:
-        path: functions
-    # Install python
-    - name: Install python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.7
-    # Install dependencies
-    - uses: actions/cache@v1
-      id: cache
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    - name: Install requirements
-      run: |
-        pip install --upgrade pip
-        pip install -r functions/requirements.txt
-    - name: Run system tests
-      run: |
-        python functions/functions.py  run-tests -r functions -s ipynb
-    - name: Output some logs in case of failure
-      if: ${{ failure() }}
-      # add set -x to print commands before executing to make logs reading easier
-      run: |
-        set -x
-        minikube logs
-        minikube kubectl -- --namespace ${NAMESPACE} get pvc
-        minikube kubectl -- --namespace ${NAMESPACE} get pv
-        minikube kubectl -- --namespace ${NAMESPACE} get cm
-        minikube kubectl -- --namespace ${NAMESPACE} get secrets
-        minikube kubectl -- --namespace ${NAMESPACE} get pods
-        minikube kubectl -- --namespace ${NAMESPACE} get pods -o yaml
-        minikube kubectl -- --namespace ${NAMESPACE} describe pods
-        minikube kubectl -- --namespace ${NAMESPACE} get cm -o yaml
-        minikube kubectl -- --namespace ${NAMESPACE} get secrets -o yaml
-        minikube kubectl -- --namespace ${NAMESPACE} get all
-        minikube kubectl -- --namespace ${NAMESPACE} get all -o yaml
-        set +x
+#     - name: Get mlrun kit charts and create namespace
+#       run: |
+#         helm repo add v3io-stable https://v3io.github.io/helm-charts/stable
+#         helm repo update
+#         minikube kubectl -- create namespace ${NAMESPACE}
+#     - name: Install MLRun Kit helm chart
+#       run: |
+#         helm --namespace ${NAMESPACE} \
+#             install mlrun-kit \
+#             --debug \
+#             --wait \
+#             --set global.registry.url=localhost:5000 \
+#             --set global.externalHostAddress=$(minikube ip) \
+#             --set mlrun.api.image.tag=0.7.1 \
+#             --set mlrun.ui.image.tag=0.7.1 \
+#             v3io-stable/mlrun-kit
+#     - name: Prepare system tests env
+#       run: |
+#         echo "MLRUN_DBPATH: http://$(minikube ip):${MLRUN_API_NODE_PORT}"
+#     - name: Checkout current repo
+#       uses: actions/checkout@v2
+#       with:
+#         path: functions
+#     # Install python
+#     - name: Install python
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: 3.7
+#     # Install dependencies
+#     - uses: actions/cache@v1
+#       id: cache
+#       with:
+#         path: ~/.cache/pip
+#         key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
+#         restore-keys: |
+#           ${{ runner.os }}-pip-
+#     - name: Install requirements
+#       run: |
+#         pip install --upgrade pip
+#         pip install -r functions/requirements.txt
+#     - name: Run system tests
+#       run: |
+#         python functions/functions.py  run-tests -r functions -s ipynb
+#     - name: Output some logs in case of failure
+#       if: ${{ failure() }}
+#       # add set -x to print commands before executing to make logs reading easier
+#       run: |
+#         set -x
+#         minikube logs
+#         minikube kubectl -- --namespace ${NAMESPACE} get pvc
+#         minikube kubectl -- --namespace ${NAMESPACE} get pv
+#         minikube kubectl -- --namespace ${NAMESPACE} get cm
+#         minikube kubectl -- --namespace ${NAMESPACE} get secrets
+#         minikube kubectl -- --namespace ${NAMESPACE} get pods
+#         minikube kubectl -- --namespace ${NAMESPACE} get pods -o yaml
+#         minikube kubectl -- --namespace ${NAMESPACE} describe pods
+#         minikube kubectl -- --namespace ${NAMESPACE} get cm -o yaml
+#         minikube kubectl -- --namespace ${NAMESPACE} get secrets -o yaml
+#         minikube kubectl -- --namespace ${NAMESPACE} get all
+#         minikube kubectl -- --namespace ${NAMESPACE} get all -o yaml
+#         set +x

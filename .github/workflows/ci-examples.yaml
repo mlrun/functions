@@ -15,12 +15,29 @@ on:
         default: '0.7.1'
 
 
+env:
+  NAMESPACE: mlrun
+  MLRUN_API_NODE_PORT: 30070
+
 jobs:
   create-cluster:
     runs-on: ubuntu-latest
     steps:
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.3.0
+
+      - uses: azure/setup-helm@v1
+        with:
+          version: "v3.9.1"
+
+
+      - name: Get mlrun kit charts and create namespace
+        run: |
+          helm repo add mlrun https://mlrun.github.io/ce
+          helm repo update
+          kubectl create namespace ${NAMESPACE}
+
+
 #       - name: Testing
 #         run: |
 #           export KUBECONFIG="$(kind get kubeconfig-path)"
@@ -35,9 +52,6 @@ jobs:
 
 
 
-# env:
-#   NAMESPACE: mlrun
-#   MLRUN_API_NODE_PORT: 30070
 
 # jobs:
 #   run-system-tests-opensource-ci:

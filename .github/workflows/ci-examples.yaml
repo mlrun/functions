@@ -41,7 +41,7 @@ jobs:
 
       - name: Install MLRun CE helm chart
         run: |
-          helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="128Mi"  --debug  --wait --timeout 600s  mlrun/mlrun-ce
+          helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="60Mi"  --debug  --wait --timeout 600s  mlrun/mlrun-ce
           kubectl get nodes -A 
           kubectl get svc -A
           kubectl get pods -A 

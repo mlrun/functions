@@ -21,7 +21,7 @@ env:
 
 jobs:
   create-cluster:
-    runs-on: ubuntu-20.04-4core
+    runs-on: ubuntu-20.04-04core
 #     runs-on: ubuntu-latest
     steps:
       - name: Create k8s Kind Cluster

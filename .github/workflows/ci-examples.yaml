@@ -7,6 +7,13 @@ on:
       
 #       - '.+-system-tests'
 
+  workflow_dispatch:
+    inputs:
+      mlrun_version:
+        description: 'mlrun version'
+        required: true
+        default: '0.7.1'
+
 
 jobs:
   create-cluster:
@@ -26,12 +33,7 @@ jobs:
 #    # Run the system tests every 3 hours
 #    - cron:  '0 */3 * * *'
 
-#   workflow_dispatch:
-#     inputs:
-#       mlrun_version:
-#         description: 'mlrun version'
-#         required: true
-#         default: '0.7.1'
+
 
 # env:
 #   NAMESPACE: mlrun

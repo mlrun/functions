@@ -36,12 +36,15 @@ jobs:
           helm repo add mlrun https://mlrun.github.io/ce
           helm repo update
           kubectl create namespace ${NAMESPACE}
+          free -h
+          lscpu
 
 
       - name: Install MLRun CE helm chart
         run: |
           helm --namespace ${NAMESPACE} \
               install mlrun-ce \
+              --set minio.resources.requests.memory="0.2Gi" \              
               --debug \
               --wait \
               --timeout 600s \

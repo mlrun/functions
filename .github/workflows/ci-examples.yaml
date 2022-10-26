@@ -41,8 +41,7 @@ jobs:
 
       - name: Install MLRun CE helm chart
         run: |
-          helm --namespace ${NAMESPACE} \
-              install mlrun-ce \
+          helm install mlrun-ce --namespace ${NAMESPACE} \
               --set minio.resources.requests.memory="0.2Gi" \              
               --debug \
               --wait \

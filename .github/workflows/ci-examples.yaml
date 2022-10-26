@@ -36,8 +36,7 @@ jobs:
           helm repo add mlrun https://mlrun.github.io/ce
           helm repo update
           kubectl create namespace ${NAMESPACE}
-          free -h
-          lscpu
+
 
 
       - name: Install MLRun CE helm chart

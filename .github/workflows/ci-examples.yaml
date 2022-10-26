@@ -21,10 +21,10 @@ jobs:
     steps:
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.3.0
-      - name: Testing
-        run: |
-          export KUBECONFIG="$(kind get kubeconfig-path)"
-          kubectl cluster-info        
+#       - name: Testing
+#         run: |
+#           export KUBECONFIG="$(kind get kubeconfig-path)"
+#           kubectl cluster-info        
 
 
 #  schedule:

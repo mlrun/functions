@@ -38,6 +38,19 @@ jobs:
           kubectl create namespace ${NAMESPACE}
 
 
+      - name: Install MLRun CE helm chart
+        run: |
+          helm --namespace ${NAMESPACE} \
+              install mlrun-ce \
+              --debug \
+              --wait \
+              --timeout 600s \
+              mlrun/mlrun-ce
+          kubectl get nodes -A 
+          kubectl get svc -A
+          kubectl get pods -A 
+
+
 #       - name: Testing
 #         run: |
 #           export KUBECONFIG="$(kind get kubeconfig-path)"

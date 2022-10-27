@@ -27,7 +27,8 @@ jobs:
       - name: get static
         run: |
           free -h 
-          sync; echo 3 > /proc/sys/vm/drop_caches 
+          sync
+          sudo echo 3 > /proc/sys/vm/drop_caches 
           free -h 
 
           

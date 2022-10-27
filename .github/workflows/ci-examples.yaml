@@ -34,6 +34,8 @@ jobs:
 
       - name: Get mlrun kit charts and create namespace
         run: |
+          free -h 
+          lscpu
           helm repo add mlrun https://mlrun.github.io/ce
           helm repo update
           kubectl create namespace ${NAMESPACE}

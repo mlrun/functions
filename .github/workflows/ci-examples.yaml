@@ -23,15 +23,7 @@ jobs:
   create-cluster:
     runs-on: ubuntu-latest
 #     runs-on: ubuntu-latest 
-    steps:
-      - name: get static
-        run: |
-          free -h 
-          sync
-          free -h 
-
-          
-
+    steps:         
 
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.3.0
@@ -53,7 +45,7 @@ jobs:
 
       - name: Install MLRun CE helm chart
         run: |
-          helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="60Mi"  --debug  --wait --timeout 600s  mlrun/mlrun-ce
+          helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="60Mi"   --set  jupyterNotebook.persistence.size="1Gi"  --set  mlrun.db.persistence.size="1Gi" --set  mlrun.api.persistence.size="1Gi" --debug  --wait --timeout 600s  mlrun/mlrun-ce
           kubectl get nodes -A 
           kubectl get svc -A
           kubectl get pods -A 

@@ -24,6 +24,15 @@ jobs:
     runs-on: ubuntu-latest
 #     runs-on: ubuntu-latest 
     steps:
+      - name: get static
+        run: |
+          free -h 
+          sync; echo 3 > /proc/sys/vm/drop_caches 
+          free -h 
+
+          
+
+
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.3.0
 

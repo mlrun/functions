@@ -23,7 +23,20 @@ jobs:
   create-cluster:
     runs-on: ubuntu-latest
 #     runs-on: ubuntu-latest 
+    # let's not run this on every fork, change to your fork when developing
+    if: github.repository == 'mlrun/functions' || github.event_name == 'workflow_dispatch'
     steps:         
+
+      # since github-actions gives us 14G only, and fills it up with some garbage
+      # we will free up some space for us (~2GB)
+      - name: Freeing up disk space
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/automation/scripts/github_workflow_free_space.sh"
+          "${GITHUB_WORKSPACE}/automation/scripts/github_workflow_free_space.sh"
+
+      - name: Get Memory
+        run: |
+          free -h 
 
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.3.0

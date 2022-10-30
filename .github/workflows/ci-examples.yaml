@@ -68,12 +68,12 @@ jobs:
         run: |
           helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="128Mi"   --set  jupyterNotebook.persistence.size="1Gi"  --set  mlrun.db.persistence.size="1Gi" --set  mlrun.api.persistence.size="1Gi" --set  mpi-operator.deployment.create="false" --debug   mlrun/mlrun-ce || echo true
           sleep 100
-          kubectl get nodes -A 
-          kubectl get svc -A
-          kubectl describe pods -n mlrun
           free -h 
           kubectl describe pods -n mlrun 
 
+      - name: chcek 
+        run: |
+          kubectl describe pod -n mlrun 
 
 #       - name: Testing
 #         run: |

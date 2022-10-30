@@ -70,7 +70,7 @@ jobs:
           sleep 100
           kubectl get nodes -A 
           kubectl get svc -A
-          kubectl get pods -A 
+          kubectl describe pods -n mlrun
           free -h 
           kubectl describe pods -n mlrun 
 

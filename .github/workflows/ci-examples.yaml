@@ -38,17 +38,17 @@ jobs:
         run: |
           free -h 
 
-#       - name: Create k8s Kind Cluster
-#         uses: helm/kind-action@v1.3.0
+      - name: Create k8s Kind Cluster
+        uses: helm/kind-action@v1.3.0
 
-      - uses: manusa/actions-setup-minikube@v2.4.2
-        with:
-          minikube version: "v1.26.0"
-          kubernetes version: "v1.23.9"
-          driver: docker
-          # I couldn't find a way to configure the IP (https://github.com/kubernetes/minikube/issues/951)
-          # but this seems to work
-          start args: '--addons=registry --insecure-registry="192.168.49.2:5000"'
+#       - uses: manusa/actions-setup-minikube@v2.4.2
+#         with:
+#           minikube version: "v1.26.0"
+#           kubernetes version: "v1.23.9"
+#           driver: docker
+#           # I couldn't find a way to configure the IP (https://github.com/kubernetes/minikube/issues/951)
+#           # but this seems to work
+#           start args: '--addons=registry --insecure-registry="192.168.49.2:5000"'
 
       - uses: azure/setup-helm@v1
         with:

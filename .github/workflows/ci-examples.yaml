@@ -27,12 +27,12 @@ jobs:
     if: github.repository == 'mlrun/functions' || github.event_name == 'workflow_dispatch'
     steps:         
 
-      # since github-actions gives us 14G only, and fills it up with some garbage
-      # we will free up some space for us (~2GB)
-      - name: Freeing up disk space
-        run: |
-          chmod +x "${GITHUB_WORKSPACE}/automation/scripts/github_workflow_free_space.sh"
-          "${GITHUB_WORKSPACE}/automation/scripts/github_workflow_free_space.sh"
+#       # since github-actions gives us 14G only, and fills it up with some garbage
+#       # we will free up some space for us (~2GB)
+#       - name: Freeing up disk space
+#         run: |
+#           chmod +x "${GITHUB_WORKSPACE}/automation/scripts/github_workflow_free_space.sh"
+#           "${GITHUB_WORKSPACE}/automation/scripts/github_workflow_free_space.sh"
 
       - name: Get Memory
         run: |
@@ -55,10 +55,9 @@ jobs:
           kubectl create namespace ${NAMESPACE}
 
 
-
       - name: Install MLRun CE helm chart
         run: |
-          helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="60Mi"   --set  jupyterNotebook.persistence.size="1Gi"  --set  mlrun.db.persistence.size="1Gi" --set  mlrun.api.persistence.size="1Gi" --debug  --wait --timeout 600s  mlrun/mlrun-ce
+          helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="60Mi"   --set  jupyterNotebook.persistence.size="1Gi"  --set  mlrun.db.persistence.size="1Gi" --set  mlrun.api.persistence.size="1Gi" --set  mpi-operator.deployment.create="false" --debug  --wait --timeout 600s  mlrun/mlrun-ce
           kubectl get nodes -A 
           kubectl get svc -A
           kubectl get pods -A 

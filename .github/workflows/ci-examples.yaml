@@ -70,11 +70,13 @@ jobs:
           sleep 100
           free -h
           mlrundbpod=`kubectl get pods -n mlrun  | grep mlrun-db | awk '{print $1}'`
-          kubectl logs -n mlrun $mlrundbpod
 
-      - name: chcek 
+      - name: chcek logs
         run: |
-          kubectl describe pod -n mlrun 
+          kubectl logs -n mlrun  $mlrundbpod
+
+
+
 
 #       - name: Testing
 #         run: |

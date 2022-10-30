@@ -71,6 +71,7 @@ jobs:
           free -h
           mlrundbpod=`kubectl get pods -n mlrun  | grep mlrun-db | awk '{print $1}'`
           kubectl describe pods -n mlrun $mlrundbpod
+          kubectl logs -n mlrun $mlrundbpod
 
       - name: chcek 
         run: |

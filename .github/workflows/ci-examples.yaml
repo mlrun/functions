@@ -34,21 +34,19 @@ jobs:
 #           chmod +x "${GITHUB_WORKSPACE}/automation/scripts/github_workflow_free_space.sh"
 #           "${GITHUB_WORKSPACE}/automation/scripts/github_workflow_free_space.sh"
 
-      - name: Get Memory
-        run: |
-          free -h 
 
-      - name: Create k8s Kind Cluster
-        uses: helm/kind-action@v1.3.0
 
-#       - uses: manusa/actions-setup-minikube@v2.4.2
-#         with:
-#           minikube version: "v1.26.0"
-#           kubernetes version: "v1.23.9"
-#           driver: docker
-#           # I couldn't find a way to configure the IP (https://github.com/kubernetes/minikube/issues/951)
-#           # but this seems to work
-#           start args: '--addons=registry --insecure-registry="192.168.49.2:5000"'
+#       - name: Create k8s Kind Cluster
+#         uses: helm/kind-action@v1.3.0
+
+      - uses: manusa/actions-setup-minikube@v2.4.2
+        with:
+          minikube version: "v1.26.0"
+          kubernetes version: "v1.23.9"
+          driver: docker
+          # I couldn't find a way to configure the IP (https://github.com/kubernetes/minikube/issues/951)
+          # but this seems to work
+          start args: '--addons=registry --insecure-registry="192.168.49.2:5000"'
 
       - uses: azure/setup-helm@v1
         with:
@@ -66,10 +64,13 @@ jobs:
 
       - name: Install MLRun CE helm chart
         run: |
-          helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="128Mi"   --set  jupyterNotebook.persistence.size="1Gi"  --set  mlrun.db.persistence.size="1Gi" --set  mlrun.api.persistence.size="1Gi" --set  mpi-operator.deployment.create="false" --set  mlrun.httpDB.dbType="sqlite" --set  mlrun.httpDB.dirPath="/mlrun/db" --set  mlrun.httpDB.dsn="sqlite:////mlrun/db/mlrun.db?check_same_thread=false"  --set  mlrun.httpDB.oldDsn=""  --wait --debug   mlrun/mlrun-ce || echo true
-          sleep 100
+          helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="128Mi"   --set  jupyterNotebook.persistence.size="1Gi"  --set  mlrun.db.persistence.size="1Gi" --set  mlrun.api.persistence.size="1Gi" --set  mpi-operator.deployment.create="false" --set  mlrun.httpDB.dbType="sqlite" --set  mlrun.httpDB.dirPath="/mlrun/db" --set  mlrun.httpDB.dsn="sqlite:////mlrun/db/mlrun.db?check_same_thread=false"  --set  mlrun.httpDB.oldDsn=""  --set global.registry.url=$(minikube ip):5000  --set global.registry.secretName=""   --set global.externalHostAddress=$(minikube ip)  -set nuclio.dashboard.externalIPAddresses[0]=$(minikube ip)  --wait --debug   mlrun/mlrun-ce 
           free -h
           
+      - name: Prepare system tests env
+        run: |
+          echo "MLRUN_DBPATH: http://$(minikube ip):${MLRUN_API_NODE_PORT}" > mlrun_tmp_env.yml
+          cat mlrun_tmp_env.yml
 
       - name: chcek logs
         run: |

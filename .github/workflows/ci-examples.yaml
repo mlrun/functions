@@ -7,7 +7,7 @@ on:
 
 #  schedule:
 #
-#    # * is a special character in YAML so you have to quote this string
+#    # * is a special character in YAML,so you have to quote this string
 #    # Run the system tests every 3 hours
 #    - cron:  '0 */3 * * *'
 
@@ -23,10 +23,42 @@ env:
   MLRUN_API_NODE_PORT: 30070
 
 jobs:
-  run-system-tests-opensource-ci:
-    timeout-minutes: 60
-    name: Run System Tests Open Source
+
+  build_stategy_matrix:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: set-matrix
+        # This is very hacky, but it goes like that:
+        # 1) Associate base_ref with origin/base_ref since actions/checkout doesn't do it, if we don't do that we won't be able to check the actual diff
+        # 2) Build JSON string
+        #  2.1) Add beginning of JSON
+        #  2.2) Get diff between origin/base_ref and the checked-out repo => git diff ${{ github.base_ref }} --name-only
+        #  2.3) Clean the file name and leave us only with directories => sed 's,/*[^/]\+/*$,,'
+        #  2.4) Sort and keep only unique directories => sort | uniq
+        #  2.5) Remove directories starting with '.' => grep -v '^\.'
+        #  2.6) Add quotation marks to all strings => sed 's/.*/"&"/'
+        #  2.7) Add comma suffix to all strings excluding the last one => sed '$!s/.*/&,/'
+        #  2.8) Close JSON
+        # 3) Save matrix JSON to output
+        # This is previous fetch command that stopped working (while investigating added WA bello in run section): git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
+        # This is old git diff version:             git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
+        # Based on instructions regarding https://docs.github.com/en/actions/learn-github-actions/contexts#github-context , gitHub.base_ref triggers a workflow run is either pull_request or pull_request_target
+        run: |
+          git fetch --no-tags --prune --depth=1 origin ${{ github.base_ref }}:${{ github.base_ref }}
+          matrix=$((
+            echo '{ "package" : ['
+            git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
+            echo " ]}"
+          ) | jq 'del(.[][] | select(. == ""))'  -c)
+          echo "::set-output name=matrix::$matrix"
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+  check_matrix:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    needs: build_stategy_matrix
 
     # let's not run this on every fork, change to your fork when developing
     if: github.repository == 'mlrun/functions' || github.event_name == 'workflow_dispatch'

@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened]
     branches:
-      - '.+-system-tests'
+      - 'test-system-tests'
 
   workflow_dispatch:
     inputs:

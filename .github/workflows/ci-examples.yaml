@@ -39,6 +39,7 @@ jobs:
         # This is previous fetch command that stopped working (while investigating added WA bello in run section): git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
         # This is old git diff version:             git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
         # Based on instructions regarding https://docs.github.com/en/actions/learn-github-actions/contexts#github-context , gitHub.base_ref triggers a workflow run is either pull_request or pull_request_target
+
         run: |
           git fetch --no-tags --prune --depth=1 origin ${{ github.base_ref }}:${{ github.base_ref }}
           matrix=$((

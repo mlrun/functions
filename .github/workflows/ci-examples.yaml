@@ -1,4 +1,4 @@
-name: System Tests Open Source
+name: IPYNB Testing
 
 on:
   pull_request:
@@ -120,7 +120,7 @@ jobs:
         pip install -r functions/requirements.txt
     - name: Run system tests
       run: |
-        python functions/functions.py  run-tests -r functions -s ipynb
+        python functions/functions.py  run-tests -r functions -s py -fn ${{ matrix.package }}
     - name: Output some logs in case of failure
       if: ${{ failure() }}
       # add set -x to print commands before executing to make logs reading easier

@@ -77,9 +77,12 @@ def install_python(directory: Union[str, Path]):
     stderr = python_install.stderr.decode("utf8")
     stderr = stderr.split("\n")
     python_location = [l for l in stderr if "Virtualenv location: " in l]
-    python_location = (
-        python_location[0].split("Virtualenv location: ")[-1] + "bin/python"
-    )
+    if python_location.count(python_location)>0:
+        python_location = (
+            python_location[0].split("Virtualenv location: ")[-1] + "bin/python"
+        )
+    else:
+        python_location = None
     return python_location
 
 

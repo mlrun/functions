@@ -123,7 +123,7 @@ jobs:
         pip install -r functions/requirements.txt
     - name: Run system tests
       run: |
-        python functions/functions.py  run-tests -r functions -s py -fn ${{ matrix.package }}
+        python functions/functions.py  run-tests -r functions -s ipynb -fn ${{ matrix.package }}
     - name: Output some logs in case of failure
       if: ${{ failure() }}
       # add set -x to print commands before executing to make logs reading easier

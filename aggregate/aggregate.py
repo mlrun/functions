@@ -20,6 +20,7 @@ from mlrun.datastore import DataItem
 
 from typing import Union
 
+
 def aggregate(context,
               df_artifact: Union[DataItem, pd.core.frame.DataFrame],
               save_to: str = 'aggregated-df.pq',

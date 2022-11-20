@@ -17,10 +17,8 @@
 import warnings
 from typing import Union
 
-import matplotlib.pyplot as plt
 import mlrun
 import numpy as np
-import seaborn as sns
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
@@ -29,7 +27,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
-from mlrun.artifacts import (DatasetArtifact, PlotArtifact, PlotlyArtifact,
+from mlrun.artifacts import (Artifact, DatasetArtifact, PlotlyArtifact,
                              TableArtifact, update_dataset_meta)
 from mlrun.datastore import DataItem
 from mlrun.execution import MLClientCtx
@@ -130,7 +128,7 @@ def analyze(
             return
 
     if df.size > MAX_SIZE_OF_DF:
-        df = df.sample(n=MAX_SIZE_OF_DF, random_state=random_state)
+        df = df.sample(n=int(MAX_SIZE_OF_DF / df.shape[1]), random_state=random_state)
     extra_data = {}
 
     if label_column not in df.columns:
@@ -204,28 +202,14 @@ def _create_histogram_mat_artifact(
     """
     Create and log a histogram matrix artifact
     """
-
-    # fig = ff.create_scatterplotmatrix(df, diag="box", width=2500, height=2500)
-    # if label_column is not None:
-    #     df_new = df.copy()
-    #     df_new[label_column] = df_new[label_column].apply(str)
-    #     fig = ff.create_scatterplotmatrix(
-    #         df_new, diag="box", index=label_column, width=2500, height=2500
-    #     )
-    # fig.update_layout(title_text="<i><b>Histograms matrix</b></i>")
-    # extra_data["histogram-matrix"] = context.log_artifact(
-    #     PlotlyArtifact(key="histograms-matrix", figure=fig),
-    #     local_path=f"{plots_dest}/hist_mat.html",
-    # )
-    context.log_artifact(f"{plots_dest}/hist.html", body=b'<b> Deprecated, see the artifacts scatter-2d and '
-                                                         b'histograms instead<b>', viewer='web-app')
-
-#     snsplt = sns.pairplot(df, hue=label_column)  # , diag_kws={"bw": 1.5})
-#     extra_data["histograms-matrix"] = context.log_artifact(
-#         PlotArtifact("histograms-matrix", body=plt.gcf()),
-#         local_path=f"{plots_dest}/hist.html",
-#         db_key=False,
-#     )
+    context.log_artifact(
+        item=Artifact(
+            key="hist",
+            body=b"<b> Deprecated, see the artifacts scatter-2d "
+            b"and histograms instead<b>",
+        ),
+        local_path=f"{plots_dest}/hist.html",
+    )
 
 
 def _create_features_histogram_artifacts(

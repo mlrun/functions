@@ -17,10 +17,9 @@
 import warnings
 from typing import Union
 
-import matplotlib.pyplot as plt
 import mlrun
 import numpy as np
-import seaborn as sns
+
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
@@ -29,7 +28,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
-from mlrun.artifacts import (DatasetArtifact, PlotArtifact, PlotlyArtifact,
+from mlrun.artifacts import (DatasetArtifact, Artifact, PlotlyArtifact,
                              TableArtifact, update_dataset_meta)
 from mlrun.datastore import DataItem
 from mlrun.execution import MLClientCtx
@@ -41,16 +40,16 @@ MAX_SIZE_OF_DF = 500000
 
 
 def analyze(
-    context: MLClientCtx,
-    name: str = "dataset",
-    table: Union[FeatureSet, DataItem] = None,
-    label_column: str = None,
-    plots_dest: str = "plots",
-    random_state: int = 1,
-    problem_type: str = "classification",
-    dask_key: str = "dask_key",
-    dask_function: str = None,
-    dask_client=None,
+        context: MLClientCtx,
+        name: str = "dataset",
+        table: Union[FeatureSet, DataItem] = None,
+        label_column: str = None,
+        plots_dest: str = "plots",
+        random_state: int = 1,
+        problem_type: str = "classification",
+        dask_key: str = "dask_key",
+        dask_function: str = None,
+        dask_client=None,
 ) -> None:
     """
     The function will output the following artifacts per
@@ -130,7 +129,7 @@ def analyze(
             return
 
     if df.size > MAX_SIZE_OF_DF:
-        df = df.sample(n=int(MAX_SIZE_OF_DF/df.shape[1]), random_state=random_state)
+        df = df.sample(n=int(MAX_SIZE_OF_DF / df.shape[1]), random_state=random_state)
     extra_data = {}
 
     if label_column not in df.columns:
@@ -195,26 +194,27 @@ def analyze(
 
 
 def _create_histogram_mat_artifact(
-    context: MLClientCtx,
-    df: pd.DataFrame,
-    extra_data: dict,
-    label_column: str,
-    plots_dest: str,
+        context: MLClientCtx,
+        df: pd.DataFrame,
+        extra_data: dict,
+        label_column: str,
+        plots_dest: str,
 ):
     """
     Create and log a histogram matrix artifact
     """
-    context.log_artifact(f"{plots_dest}/hist.html", body=b'<b> Deprecated, see the artifacts scatter-2d and '
-                                                         b'histograms instead<b>')
+    context.log_artifact(item=Artifact(key='hist', body=b'<b> Deprecated, see the artifacts scatter-2d '
+                                                        b'and histograms instead<b>'),
+                         local_path=f"{plots_dest}/hist.html")
 
 
 def _create_features_histogram_artifacts(
-    context: MLClientCtx,
-    df: pd.DataFrame,
-    extra_data: dict,
-    label_column: str,
-    plots_dest: str,
-    problem_type: str,
+        context: MLClientCtx,
+        df: pd.DataFrame,
+        extra_data: dict,
+        label_column: str,
+        plots_dest: str,
+        problem_type: str,
 ):
     """
     Create and log a histogram artifact for each feature
@@ -312,12 +312,12 @@ def _create_features_histogram_artifacts(
 
 
 def _create_features_2d_scatter_artifacts(
-    context: MLClientCtx,
-    df: pd.DataFrame,
-    extra_data: dict,
-    label_column: str,
-    plots_dest: str,
-    problem_type: str,
+        context: MLClientCtx,
+        df: pd.DataFrame,
+        extra_data: dict,
+        label_column: str,
+        plots_dest: str,
+        problem_type: str,
 ):
     """
     Create and log a scatter-2d artifact for each couple of features
@@ -424,7 +424,7 @@ def _create_features_2d_scatter_artifacts(
 
 
 def _create_violin_artifact(
-    context: MLClientCtx, df: pd.DataFrame, extra_data: dict, plots_dest: str
+        context: MLClientCtx, df: pd.DataFrame, extra_data: dict, plots_dest: str
 ):
     """
     Create and log a violin artifact
@@ -464,12 +464,12 @@ def _create_violin_artifact(
 
 
 def _create_imbalance_artifact(
-    context: MLClientCtx,
-    df: pd.DataFrame,
-    extra_data: dict,
-    label_column: str,
-    plots_dest: str,
-    problem_type: str,
+        context: MLClientCtx,
+        df: pd.DataFrame,
+        extra_data: dict,
+        label_column: str,
+        plots_dest: str,
+        problem_type: str,
 ):
     """
     Create and log an imbalance class artifact (csv + plot)
@@ -506,11 +506,11 @@ def _create_imbalance_artifact(
 
 
 def _create_corr_artifact(
-    context: MLClientCtx,
-    df: pd.DataFrame,
-    extra_data: dict,
-    label_column: str,
-    plots_dest: str,
+        context: MLClientCtx,
+        df: pd.DataFrame,
+        extra_data: dict,
+        label_column: str,
+        plots_dest: str,
 ):
     """
     Create and log an correlation-matrix artifact (csv + plot)

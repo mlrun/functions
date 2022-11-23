@@ -10,7 +10,7 @@ labels:
   author: Davids
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.2.0
 name: describe
 platformVersion: 3.5.0
 spec:

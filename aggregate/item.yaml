@@ -13,7 +13,7 @@ maintainers: []
 marketplaceType: ''
 mlrunVersion: 1.1.0
 name: aggregate
-platformVersion: 3.5.0
+platformVersion: 3.5.2
 spec:
   filename: aggregate.py
   handler: aggregate

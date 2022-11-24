@@ -372,7 +372,6 @@ class TestIPYNB(TestSuite):
         print("IPYNB run path {}".format(path))
         install_python(path)
         item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
-        #install_requirements(path, ["papermill", "jupyter"] + item_requirements)
         install_requirements(path, ["papermill"] + item_requirements)
 
         click.echo(f"Running tests for {path}...")
@@ -429,7 +428,8 @@ class TestIPYNB(TestSuite):
             process = failed_test.meta_data["completed_process"]
             click.echo(f"{test_path} [Failed]")
             click.echo("==================== stdout ====================")
-            click.echo(process.stdout.decode("utf-8"))
+            if process.stdout is not None:
+                click.echo(process.stdout.decode("utf-8"))
             click.echo("==================== stderr ====================")
             click.echo(process.stderr.decode("utf-8"))
             click.echo("\n")

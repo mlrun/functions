@@ -20,17 +20,28 @@ class ChangeLog:
         self.changes = []
         self.changes_available = False
 
-    def new_item(self, item_name: str, item_version: str):
+    def changed(self):
         self.changes_available = True
+
+    def new_item(self, item_name: str, item_version: str):
+        self.changed()
         self.changes.append(
             f"New item created: `{item_name}` (version: `{item_version}`)"
         )
 
     def update_item(self, item_name: str, new_version: str, old_version: str):
-        self.changes_available = True
+        self.changed()
         self.changes.append(
             f"Item Updated: `{item_name}` (from version: `{old_version}` to `{new_version}`)"
         )
+
+    def deleted_item(self, item_name: str):
+        self.changed()
+        self.changes.append(f"Item Removed: `{item_name}`")
+
+    def hide_item(self, item_name: str):
+        self.changed()
+        self.changes.append(f"Item Hid: `{item_name}`")
 
     def compile(self) -> str:
         compiled = (

@@ -5,6 +5,7 @@ description: retrieve remote archive, open and save as parquet
 doc: ''
 example: arc_to_parquet.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: yjb

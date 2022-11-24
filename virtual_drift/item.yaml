@@ -6,6 +6,7 @@ description: Compute drift magnitude between Time-Samples T and U
 doc: ''
 example: virtual_drift.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: orz

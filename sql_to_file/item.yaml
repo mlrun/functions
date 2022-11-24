@@ -5,6 +5,7 @@ description: SQL To File - Ingest data using SQL query
 doc: ''
 example: sql_to_file.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: adih

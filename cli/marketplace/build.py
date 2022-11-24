@@ -148,10 +148,12 @@ def build_marketplace(
     build_catalog_json(
         marketplace_dir=marketplace_dir,
         catalog_path=(marketplace_root / "catalog.json"),
+        change_log=change_log,
     )
     build_catalog_json(
         marketplace_dir=marketplace_dir,
         catalog_path=(marketplace_dir / "catalog.json"),
+        change_log=change_log,
         with_functions_legacy=False,
         add_artifacts=True,
     )
@@ -222,6 +224,7 @@ def add_object_and_source(function_name: str, yaml_obj):
 def build_catalog_json(
     marketplace_dir: Union[str, Path],
     catalog_path: Union[str, Path],
+    change_log: ChangeLog,
     with_functions_legacy: bool = True,
     add_artifacts: bool = False,
 ):
@@ -233,11 +236,14 @@ def build_catalog_json(
 
     catalog = json.load(open(catalog_path, "r")) if catalog_path.exists() else {}
 
+    funcs = catalog
     if with_functions_legacy:
         if source not in catalog:
             catalog[source] = {}
         if channel not in catalog[source]:
             catalog[source][channel] = {}
+        funcs = catalog[source][channel]
+
     for source_dir in marketplace_dir.iterdir():
         if not source_dir.is_dir() or source_dir.name == "_static":
             continue
@@ -247,17 +253,19 @@ def build_catalog_json(
 
         latest_yaml = yaml.full_load(open(source_yaml_path, "r"))
         latest_yaml["generationDate"] = str(latest_yaml["generationDate"])
-
         latest_version = latest_yaml["version"]
         if add_artifacts:
             latest_yaml = add_object_and_source(
                 function_name=source_dir.name, yaml_obj=latest_yaml
             )
 
-        if with_functions_legacy:
-            catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
+        # removing hidden function from catalog:
+        if latest_yaml["hidden"]:
+            change_log.hide_item(source_dir.name)
+            funcs.pop(source_dir.name, None)
         else:
-            catalog[source_dir.name] = {"latest": latest_yaml}
+            funcs[source_dir.name] = {"latest": latest_yaml}
+
         for version_dir in source_dir.iterdir():
             version = version_dir.name
 
@@ -269,20 +277,14 @@ def build_catalog_json(
                     version_yaml = add_object_and_source(
                         function_name=source_dir.name, yaml_obj=version_yaml
                     )
-                if with_functions_legacy:
-                    catalog[source][channel][source_dir.name][version] = version_yaml
-                else:
-                    catalog[source_dir.name][version] = version_yaml
+                if not latest_yaml["hidden"]:
+                    funcs[source_dir.name][version] = version_yaml
 
     # Remove deleted directories from catalog:
-    if with_functions_legacy:
-        for function_dir in list(catalog[source][channel].keys()):
-            if not (marketplace_dir / function_dir).exists():
-                del catalog[source][channel][function_dir]
-    else:
-        for function_dir in list(catalog.keys()):
-            if not (marketplace_dir / function_dir).exists():
-                del catalog[function_dir]
+    for function_dir in funcs.keys():
+        if not (marketplace_dir / function_dir).exists():
+            change_log.deleted_item(function_dir)
+            del funcs[function_dir]
 
     json.dump(catalog, open(catalog_path, "w"))
 
@@ -299,8 +301,12 @@ def update_or_create_item(
     target_version = marketplace_item / source_version
 
     if target_version.exists():
-        click.echo("Source version already exists in target directory!")
-        return
+        latest_item_yaml = yaml.full_load(
+            open(target_latest / "src" / "item.yaml", "r")
+        )
+        if item_yaml["hidden"] == latest_item_yaml.get("hidden"):
+            click.echo("Source version already exists in target directory!")
+            return
 
     documentation_html_name = f"{item_dir.stem}.html"
     example_html_name = f"{item_dir.stem}_example.html"
@@ -321,6 +327,8 @@ def update_or_create_item(
     # If its the first source is encountered, copy source to target
     if latest_src.exists():
         shutil.rmtree(latest_src)
+        if version_src.exists():
+            shutil.rmtree(version_src)
         change_log.update_item(item_dir.stem, source_version, target_version.name)
     else:
         change_log.new_item(item_dir.stem, source_version)

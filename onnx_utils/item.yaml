@@ -6,6 +6,7 @@ description: ONNX intigration in MLRun, some utils functions for the ONNX framew
 doc: ''
 example: onnx_utils.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: guyl

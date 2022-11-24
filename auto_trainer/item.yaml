@@ -7,6 +7,7 @@ description: Automatic train, evaluate and predict functions for the ML framewor
 doc: ''
 example: auto_trainer.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: yonish

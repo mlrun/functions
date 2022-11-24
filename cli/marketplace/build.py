@@ -236,11 +236,14 @@ def build_catalog_json(
 
     catalog = json.load(open(catalog_path, "r")) if catalog_path.exists() else {}
 
+    funcs = catalog
     if with_functions_legacy:
         if source not in catalog:
             catalog[source] = {}
         if channel not in catalog[source]:
             catalog[source][channel] = {}
+        funcs = catalog[source][channel]
+
     for source_dir in marketplace_dir.iterdir():
         if not source_dir.is_dir() or source_dir.name == "_static":
             continue
@@ -255,19 +258,14 @@ def build_catalog_json(
             latest_yaml = add_object_and_source(
                 function_name=source_dir.name, yaml_obj=latest_yaml
             )
-        hide = latest_yaml["hidden"]
-        if with_functions_legacy:
-            if hide:
-                change_log.hide_item(source_dir.name)
-                catalog[source][channel].pop(source_dir.name, None)
-            else:
-                catalog[source][channel][source_dir.name] = {"latest": latest_yaml}
+
+        # removing hidden function from catalog:
+        if latest_yaml["hidden"]:
+            change_log.hide_item(source_dir.name)
+            funcs.pop(source_dir.name, None)
         else:
-            if hide:
-                change_log.hide_item(source_dir.name)
-                catalog.pop(source_dir.name, None)
-            else:
-                catalog[source_dir.name] = {"latest": latest_yaml}
+            funcs[source_dir.name] = {"latest": latest_yaml}
+
         for version_dir in source_dir.iterdir():
             version = version_dir.name
 
@@ -279,25 +277,14 @@ def build_catalog_json(
                     version_yaml = add_object_and_source(
                         function_name=source_dir.name, yaml_obj=version_yaml
                     )
-                if not hide:
-                    if with_functions_legacy:
-                        catalog[source][channel][source_dir.name][
-                            version
-                        ] = version_yaml
-                    else:
-                        catalog[source_dir.name][version] = version_yaml
+                if not latest_yaml["hidden"]:
+                    funcs[source_dir.name][version] = version_yaml
 
     # Remove deleted directories from catalog:
-    if with_functions_legacy:
-        for function_dir in list(catalog[source][channel].keys()):
-            if not (marketplace_dir / function_dir).exists():
-                change_log.deleted_item(function_dir)
-                del catalog[source][channel][function_dir]
-    else:
-        for function_dir in list(catalog.keys()):
-            if not (marketplace_dir / function_dir).exists():
-                change_log.deleted_item(function_dir)
-                del catalog[function_dir]
+    for function_dir in funcs.keys():
+        if not (marketplace_dir / function_dir).exists():
+            change_log.deleted_item(function_dir)
+            del funcs[function_dir]
 
     json.dump(catalog, open(catalog_path, "w"))
 
@@ -314,8 +301,10 @@ def update_or_create_item(
     target_version = marketplace_item / source_version
 
     if target_version.exists():
-        latest_item_yaml = yaml.full_load(open(target_latest / "src" / "item.yaml", "r"))
-        if item_yaml['hidden'] == latest_item_yaml["hidden"]:
+        latest_item_yaml = yaml.full_load(
+            open(target_latest / "src" / "item.yaml", "r")
+        )
+        if item_yaml["hidden"] == latest_item_yaml.get("hidden"):
             click.echo("Source version already exists in target directory!")
             return
 

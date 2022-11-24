@@ -22,6 +22,7 @@ import json
 
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
+from mlrun.artifacts.base import DirArtifact
 
 from typing import Union
 import boto3
@@ -58,8 +59,12 @@ def open_archive(
 
     kwargs = {}
     if target_path:
-        kwargs = {"target_path": target_path}
+        if(os.path.isdir(target_path)):
+            context.log_artifact(DirArtifact(key=key, target_path=target_path))
+            return
+        else:
+            kwargs = {"target_path": target_path}
     else:
         kwargs = {"local_path": subdir}
-        
+    
     context.log_artifact(key, **kwargs)

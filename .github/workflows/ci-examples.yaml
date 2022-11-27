@@ -78,25 +78,28 @@ jobs:
         minikube version: "v1.22.0"
         kubernetes version: "v1.19.13"
         driver: docker
-        github token: ${{ github.token }}
-        start args: '--addons registry'
+#         github token: ${{ github.token }}
+        start args: '--addons=registry --insecure-registry="192.168.49.2:5000"'
+
 
     - name: Get mlrun kit charts and create namespace
       run: |
-        helm repo add v3io-stable https://v3io.github.io/helm-charts/stable
+        helm repo add mlrun https://mlrun.github.io/ce
         helm repo update
-        minikube kubectl -- create namespace ${NAMESPACE}
-    - name: Install MLRun Kit helm chart
+        kubectl create namespace ${NAMESPACE}
+    - name: Install MLRun CE helm chart
       run: |
-        helm --namespace ${NAMESPACE} \
-            install mlrun-kit \
-            --debug \
-            --wait \
-            --set global.registry.url=localhost:5000 \
-            --set global.externalHostAddress=$(minikube ip) \
-            --set mlrun.api.image.tag=0.7.1 \
-            --set mlrun.ui.image.tag=0.7.1 \
-            v3io-stable/mlrun-kit
+        helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="128Mi"   --set  jupyterNotebook.persistence.size="1Gi"  --set  mlrun.db.persistence.size="1Gi" --set  mlrun.api.persistence.size="1Gi" --set  mpi-operator.deployment.create="false" --set  mlrun.httpDB.dbType="sqlite" --set  mlrun.httpDB.dirPath="/mlrun/db" --set  mlrun.httpDB.dsn="sqlite:////mlrun/db/mlrun.db?check_same_thread=false"  --set  mlrun.httpDB.oldDsn=""  --set global.registry.url=$(minikube ip):5000  --set global.registry.secretName=""   --set global.externalHostAddress=$(minikube ip)  --set nuclio.dashboard.externalIPAddresses[0]=$(minikube ip)  --wait --debug   mlrun/mlrun-ce 
+          
+    - name: Prepare system tests env
+      run: |
+        kubectl get pods -A 
+        kubectl get  nodes
+        echo "MLRUN_DBPATH: http://$(minikube ip):${MLRUN_API_NODE_PORT}" > mlrun_tmp_env.yml
+        cat mlrun_tmp_env.yml
+
+
+
     - name: Prepare system tests env
       run: |
         echo "MLRUN_DBPATH: http://$(minikube ip):${MLRUN_API_NODE_PORT}"

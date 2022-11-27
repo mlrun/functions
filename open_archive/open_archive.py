@@ -46,16 +46,38 @@ def open_archive(
     """
     
     archive_url = archive_url.local()
+#     when working on CE, target path might be on s3
+    if 's3' in (target_path or subdir):
+        if os.environ.get('S3_ENDPOINT_URL'):
+            client = boto3.client('s3', endpoint_url = os.environ.get('S3_ENDPOINT_URL')) 
+        else:
+            client = boto3.client('s3')  
+            
+        if archive_url.endswith("gz"):
+            with tarfile.open(archive_url, mode="r|gz") as ref:
+                for filename in ref.namelist():
+                    data=ref.read(filename)
+                    client.put_object(Body=data, Bucket=urlparse(target_path).netloc, Key=f'{urlparse(target_path or subdir).path[1:]}/{filename}')
 
-    os.makedirs(target_path or subdir, exist_ok=True)
-    if archive_url.endswith("gz"):
-        with tarfile.open(archive_url, mode="r|gz") as ref:
-            ref.extractall(target_path or subdir)
-    elif archive_url.endswith("zip"):
-        with zipfile.ZipFile(archive_url, "r") as ref:
-            ref.extractall(target_path or subdir)
+        elif archive_url.endswith("zip"):
+            with zipfile.ZipFile(archive_url, "r") as ref:
+                for filename in ref.namelist():
+                    data=ref.read(filename)
+                    client.put_object(Body=data, Bucket=urlparse(target_path).netloc, Key=f'{urlparse(target_path or subdir).path[1:]}/{filename}')
+        else:
+            raise ValueError(f"unsupported archive type in {archive_url}")
+    
     else:
-        raise ValueError(f"unsupported archive type in {archive_url}")
+        print('s3' in (target_path or subdir))
+        os.makedirs(target_path or subdir, exist_ok=True)
+        if archive_url.endswith("gz"):
+            with tarfile.open(archive_url, mode="r|gz") as ref:
+                ref.extractall(target_path or subdir)
+        elif archive_url.endswith("zip"):
+            with zipfile.ZipFile(archive_url, "r") as ref:
+                ref.extractall(target_path or subdir)
+        else:
+            raise ValueError(f"unsupported archive type in {archive_url}")
 
     kwargs = {}
     if target_path:

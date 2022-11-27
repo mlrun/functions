@@ -9,6 +9,11 @@ on:
 #    branches:
 #      - 'testing'
 
+
+env:
+  NAMESPACE: mlrun
+  MLRUN_API_NODE_PORT: 30070
+
 jobs:
   build_stategy_matrix:
     runs-on: ubuntu-latest

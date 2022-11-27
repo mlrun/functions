@@ -4,7 +4,10 @@ on:
   pull_request:
     types: [opened]
     branches:
-      - testing
+      - testing      
+  push:
+    branches:
+      - 'testing'      
 
   workflow_dispatch:
     inputs:

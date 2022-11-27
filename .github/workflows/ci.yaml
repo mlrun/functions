@@ -56,7 +56,7 @@ jobs:
           echo $matrix | json2yaml
   run_monorepo_tests:
     needs: build_stategy_matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       # matrix: [{"package": some package that changed}, {...}, ...]
       matrix: ${{fromJson(needs.build_stategy_matrix.outputs.matrix)}}

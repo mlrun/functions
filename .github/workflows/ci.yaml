@@ -7,7 +7,7 @@ on:
       - testing
   push:
     branches:
-      - 'testing'      
+      - 'testing'    
 
 jobs:
   build_stategy_matrix:
@@ -61,64 +61,38 @@ jobs:
       # matrix: [{"package": some package that changed}, {...}, ...]
       matrix: ${{fromJson(needs.build_stategy_matrix.outputs.matrix)}}
     steps:
-    - uses: azure/setup-helm@v1
-      with:
-        version: "v3.3.4"
-
-    - uses: manusa/actions-setup-minikube@v2.4.2
-      with:
-        minikube version: "v1.22.0"
-        kubernetes version: "v1.19.13"
-        driver: docker
-#         github token: ${{ github.token }}
-        start args: '--addons=registry --insecure-registry="192.168.49.2:5000"'
-
-    - name: Get mlrun kit charts and create namespace
-      run: |
-        helm repo add mlrun https://mlrun.github.io/ce
-        helm repo update
-        kubectl create namespace ${NAMESPACE}
-    - name: Install MLRun CE helm chart
-      run: |
-        helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="128Mi"   --set  jupyterNotebook.persistence.size="1Gi"  --set  mlrun.db.persistence.size="1Gi" --set  mlrun.api.persistence.size="1Gi" --set  mpi-operator.deployment.create="false" --set  mlrun.httpDB.dbType="sqlite" --set  mlrun.httpDB.dirPath="/mlrun/db" --set  mlrun.httpDB.dsn="sqlite:////mlrun/db/mlrun.db?check_same_thread=false"  --set  mlrun.httpDB.oldDsn=""  --set global.registry.url=$(minikube ip):5000  --set global.registry.secretName=""   --set global.externalHostAddress=$(minikube ip)  --set nuclio.dashboard.externalIPAddresses[0]=$(minikube ip)  --wait --debug   mlrun/mlrun-ce           
-    - name: Prepare system tests env
-      run: |
-        kubectl get pods -A 
-        kubectl get  nodes
-        echo "MLRUN_DBPATH: http://$(minikube ip):${MLRUN_API_NODE_PORT}" > mlrun_tmp_env.yml
-        cat mlrun_tmp_env.yml    
       # Source
-    - name: Checkout current repo
-      uses: actions/checkout@v2
-      with:
-        path: functions
-    # Install python
-    - name: Install python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.7
+      - name: Checkout current repo
+        uses: actions/checkout@v2
+        with:
+          path: functions
+      # Install python
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
       # Install dependencies
-    - uses: actions/cache@v1
-      id: cache
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    - name: Install requirements
-      run: |
-        pip install --upgrade pip
-        pip install -r functions/requirements.txt
+      - uses: actions/cache@v1
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install requirements
+        run: |
+          pip install --upgrade pip
+          pip install -r functions/requirements.txt
 #      - name: Run item validation
         # add functionality for test single item
 #        run: python functions/functions.py  run-tests -r functions -s items
-    - name: Run py tests
-      run: python functions/functions.py  run-tests -r functions -s py -fn ${{ matrix.package }}
+      - name: Run py tests
+        run: python functions/functions.py  run-tests -r functions -s py -fn ${{ matrix.package }}
 #      - name: Run ipynb tests
 #        run: python functions/functions.py  run-tests -r functions -s ipynb
-    - name: Clean
-      run: |
-        rm -rf functions
+      - name: Clean
+        run: |
+          rm -rf functions
 #    tests:
 #    name: Run tests
 #    runs-on: self-hosted

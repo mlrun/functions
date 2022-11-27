@@ -3,8 +3,11 @@ name: Test functions over pull requests
 on:
   pull_request:
     types: [opened]
-    branches-ignore:
-      - testing
+#     branches-ignore:
+#       - testing
+  push:
+    branches:
+      - 'testing'    
 
 jobs:
   build_stategy_matrix:

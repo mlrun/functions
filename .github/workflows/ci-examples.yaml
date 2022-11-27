@@ -3,8 +3,8 @@ name: Test functions examples
 on:
   pull_request:
     types: [opened]
-#     branches-ignore:
-#       - testing
+    branches:
+      - testing
 #  push:
 #    branches:
 #      - 'testing'

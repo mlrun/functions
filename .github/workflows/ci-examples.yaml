@@ -1,13 +1,9 @@
 name: Test functions examples
 
 on:
-  pull_request:
-    types: [opened]
-
-#  push:
-#    branches:
-#      - 'testing'
-
+  push:
+    branches:
+      - testing
 
 env:
   NAMESPACE: mlrun

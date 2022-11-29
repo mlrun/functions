@@ -1,10 +1,10 @@
 name: Test functions examples
 
+on:
   pull_request:
     types: [opened]
     branches:
       - testing
-
 env:
   NAMESPACE: mlrun
   MLRUN_API_NODE_PORT: 30070

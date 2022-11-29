@@ -93,7 +93,7 @@ jobs:
           kubectl get pods -A 
           kubectl get  nodes
           echo "MLRUN_DBPATH: http://$(minikube ip):${MLRUN_API_NODE_PORT}" > examples_ci.env
-          cat mlrun_tmp_env.yml
+          cat examples_ci.yml
       - name: Checkout current repo
         uses: actions/checkout@v2
         with:

@@ -100,7 +100,7 @@ jobs:
           echo "MLRUN_STORAGE__AUTO_MOUNT_TYPE=s3" >> /tmp/examples_ci.env
 
 
-          cat /tmp/examples_ci.yml
+          cat /tmp/examples_ci.env
       - name: Checkout current repo
         uses: actions/checkout@v2
         with:

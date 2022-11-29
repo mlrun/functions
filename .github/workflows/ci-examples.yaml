@@ -111,7 +111,7 @@ jobs:
           pip install --upgrade pip
           pip install -r functions/requirements.txt
       - name: Run ipynb tests
-        run: python functions/functions.py  run-tests -r functions -s ipynb -fn ${{ matrix.package }
+        run: python functions/functions.py  run-tests -r functions -s ipynb -fn ${{ matrix.package }}
 
       - name: Clean
         run: |

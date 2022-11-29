@@ -13,6 +13,11 @@ jobs:
   build_stategy_matrix:
     runs-on: ubuntu-latest
     steps:
+      - name: Get the current branch name
+        shell: bash
+        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        id: myref
+
       - uses: actions/checkout@v2
       - id: set-matrix
         # This is very hacky, but it goes like that:

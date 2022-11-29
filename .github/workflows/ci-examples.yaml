@@ -92,8 +92,15 @@ jobs:
         run: |
           kubectl get pods -A 
           kubectl get  nodes
-          echo "MLRUN_DBPATH: http://$(minikube ip):${MLRUN_API_NODE_PORT}" > examples_ci.env
-          cat mlrun_tmp_env.yml
+          echo "MLRUN_DBPATH=http://$(minikube ip):${MLRUN_API_NODE_PORT}" > /tmp/examples_ci.env
+          echo "AWS_ACCESS_KEY_ID=minio" >> /tmp/examples_ci.env
+          echo "AWS_SECRET_ACCESS_KEY=minio123" >> /tmp/examples_ci.env
+          echo "S3_ENDPOINT_URL=http://$(minikube ip):30080" >> /tmp/examples_ci.env
+          echo "MLRUN_STORAGE__AUTO_MOUNT_PARAMS='aws_access_key=minio,aws_secret_key=minio123,endpoint_url=http://minio.mlrun.svc.cluster.local:9000'" >> /tmp/examples_ci.env
+          echo "MLRUN_STORAGE__AUTO_MOUNT_TYPE=s3" >> /tmp/examples_ci.env
+
+
+          cat /tmp/examples_ci.yml
       - name: Checkout current repo
         uses: actions/checkout@v2
         with:

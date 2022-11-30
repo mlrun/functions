@@ -6,6 +6,7 @@ description: Deploy a streaming Concept Drift detector on a labeled stream
 doc: ''
 example: concept_drift.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: orz

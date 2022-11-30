@@ -42,6 +42,11 @@ def aggregate(context,
     feature names.
     
     if not {inplace}, will return the original {df_artifact}, joined by the aggregated result.
+
+    :param context: After running a job, you need to be able to track it. To gain the maximum value, MLRun uses the
+                    job context object inside the code. This provides access to job metadata, parameters,
+                    inputs, secrets, and API for logging and monitoring the results, as well as log text, files,
+                    artifacts, and labels.
     
     :param df_artifact: MLRun input pointing to pandas dataframe (csv/parquet file path) or a 
                         directory containing parquet files.

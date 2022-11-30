@@ -6,6 +6,7 @@ description: cox proportional hazards, kaplan meier plots
 doc: ''
 example: coxph_trainer.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: yjb

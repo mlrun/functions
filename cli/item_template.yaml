@@ -4,6 +4,7 @@ description: ''        # Short description
 doc: ''                # Path to README.md if exists
 example: ''            # Path to examole notebook
 generationDate: ''     # Automatically generated ISO8086 datetime
+hidden: false          # Hide function from the UI
 icon: ''               # Path to icon file
 labels: {}             # Key values label pairs
 maintainers: []        # List of maintainers

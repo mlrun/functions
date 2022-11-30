@@ -5,6 +5,7 @@ description: Create a binary classification sample dataset and save.
 doc: ''
 example: gen_class_data.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: Daniel

@@ -6,6 +6,7 @@ description: churn classification and predictor
 doc: ''
 example: churn_server.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: Iguazio

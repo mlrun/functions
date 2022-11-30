@@ -268,7 +268,7 @@ def _create_data(n_samples, n_features, n_classes, n_informative, reg=False):
         )
     df = pd.DataFrame(X, columns=[f"feature_{i}" for i in range(n_features)])
     df["label"] = y
-    df["timestamp"] = [pd.Timestamp("2022").now()] * 100
+    df["timestamp"] = [pd.Timestamp("2022").now()] * n_samples
     df.to_parquet("artifacts/random_dataset.parquet")
     return df
 

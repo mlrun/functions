@@ -265,7 +265,8 @@ def _create_features_histogram_artifacts(
                                 "visible": [
                                     key.split("@?@")[0] == column_name
                                     for key in figs.keys()
-                                ]
+                                ],
+                                'xaxis': {'range': [np.min(df[column_name]), np.max(df[column_name])]}
                             },
                             {"title": f"<i><b>Histogram of {column_name}</b></i>"},
                         ],

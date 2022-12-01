@@ -6,6 +6,7 @@ description: AzureML serving function
 doc: ''
 example: azureml_serving.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: yonish

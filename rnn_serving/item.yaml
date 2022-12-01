@@ -6,6 +6,7 @@ description: deploy an rnn based stock analysis model server.
 doc: ''
 example: rnn_serving.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: Daniel

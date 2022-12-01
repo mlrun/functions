@@ -5,6 +5,7 @@ description: Snowflake Dask - Ingest snowflake data in parallel with Dask cluste
 doc: ''
 example: snowflake-dask-mlrun.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: xingsheng

@@ -6,6 +6,7 @@ description: Generic Hugging Face model server.
 doc: ''
 example: hugging_face_serving.ipynb
 generationDate: 2022-09-05:17-00
+hidden: false
 icon: ''
 labels:
   author: yonish

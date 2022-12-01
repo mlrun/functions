@@ -6,6 +6,7 @@ description: generic sklearn model server
 doc: ''
 example: model_server.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: yaronh

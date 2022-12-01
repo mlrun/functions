@@ -273,8 +273,8 @@ def _create_features_histogram_artifacts(
                                 ],
                                 "xaxis": {
                                     "range": [
-                                        np.min(df[column_name]),
-                                        np.max(df[column_name]),
+                                        min(df[column_name]),
+                                        max(df[column_name]),
                                     ]
                                 },
                             },

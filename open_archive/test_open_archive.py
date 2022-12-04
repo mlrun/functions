@@ -14,6 +14,7 @@
 #
 from pathlib import Path
 import shutil
+import os
 
 from mlrun import code_to_function, import_function
 

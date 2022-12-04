@@ -94,4 +94,6 @@ def open_archive(
             
     if v3io_subdir:
         subdir = v3io_subdir
+        
+    context.logger.info(f'Logging artifact to {(target_path or subdir)}')
     context.log_artifact(DirArtifact(key=key, target_path=(target_path or subdir)))

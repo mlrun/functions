@@ -45,7 +45,7 @@ def _delete_outputs(paths):
 def test_open_archive_import_function():
     fn = import_function("function.yaml")
     run = fn.run(inputs={'archive_url': ARCHIVE_URL},
-                 params={'key': 'test_archive'},
+                 params={'key': 'test_archive', 'target_path': os.getcwd() + '/content/'},
                  local=True)
     
     assert (run.artifact('test_archive'))

@@ -71,13 +71,13 @@ def open_archive(
             with tarfile.open(archive_url, mode="r|gz") as ref:
                 for filename in ref.namelist():
                     data=ref.read(filename)
-                    client.put_object(Body=data, Bucket=urlparse(target_path or subdir).netloc, Key=f'{urlparse(target_path or subdir).path[1:]}/{filename}')
+                    client.put_object(Body=data, Bucket=urlparse(target_path or subdir).netloc, Key=f'{urlparse(target_path or subdir).path[1:]}{filename}')
 
         elif archive_url.endswith("zip"):
             with zipfile.ZipFile(archive_url, "r") as ref:
                 for filename in ref.namelist():
                     data=ref.read(filename)
-                    client.put_object(Body=data, Bucket=urlparse(target_path or subdir).netloc, Key=f'{urlparse(target_path or subdir).path[1:]}/{filename}')
+                    client.put_object(Body=data, Bucket=urlparse(target_path or subdir).netloc, Key=f'{urlparse(target_path or subdir).path[1:]}{filename}')
         else:
             raise ValueError(f"unsupported archive type in {archive_url}")
     

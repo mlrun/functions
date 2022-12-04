@@ -52,9 +52,8 @@ def open_archive(
         parsed_subdir = urlparse(context.artifact_path)
         if parsed_subdir.scheme == 's3':
             subdir = os.path.join(context.artifact_path, subdir)
-            context.logger.info(f'Using s3 scheme, extracting to {subdir}')
         elif parsed_subdir.scheme == 'v3io':
-            v3io_subdir = os.path.join(context.artifact_path, subdir)
+            v3io_subdir = os.path.join(context.artifact_path, subdir) # Using v3io_subdir for logging
             subdir = '/v3io' + parsed_subdir.path + '/' + subdir
             context.logger.info(f'Using v3io scheme, extracting to {subdir}')
         else:
@@ -62,6 +61,7 @@ def open_archive(
             
     # When working on CE, target path might be on s3
     if 's3' in (target_path or subdir):
+        context.logger.info(f'Using s3 scheme, extracting to {target_path or subdir}')
         if os.environ.get('S3_ENDPOINT_URL'):
             client = boto3.client('s3', endpoint_url = os.environ.get('S3_ENDPOINT_URL')) 
         else:

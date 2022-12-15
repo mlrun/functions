@@ -14,6 +14,7 @@
 #
 from pathlib import Path
 import shutil
+import os
 
 from mlrun import code_to_function, import_function
 
@@ -29,23 +30,25 @@ def _delete_outputs(paths):
             shutil.rmtree(path)
 
 
-# def test_open_archive():
-#     fn = code_to_function(name='test_open_archive',
-#                           filename="open_archive.py",
-#                           handler="open_archive",
-#                           kind="local",
-#                           )
-#     fn.spec.command = "open_archive.py"
-#     fn.run(inputs={'archive_url': ARCHIVE_URL}
-#            )
-#     assert Path(CONTENT_PATH).is_dir()
-#     _delete_outputs({'artifacts', 'runs', 'schedules', 'content'})
+def test_open_archive():
+    fn = code_to_function(name='test_open_archive',
+                          filename="open_archive.py",
+                          handler="open_archive",
+                          kind="local",
+                          )
+    fn.spec.command = "open_archive.py"
+    run = fn.run(inputs={'archive_url': ARCHIVE_URL},
+                 params={'key': 'test_archive', 'target_path': os.getcwd() + '/content/'},
+                 local=True)
+    
+    assert Path(CONTENT_PATH).is_dir()
+    _delete_outputs({'artifacts', 'runs', 'schedules', 'content'})
 
 
 def test_open_archive_import_function():
     fn = import_function("function.yaml")
     run = fn.run(inputs={'archive_url': ARCHIVE_URL},
-                 params={'key': 'test_archive'},
+                 params={'key': 'test_archive', 'target_path': os.getcwd() + '/content/'},
                  local=True)
     
     assert (run.artifact('test_archive'))

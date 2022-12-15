@@ -1,1 +1,1 @@
-mlrun
+mlrun==1.1.1

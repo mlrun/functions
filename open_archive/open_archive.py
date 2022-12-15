@@ -92,6 +92,9 @@ def open_archive(
         else:
             raise ValueError(f"unsupported archive type in {archive_url}")
             
+        if 'v3io' in context.artifact_path:
+            v3io_subdir = os.path.join(context.artifact_path, subdir) 
+        
     if v3io_subdir:
         subdir = v3io_subdir
         

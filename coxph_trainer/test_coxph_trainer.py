@@ -1,22 +1,36 @@
-from mlrun import get_or_create_ctx,import_function
+# Copyright 2019 Iguazio
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+from mlrun import get_or_create_ctx, import_function
 import os
 import json
 import pandas as pd
 import numpy as np
 from collections import defaultdict
 from cloudpickle import dumps, load
-from sklearn.preprocessing import (OneHotEncoder,LabelEncoder)
+from sklearn.preprocessing import LabelEncoder
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 import mlrun
 
-
-ARTIFACT_PATH="artifacts"
-FUNCTION_PATH="functions"
+ARTIFACT_PATH = "artifacts"
+FUNCTION_PATH = "functions"
 MODELS_PATH = "models"
-PLOTS_PATH= "plots"
-RUNS_PATH="runs"
-SCHEDULES_PATH="schedules"
+PLOTS_PATH = "plots"
+RUNS_PATH = "runs"
+SCHEDULES_PATH = "schedules"
+DATA_URL = "https://raw.githubusercontent.com/mlrun/demos/0.6.x/customer-churn-prediction/WA_Fn-UseC_-Telco-Customer-Churn.csv"
 
 
 def data_clean(
@@ -86,17 +100,37 @@ def data_clean(
 
 
 def test_local_coxph_train():
-    ctx = get_or_create_ctx(name="tasks survive trainer")
-    data_url = "https://raw.githubusercontent.com/mlrun/demos/0.6.x/customer-churn-prediction/WA_Fn-UseC_-Telco-Customer-Churn.csv"
-    src = mlrun.get_dataitem(data_url)
-    data_clean(context=ctx, src=src,cleaned_key="artifacts/inputs/cleaned-data",encoded_key="artifacts/inputs/encoded-data")
-    fn = import_function("function.yaml")
-    fn.run(params={"strata_cols": ['InternetService', 'StreamingMovies', 'StreamingTV', 'PhoneService'],
-                   "encode_cols": {"Contract": "Contract", "PaymentMethod": "Payment"},
-                   "models_dest": 'models/cox'},
-           inputs={"dataset": "artifacts/inputs/encoded-data.csv"},
-           local=True)
-    model = load(open("models/cox/km/model.pkl", "rb"))
-    ans = model.predict([1, 10, 30, 100, 200])
-    assert (list(np.around(ans, 3)) == [0.969, 0.869, 0.781, 0.668, 0.668])
+    # ctx = get_or_create_ctx(name="tasks survive trainer")
+    # src = mlrun.get_dataitem(DATA_URL)
+    data_clean_function = mlrun.code_to_function(
+        filename="test_coxph_trainer.py",
+        name="data_clean",
+        kind="job",
+        image="mlrun/mlrun",
+    )
+    data_clean_run = data_clean_function.run(
+        handler="data_clean",
+        inputs={"src": DATA_URL},
+        params={
+            "cleaned_key": "cleaned-data",
+            "encoded_key": "encoded-data",
+        },
+        local=True,
+        artifact_path='./'
+    )
 
+    trainer_fn = import_function("function.yaml")
+    trainer_run = trainer_fn.run(
+        params={
+            "strata_cols": ['InternetService', 'StreamingMovies', 'StreamingTV', 'PhoneService'],
+            "encode_cols": {"Contract": "Contract", "PaymentMethod": "Payment"},
+            "models_dest": 'models/cox'
+        },
+        inputs={"dataset": data_clean_run.artifact("encoded-data").url},
+        local=True,
+        artifact_path='./'
+    )
+
+    model = load(open(f"{trainer_run.artifact('km-model').url}model.pkl", "rb"))
+    ans = model.predict([1, 10, 30, 100, 200])
+    assert(sum([abs(x-y) for x, y in zip(list(np.around(ans, 2)), [0.95, 0.85, 0.77, 0.58, 0.58])]) < 0.5)

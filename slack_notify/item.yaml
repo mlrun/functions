@@ -4,15 +4,15 @@ categories:
 description: Send Slack notification
 doc: ''
 example: slack_notify.ipynb
-generationDate: 2021-11-18:12-28
+generationDate: 2022-08-28:17-25
 icon: ''
 labels:
   author: mdl
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.8.0
+mlrunVersion: 1.1.0
 name: slack-notify
-platformVersion: 3.2.0
+platformVersion: 3.5.0
 spec:
   filename: slack_notify.py
   handler: slack_notify
@@ -21,4 +21,4 @@ spec:
   requirements:
   - requests
 url: ''
-version: 0.8.0
+version: 1.1.0

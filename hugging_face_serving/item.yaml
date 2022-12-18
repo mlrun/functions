@@ -1,0 +1,28 @@
+apiVersion: v1
+categories:
+- model-serving
+- machine-learning
+description: Generic Hugging Face model server.
+doc: ''
+example: hugging_face_serving.ipynb
+generationDate: 2022-09-05:17-00
+icon: ''
+labels:
+  author: yonish
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.1.0
+name: hugging_face_serving
+platformVersion: ''
+spec:
+  customFields:
+    default_class: HuggingFaceModelServer
+  filename: hugging_face_serving.py
+  handler: handler
+  image: mlrun/ml-models
+  kind: serving
+  requirements:
+  - transformers==4.21.3
+  - tensorflow==2.9.2
+url: ''
+version: 1.0.0

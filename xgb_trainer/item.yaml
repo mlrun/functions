@@ -4,15 +4,15 @@ categories:
 description: train multiple model types using xgboost.
 doc: ''
 example: xgb_trainer.ipynb
-generationDate: 2021-11-18:12-28
+generationDate: 2022-08-28:17-25
 icon: ''
 labels:
   author: Daniel
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.8.0
+mlrunVersion: 1.1.0
 name: xgb_trainer
-platformVersion: 3.2.0
+platformVersion: 3.5.0
 spec:
   filename: xgb_trainer.py
   handler: train_model
@@ -20,4 +20,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.8.0
+version: 1.1.0

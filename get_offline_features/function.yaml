@@ -1,0 +1,126 @@
+kind: job
+metadata:
+  name: get-offline-features
+  tag: ''
+  hash: d8af2b5f1838ec720c9db726ec4f1e96ea82b2b8
+  project: ''
+  labels:
+    author: yonish
+  categories:
+  - data-preparation
+  - data-analysis
+  - feature-store
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  build:
+    functionSourceCode: ZnJvbSB0eXBpbmcgaW1wb3J0IFVuaW9uLCBMaXN0LCBEaWN0CgppbXBvcnQgbWxydW4KaW1wb3J0IG1scnVuLmZlYXR1cmVfc3RvcmUgYXMgZnMKZnJvbSBtbHJ1bi5kYXRhc3RvcmUuc3RvcmVfcmVzb3VyY2VzIGltcG9ydCBpc19zdG9yZV91cmksIHBhcnNlX3N0b3JlX3VyaQpmcm9tIG1scnVuLmRhdGFzdG9yZS50YXJnZXRzIGltcG9ydCBnZXRfdGFyZ2V0X2RyaXZlciwga2luZF90b19kcml2ZXIKZnJvbSBtbHJ1bi5kYXRhc3RvcmUuYmFzZSBpbXBvcnQgRGF0YUl0ZW0KZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CmZyb20gbWxydW4udXRpbHMgaW1wb3J0IFN0b3JlUHJlZml4LCBwYXJzZV92ZXJzaW9uZWRfb2JqZWN0X3VyaQpmcm9tIG1scnVuLmVycm9ycyBpbXBvcnQgTUxSdW5JbnZhbGlkQXJndW1lbnRFcnJvcgoKCmRlZiBnZXRfb2ZmbGluZV9mZWF0dXJlcygKICAgIGNvbnRleHQ6IE1MQ2xpZW50Q3R4LAogICAgZmVhdHVyZV92ZWN0b3I6IHN0ciwKICAgIGZlYXR1cmVzOiBVbmlvbltMaXN0W3N0cl0sIE5vbmVdID0gTm9uZSwKICAgIGxhYmVsX2ZlYXR1cmU6IHN0ciA9IE5vbmUsCiAgICBkZXNjcmlwdGlvbjogc3RyID0gTm9uZSwKICAgIGVudGl0eV9yb3dzOiBEYXRhSXRlbSA9IE5vbmUsCiAgICBlbnRpdHlfdGltZXN0YW1wX2NvbHVtbjogc3RyID0gTm9uZSwKICAgIHRhcmdldDogVW5pb25bc3RyLCBEaWN0XSA9IE5vbmUsCiAgICBydW5fY29uZmlnOiBVbmlvbltzdHIsIERpY3RdID0gTm9uZSwKICAgIGRyb3BfY29sdW1uczogTGlzdFtzdHJdID0gTm9uZSwKICAgIHN0YXJ0X3RpbWU6IHN0ciA9IE5vbmUsCiAgICBlbmRfdGltZTogc3RyID0gTm9uZSwKICAgIHdpdGhfaW5kZXhlczogYm9vbCA9IEZhbHNlLAogICAgdXBkYXRlX3N0YXRzOiBib29sID0gRmFsc2UsCik6CiAgICAiIiJyZXRyaWV2ZSBvZmZsaW5lIGZlYXR1cmUgdmVjdG9yIHJlc3VsdHMKCiAgICBzcGVjaWZ5IGEgZmVhdHVyZSB2ZWN0b3Igb2JqZWN0L3VyaSBhbmQgcmV0cmlldmUgdGhlIGRlc2lyZWQgZmVhdHVyZXMsIHRoZWlyIG1ldGFkYXRhCiAgICBhbmQgc3RhdGlzdGljcy4gcmV0dXJucyA6cHk6Y2xhc3M6YH5tbHJ1bi5mZWF0dXJlX3N0b3JlLk9mZmxpbmVWZWN0b3JSZXNwb25zZWAsCiAgICByZXN1bHRzIGNhbiBiZSByZXR1cm5lZCBhcyBhIGRhdGFmcmFtZSBvciB3cml0dGVuIHRvIGEgdGFyZ2V0LgogICAgSWYgZmVhdHVyZSB2ZWN0b3IgZG9lcyBub3QgZXhpc3QsIGEgbmV3IG9uZSB3aWxsIGJlIGNyZWF0ZWQgYW5kIHNhdmVkIHdpdGggdGhlIGdpdmVuIGZlYXR1cmVzLgoKICAgIFRoZSBzdGFydF90aW1lIGFuZCBlbmRfdGltZSBhdHRyaWJ1dGVzIGFsbG93IGZpbHRlcmluZyB0aGUgZGF0YSB0byBhIGdpdmVuIHRpbWUgcmFuZ2UsIHRoZXkgYWNjZXB0CiAgICBzdHJpbmcgdmFsdWVzIG9yIHBhbmRhcyBgVGltZXN0YW1wYCBvYmplY3RzLCBzdHJpbmcgdmFsdWVzIGNhbiBhbHNvIGJlIHJlbGF0aXZlLCBmb3IgZXhhbXBsZToKICAgICJub3ciLCAibm93IC0gMWQyaCIsICJub3crNW0iLCB3aGVyZSBhIHZhbGlkIHBhbmRhcyBUaW1lZGVsdGEgc3RyaW5nIGZvbGxvd3MgdGhlIHZlcmIgIm5vdyIsCiAgICBmb3IgdGltZSBhbGlnbm1lbnQgeW91IGNhbiB1c2UgdGhlIHZlcmIgImZsb29yIiBlLmcuICJub3cgLTFkIGZsb29yIDFIIiB3aWxsIGFsaWduIHRoZSB0aW1lIHRvIHRoZSBsYXN0IGhvdXIKICAgICh0aGUgZmxvb3Igc3RyaW5nIGlzIHBhc3NlZCB0byBwYW5kYXMuVGltZXN0YW1wLmZsb29yKCksIGNhbiB1c2UgRCwgSCwgVCwgUyBmb3IgZGF5LCBob3VyLCBtaW4sIHNlYyBhbGlnbm1lbnQpCgoKICAgIDpwYXJhbSBjb250ZXh0OiAgICAgICAgTUxSdW4gY29udGV4dAogICAgOnBhcmFtIGZlYXR1cmVfdmVjdG9yOiBmZWF0dXJlIHZlY3RvciB1cmkKICAgIDpwYXJhbSBmZWF0dXJlczogICAgICAgUmVsZXZhbnQgb25seSBpZiBmZWF0dXJlX3ZlY3RvciBub3QgZXhpc3QuIGxpc3Qgb2YgZmVhdHVyZSB0byBjb2xsZWN0IHRvIHRoaXMgdmVjdG9yCiAgICAgICAgICAgICAgICAgICAgICAgICAgIGZvcm1hdCBbPHByb2plY3Q+L108ZmVhdHVyZV9zZXQ+LjxmZWF0dXJlX25hbWUgb3IgKj4gW2FzIDxhbGlhcz5dCiAgICA6cGFyYW0gbGFiZWxfZmVhdHVyZTogIGZlYXR1cmUgbmFtZSB0byBiZSB1c2VkIGFzIGxhYmVsIGRhdGEKICAgIDpwYXJhbSBkZXNjcmlwdGlvbjogICAgdGV4dCBkZXNjcmlwdGlvbiBvZiB0aGUgdmVjdG9yCiAgICA6cGFyYW0gZW50aXR5X3Jvd3M6ICAgIFVSSSBvZiB0aGUgZGF0YSBlbnRpdHkgcm93cyB0byBqb2luIHdpdGgKICAgIDpwYXJhbSB0YXJnZXQ6ICAgICAgICAgd2hlcmUgdG8gd3JpdGUgdGhlIHJlc3VsdHMgdG8KICAgIDpwYXJhbSBkcm9wX2NvbHVtbnM6ICAgbGlzdCBvZiBjb2x1bW5zIHRvIGRyb3AgZnJvbSB0aGUgZmluYWwgcmVzdWx0CiAgICA6cGFyYW0gZW50aXR5X3RpbWVzdGFtcF9jb2x1bW46IHRpbWVzdGFtcCBjb2x1bW4gbmFtZSBpbiB0aGUgZW50aXR5IHJvd3MgZGF0YWZyYW1lCiAgICA6cGFyYW0gcnVuX2NvbmZpZzogICAgIGZ1bmN0aW9uIGFuZC9vciBydW4gY29uZmlndXJhdGlvbgogICAgICAgICAgICAgICAgICAgICAgICAgICBzZWUgOnB5OmNsYXNzOmB+bWxydW4uZmVhdHVyZV9zdG9yZS5SdW5Db25maWdgCiAgICA6cGFyYW0gc3RhcnRfdGltZTogICAgICBkYXRldGltZSwgbG93IGxpbWl0IG9mIHRpbWUgbmVlZGVkIHRvIGJlIGZpbHRlcmVkLiBPcHRpb25hbAogICAgICAgIGVudGl0eV90aW1lc3RhbXBfY29sdW1uIG11c3QgYmUgcGFzc2VkIHdoZW4gdXNpbmcgdGltZSBmaWx0ZXJpbmcKICAgIDpwYXJhbSBlbmRfdGltZTogICAgICAgIGRhdGV0aW1lLCBoaWdoIGxpbWl0IG9mIHRpbWUgbmVlZGVkIHRvIGJlIGZpbHRlcmVkLiBPcHRpb25hbAogICAgICAgIGVudGl0eV90aW1lc3RhbXBfY29sdW1uIG11c3QgYmUgcGFzc2VkIHdoZW4gdXNpbmcgdGltZSBmaWx0ZXJpbmcKICAgIDpwYXJhbSB3aXRoX2luZGV4ZXM6ICAgIHJldHVybiB2ZWN0b3Igd2l0aCBpbmRleCBjb2x1bW5zIChkZWZhdWx0IEZhbHNlKQogICAgOnBhcmFtIHVwZGF0ZV9zdGF0czogICAgdXBkYXRlIGZlYXR1cmVzIHN0YXRpc3RpY3MgZnJvbSB0aGUgcmVxdWVzdGVkIGZlYXR1cmUgc2V0cyBvbiB0aGUgdmVjdG9yLiBEZWZhdWx0IGlzIEZhbHNlLgoKICAgIDpyZXR1cm5zIGZlYXR1cmVfdmVjdG9yIGlucHV0CiAgICAiIiIKCiAgICBpZiBmZWF0dXJlczoKICAgICAgICAjIENyZWF0aW5nIGEgbmV3IEZlYXR1cmVWZWN0b3IgYW5kIHNhdmluZzoKICAgICAgICBpZiBpc19zdG9yZV91cmkoZmVhdHVyZV92ZWN0b3IpOgogICAgICAgICAgICBwcmVmaXgsIG5ld191cmkgPSBwYXJzZV9zdG9yZV91cmkoZmVhdHVyZV92ZWN0b3IpCiAgICAgICAgICAgIGlmIHByZWZpeCAhPSBTdG9yZVByZWZpeC5GZWF0dXJlVmVjdG9yOgogICAgICAgICAgICAgICAgcmFpc2UgTUxSdW5JbnZhbGlkQXJndW1lbnRFcnJvcigKICAgICAgICAgICAgICAgICAgICBmInByb3ZpZGVkIHN0b3JlIHVyaSAoe2ZlYXR1cmVfdmVjdG9yfSkgZG9lcyBub3QgcmVwcmVzZW50IGEgZmVhdHVyZSB2ZWN0b3IgKHByZWZpeD17cHJlZml4fSkiCiAgICAgICAgICAgICAgICApCiAgICAgICAgICAgIGZlYXR1cmVfdmVjdG9yID0gbmV3X3VyaQoKICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYiQ3JlYXRpbmcgRmVhdHVyZVZlY3RvciB7ZmVhdHVyZV92ZWN0b3J9IikKICAgICAgICBwcm9qZWN0LCBuYW1lLCB0YWcsIF8gPSBwYXJzZV92ZXJzaW9uZWRfb2JqZWN0X3VyaShmZWF0dXJlX3ZlY3RvciwgbWxydW4ubWxjb25mLmRlZmF1bHRfcHJvamVjdCkKICAgICAgICB2ZWN0b3IgPSBmcy5GZWF0dXJlVmVjdG9yKG5hbWUsIGZlYXR1cmVzLCBsYWJlbF9mZWF0dXJlPWxhYmVsX2ZlYXR1cmUsIGRlc2NyaXB0aW9uPWRlc2NyaXB0aW9uKQogICAgICAgIHZlY3Rvci5tZXRhZGF0YS5wcm9qZWN0ID0gcHJvamVjdAogICAgICAgIHZlY3Rvci5tZXRhZGF0YS50YWcgPSB0YWcKICAgICAgICB2ZWN0b3Iuc2F2ZSgpCiAgICAgICAgZmVhdHVyZV92ZWN0b3IgPSB2ZWN0b3IudXJpCgogICAgIyBQcmVwYXJpbmcgZW50aXR5X3Jvd3M6CiAgICBpZiBlbnRpdHlfcm93cyBpcyBub3QgTm9uZToKICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYiQ3JlYXRpbmcgRGF0YUZyYW1lIGZyb20gZW50aXR5X3Jvd3MgPSB7ZW50aXR5X3Jvd3N9IikKICAgICAgICBlbnRpdHlfcm93cyA9IGVudGl0eV9yb3dzLmFzX2RmKCkKCiAgICAjIFByZXBhcmluZyB0YXJnZXQ6CiAgICBpZiB0YXJnZXQ6CiAgICAgICAgaWYgaXNpbnN0YW5jZSh0YXJnZXQsIHN0cik6CiAgICAgICAgICAgIHRhcmdldCA9IGtpbmRfdG9fZHJpdmVyW3RhcmdldF0oKQoKICAgICAgICBuYW1lID0gdGFyZ2V0Lm5hbWUgaWYgaGFzYXR0cih0YXJnZXQsICJuYW1lIikgZWxzZSB0YXJnZXRbIm5hbWUiXQogICAgICAgIGNvbnRleHQubG9nZ2VyLmluZm8oZiJQcmVwYXJpbmcgJ3tuYW1lfScgdGFyZ2V0IikKICAgICAgICB0YXJnZXQgPSBnZXRfdGFyZ2V0X2RyaXZlcih0YXJnZXQpCiAgICBpZiBoYXNhdHRyKHRhcmdldCwgJ3BhdGgnKSBhbmQgdGFyZ2V0LnBhdGg6CiAgICAgICAgY29udGV4dC5sb2dfcmVzdWx0KCJ0YXJnZXQiLCB0YXJnZXQucGF0aCkKCiAgICAjIFByZXBhcmluZyBydW5fY29uZmlnOgogICAgaWYgcnVuX2NvbmZpZyBhbmQgaXNpbnN0YW5jZShydW5fY29uZmlnLCBkaWN0KToKICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCJQcmVwYXJpbmcgcnVuIGNvbmZpZ3VyYXRpb24iKQogICAgICAgIHJ1bl9jb25maWcgPSBmcy5SdW5Db25maWcoKipydW5fY29uZmlnKQoKICAgICMgQ2FsbGluZyBnZXRfb2ZmbGluZV9mZWF0dXJlczoKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oCiAgICAgICAgZiJnZXR0aW5nIG9mZmxpbmUgZmVhdHVyZXMgZnJvbSB0aGUgRmVhdHVyZVZlY3RvciB7ZmVhdHVyZV92ZWN0b3J9IgogICAgKQogICAgZnMuZ2V0X29mZmxpbmVfZmVhdHVyZXMoCiAgICAgICAgZmVhdHVyZV92ZWN0b3I9ZmVhdHVyZV92ZWN0b3IsCiAgICAgICAgZW50aXR5X3Jvd3M9ZW50aXR5X3Jvd3MsCiAgICAgICAgZW50aXR5X3RpbWVzdGFtcF9jb2x1bW49ZW50aXR5X3RpbWVzdGFtcF9jb2x1bW4sCiAgICAgICAgdGFyZ2V0PXRhcmdldCwKICAgICAgICBydW5fY29uZmlnPXJ1bl9jb25maWcsCiAgICAgICAgZHJvcF9jb2x1bW5zPWRyb3BfY29sdW1ucywKICAgICAgICBzdGFydF90aW1lPXN0YXJ0X3RpbWUsCiAgICAgICAgZW5kX3RpbWU9ZW5kX3RpbWUsCiAgICAgICAgd2l0aF9pbmRleGVzPXdpdGhfaW5kZXhlcywKICAgICAgICB1cGRhdGVfc3RhdHM9dXBkYXRlX3N0YXRzLAogICAgKQoKICAgIGNvbnRleHQubG9nX3Jlc3VsdCgiZmVhdHVyZV92ZWN0b3IiLCBmZWF0dXJlX3ZlY3RvcikK
+    commands: []
+    code_origin: https://github.com/mlrun/functions.git#ecc7bc18501d377d10d2b40edccf5c4b256a79d3:/Users/yonatanshelach/yoni/projects/functions/get_offline_features/get_offline_features.py
+    origin_filename: /Users/yonatanshelach/yoni/projects/functions/get_offline_features/get_offline_features.py
+  entry_points:
+    get_offline_features:
+      name: get_offline_features
+      doc: 'retrieve offline feature vector results
+
+
+        specify a feature vector object/uri and retrieve the desired features, their
+        metadata
+
+        and statistics. returns :py:class:`~mlrun.feature_store.OfflineVectorResponse`,
+
+        results can be returned as a dataframe or written to a target.
+
+        If feature vector does not exist, a new one will be created and saved with
+        the given features.
+
+
+        The start_time and end_time attributes allow filtering the data to a given
+        time range, they accept
+
+        string values or pandas `Timestamp` objects, string values can also be relative,
+        for example:
+
+        "now", "now - 1d2h", "now+5m", where a valid pandas Timedelta string follows
+        the verb "now",
+
+        for time alignment you can use the verb "floor" e.g. "now -1d floor 1H" will
+        align the time to the last hour
+
+        (the floor string is passed to pandas.Timestamp.floor(), can use D, H, T,
+        S for day, hour, min, sec alignment)'
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: MLRun context
+        default: ''
+      - name: feature_vector
+        type: str
+        doc: feature vector uri
+        default: ''
+      - name: features
+        type: Union[List[str], ]
+        doc: Relevant only if feature_vector not exist. list of feature to collect
+          to this vector format [<project>/]<feature_set>.<feature_name or *> [as
+          <alias>]
+        default: null
+      - name: label_feature
+        type: str
+        doc: feature name to be used as label data
+        default: null
+      - name: description
+        type: str
+        doc: text description of the vector
+        default: null
+      - name: entity_rows
+        type: DataItem
+        doc: URI of the data entity rows to join with
+        default: null
+      - name: entity_timestamp_column
+        type: str
+        doc: timestamp column name in the entity rows dataframe
+        default: null
+      - name: target
+        type: Union[str, Dict]
+        doc: where to write the results to
+        default: null
+      - name: run_config
+        type: Union[str, Dict]
+        doc: function and/or run configuration see :py:class:`~mlrun.feature_store.RunConfig`
+        default: null
+      - name: drop_columns
+        type: List[str]
+        doc: list of columns to drop from the final result
+        default: null
+      - name: start_time
+        type: str
+        doc: datetime, low limit of time needed to be filtered. Optional entity_timestamp_column
+          must be passed when using time filtering
+        default: null
+      - name: end_time
+        type: str
+        doc: datetime, high limit of time needed to be filtered. Optional entity_timestamp_column
+          must be passed when using time filtering
+        default: null
+      - name: with_indexes
+        type: bool
+        doc: return vector with index columns (default False)
+        default: false
+      - name: update_stats
+        type: bool
+        doc: update features statistics from the requested feature sets on the vector.
+          Default is False.
+        default: false
+      outputs:
+      - default: ''
+      lineno: 13
+  description: retrieve offline feature vector results
+  default_handler: get_offline_features
+  disable_auto_mount: false
+  env: []
+  priority_class_name: ''
+  preemption_mode: prevent
+  affinity: null
+  tolerations: null
+verbose: false

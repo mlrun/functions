@@ -1,3 +1,17 @@
+# Copyright 2019 Iguazio
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 from pathlib import Path
 from typing import Optional, Union
 
@@ -66,6 +80,21 @@ def item_to_function(
                 click.echo(f"{inner_dir.name}: Failed to generate function.yaml")
 
 
+def set_nested(parent, key, value):
+    if value and isinstance(value, dict):
+        for k, v in value.items():
+            if not hasattr(parent, key):
+                setattr(parent, key, value)
+                return
+            set_nested(getattr(parent, key), k, v)
+        return
+    if hasattr(parent, key) and isinstance(value, list):
+        old_value = getattr(parent, key)
+        setattr(parent, key, value + old_value)
+    else:
+        setattr(parent, key, value)
+
+
 def create_function_yaml(
     item_path: Union[str, Path],
     output_path: Optional[str] = None,
@@ -110,10 +139,16 @@ def create_function_yaml(
         labels=item_yaml.get("labels", {}),
         with_doc=True,
     )
+    function_object.metadata.project = ""
 
     custom_fields = spec.get("customFields", {})
     for key, value in custom_fields.items():
         setattr(function_object.spec, key, value)
+
+    # Extra spec with nesting support (dict inside dict):
+    extra_spec = spec.get("extra_spec")
+    if extra_spec:
+        set_nested(function_object, "spec", extra_spec)
 
     env = spec.get("env", {})
     if env:

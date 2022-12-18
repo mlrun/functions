@@ -1,3 +1,17 @@
+# Copyright 2019 Iguazio
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 import json
 import os
 from collections import defaultdict
@@ -12,7 +26,7 @@ from mlrun import store_manager
 from mlrun.data_types.infer import DFDataInfer, InferOptions
 from mlrun.run import MLClientCtx
 from mlrun.utils import logger, config
-from mlrun.utils.model_monitoring import parse_model_endpoint_store_prefix
+from mlrun.utils.model_monitoring import EndpointType, parse_model_endpoint_store_prefix
 from mlrun.utils.v3io_clients import get_v3io_client, get_frames_client
 from sklearn.preprocessing import KBinsDiscretizer
 
@@ -226,7 +240,7 @@ class BatchProcessor:
 
         self.v3io_access_key = v3io_access_key
         self.model_monitoring_access_key = (
-            model_monitoring_access_key or v3io_access_key
+                model_monitoring_access_key or v3io_access_key
         )
 
         self.virtual_drift = VirtualDrift(inf_capping=10)
@@ -278,6 +292,7 @@ class BatchProcessor:
             container=self.tsdb_container,
             token=self.v3io_access_key,
         )
+        self.exception = None
 
     def post_init(self):
         response = self.v3io.create_stream(
@@ -325,16 +340,18 @@ class BatchProcessor:
                 last_day = self.get_last_created_dir(fs, last_month)
                 last_hour = self.get_last_created_dir(fs, last_day)
 
-                parquet_files = fs.ls(last_hour["name"])
-                last_parquet = sorted(parquet_files, key=lambda k: k["mtime"])[-1]
-                parquet_name = last_parquet["name"]
-                full_path = f"{prefix}{parquet_name}"
+                full_path = f"{prefix}{last_hour['name']}"
 
                 logger.info(f"Now processing {full_path}")
 
                 endpoint = self.db.get_model_endpoint(
                     project=self.project, endpoint_id=endpoint_id
                 )
+
+                if endpoint.status.endpoint_type == EndpointType.ROUTER:
+                    # endpoint.status.feature_stats is None
+                    logger.info(f"{endpoint_id} is router skipping")
+                    continue
 
                 df = pd.read_parquet(full_path)
                 timestamp = df["timestamp"].iloc[-1]
@@ -412,7 +429,8 @@ class BatchProcessor:
                 logger.info(f"Done updating drift measures {full_path}")
 
             except Exception as e:
-                logger.error(e)
+                logger.error(f"Exception for endpoint {endpoint_id}")
+                self.exception = e
 
     def check_for_drift(self, drift_result, endpoint):
         tvd_mean = drift_result.get("tvd_mean")
@@ -455,3 +473,5 @@ def handler(context: MLClientCtx):
     )
     batch_processor.post_init()
     batch_processor.run()
+    if batch_processor.exception:
+        raise batch_processor.exception

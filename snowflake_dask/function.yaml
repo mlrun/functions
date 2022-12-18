@@ -1,0 +1,81 @@
+kind: job
+metadata:
+  name: snowflake-dask
+  tag: ''
+  hash: a002c7743b4a7471c7befe00f5497de050ebe902
+  project: snowflake-dask
+  labels:
+    author: xingsheng
+  categories:
+  - data-prep
+  credentials:
+    access_key: ec09bfc8-1cb4-466d-9049-852081973ce3
+spec:
+  command: ''
+  args: []
+  image: .mlrun/func-snowflake-dask-snowflake-dask:latest
+  build:
+    functionSourceCode: IiIiU25vd2ZsYWtlIERhc2sgLSBJbmdlc3QgU25hb3dmbGFrZSBkYXRhIHdpdGggRGFzayIiIgppbXBvcnQgd2FybmluZ3MKaW1wb3J0IG1scnVuCmZyb20gbWxydW4uZXhlY3V0aW9uIGltcG9ydCBNTENsaWVudEN0eAppbXBvcnQgc25vd2ZsYWtlLmNvbm5lY3RvciBhcyBzbm93CmZyb20gZGFzay5kaXN0cmlidXRlZCBpbXBvcnQgQ2xpZW50CmZyb20gZGFzay5kYXRhZnJhbWUgaW1wb3J0IGZyb21fZGVsYXllZApmcm9tIGRhc2sgaW1wb3J0IGRlbGF5ZWQKZnJvbSBkYXNrIGltcG9ydCBkYXRhZnJhbWUgYXMgZGQKZnJvbSBjcnlwdG9ncmFwaHkuaGF6bWF0LmJhY2tlbmRzIGltcG9ydCBkZWZhdWx0X2JhY2tlbmQKZnJvbSBjcnlwdG9ncmFwaHkuaGF6bWF0LnByaW1pdGl2ZXMgaW1wb3J0IHNlcmlhbGl6YXRpb24KCndhcm5pbmdzLmZpbHRlcndhcm5pbmdzKCJpZ25vcmUiKQoKQGRlbGF5ZWQKZGVmIGxvYWQoYmF0Y2gpOgoKICAgICIiIkEgZGVsYXllZCBsb2FkIG9uZSBiYXRjaC4iIiIKCiAgICB0cnk6CiAgICAgICAgcHJpbnQoIkJBVENISU5HIikKICAgICAgICBkZl8gPSBiYXRjaC50b19wYW5kYXMoKQogICAgICAgIHJldHVybiBkZl8KICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZToKICAgICAgICBwcmludChmIkZhaWxlZCBvbiB7YmF0Y2h9IGZvciB7ZX0iKQogICAgICAgIHJhaXNlCgpkZWYgbG9hZF9yZXN1bHRzKGNvbnRleHQ6IE1MQ2xpZW50Q3R4LAogICAgICAgICAgICAgICAgIGRhc2tfY2xpZW50OiBzdHIsCiAgICAgICAgICAgICAgICAgY29ubmVjdGlvbl9pbmZvOiBzdHIsCiAgICAgICAgICAgICAgICAgcXVlcnk6IHN0ciwKICAgICAgICAgICAgICAgICBwYXJxdWV0X291dF9kaXIgPSBOb25lLAogICAgICAgICAgICAgICAgIHB1Ymxpc2hfbmFtZSA9IE5vbmUKICAgICAgICAgICAgICAgICkgLT4gTm9uZToKCiAgICAiIiJTbm93Zmxha2UgRGFzayAtIEluZ2VzdCBTbmFvd2ZsYWtlIGRhdGEgd2l0aCBEYXNrCgogICAgOnBhcmFtIGNvbnRleHQ6ICAgICAgICAgICB0aGUgZnVuY3Rpb24gY29udGV4dAogICAgOnBhcmFtIGRhc2tfY2xpZW50OiAgICAgICBkYXNrIGNsdXN0ZXIgZnVuY3Rpb24gbmFtZQogICAgOnBhcmFtIGNvbm5lY3Rpb25faW5mbzogICBTbm93Zmxha2UgZGF0YWJhc2UgY29ubmVjdGlvbiBpbmZvICh0aGlzIHdpbGwgYmUgaW4gYSBzZWNyZXQgbGF0ZXIpCiAgICA6cGFyYW0gcXVlcnk6ICAgICAgICAgICAgIHF1ZXJ5IHRvIGZvciBTbm93Zmxha2UKICAgIDpwYXJhbSBwYXJxdWV0X291dF9kaXI6ICAgZGlyZWN0b3J5IHBhdGggZm9yIHRoZSBvdXRwdXQgcGFycXVldCBmaWxlcwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAoZGVmYXVsdCBOb25lLCBub3Qgd3JpdGUgb3V0KQogICAgOnBhcmFtIHB1Ymxpc2hfbmFtZTogICAgICBuYW1lIG9mIHRoZSBkYXNrIGRhdGFmcmFtZSB0byBwdWJsaXNoIHRvIHRoZSBkYXNrIGNsdXN0ZXIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKGRlZmF1bHQgTm9uZSwgbm90IHB1Ymxpc2gpCgogICAgIiIiCiAgICBjb250ZXh0ID0gbWxydW4uZ2V0X29yX2NyZWF0ZV9jdHgoJ3NuYXdmbGFrZS1kYXNrLWNsdXN0ZXInKQogICAgc2ZfcGFzc3dvcmQgPSBjb250ZXh0LmdldF9zZWNyZXQoJ3NmUGFzc3dvcmQnKQogICAgcGtfcGF0aCA9ICBjb250ZXh0LmdldF9zZWNyZXQoJ3BrUGF0aCcpCiAgICBwa19wYXNzd29yZCA9ICBjb250ZXh0LmdldF9zZWNyZXQoJ3BrUGFzc3dvcmQnKQoKICAgIGlmIHBrX3BhdGggYW5kIHBrX3Bhc3N3b3JkOgogICAgICAgIHdpdGggb3Blbihwa19wYXRoLCAicmIiKSBhcyBrZXk6CiAgICAgICAgICAgIHBfa2V5PSBzZXJpYWxpemF0aW9uLmxvYWRfcGVtX3ByaXZhdGVfa2V5KAogICAgICAgICAgICAgICAga2V5LnJlYWQoKSwKICAgICAgICAgICAgICAgIHBhc3N3b3JkPXN0cihwa19wYXNzd29yZCkuZW5jb2RlKCksCiAgICAgICAgICAgICAgICBiYWNrZW5kPWRlZmF1bHRfYmFja2VuZCgpCiAgICAgICAgICAgICkKICAgICAgICBwa2IgPSBwX2tleS5wcml2YXRlX2J5dGVzKAogICAgICAgICAgICBlbmNvZGluZz1zZXJpYWxpemF0aW9uLkVuY29kaW5nLkRFUiwKICAgICAgICAgICAgZm9ybWF0PXNlcmlhbGl6YXRpb24uUHJpdmF0ZUZvcm1hdC5QS0NTOAogICAgICAgICAgICAsZW5jcnlwdGlvbl9hbGdvcml0aG09c2VyaWFsaXphdGlvbi5Ob0VuY3J5cHRpb24oKQogICAgICAgICkKICAgICAgICBjb25uZWN0aW9uX2luZm8ucG9wKCdwYXNzd29yZCcsICdObyBwYXNzd29yZCBmb3VuZCcpCiAgICAgICAgY29ubmVjdGlvbl9pbmZvWydwcml2YXRlX2tleSddID0gcGtiCiAgICBlbGlmIHNmX3Bhc3N3b3JkOgogICAgICAgIGNvbm5lY3Rpb25faW5mb1sncGFzc3dvcmQnXSA9IHNmX3Bhc3N3b3JkCiAgICBlbHNlOgogICAgICAgIHJhaXNlIEV4Y2VwdGlvbigiXG5QbGVhc2Ugc2V0IHVwIHRoZSBzZWNyZXQgZm9yIFNub3dmbGFrZSBpbiB5b3VyIHByb2plY3QhXG4iKQoKICAgICMgc2V0dXAgZGFzayBjbGllbnQgZnJvbSB0aGUgTUxSdW4gZGFzayBjbHVzdGVyIGZ1bmN0aW9uCiAgICBpZiBkYXNrX2NsaWVudDoKICAgICAgICBjbGllbnQgPSBtbHJ1bi5pbXBvcnRfZnVuY3Rpb24oZGFza19jbGllbnQpLmNsaWVudAogICAgICAgIGNvbnRleHQubG9nZ2VyLmluZm8oZidFeGlzdGluZyBkYXNrIGNsaWVudCA9PT0gPj4+IHtjbGllbnR9XG4nKQogICAgZWxzZToKICAgICAgICBjbGllbnQgPSBDbGllbnQoKQogICAgICAgIGNvbnRleHQubG9nZ2VyLmluZm8oZidcbk5ld2x5IGNyZWF0ZWQgZGFzayBjbGllbnQgPT09ID4+PiB7Y2xpZW50fVxuJykKCiAgICBjb25uID0gc25vdy5jb25uZWN0KCoqY29ubmVjdGlvbl9pbmZvKQogICAgY3VyID0gY29ubi5jdXJzb3IoKQogICAgY3VyLmV4ZWN1dGUocXVlcnkpCiAgICBiYXRjaGVzID0gY3VyLmdldF9yZXN1bHRfYmF0Y2hlcygpCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYnYmF0Y2hlcyBsZW4gPT09IHtsZW4oYmF0Y2hlcyl9XG4nKQoKICAgIGRmcyA9IFtdCiAgICBmb3IgYmF0Y2ggaW4gYmF0Y2hlczoKICAgICAgICBpZiBiYXRjaC5yb3djb3VudCA+IDA6CiAgICAgICAgICAgIGRmID0gbG9hZChiYXRjaCkKICAgICAgICAgICAgZGZzLmFwcGVuZChkZikKICAgIGRkZiA9IGZyb21fZGVsYXllZChkZnMpCgogICAgIyBtYXRlcmlhbGl6ZSB0aGUgcXVlcnkgcmVzdWx0cyBzZXQgZm9yIHNvbWUgc2FtcGxlIGNvbXB1dGUKCiAgICBkZGZfZGVzY3JpYmUgPSBkZGYuZGVzY3JpYmUoKS5jb21wdXRlKCkKCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYncXVlcnkgID09PSA+Pj4ge3F1ZXJ5fVxuJykKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oZidkZGYgID09PSA+Pj4ge2RkZn1cbicpCiAgICBjb250ZXh0LmxvZ19yZXN1bHQoJ251bWJlciBvZiByb3dzJywgbGVuKGRkZi5pbmRleCkpCiAgICBjb250ZXh0LmxvZ19kYXRhc2V0KCJkZGZfZGVzY3JpYmUiLCBkZj1kZGZfZGVzY3JpYmUpCgogICAgaWYgcHVibGlzaF9uYW1lOgogICAgICAgIGNvbnRleHQubG9nX3Jlc3VsdCgnZGF0YV9zZXRfbmFtZScsIHB1Ymxpc2hfbmFtZSkKICAgICAgICBpZiBub3QgY2xpZW50Lmxpc3RfZGF0YXNldHMoKToKICAgICAgICAgICAgZGRmLnBlcnNpc3QobmFtZSA9IHB1Ymxpc2hfbmFtZSkKICAgICAgICAgICAgY2xpZW50LnB1Ymxpc2hfZGF0YXNldChwdWJsaXNoX25hbWU9ZGRmKQoKICAgIGlmIHBhcnF1ZXRfb3V0X2RpcjoKICAgICAgICBkZC50b19wYXJxdWV0KGRmPWRkZiwgcGF0aD1wYXJxdWV0X291dF9kaXIpCiAgICAgICAgY29udGV4dC5sb2dfcmVzdWx0KCdwYXJxdWV0IGRpcmVjdG9yeScsIHBhcnF1ZXRfb3V0X2RpcikK
+    base_image: mlrun/mlrun
+    commands:
+    - python -m pip install bokeh snowflake-connector-python[pandas] mlrun~=0.9.1
+    code_origin: https://github.com/xsqian/functions.git#6b31040e2ad762602f335b0589823a1c61a09975:snowflake_dask.py
+    origin_filename: snowflake_dask.py
+  entry_points:
+    load:
+      name: load
+      doc: A delayed load one batch.
+      parameters:
+      - name: batch
+        default: ''
+      outputs:
+      - default: ''
+      lineno: 15
+    load_results:
+      name: load_results
+      doc: Snowflake Dask - Ingest Snaowflake data with Dask
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+        default: ''
+      - name: dask_client
+        type: str
+        doc: dask cluster function name
+        default: ''
+      - name: connection_info
+        type: str
+        doc: Snowflake database connection info (this will be in a secret later)
+        default: ''
+      - name: query
+        type: str
+        doc: query to for Snowflake
+        default: ''
+      - name: parquet_out_dir
+        doc: directory path for the output parquet files (default None, not write
+          out)
+        default: null
+      - name: publish_name
+        doc: name of the dask dataframe to publish to the dask cluster (default None,
+          not publish)
+        default: null
+      outputs:
+      - default: ''
+      lineno: 28
+  description: Snowflake Dask - Ingest snowflake data in parallel with Dask cluster
+  default_handler: load_results
+  disable_auto_mount: false
+  env:
+  - name: V3IO_API
+    value: ''
+  - name: V3IO_USERNAME
+    value: ''
+  - name: V3IO_ACCESS_KEY
+    value: ''
+  - name: V3IO_FRAMESD
+    value: ''
+  priority_class_name: igz-workload-medium
+  preemption_mode: prevent
+  affinity: null
+  tolerations: null
+verbose: false

@@ -1,3 +1,17 @@
+# Copyright 2019 Iguazio
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 import pandas as pd
 import matplotlib.pyplot as plt
 import mlrun.feature_store as fs
@@ -73,19 +87,18 @@ def plot_stat(context,
 
 def feature_selection(context,
                       df_artifact,
-                      k: int=5,
-                      min_votes: float=0.5,
-                      label_column: str=None,
-                      stat_filters: list=['f_classif', 'mutual_info_classif', 'chi2', 'f_regression'],
-                      model_filters: dict={'LinearSVC': 'LinearSVC',
-                                     'LogisticRegression': 'LogisticRegression',
-                                     'ExtraTreesClassifier': 'ExtraTreesClassifier'},
-                      max_scaled_scores: bool=True,
-                      sample_ratio: float=None,
-                      output_vector_name: float=None,
-                      ignore_type_errors: bool=False,
-                      is_feature_vector: bool=False):
-    
+                      k: int = 5,
+                      min_votes: float = 0.5,
+                      label_column: str = None,
+                      stat_filters: list = ['f_classif', 'mutual_info_classif', 'chi2', 'f_regression'],
+                      model_filters: dict = {'LinearSVC': 'LinearSVC',
+                                             'LogisticRegression': 'LogisticRegression',
+                                             'ExtraTreesClassifier': 'ExtraTreesClassifier'},
+                      max_scaled_scores: bool = True,
+                      sample_ratio: float = None,
+                      output_vector_name: float = None,
+                      ignore_type_errors: bool = False,
+                      is_feature_vector: bool = False):
     """Applies selected feature selection statistical functions
     or models on our 'df_artifact'.
 
@@ -121,49 +134,51 @@ def feature_selection(context,
     
     :param is_feature_vector: bool stating if the data is passed as a feature vector.
     """
-        
+
     # Check if df.meta is valid, if it is, look for a feature vector
     if df_artifact.meta:
         if df_artifact.meta.kind == mlrun.api.schemas.ObjectKind.feature_vector:
             is_feature_vector = True
-    
+
     # Look inside meta.spec.label_feature to identify the label_column if the user did not specify it
     if label_column is None:
         if is_feature_vector:
             label_column = df_artifact.meta.spec.label_feature.split('.')[1]
         else:
             raise ValueError('No label_column was given, please add a label_column.')
-    
+
     # Use the feature vector as dataframe
     df = df_artifact.as_df()
-    
+
     # Ensure k is not bigger than the the total number of features
     if k > df.shape[1]:
-        raise ValueError(f'K cannot be bigger than the total number of features ({df.shape[1]}). Please choose a smaller K.')
+        raise ValueError(
+            f'K cannot be bigger than the total number of features ({df.shape[1]}). Please choose a smaller K.')
     elif k < 1:
         raise ValueError(f'K cannot be smaller than 1. Please choose a bigger K.')
-        
+
     # Create a sample dataframe of the original feature vector
     if sample_ratio:
         df = df.groupby(label_column).apply(lambda x: x.sample(frac=sample_ratio)).reset_index(drop=True)
         df = df.dropna()
-        
+
     # Set feature vector and labels
     y = df.pop(label_column)
     X = df
-    
+
     if np.object in list(X.dtypes) and ignore_type_errors is False:
         raise ValueError(f"{df.select_dtypes(include=['object']).columns.tolist()} are neither float or int.")
-        
+
     # Create selected statistical estimators
-    stat_functions_list = {stat_name: SelectKBest(create_class(f'sklearn.feature_selection.{stat_name}'), k)
-                           for stat_name in stat_filters}
+    stat_functions_list = {
+        stat_name: SelectKBest(score_func=create_class(f'sklearn.feature_selection.{stat_name}'), k=k)
+        for stat_name in stat_filters}
     requires_abs = ['chi2']
 
     # Run statistic filters
     selected_features_agg = {}
     stats_df = pd.DataFrame(index=X.columns).dropna()
-                
+
     for stat_name, stat_func in stat_functions_list.items():
         try:
             params = (X, y) if stat_name in requires_abs else (abs(X), y)
@@ -179,7 +194,7 @@ def feature_selection(context,
             # Select K Best features
             selected_features = X.columns[stat_func.get_support()]
             selected_features_agg[stat_name] = selected_features
-            
+
         except Exception as e:
             context.logger.info(f"Couldn't calculate {stat_name} because of: {e}")
 
@@ -193,7 +208,7 @@ def feature_selection(context,
             selected_models[model_name] = ClassifierClass(**current_model["CLASS"])
         elif model in all_sklearn_estimators:
             selected_models[model_name] = all_sklearn_estimators[model_name]()
-            
+
         else:
             try:
                 current_model = json.loads(model) if isinstance(model, str) else current_model
@@ -205,11 +220,10 @@ def feature_selection(context,
     # Run model filters
     models_df = pd.DataFrame(index=X.columns)
     for model_name, model in selected_models.items():
-        
 
         if model_name == 'LogisticRegression':
             model.set_params(solver='liblinear')
-            
+
         # Train model and get feature importance
         select_from_model = SelectFromModel(model).fit(X, y)
         feature_idx = select_from_model.get_support()
@@ -272,21 +286,21 @@ def feature_selection(context,
                         df=final_df,
                         local_path='selected_features.parquet',
                         format='parquet')
-    
+
     # Creating a new feature vector containing only the identified top features
     if is_feature_vector and df_artifact.meta.spec.features and output_vector_name:
-
         # Selecting the top K features from our top feature dataframe
         selected_features = result_matrix_df.head(k).index
 
         # Match the selected feature names to the FS Feature annotations
-        matched_selections = [feature for feature in list(df_artifact.meta.spec.features) for selected in list(selected_features) if feature.endswith(selected)]
+        matched_selections = [feature for feature in list(df_artifact.meta.spec.features) for selected in
+                              list(selected_features) if feature.endswith(selected)]
 
         # Defining our new feature vector
-        top_features_fv = fs.FeatureVector(output_vector_name, 
-                                    matched_selections, 
-                                    label_feature="labels.label",
-                                    description='feature vector composed strictly of our top features')
+        top_features_fv = fs.FeatureVector(output_vector_name,
+                                           matched_selections,
+                                           label_feature="labels.label",
+                                           description='feature vector composed strictly of our top features')
 
         # Saving
         top_features_fv.save()

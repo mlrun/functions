@@ -6,16 +6,16 @@ description: Deploy a streaming Concept Drift detector on a labeled stream. the 
   part of the concept_drift function
 doc: ''
 example: concept_drift_streaming.ipynb
-generationDate: 2021-11-18:12-28
+generationDate: 2022-08-28:17-25
 icon: ''
 labels:
   author: orz
   framework: sklearn
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.8.0
+mlrunVersion: 1.1.0
 name: concept-drift-streaming
-platformVersion: 3.2.0
+platformVersion: 3.5.0
 spec:
   filename: concept_drift_streaming.py
   handler: handler
@@ -25,4 +25,4 @@ spec:
   - scikit-multiflow==0.4.1
   - v3io_frames
 url: ''
-version: 0.8.0
+version: 1.1.0

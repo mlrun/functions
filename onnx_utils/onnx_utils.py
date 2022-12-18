@@ -1,3 +1,17 @@
+# Copyright 2019 Iguazio
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 from typing import Any, Callable, Dict, List, Tuple
 
 import mlrun
@@ -32,6 +46,7 @@ class _ToONNXConversions:
         """
         # Import the framework and handler:
         import tensorflow as tf
+        from mlrun.frameworks.tf_keras import TFKerasUtils
 
         # Check the given 'input_signature' parameter:
         if input_signature is None:
@@ -48,7 +63,7 @@ class _ToONNXConversions:
             input_signature = [
                 tf.TensorSpec(
                     shape=shape,
-                    dtype=model_handler.convert_value_type_to_tf_dtype(
+                    dtype=TFKerasUtils.convert_value_type_to_tf_dtype(
                         value_type=value_type
                     ),
                 )
@@ -107,6 +122,7 @@ class _ToONNXConversions:
         """
         # Import the framework and handler:
         import torch
+        from mlrun.frameworks.pytorch import PyTorchUtils
 
         # Parse the 'input_signature' parameter:
         if input_signature is not None:
@@ -114,7 +130,7 @@ class _ToONNXConversions:
                 [
                     torch.zeros(
                         size=shape,
-                        dtype=model_handler.convert_value_type_to_torch_dtype(
+                        dtype=PyTorchUtils.convert_value_type_to_torch_dtype(
                             value_type=value_type
                         ),
                     )
@@ -136,8 +152,8 @@ class _ToONNXConversions:
 
 # Map for getting the conversion function according to the provided framework:
 _CONVERSION_MAP = {
-    "tf.keras": _ToONNXConversions.tf_keras_to_onnx,
-    "pytorch": _ToONNXConversions.pytorch_to_onnx,
+    "tensorflow.keras": _ToONNXConversions.tf_keras_to_onnx,
+    "torch": _ToONNXConversions.pytorch_to_onnx,
 }  # type: Dict[str, Callable]
 
 

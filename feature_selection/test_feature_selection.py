@@ -1,6 +1,19 @@
+# Copyright 2019 Iguazio
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 from mlrun import code_to_function
 from pathlib import Path
-import os
 import shutil
 
 METRICS_PATH = 'data/metrics.pq'
@@ -15,16 +28,6 @@ def _delete_outputs(paths):
             shutil.rmtree(path)
 
 
-def _validate_paths(paths: {}):
-    base_folder = ARTIFACTS_PATH
-    for path in paths:
-        full_path = os.path.join(base_folder, path)
-        if Path(full_path).is_file():
-            print("File exist")
-        else:
-            raise FileNotFoundError
-
-
 def test_run_local_feature_selection():
     fn = code_to_function(name='test_run_local_feature_selection',
                           filename="feature_selection.py",
@@ -32,13 +35,14 @@ def test_run_local_feature_selection():
                           kind="local",
                           )
     fn.spec.command = "feature_selection.py"
-    fn.run(params={'k': 2,
-                           'min_votes': 0.3,
-                           'label_column': 'is_error'},
-           # , local=True
-           inputs={'df_artifact': 'data/metrics.pq'},
-           artifact_path='artifacts/'
-           )
-    _validate_paths({'feature_scores.parquet',
-                     'selected_features.parquet'})
+    run = fn.run(
+        params={
+            'k': 2,
+            'min_votes': 0.3,
+            'label_column': 'is_error',
+        },
+        inputs={'df_artifact': 'data/metrics.pq'},
+        artifact_path='artifacts/',
+    )
+    assert run.artifact('feature_scores').get() and run.artifact('selected_features').get()
     _delete_outputs({ARTIFACTS_PATH, RUNS_PATH, SCHEDULES_PATH})

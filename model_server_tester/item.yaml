@@ -5,15 +5,15 @@ categories:
 description: test model servers
 doc: ''
 example: model_server_tester.ipynb
-generationDate: 2021-11-18:12-28
+generationDate: 2022-08-28:17-25
 icon: ''
 labels:
   author: yaronh
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.8.0
+mlrunVersion: 1.1.0
 name: model-server-tester
-platformVersion: 3.2.0
+platformVersion: 3.5.0
 spec:
   filename: model_server_tester.py
   handler: model_server_tester
@@ -21,4 +21,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.8.0
+version: 1.1.0

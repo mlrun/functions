@@ -5,15 +5,15 @@ categories:
 description: tf2 image classification server v2
 doc: ''
 example: tf2_serving_v2.ipynb
-generationDate: 2021-11-18:12-28
+generationDate: 2022-08-28:17-25
 icon: ''
 labels:
   author: yaronh
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.8.0
+mlrunVersion: 1.1.0
 name: tf2-serving-v2
-platformVersion: 3.2.0
+platformVersion: 3.5.0
 spec:
   filename: tf2_serving_v2.py
   handler: handler
@@ -24,4 +24,4 @@ spec:
   - pillow
   - tensorflow>=2.1
 url: ''
-version: 0.8.0
+version: 1.1.0

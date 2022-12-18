@@ -5,16 +5,16 @@ categories:
 description: test a classifier using held-out or new data
 doc: README.md
 example: test_classifier.ipynb
-generationDate: 2021-11-18:12-28
+generationDate: 2022-08-28:17-25
 icon: ''
 labels:
   author: yjb
   framework: sklearn
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.8.0
+mlrunVersion: 1.1.0
 name: test-classifier
-platformVersion: 3.2.0
+platformVersion: 3.5.0
 spec:
   filename: test_classifier.py
   handler: test_classifier
@@ -22,4 +22,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 0.8.0
+version: 1.1.0

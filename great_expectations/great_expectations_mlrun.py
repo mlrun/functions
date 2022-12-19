@@ -22,7 +22,7 @@ def get_default_datasource_config(
     :param datasource_name:     Name of datasource.
     :param data_connector_name: Name of data connector.
 
-    :return: Configuration for default datasource.
+    :returns: Configuration for default datasource.
     """
     default_datasource_config = {
         "name": f"{datasource_name}",
@@ -50,7 +50,7 @@ def get_default_checkpoint_config(checkpoint_name: str) -> dict:
 
     :param checkpoint_name: Name of checkpoint.
 
-    :return: Configuration for default checkpoint.
+    :returns: Configuration for default checkpoint.
     """
     return {
         "name": checkpoint_name,
@@ -67,7 +67,7 @@ def get_data_doc_path(checkpoint_result: CheckpointResult) -> str:
 
     :param checkpoint_result: Great Expectations checkpoint result.
 
-    :return: Absolute path to new data doc.
+    :returns: Absolute path to new data doc.
     """
     result_id = checkpoint_result.list_validation_result_identifiers()[0]
     data_doc_path = checkpoint_result["run_results"][result_id]["actions_results"][

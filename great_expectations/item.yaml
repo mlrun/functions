@@ -12,14 +12,14 @@ labels:
   framework: great-expectations
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 0.10.1
+mlrunVersion: 1.1.0
 name: great-expectations
-platformVersion: 3.2.3
+platformVersion: 3.5.2
 spec:
   filename: great_expectations_mlrun.py
   handler: validate_expectations
   image: mlrun/mlrun
   kind: job
-  requirements: [great-expectations==0.14.9]
+  requirements: [great-expectations==0.15.41]
 url: ''
-version: 0.0.1
+version: 1.0.0

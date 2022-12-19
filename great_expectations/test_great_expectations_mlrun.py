@@ -17,7 +17,7 @@ from great_expectations_mlrun import (
     get_default_datasource_config,
     get_default_checkpoint_config,
     get_data_doc_path,
-)
+) 
 
 
 DATA_ASSET_NAME = "iris_dataset"
@@ -140,7 +140,6 @@ def cleanup_expectations():
 
 def run_expectations():
     fn = mlrun.import_function("function.yaml")
-    fn.deploy()
     run = fn.run(
         inputs={"data": "https://s3.wasabisys.com/iguazio/data/iris/iris.data.raw.csv"},
         params={

@@ -96,6 +96,7 @@ categories: []         # List of category names
 description: ''        # Short description
 example: ''            # Path to examole notebook
 generationDate:        # Automatically created when creating a new item using the cli
+hidden: false          # Hide function from the UI
 icon: ''               # Path to icon file
 labels: {}             # Key values label pairs
 maintainers: []        # List of maintainers

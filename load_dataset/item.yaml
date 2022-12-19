@@ -5,6 +5,7 @@ description: load a toy dataset from scikit-learn
 doc: README.md
 example: load_dataset.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: yjb

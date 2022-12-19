@@ -6,6 +6,7 @@ description: Saves a stream to Parquet and can lunch drift detection task on it
 doc: ''
 example: stream_to_parquet.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: orz

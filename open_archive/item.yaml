@@ -5,6 +5,7 @@ description: Open a file/object archive into a target directory
 doc: ''
 example: open_archive.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: yaronh

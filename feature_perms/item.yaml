@@ -5,6 +5,7 @@ description: estimate feature importances using permutations
 doc: ''
 example: feature_perms.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: yjb

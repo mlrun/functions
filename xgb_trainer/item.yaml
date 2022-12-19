@@ -5,6 +5,7 @@ description: train multiple model types using xgboost.
 doc: ''
 example: xgb_trainer.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: Daniel

@@ -5,6 +5,7 @@ description: add comments to github pull request
 doc: ''
 example: github_utils.ipynb
 generationDate: 2022-08-28:17-25
+hidden: false
 icon: ''
 labels:
   author: yaronh

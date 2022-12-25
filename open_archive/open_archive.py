@@ -31,7 +31,7 @@ from urllib.parse import urlparse
 def open_archive(
     context: MLClientCtx,
     archive_url: DataItem,
-    subdir: str = "content",
+    subdir: str = "content/",
     key: str = "content",
     target_path: str = None,
 ):
@@ -46,25 +46,54 @@ def open_archive(
     """
     
     archive_url = archive_url.local()
-
-    os.makedirs(target_path or subdir, exist_ok=True)
-    if archive_url.endswith("gz"):
-        with tarfile.open(archive_url, mode="r|gz") as ref:
-            ref.extractall(target_path or subdir)
-    elif archive_url.endswith("zip"):
-        with zipfile.ZipFile(archive_url, "r") as ref:
-            ref.extractall(target_path or subdir)
-    else:
-        raise ValueError(f"unsupported archive type in {archive_url}")
-
-    kwargs = {}
-    if target_path:
-        if(os.path.isdir(target_path)):
-            context.log_artifact(DirArtifact(key=key, target_path=target_path))
-            return
+    v3io_subdir = None
+    # When custom artifact path is defined
+    if not target_path and context.artifact_path:
+        parsed_subdir = urlparse(context.artifact_path)
+        if parsed_subdir.scheme == 's3':
+            subdir = os.path.join(context.artifact_path, subdir)
+        elif parsed_subdir.scheme == 'v3io':
+            v3io_subdir = os.path.join(context.artifact_path, subdir) # Using v3io_subdir for logging
+            subdir = '/v3io' + parsed_subdir.path + '/' + subdir
+            context.logger.info(f'Using v3io scheme, extracting to {subdir}')
         else:
-            kwargs = {"target_path": target_path}
-    else:
-        kwargs = {"local_path": subdir}
+            context.logger.info(f'Unrecognizable scheme, extracting to {subdir}')
+            
+    # When working on CE, target path might be on s3
+    if 's3' in (target_path or subdir):
+        context.logger.info(f'Using s3 scheme, extracting to {target_path or subdir}')
+        if os.environ.get('S3_ENDPOINT_URL'):
+            client = boto3.client('s3', endpoint_url = os.environ.get('S3_ENDPOINT_URL')) 
+        else:
+            client = boto3.client('s3')  
+            
+        if archive_url.endswith("gz"):
+            with tarfile.open(archive_url, mode="r|gz") as ref:
+                for filename in ref.namelist():
+                    data=ref.read(filename)
+                    client.put_object(Body=data, Bucket=urlparse(target_path or subdir).netloc, Key=f'{urlparse(target_path or subdir).path[1:]}{filename}')
+
+        elif archive_url.endswith("zip"):
+            with zipfile.ZipFile(archive_url, "r") as ref:
+                for filename in ref.namelist():
+                    data=ref.read(filename)
+                    client.put_object(Body=data, Bucket=urlparse(target_path or subdir).netloc, Key=f'{urlparse(target_path or subdir).path[1:]}{filename}')
+        else:
+            raise ValueError(f"unsupported archive type in {archive_url}")
     
-    context.log_artifact(key, **kwargs)
+    else:
+        os.makedirs(target_path or subdir, exist_ok=True)
+        if archive_url.endswith("gz"):
+            with tarfile.open(archive_url, mode="r|gz") as ref:
+                ref.extractall(target_path or subdir)
+        elif archive_url.endswith("zip"):
+            with zipfile.ZipFile(archive_url, "r") as ref:
+                ref.extractall(target_path or subdir)
+        else:
+            raise ValueError(f"unsupported archive type in {archive_url}")
+            
+    if v3io_subdir:
+        subdir = v3io_subdir
+        
+    context.logger.info(f'Logging artifact to {(target_path or subdir)}')
+    context.log_artifact(DirArtifact(key=key, target_path=(target_path or subdir)))

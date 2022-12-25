@@ -1,0 +1,25 @@
+apiVersion: v1
+categories:
+- data-validation
+- data-analysis
+description: Validate a dataset using Great Expectations
+doc: ''
+example: 2_validate_expectations.ipynb
+generationDate: 2022-04-26:12-28
+icon: ''
+labels:
+  author: nicks
+  framework: great-expectations
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.1.0
+name: great-expectations
+platformVersion: 3.5.2
+spec:
+  filename: great_expectations_mlrun.py
+  handler: validate_expectations
+  image: mlrun/mlrun
+  kind: job
+  requirements: [great-expectations==0.15.41]
+url: ''
+version: 1.0.0

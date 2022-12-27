@@ -27,8 +27,13 @@ import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
-from mlrun.artifacts import (Artifact, DatasetArtifact, PlotlyArtifact,
-                             TableArtifact, update_dataset_meta)
+from mlrun.artifacts import (
+    Artifact,
+    DatasetArtifact,
+    PlotlyArtifact,
+    TableArtifact,
+    update_dataset_meta,
+)
 from mlrun.datastore import DataItem
 from mlrun.execution import MLClientCtx
 from mlrun.feature_store import FeatureSet, FeatureVector
@@ -265,7 +270,13 @@ def _create_features_histogram_artifacts(
                                 "visible": [
                                     key.split("@?@")[0] == column_name
                                     for key in figs.keys()
-                                ]
+                                ],
+                                "xaxis": {
+                                    "range": [
+                                        min(df[column_name]),
+                                        max(df[column_name]),
+                                    ]
+                                },
                             },
                             {"title": f"<i><b>Histogram of {column_name}</b></i>"},
                         ],

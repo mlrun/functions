@@ -6,6 +6,7 @@ description: Validate a dataset using Great Expectations
 doc: ''
 example: 2_validate_expectations.ipynb
 generationDate: 2022-04-26:12-28
+hidden: false
 icon: ''
 labels:
   author: nicks

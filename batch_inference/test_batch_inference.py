@@ -95,6 +95,7 @@ def test_batch_predict():
             "model": train_run.outputs["model"],
             # "label_columns": "label",
             "result_set_name": "result_set",
+            "weights": {"feature_1": 0.25, "feature_2": 0.7, "feature_3": 0.05},
         },
         local=True,
     )
@@ -118,8 +119,10 @@ def test_batch_predict():
     assert len(drift_results) == n_features + 1
 
     # Check the final analysis logged results:
-    assert "drift_status" in batch_predict_run.status.results
-    assert "drift_metric" in batch_predict_run.status.results
+    assert "features_drift_status" in batch_predict_run.status.results
+    assert "features_drift_metric" in batch_predict_run.status.results
+    assert "labels_drift_status" in batch_predict_run.status.results
+    assert "labels_drift_metric" in batch_predict_run.status.results
 
     # Clear outputs:
     artifact_path.cleanup()

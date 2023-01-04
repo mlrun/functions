@@ -153,6 +153,35 @@ def _prepare_result_set(
     )
 
 
+def _parse_weights(
+    features: List[str], labels: List[str], weights: Dict[str, float]
+) -> Dict[str, float]:
+    """
+    Parse the given weights so missing features will be 0.0 or if not given, a default weights will be assigned.
+
+    :param features: List of features.
+    :param labels:   List of labels.
+    :param weights:  The user's weights.
+
+    :return: The parsed weights.
+    """
+    # If no weights are given, make weights all equal (to represent a simple average):
+    if weights is None:
+        feature_weight = 1 / len(features)
+        label_weight = 1 / len(labels)
+        return {
+            **{feature: feature_weight for feature in features},
+            **{label: label_weight for label in labels},
+        }
+
+    # Zero out missing features and labels:
+    for possible_weight_keys in [features, labels]:
+        for key in possible_weight_keys:
+            if key not in weights:
+                weights[key] = 0.0
+    return weights
+
+
 def _get_sample_set_statistics(
     sample_set: DatasetType = None, model_artifact_feature_stats: dict = None
 ) -> dict:
@@ -187,31 +216,33 @@ def _get_sample_set_statistics(
     return get_df_stats(df=sample_set, options=InferOptions.Histogram)
 
 
-def _get_drift_result(
-    tvd: float,
-    hellinger: float,
-    threshold: float,
-) -> Tuple[bool, float]:
+def _calculate_final_score(
+    columns, drift_results, weights, threshold
+) -> Tuple[float, bool]:
     """
-    Calculate the drift result by the following equation: (tvd + hellinger) / 2
+    Calculate the final drift result on the specified columns.
 
-    :param tvd:       The feature's TVD value.
-    :param hellinger: The feature's Hellinger value.
-    :param threshold: The threshold from which the value is considered a drift.
+    :param columns:       The columns to include in the final score.
+    :param drift_results: The columns results.
+    :param weights:       The weights to use.
+    :param threshold:     The threshold from which the value is considered a drift.
 
     :returns: A tuple of:
-              [0] = Boolean value as the drift status.
-              [1] = The result.
+              [0] = The result.
+              [1] = Boolean value as the drift status.
     """
-    result = (tvd + hellinger) / 2
-    if result >= threshold:
-        return True, result
-    return False, result
+    result = sum(drift_results[column] * weights[column] for column in columns)
+    if result < threshold:
+        return result, False
+    return result, True
 
 
 def _perform_drift_analysis(
+    features: List[str],
+    labels: List[str],
     sample_set_statistics: dict,
     inputs: pd.DataFrame,
+    weights: Dict[str, float],
     drift_threshold: float,
     possible_drift_threshold: float,
     inf_capping: float,
@@ -219,8 +250,11 @@ def _perform_drift_analysis(
     """
     Perform drift analysis, producing the drift table artifact for logging post prediction.
 
+    :param features:                 The features names.
+    :param labels:                   The labels names.
     :param sample_set_statistics:    The statistics of the sample set logged along a model.
     :param inputs:                   Input dataset to perform the drift calculation on.
+    :param weights:                  Weights dictionary.
     :param drift_threshold:          The threshold of which to mark drifts.
     :param possible_drift_threshold: The threshold of which to mark possible drifts.
     :param inf_capping:              The value to set for when it reached infinity.
@@ -249,23 +283,23 @@ def _perform_drift_analysis(
     )
 
     # Validate all feature columns named the same between the inputs and sample sets:
-    sample_features = set(
+    sample_columns = set(
         [
-            feature_name
-            for feature_name, feature_statistics in sample_set_statistics.items()
-            if isinstance(feature_statistics, dict)
+            column_name
+            for column_name, column_statistics in sample_set_statistics.items()
+            if isinstance(column_statistics, dict)
         ]
     )
-    input_features = set(inputs.columns)
-    if len(sample_features & input_features) != len(input_features):
+    input_columns = set(inputs.columns)
+    if len(sample_columns & input_columns) != len(input_columns):
         raise mlrun.errors.MLRunInvalidArgumentError(
-            f"Not all feature names were matching between the inputs and the sample set provided: "
-            f"{input_features - sample_features | sample_features - input_features}"
+            f"Not all column names (features and labels) were matching between the inputs and the sample set provided: "
+            f"{input_columns - sample_columns | sample_columns - input_columns}"
         )
 
     # Plot:
     html_plot = FeaturesDriftTablePlot().produce(
-        features=list(input_features),
+        features=list(input_columns),
         sample_set_statistics=sample_set_statistics,
         inputs_statistics=inputs_statistics,
         metrics=metrics,
@@ -273,34 +307,51 @@ def _perform_drift_analysis(
     )
 
     # Prepare metrics per feature dictionary:
-    metrics_per_feature = {
-        feature: _get_drift_result(
-            tvd=metric_dictionary["tvd"],
-            hellinger=metric_dictionary["hellinger"],
-            threshold=drift_threshold,
-        )[1]
-        for feature, metric_dictionary in metrics.items()
+    metrics_per_column = {
+        column: (metric_dictionary["tvd"] + metric_dictionary["hellinger"]) / 2
+        for column, metric_dictionary in metrics.items()
         if isinstance(metric_dictionary, dict)
     }
 
+    # Parse the weights:
+    weights = _parse_weights(features=features, labels=labels, weights=weights)
+
     # Calculate the final analysis result:
-    drift_status, drift_metric = _get_drift_result(
-        tvd=metrics["tvd_mean"],
-        hellinger=metrics["hellinger_mean"],
+    results = {}
+    (
+        results["features_drift_status"],
+        results["features_drift_metric"],
+    ) = _calculate_final_score(
+        columns=features,
+        drift_results=metrics_per_column,
+        weights=weights,
         threshold=drift_threshold,
     )
+    if labels:
+        (
+            results["labels_drift_status"],
+            results["labels_drift_metric"],
+        ) = _calculate_final_score(
+            columns=features,
+            drift_results=metrics_per_column,
+            weights=weights,
+            threshold=drift_threshold,
+        )
 
     return (
         Artifact(body=html_plot, format="html", key="drift_table_plot"),
         Artifact(
-            body=json.dumps(metrics_per_feature),
+            body=json.dumps(metrics_per_column),
             format="json",
             key="features_drift_results",
         ),
-        {"drift_status": drift_status, "drift_metric": drift_metric},
+        results,
     )
 
 
+# TODO: Add a string option for `weights` parameter: `"feature-importance"` to use the model's feature importance as
+#       weights. Only possible if the model has a feature importance attribute. If the model doesn't have feature
+#       importance attribute, a warning will be shown and no weights will be applied.
 def infer(
     context: mlrun.MLClientCtx,
     model: str,
@@ -312,6 +363,7 @@ def infer(
     batch_id: str = None,
     perform_drift_analysis: bool = None,
     sample_set: DatasetType = None,
+    weights: Dict[str, float] = None,
     drift_threshold: float = 0.7,
     possible_drift_threshold: float = 0.5,
     inf_capping: float = 10.0,
@@ -346,6 +398,9 @@ def infer(
                                      table artifact.
     :param sample_set:               A sample dataset to give to compare the inputs in the drift analysis. The default
                                      chosen sample set will always be the one who is set in the model artifact itself.
+    :param weights:                  A dictionary of feature names keys (`str`) and their weights as values (`float`)
+                                     to apply on the drift results. `None` means no weights are used and every feature
+                                     will have an equal say in the final score (a simple average). Default: None.
     :param drift_threshold:          The threshold of which to mark drifts. Defaulted to 0.7.
     :param possible_drift_threshold: The threshold of which to mark possible drifts. Defaulted to 0.5.
     :param inf_capping:              The value to set for when it reached infinity. Defaulted to 10.0.
@@ -405,14 +460,21 @@ def infer(
             sample_set=sample_set,
             model_artifact_feature_stats=model_handler._model_artifact.spec.feature_stats,
         )
-        # Produce the artifact:
+        # Get the features names:
+        features = [
+            feature for feature in result_set.columns if feature not in label_columns
+        ]
+        # Produce the artifacts:
         (
             drift_table_plot,
             metric_per_feature_dict,
             analysis_results,
         ) = _perform_drift_analysis(
+            features=features,
+            labels=label_columns,
             sample_set_statistics=sample_set_statistics,
             inputs=result_set,
+            weights=weights,
             drift_threshold=drift_threshold,
             possible_drift_threshold=possible_drift_threshold,
             inf_capping=inf_capping,

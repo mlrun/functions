@@ -20,6 +20,7 @@ import numpy as np
 import os
 import json
 import mlrun
+import mlrun.api.schemas
 
 # Feature selection strategies
 from sklearn.feature_selection import SelectKBest
@@ -33,10 +34,18 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils import all_estimators
 
 # MLRun utils
-from mlrun.mlutils.plots import gcf_clear
 from mlrun.utils.helpers import create_class
 from mlrun.artifacts import PlotArtifact
 from mlrun.datastore.targets import ParquetTarget
+
+
+def _clear_current_figure():
+    """
+    Clear matplotlib current figure.
+    """
+    plt.cla()
+    plt.clf()
+    plt.close()
 
 
 def show_values_on_bars(axs, h_v="v", space=0.4):
@@ -64,7 +73,7 @@ def show_values_on_bars(axs, h_v="v", space=0.4):
 def plot_stat(context,
               stat_name,
               stat_df):
-    gcf_clear(plt)
+    _clear_current_figure()
 
     # Add chart
     ax = plt.axes()
@@ -82,7 +91,7 @@ def plot_stat(context,
 
     context.log_artifact(PlotArtifact(f'{stat_name}', body=plt.gcf()),
                          local_path=os.path.join('plots', 'feature_selection', f'{stat_name}.html'))
-    gcf_clear(plt)
+    _clear_current_figure()
 
 
 def feature_selection(context,

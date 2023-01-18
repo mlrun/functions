@@ -6,7 +6,7 @@ description: Select features through multiple Statistical and Model filters
 doc: ''
 example: feature_selection.ipynb
 generationDate: 2022-08-28:17-25
-hidden: true
+hidden: false
 icon: ''
 labels:
   author: orz

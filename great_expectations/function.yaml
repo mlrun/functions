@@ -1,0 +1,172 @@
+kind: job
+metadata:
+  name: validate-expectations
+  tag: ''
+  hash: 97a18b324f1212e7663ba46a8bcee96de0d316c0
+  project: great-expectations
+spec:
+  command: ''
+  args: []
+  image: ''
+  build:
+    functionSourceCode: aW1wb3J0IG9zCmltcG9ydCBzaHV0aWwKCmltcG9ydCBtbHJ1bgoKZnJvbSBncmVhdF9leHBlY3RhdGlvbnMuY29yZS5iYXRjaCBpbXBvcnQgUnVudGltZUJhdGNoUmVxdWVzdApmcm9tIGdyZWF0X2V4cGVjdGF0aW9ucy5kYXRhX2NvbnRleHQgaW1wb3J0IEJhc2VEYXRhQ29udGV4dApmcm9tIGdyZWF0X2V4cGVjdGF0aW9ucy5kYXRhX2NvbnRleHQudHlwZXMuYmFzZSBpbXBvcnQgKAogICAgRGF0YUNvbnRleHRDb25maWcsCiAgICBGaWxlc3lzdGVtU3RvcmVCYWNrZW5kRGVmYXVsdHMsCikKZnJvbSBncmVhdF9leHBlY3RhdGlvbnMuY2hlY2twb2ludC50eXBlcy5jaGVja3BvaW50X3Jlc3VsdCBpbXBvcnQgQ2hlY2twb2ludFJlc3VsdAoKCmRlZiBnZXRfZGVmYXVsdF9kYXRhc291cmNlX2NvbmZpZygKICAgIGRhdGFzb3VyY2VfbmFtZTogc3RyLCBkYXRhX2Nvbm5lY3Rvcl9uYW1lOiBzdHIKKSAtPiBkaWN0OgogICAgIiIiCiAgICBDb252ZW5pZW5jZSBmdW5jdGlvbiB0byBnZXQgdGhlIGRlZmF1bHQgcGFuZGFzIGRhdGFzb3VyY2UgY29uZmlnCiAgICBmb3IgdXNlIGluIHZhbGlkYXRpbmcgZXhwZWN0YXRpb25zLgoKICAgIDpwYXJhbSBkYXRhc291cmNlX25hbWU6ICAgICBOYW1lIG9mIGRhdGFzb3VyY2UuCiAgICA6cGFyYW0gZGF0YV9jb25uZWN0b3JfbmFtZTogTmFtZSBvZiBkYXRhIGNvbm5lY3Rvci4KCiAgICA6cmV0dXJuczogQ29uZmlndXJhdGlvbiBmb3IgZGVmYXVsdCBkYXRhc291cmNlLgogICAgIiIiCiAgICBkZWZhdWx0X2RhdGFzb3VyY2VfY29uZmlnID0gewogICAgICAgICJuYW1lIjogZiJ7ZGF0YXNvdXJjZV9uYW1lfSIsCiAgICAgICAgImNsYXNzX25hbWUiOiAiRGF0YXNvdXJjZSIsCiAgICAgICAgIm1vZHVsZV9uYW1lIjogImdyZWF0X2V4cGVjdGF0aW9ucy5kYXRhc291cmNlIiwKICAgICAgICAiZXhlY3V0aW9uX2VuZ2luZSI6IHsKICAgICAgICAgICAgIm1vZHVsZV9uYW1lIjogImdyZWF0X2V4cGVjdGF0aW9ucy5leGVjdXRpb25fZW5naW5lIiwKICAgICAgICAgICAgImNsYXNzX25hbWUiOiAiUGFuZGFzRXhlY3V0aW9uRW5naW5lIiwKICAgICAgICB9LAogICAgICAgICJkYXRhX2Nvbm5lY3RvcnMiOiB7CiAgICAgICAgICAgIGYie2RhdGFfY29ubmVjdG9yX25hbWV9IjogewogICAgICAgICAgICAgICAgImNsYXNzX25hbWUiOiAiUnVudGltZURhdGFDb25uZWN0b3IiLAogICAgICAgICAgICAgICAgIm1vZHVsZV9uYW1lIjogImdyZWF0X2V4cGVjdGF0aW9ucy5kYXRhc291cmNlLmRhdGFfY29ubmVjdG9yIiwKICAgICAgICAgICAgICAgICJiYXRjaF9pZGVudGlmaWVycyI6IFsiZGVmYXVsdF9pZGVudGlmaWVyX25hbWUiXSwKICAgICAgICAgICAgfSwKICAgICAgICB9LAogICAgfQogICAgcmV0dXJuIGRlZmF1bHRfZGF0YXNvdXJjZV9jb25maWcKCgpkZWYgZ2V0X2RlZmF1bHRfY2hlY2twb2ludF9jb25maWcoY2hlY2twb2ludF9uYW1lOiBzdHIpIC0+IGRpY3Q6CiAgICAiIiIKICAgIENvbnZlbmllbmNlIGZ1bmN0aW9uIHRvIGdldCB0aGUgZGVmYXVsdCBjaGVja3BvaW50IGNvbmZpZyBmb3IKICAgIHVzZSBpbiB2YWxpZGF0aW5nIGV4cGVjdGF0aW9ucy4KCiAgICA6cGFyYW0gY2hlY2twb2ludF9uYW1lOiBOYW1lIG9mIGNoZWNrcG9pbnQuCgogICAgOnJldHVybnM6IENvbmZpZ3VyYXRpb24gZm9yIGRlZmF1bHQgY2hlY2twb2ludC4KICAgICIiIgogICAgcmV0dXJuIHsKICAgICAgICAibmFtZSI6IGNoZWNrcG9pbnRfbmFtZSwKICAgICAgICAiY29uZmlnX3ZlcnNpb24iOiAxLjAsCiAgICAgICAgImNsYXNzX25hbWUiOiAiU2ltcGxlQ2hlY2twb2ludCIsCiAgICAgICAgInJ1bl9uYW1lX3RlbXBsYXRlIjogIiVZJW0lZC0lSCVNJVMtbXktcnVuLW5hbWUtdGVtcGxhdGUiLAogICAgfQoKCmRlZiBnZXRfZGF0YV9kb2NfcGF0aChjaGVja3BvaW50X3Jlc3VsdDogQ2hlY2twb2ludFJlc3VsdCkgLT4gc3RyOgogICAgIiIiCiAgICBDb252ZW5pZW5jZSBmdW5jdGlvbiB0byBnZXQgdGhlIHBhdGggb2YgdGhlIG91dHB1dAogICAgZGF0YSBkb2MgZnJvbSBhIGNoZWNrcG9pbnQgcmVzdWx0LgoKICAgIDpwYXJhbSBjaGVja3BvaW50X3Jlc3VsdDogR3JlYXQgRXhwZWN0YXRpb25zIGNoZWNrcG9pbnQgcmVzdWx0LgoKICAgIDpyZXR1cm5zOiBBYnNvbHV0ZSBwYXRoIHRvIG5ldyBkYXRhIGRvYy4KICAgICIiIgogICAgcmVzdWx0X2lkID0gY2hlY2twb2ludF9yZXN1bHQubGlzdF92YWxpZGF0aW9uX3Jlc3VsdF9pZGVudGlmaWVycygpWzBdCiAgICBkYXRhX2RvY19wYXRoID0gY2hlY2twb2ludF9yZXN1bHRbInJ1bl9yZXN1bHRzIl1bcmVzdWx0X2lkXVsiYWN0aW9uc19yZXN1bHRzIl1bCiAgICAgICAgInVwZGF0ZV9kYXRhX2RvY3MiCiAgICBdWyJsb2NhbF9zaXRlIl0KICAgIGRhdGFfZG9jX3BhdGggPSBkYXRhX2RvY19wYXRoLnJlcGxhY2UoImZpbGU6Ly8iLCAiIikKICAgIHJldHVybiBkYXRhX2RvY19wYXRoCgoKZGVmIHZhbGlkYXRlX2V4cGVjdGF0aW9ucygKICAgIGNvbnRleHQ6IG1scnVuLk1MQ2xpZW50Q3R4LAogICAgZGF0YTogbWxydW4uRGF0YUl0ZW0sCiAgICBleHBlY3RhdGlvbl9zdWl0ZV9uYW1lOiBzdHIsCiAgICBkYXRhX2Fzc2V0X25hbWU6IHN0ciwKICAgIGRhdGFzb3VyY2VfbmFtZTogc3RyID0gInBhbmRhc19kYXRhc291cmNlIiwKICAgIGRhdGFfY29ubmVjdG9yX25hbWU6IHN0ciA9ICJkZWZhdWx0X3J1bnRpbWVfZGF0YV9jb25uZWN0b3JfbmFtZSIsCiAgICBkYXRhc291cmNlX2NvbmZpZzogZGljdCA9IE5vbmUsCiAgICBiYXRjaF9pZGVudGlmaWVyczogZGljdCA9IE5vbmUsCiAgICByb290X2RpcmVjdG9yeTogc3RyID0gTm9uZSwKICAgIGNoZWNrcG9pbnRfbmFtZTogc3RyID0gTm9uZSwKICAgIGNoZWNrcG9pbnRfY29uZmlnOiBkaWN0ID0gTm9uZSwKKSAtPiBOb25lOgogICAgIiIiCiAgICBNYWluIGZ1bmN0aW9uIHRvIHZhbGlkYXRlIGFuIGlucHV0IGRhdGFzZXQsIGRhdGFzb3VyY2UsIGRhdGEgY29ubmVjdG9yLAogICAgYW5kIGV4cGVjdGF0aW9uIHN1aXRlLgoKICAgIFJ1bnMgdGhlIEdyZWF0IEV4cGVjdGF0aW9uIHZhbGlkYXRpb24gYW5kIGxvZ3MKICAgIHdoZXRoZXIgdGhlIHZhbGlkYXRpb24gd2FzIGEgc3VjY2VzcyBhcyB3ZWxsIGFzIHRoZSBvdXRwdXQgcGFnZQogICAgb2YgdGhlIGRhdGEgZG9jcy4KCiAgICA6cGFyYW0gY29udGV4dDogICAgICAgICAgICAgICAgTUxSdW4gY29udGV4dC4KICAgIDpwYXJhbSBkYXRhOiAgICAgICAgICAgICAgICAgICBEYXRhIHRvIHZhbGlkYXRlLiBDYW4gYmUgbG9jYWwgb3IgcmVtb3RlIGxpbmsuCiAgICA6cGFyYW0gZXhwZWN0YXRpb25fc3VpdGVfbmFtZTogTmFtZSBvZiBleHBlY3RhdGlvbiBzdWl0ZSB0byB2YWxpZGF0ZSBhZ2FpbnN0LgogICAgOnBhcmFtIGRhdGFfYXNzZXRfbmFtZTogICAgICAgIE5hbWUgb2YgZGF0YXNldCBpbiBHcmVhdCBFeHBlY3RhdGlvbnMuCiAgICA6cGFyYW0gZGF0YXNvdXJjZV9uYW1lOiAgICAgICAgTmFtZSBvZiBkYXRhc291cmNlIHRvIHVzZSBmb3IgdmFsaWRhdGlvbi4KICAgIDpwYXJhbSBkYXRhX2Nvbm5lY3Rvcl9uYW1lOiAgICBOYW1lIG9mIGRhdGEgY29ubmVjdG9yIHRvIHVzZSBmb3IgdmFsaWRhdGlvbi4KICAgIDpwYXJhbSBkYXRhc291cmNlX2NvbmZpZzogICAgICBGdWxsIGNvbmZpZ3VyYXRpb24gZm9yIGRhdGFzb3VyY2UuIEZvciB1c2Ugd2l0aCBjdXN0b20KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkYXRhIHNvdXJjZXMgb3RoZXIgdGhhbiB0aGUgZGVmYXVsdCBwYW5kYXMgZGF0YXNvdXJjZS4KICAgIDpwYXJhbSBiYXRjaF9pZGVudGlmaWVyczogICAgICBDdXN0b20gbWV0YWRhdGEgZm9yIGlkZW50aWZ5aW5nIHBhcnRpY3VsYXIgYmF0Y2hlcyBvZgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRhdGEuIEZvciB1c2Ugd2hlbiBub3QgdXNpbmcgdGhlIGRlZmF1bHQgYmF0Y2ggaWRlbnRpZmllcnMuCiAgICA6cGFyYW0gcm9vdF9kaXJlY3Rvcnk6ICAgICAgICAgUGF0aCB0byB1bmRlcmx5aW5nIEdyZWF0IEV4cGVjdGF0aW9ucyBwcm9qZWN0LiBEZWZhdWx0cyB0bwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE1MUnVuIHByb2plY3QgYXJ0aWZhY3QgcGF0aCBpZiBub3Qgc3BlY2lmaWVkLgogICAgOnBhcmFtIGNoZWNrcG9pbnRfbmFtZTogICAgICAgIE5hbWUgb2YgY2hlY2twb2ludCB0byB1c2UgZm9yIHZhbGlkYXRpb24uCiAgICA6cGFyYW0gY2hlY2twb2ludF9jb25maWc6ICAgICAgRnVsbCBjb25maWd1cmF0aW9uIGZvciBjaGVja3BvaW50LiBGb3IgdXNlIHdpdGggY3VzdG9tZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNoZWNrcG9pbnQgY29uZmlnIG90aGVyIHRoYW4gdGhlIGRlZmF1bHQuCiAgICAiIiIKCiAgICAjIEdldCBkYXRhCiAgICBkZiA9IGRhdGEuYXNfZGYoKQoKICAgICMgVXNlIGRlZmF1bHQgcm9vdCBkaXJlY3RvcnkgZm9yIHByb2plY3QgaWYgbm90IHNwZWNpZmllZAogICAgcm9vdF9kaXJlY3RvcnkgPSAoCiAgICAgICAgcm9vdF9kaXJlY3RvcnkKICAgICAgICBpZiByb290X2RpcmVjdG9yeQogICAgICAgIGVsc2UgZiIvdjNpby9wcm9qZWN0cy97Y29udGV4dC5wcm9qZWN0fS9ncmVhdF9leHBlY3RhdGlvbnMiCiAgICApCgogICAgIyBMb2FkIGdyZWF0IGV4cGVjdGF0aW9ucyBjb250ZXh0CiAgICBnZV9jb250ZXh0ID0gQmFzZURhdGFDb250ZXh0KAogICAgICAgIHByb2plY3RfY29uZmlnPURhdGFDb250ZXh0Q29uZmlnKAogICAgICAgICAgICBzdG9yZV9iYWNrZW5kX2RlZmF1bHRzPUZpbGVzeXN0ZW1TdG9yZUJhY2tlbmREZWZhdWx0cygKICAgICAgICAgICAgICAgIHJvb3RfZGlyZWN0b3J5PXJvb3RfZGlyZWN0b3J5CiAgICAgICAgICAgICkKICAgICAgICApCiAgICApCgogICAgIyBHZXQgZXhwZWN0YXRpb24gc3VpdGUKICAgIGdlX2NvbnRleHQuZ2V0X2V4cGVjdGF0aW9uX3N1aXRlKGV4cGVjdGF0aW9uX3N1aXRlX25hbWU9ZXhwZWN0YXRpb25fc3VpdGVfbmFtZSkKCiAgICAjIEFkZCBkZWZhdWx0IGRhdGEgc291cmNlIGlmIG5vdCBzcGVjaWZpZWQKICAgIGRhdGFzb3VyY2VfY29uZmlnID0gKAogICAgICAgIGRhdGFzb3VyY2VfY29uZmlnCiAgICAgICAgaWYgZGF0YXNvdXJjZV9jb25maWcKICAgICAgICBlbHNlIGdldF9kZWZhdWx0X2RhdGFzb3VyY2VfY29uZmlnKGRhdGFzb3VyY2VfbmFtZSwgZGF0YV9jb25uZWN0b3JfbmFtZSkKICAgICkKICAgIGdlX2NvbnRleHQuYWRkX2RhdGFzb3VyY2UoKipkYXRhc291cmNlX2NvbmZpZykKCiAgICAjIEdldCBkYXRhIGJhdGNoCiAgICBiYXRjaF9pZGVudGlmaWVycyA9ICgKICAgICAgICBiYXRjaF9pZGVudGlmaWVycwogICAgICAgIGlmIGJhdGNoX2lkZW50aWZpZXJzCiAgICAgICAgZWxzZSB7ImRlZmF1bHRfaWRlbnRpZmllcl9uYW1lIjogImRlZmF1bHRfaWRlbnRpZmllciJ9CiAgICApCiAgICBiYXRjaF9yZXF1ZXN0ID0gUnVudGltZUJhdGNoUmVxdWVzdCgKICAgICAgICBkYXRhc291cmNlX25hbWU9ZGF0YXNvdXJjZV9uYW1lLAogICAgICAgIGRhdGFfY29ubmVjdG9yX25hbWU9ZGF0YV9jb25uZWN0b3JfbmFtZSwKICAgICAgICBkYXRhX2Fzc2V0X25hbWU9ZGF0YV9hc3NldF9uYW1lLAogICAgICAgIHJ1bnRpbWVfcGFyYW1ldGVycz17ImJhdGNoX2RhdGEiOiBkZn0sCiAgICAgICAgYmF0Y2hfaWRlbnRpZmllcnM9YmF0Y2hfaWRlbnRpZmllcnMsCiAgICApCgogICAgIyBHZXQgdmFsaWRhdG9yCiAgICB2YWxpZGF0b3IgPSBnZV9jb250ZXh0LmdldF92YWxpZGF0b3IoCiAgICAgICAgYmF0Y2hfcmVxdWVzdD1iYXRjaF9yZXF1ZXN0LAogICAgICAgIGV4cGVjdGF0aW9uX3N1aXRlX25hbWU9ZXhwZWN0YXRpb25fc3VpdGVfbmFtZSwKICAgICkKCiAgICAjIFVzZSBkZWZhdWx0IGNoZWNrcG9pbnQgbmFtZSBhbmQgY29uZmlnIGlmIG5vdCBzcGVjaWZpZWQKICAgIGNoZWNrcG9pbnRfbmFtZSA9ICgKICAgICAgICBjaGVja3BvaW50X25hbWUgaWYgY2hlY2twb2ludF9uYW1lIGVsc2UgZiJ7ZGF0YV9hc3NldF9uYW1lfV9jaGVja3BvaW50IgogICAgKQogICAgY2hlY2twb2ludF9jb25maWcgPSAoCiAgICAgICAgY2hlY2twb2ludF9jb25maWcKICAgICAgICBpZiBjaGVja3BvaW50X2NvbmZpZwogICAgICAgIGVsc2UgZ2V0X2RlZmF1bHRfY2hlY2twb2ludF9jb25maWcoY2hlY2twb2ludF9uYW1lKQogICAgKQoKICAgICMgQWRkIGNoZWNrcG9pbnQKICAgIGdlX2NvbnRleHQuYWRkX2NoZWNrcG9pbnQoKipjaGVja3BvaW50X2NvbmZpZykKCiAgICAjIFJ1biBleHBlY3RhdGlvbiBzdWl0ZSBvbiBjaGVja3BvaW50CiAgICBjaGVja3BvaW50X3Jlc3VsdCA9IGdlX2NvbnRleHQucnVuX2NoZWNrcG9pbnQoCiAgICAgICAgY2hlY2twb2ludF9uYW1lPWNoZWNrcG9pbnRfbmFtZSwKICAgICAgICB2YWxpZGF0aW9ucz1bCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJiYXRjaF9yZXF1ZXN0IjogYmF0Y2hfcmVxdWVzdCwKICAgICAgICAgICAgICAgICJleHBlY3RhdGlvbl9zdWl0ZV9uYW1lIjogZXhwZWN0YXRpb25fc3VpdGVfbmFtZSwKICAgICAgICAgICAgfQogICAgICAgIF0sCiAgICApCgogICAgIyBMb2cgc3VjY2VzcwogICAgY29udGV4dC5sb2dfcmVzdWx0KCJ2YWxpZGF0ZWQiLCBjaGVja3BvaW50X3Jlc3VsdFsic3VjY2VzcyJdKQoKICAgICMgTG9nIGRhdGEgZG9jCiAgICBkYXRhX2RvY19wYXRoID0gZ2V0X2RhdGFfZG9jX3BhdGgoY2hlY2twb2ludF9yZXN1bHQpCiAgICBjb250ZXh0LmxvZ19hcnRpZmFjdCgidmFsaWRhdGlvbl9yZXN1bHRzIiwgdGFyZ2V0X3BhdGg9ZGF0YV9kb2NfcGF0aCkK
+    base_image: mlrun/mlrun
+    commands:
+    - python -m pip install great-expectations==0.15.41
+    code_origin: ./great_expectations_mlrun.py
+    origin_filename: ./great_expectations_mlrun.py
+  entry_points:
+    get_default_datasource_config:
+      name: get_default_datasource_config
+      doc: 'Convenience function to get the default pandas datasource config
+
+        for use in validating expectations.'
+      parameters:
+      - name: datasource_name
+        type: str
+        doc: Name of datasource.
+        default: ''
+      - name: data_connector_name
+        type: str
+        doc: Name of data connector.
+        default: ''
+      outputs:
+      - default: ''
+        doc: Configuration for default datasource.
+        type: dict
+      lineno: 15
+    get_default_checkpoint_config:
+      name: get_default_checkpoint_config
+      doc: 'Convenience function to get the default checkpoint config for
+
+        use in validating expectations.'
+      parameters:
+      - name: checkpoint_name
+        type: str
+        doc: Name of checkpoint.
+        default: ''
+      outputs:
+      - default: ''
+        doc: Configuration for default checkpoint.
+        type: dict
+      lineno: 46
+    get_data_doc_path:
+      name: get_data_doc_path
+      doc: 'Convenience function to get the path of the output
+
+        data doc from a checkpoint result.'
+      parameters:
+      - name: checkpoint_result
+        type: CheckpointResult
+        doc: Great Expectations checkpoint result.
+        default: ''
+      outputs:
+      - default: ''
+        doc: Absolute path to new data doc.
+        type: str
+      lineno: 63
+    validate_expectations:
+      name: validate_expectations
+      doc: 'Main function to validate an input dataset, datasource, data connector,
+
+        and expectation suite.
+
+
+        Runs the Great Expectation validation and logs
+
+        whether the validation was a success as well as the output page
+
+        of the data docs.'
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: MLRun context.
+        default: ''
+      - name: data
+        type: DataItem
+        doc: Data to validate. Can be local or remote link.
+        default: ''
+      - name: expectation_suite_name
+        type: str
+        doc: Name of expectation suite to validate against.
+        default: ''
+      - name: data_asset_name
+        type: str
+        doc: Name of dataset in Great Expectations.
+        default: ''
+      - name: datasource_name
+        type: str
+        doc: Name of datasource to use for validation.
+        default: pandas_datasource
+      - name: data_connector_name
+        type: str
+        doc: Name of data connector to use for validation.
+        default: default_runtime_data_connector_name
+      - name: datasource_config
+        type: dict
+        doc: Full configuration for datasource. For use with custom data sources other
+          than the default pandas datasource.
+        default: null
+      - name: batch_identifiers
+        type: dict
+        doc: Custom metadata for identifying particular batches of data. For use when
+          not using the default batch identifiers.
+        default: null
+      - name: root_directory
+        type: str
+        doc: Path to underlying Great Expectations project. Defaults to MLRun project
+          artifact path if not specified.
+        default: null
+      - name: checkpoint_name
+        type: str
+        doc: Name of checkpoint to use for validation.
+        default: null
+      - name: checkpoint_config
+        type: dict
+        doc: Full configuration for checkpoint. For use with custome checkpoint config
+          other than the default.
+        default: null
+      outputs:
+      - default: ''
+      lineno: 80
+  description: ''
+  default_handler: validate_expectations
+  disable_auto_mount: false
+  env:
+  - name: V3IO_API
+    value: ''
+  - name: V3IO_USERNAME
+    value: ''
+  - name: V3IO_ACCESS_KEY
+    value: ''
+  - name: V3IO_FRAMESD
+    value: ''
+  resources:
+    requests:
+      memory: 1Mi
+      cpu: 25m
+    limits:
+      memory: 20Gi
+      cpu: '2'
+  priority_class_name: igz-workload-medium
+  preemption_mode: prevent
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: app.iguazio.com/lifecycle
+            operator: NotIn
+            values:
+            - preemptible
+          - key: eks.amazonaws.com/capacityType
+            operator: NotIn
+            values:
+            - SPOT
+          - key: node-lifecycle
+            operator: NotIn
+            values:
+            - spot
+  tolerations: null
+  security_context: {}
+verbose: false

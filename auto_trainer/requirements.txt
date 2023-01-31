@@ -1,5 +1,5 @@
 mlrun
 pandas
-sklearn
+scikit-learn
 xgboost
 lightgbm

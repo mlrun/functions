@@ -3,6 +3,6 @@ pandas
 typing
 xgboost
 matplotlib
-sklearn
+scikit-learn
 seaborn
 scikit-plot

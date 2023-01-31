@@ -3,6 +3,6 @@ dask
 yellowbrick
 matplotlib
 seaborn
-sklearn
+scikit-learn
 scikit-plot
 dask-kubernetes

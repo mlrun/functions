@@ -3,6 +3,6 @@ pandas
 xgboost
 cloudpickle
 pygit2
-sklearn
+scikit-learn
 scikit-plot
 seaborn

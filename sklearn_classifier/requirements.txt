@@ -1,6 +1,6 @@
 mlrun
 pandas
-sklearn
+scikit-learn
 matplotlib
 seaborn
 scikit-plot

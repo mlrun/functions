@@ -159,6 +159,9 @@ def train(
         label_columns=label_columns,
         drop_columns=drop_columns,
     )
+    # TODO: Remove dropna after fixing steps in feature store
+    #  This is a temporary change for fraud-prevention demo
+    dataset.dropna(inplace=True)
 
     # Getting the sample set:
     if sample_set is None:

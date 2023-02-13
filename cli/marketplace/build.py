@@ -154,8 +154,8 @@ def build_marketplace(
         marketplace_dir=marketplace_dir,
         catalog_path=(marketplace_dir / "catalog.json"),
         change_log=change_log,
-        with_functions_legacy=False,
-        add_artifacts=True,
+        in_channel_directory=False,
+        with_assets=True,
     )
 
     if _verbose:
@@ -215,19 +215,26 @@ def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
         update_or_create_item(item_dir, marketplace_dir, temp_docs, change_log)
 
 
-def add_object_and_source(function_name: str, yaml_obj):
-    yaml_obj["object"] = "src/function.yaml"
-    yaml_obj["source"] = f"src/{function_name}.py"
-    return yaml_obj
-
-
 def build_catalog_json(
     marketplace_dir: Union[str, Path],
     catalog_path: Union[str, Path],
     change_log: ChangeLog,
-    with_functions_legacy: bool = True,
-    add_artifacts: bool = False,
+    in_channel_directory: bool = True,
+    with_assets: bool = False,
 ):
+    """
+    Building JSON catalog with all the details of the functions in marketplace
+    Each function in the catalog is seperated into different versions of the function,
+    and in each version field, there is all the details that concerned the version.
+
+    :param marketplace_dir:         the root directory of the marketplace
+    :param catalog_path:            the path to the catalog
+    :param change_log:              logger of all changes
+    :param in_channel_directory:    if True the catalog will be written relatively to channel,
+                                    false is relatively to root (the catalog will contain the channels inside)
+    :param with_assets:             if True assets will be added to each version with the relative path to them
+                                    (API requirement)
+    """
     click.echo("Building catalog.json...")
 
     marketplace_dir = Path(marketplace_dir)
@@ -237,7 +244,7 @@ def build_catalog_json(
     catalog = json.load(open(catalog_path, "r")) if catalog_path.exists() else {}
 
     funcs = catalog
-    if with_functions_legacy:
+    if in_channel_directory:
         if source not in catalog:
             catalog[source] = {}
         if channel not in catalog[source]:
@@ -249,15 +256,7 @@ def build_catalog_json(
             continue
 
         latest_dir = source_dir / "latest"
-        source_yaml_path = latest_dir / "src" / "item.yaml"
-
-        latest_yaml = yaml.full_load(open(source_yaml_path, "r"))
-        latest_yaml["generationDate"] = str(latest_yaml["generationDate"])
-        latest_version = latest_yaml["version"]
-        if add_artifacts:
-            latest_yaml = add_object_and_source(
-                function_name=source_dir.name, yaml_obj=latest_yaml
-            )
+        latest_yaml = update_item_in_catalog(latest_dir, with_assets)
 
         # removing hidden function from catalog:
         if latest_yaml["hidden"]:
@@ -270,13 +269,7 @@ def build_catalog_json(
             version = version_dir.name
 
             if version != "latest":
-                version_yaml_path = version_dir / "src" / "item.yaml"
-                version_yaml = yaml.full_load(open(version_yaml_path, "r"))
-                version_yaml["generationDate"] = str(version_yaml["generationDate"])
-                if add_artifacts:
-                    version_yaml = add_object_and_source(
-                        function_name=source_dir.name, yaml_obj=version_yaml
-                    )
+                version_yaml = update_item_in_catalog(version_dir, with_assets)
                 if not latest_yaml["hidden"]:
                     funcs[source_dir.name][version] = version_yaml
 
@@ -287,6 +280,35 @@ def build_catalog_json(
             del funcs[function_dir]
 
     json.dump(catalog, open(catalog_path, "w"))
+
+
+def update_item_in_catalog(directory: Path, with_assets: bool) -> dict:
+    """
+    Updates the item yaml in catalog with and add assets if required
+    :param directory:   the version directory of the function
+    :param with_assets: add function's assets to support MLRun API
+    :return: Updated item yaml dictionary
+    """
+    source_yaml_path = directory / "src" / "item.yaml"
+
+    item_yaml = yaml.full_load(open(source_yaml_path, "r"))
+    item_yaml["generationDate"] = str(item_yaml["generationDate"])
+    if with_assets:
+        add_assets(item_yaml)
+    return item_yaml
+
+
+def add_assets(item_yaml: dict):
+    """
+    Adding assets to function's item yaml with the relative path for MLRun API
+
+    :param item_yaml: function's item yaml as a dict
+    """
+    if item_yaml.get("example"):
+        item_yaml["example"] = "src/" + item_yaml["example"]
+    if item_yaml["spec"].get("filename"):
+        item_yaml["spec"]["filename"] = "src/" + item_yaml["spec"]["filename"]
+    item_yaml["docs"] = f"static/documentation.html"
 
 
 def update_or_create_item(

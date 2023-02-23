@@ -348,6 +348,75 @@ def _create_compute_metrics(metrics: List[str]):
     return _compute_metrics
 
 
+def _edit_columns(
+    dataset: Dataset,
+    drop_columns: List[str] = None,
+    rename_columns: [str, str] = None,
+):
+    if drop_columns:
+        dataset = dataset.remove_columns(drop_columns)
+    if rename_columns:
+        dataset = dataset.rename_columns(rename_columns)
+    return dataset
+
+
+def _prepare_dataset(
+    context: MLClientCtx,
+    dataset_name: str,
+    label_name: str = None,
+    drop_columns: Optional[List[str]] = None,
+    num_of_train_samples: int = None,
+    train_test_split_size: float = None,
+    random_state: int = None,
+):
+    """
+    Loading the dataset and editing the columns
+
+    :param context:                 MLRun contex
+    :param dataset_name:            The name of the dataset to get from the HuggingFace hub
+    :param label_name:
+    :param drop_columns:            The columns to drop from the dataset.
+    :param num_of_train_samples:    Max number of training samples, for debugging.
+    :param train_test_split_size:   Should be between 0.0 and 1.0 and represent the proportion of the dataset to include
+                                    in the test split.
+    :param random_state:            Random state for train_test_split
+
+    """
+
+    context.logger.info(
+        f"Loading and editing {dataset_name} dataset from Hugging Face hub"
+    )
+    rename_cols = {label_name: "labels"}
+
+    # Loading and editing dataset:
+    dataset = load_dataset(dataset_name)
+
+    # train set
+    train_dataset = dataset["train"]
+    if num_of_train_samples:
+        train_dataset = train_dataset.shuffle(seed=random_state).select(
+            list(range(num_of_train_samples))
+        )
+    train_dataset = _edit_columns(train_dataset, drop_columns, rename_cols)
+
+    # test set
+    test_dataset = dataset["test"]
+    if train_test_split_size or num_of_train_samples:
+        train_test_split_size = train_test_split_size or 0.2
+        num_of_test_samples = int(
+            (train_dataset.num_rows * train_test_split_size) // (1 - train_test_split_size)
+        )
+        test_dataset = (
+            test_dataset
+            .shuffle(seed=random_state)
+            .select(list(range(num_of_test_samples)))
+        )
+    test_dataset = _edit_columns(test_dataset, drop_columns, rename_cols)
+
+    return train_dataset, test_dataset
+
+
+
 def train(
     context: MLClientCtx,
     dataset_name: str = None,
@@ -366,7 +435,6 @@ def train(
     """
     Training and evaluating a pretrained model with a pretrained tokenizer over a dataset.
 
-    :param num_of_train_samples:
     :param context:                 MLRun context
     :param dataset_name:            The name of the dataset to get from the HuggingFace hub
     :param drop_columns:            The columns to drop from the dataset.
@@ -374,25 +442,19 @@ def train(
     :param pretrained_model:        The name of the pretrained model from the HuggingFace hub.
     :param model_name:              The model's name to use for storing the model artifact, default to 'model'
     :param model_class:             The class of the model, e.g. `transformers.AutoModelForSequenceClassification`
+    :param label_name:              The target label of the column in the dataset.
+    :param text_col:                The input text column un the dataset.
+    :param num_of_train_samples:    Max number of training samples, for debugging.
     :param train_test_split_size:   Should be between 0.0 and 1.0 and represent the proportion of the dataset to include
-                                    in the test split. The size of the Training set is set to the complement of this
-                                    value. Default = 0.2
-    :param label_names:             The target label(s) of the column(s) in the dataset. for Regression or
-                                    Classification tasks
-    :param metrics:                 ???
-    :param random_state:            Random state for `train_test_split`
+                                    in the test split.
+    :param metrics:                 List of different metrics for evaluate the model such as f1, accuracy etc.
+    :param random_state:            Random state for train_test_split
     """
 
     if not label_name or not pretrained_tokenizer:
         raise mlrun.errors.MLRunRuntimeError(
             "Must provide label_names and pretrained_tokenizer"
         )
-
-    if train_test_split_size is None:
-        context.logger.info(
-            "test_set or train_test_split_size are not provided, setting train_test_split_size to 0.2"
-        )
-        train_test_split_size = 0.2
 
     # Creating tokenizer:
     tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
@@ -401,14 +463,13 @@ def train(
         return tokenizer(examples[text_col], truncation=True)
 
     # prepare data for training
-    train_dataset, test_dataset = prepare_dataset(
+    train_dataset, test_dataset = _prepare_dataset(
         context,
         dataset_name,
         label_name,
         drop_columns,
         num_of_train_samples,
         train_test_split_size,
-        to_pandas=False,
         random_state=random_state,
     )
 
@@ -459,71 +520,3 @@ def train(
     # Apply training with evaluation:
     context.logger.info(f"training '{model_name}'")
     trainer.train()
-
-
-def _edit_columns(
-    dataset: Dataset,
-    drop_columns: List[str] = None,
-    rename_columns: [str, str] = None,
-):
-    if drop_columns:
-        dataset = dataset.remove_columns(drop_columns)
-    if rename_columns:
-        dataset = dataset.rename_columns(rename_columns)
-    return dataset
-
-
-def prepare_dataset(
-    context: MLClientCtx,
-    dataset_name: str,
-    label_name: str = None,
-    drop_columns: Optional[List[str]] = None,
-    num_of_train_samples: int = None,
-    train_test_split_size: float = 0.2,
-    to_pandas: bool = True,
-    random_state: int = None,
-):
-    """
-    Loading the dataset and editing the columns
-
-    :param label_name:
-    :param context:                 MLRun context
-    :param to_pandas:
-    :param train_test_split_size:
-    :param num_of_train_samples:
-    :param dataset_name:            The name of the dataset to get from the HuggingFace hub
-    :param drop_columns:            The columns to drop from the dataset.
-    :param random_state:            Random state for `train_test_split`
-
-    """
-
-    context.logger.info(
-        f"Loading and editing {dataset_name} dataset from Hugging Face hub"
-    )
-    rename_cols = {label_name: "labels"}
-
-    # Loading and editing dataset:
-    dataset = load_dataset(dataset_name)
-
-    # train set
-    train_dataset = dataset["train"]
-    if num_of_train_samples:
-        train_dataset = train_dataset.shuffle(seed=random_state).select(
-            list(range(num_of_train_samples))
-        )
-    train_dataset = _edit_columns(train_dataset, drop_columns, rename_cols)
-
-    # test set
-    num_of_test_samples = int(
-        (train_dataset.num_rows * train_test_split_size) // (1 - train_test_split_size)
-    )
-    test_dataset = (
-        dataset["test"]
-        .shuffle(seed=random_state)
-        .select(list(range(num_of_test_samples)))
-    )
-    test_dataset = _edit_columns(test_dataset, drop_columns, rename_cols)
-
-    if to_pandas:
-        return train_dataset.to_pandas(), test_dataset.to_pandas()
-    return train_dataset, test_dataset

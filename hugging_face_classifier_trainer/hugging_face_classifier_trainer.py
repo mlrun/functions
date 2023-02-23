@@ -2,11 +2,11 @@ import os
 import shutil
 import tempfile
 from abc import ABC
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Any
 
 import mlrun
 import numpy as np
-import optimum.onnxruntime as optimum_ort
+
 import transformers
 from datasets import Dataset, load_dataset, load_metric
 from mlrun import MLClientCtx
@@ -264,7 +264,7 @@ class MLRunCallback(TrainerCallback):
 
 
 def apply_mlrun(
-    huggingface_object: Union[optimum_ort.ORTOptimizer, transformers.Trainer],
+    huggingface_object: transformers.Trainer,
     model_name: str = None,
     tag: str = "",
     context: mlrun.MLClientCtx = None,
@@ -356,7 +356,8 @@ def train(
     pretrained_model: str = None,
     model_class: str = None,
     model_name: str = "huggingface_model",
-    label_names: List[str] = None,
+    label_name: str = "labels",
+    text_col: str = "text",
     num_of_train_samples: int = None,
     train_test_split_size: float = None,
     metrics: List[str] = None,
@@ -382,6 +383,11 @@ def train(
     :param random_state:            Random state for `train_test_split`
     """
 
+    if not label_name or not pretrained_tokenizer:
+        raise mlrun.errors.MLRunRuntimeError(
+            "Must provide label_names and pretrained_tokenizer"
+        )
+
     if train_test_split_size is None:
         context.logger.info(
             "test_set or train_test_split_size are not provided, setting train_test_split_size to 0.2"
@@ -392,12 +398,13 @@ def train(
     tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
 
     def preprocess_function(examples):
-        return tokenizer(examples["text"], truncation=True)
+        return tokenizer(examples[text_col], truncation=True)
 
     # prepare data for training
     train_dataset, test_dataset = prepare_dataset(
         context,
         dataset_name,
+        label_name,
         drop_columns,
         num_of_train_samples,
         train_test_split_size,
@@ -421,18 +428,17 @@ def train(
     )
 
     # Loading our pretrained model:
-    model_class_kwargs["pretrained_model"] = (
-        model_class_kwargs.get("pretrained_model") or pretrained_model
+    model_class_kwargs["pretrained_model_name_or_path"] = (
+        model_class_kwargs.get("pretrained_model_name_or_path") or pretrained_model
     )
-    if not model_class_kwargs["pretrained_model"]:
+    if not model_class_kwargs["pretrained_model_name_or_path"]:
         raise mlrun.errors.MLRunRuntimeError(
             "Must provide pretrained_model name as "
             "function argument or in extra params"
         )
-    model = create_class(model_class)(**model_class_kwargs)
+    model = create_class(model_class).from_pretrained(**model_class_kwargs)
 
     # Preparing training arguments:
-    train_kwargs["label_names"] = train_kwargs.get("label_names") or label_names
     training_args = TrainingArguments(
         **train_kwargs,
     )
@@ -470,6 +476,7 @@ def _edit_columns(
 def prepare_dataset(
     context: MLClientCtx,
     dataset_name: str,
+    label_name: str = None,
     drop_columns: Optional[List[str]] = None,
     num_of_train_samples: int = None,
     train_test_split_size: float = 0.2,
@@ -479,6 +486,7 @@ def prepare_dataset(
     """
     Loading the dataset and editing the columns
 
+    :param label_name:
     :param context:                 MLRun context
     :param to_pandas:
     :param train_test_split_size:
@@ -492,6 +500,8 @@ def prepare_dataset(
     context.logger.info(
         f"Loading and editing {dataset_name} dataset from Hugging Face hub"
     )
+    rename_cols = {label_name: "labels"}
+
     # Loading and editing dataset:
     dataset = load_dataset(dataset_name)
 
@@ -501,7 +511,7 @@ def prepare_dataset(
         train_dataset = train_dataset.shuffle(seed=random_state).select(
             list(range(num_of_train_samples))
         )
-    train_dataset = _edit_columns(train_dataset, drop_columns)
+    train_dataset = _edit_columns(train_dataset, drop_columns, rename_cols)
 
     # test set
     num_of_test_samples = int(
@@ -512,7 +522,7 @@ def prepare_dataset(
         .shuffle(seed=random_state)
         .select(list(range(num_of_test_samples)))
     )
-    test_dataset = _edit_columns(test_dataset, drop_columns)
+    test_dataset = _edit_columns(test_dataset, drop_columns, rename_cols)
 
     if to_pandas:
         return train_dataset.to_pandas(), test_dataset.to_pandas()

@@ -5,7 +5,7 @@ categories:
 description: Automatic train, evaluate and predict functions for the ML frameworks
   - Scikit-Learn, XGBoost and LightGBM.
 doc: ''
-example: hugging_face_trainer.ipynb
+example: hugging_face_classifier_trainer.ipynb
 generationDate: 2022-08-28:17-25
 hidden: false
 icon: ''
@@ -14,10 +14,10 @@ labels:
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 1.3.0-rc29
-name: hugging_face_trainer
+name: hugging_face_classifier_trainer
 platformVersion: 3.5.0
 spec:
-  filename: hugging_face_trainer.py
+  filename: hugging_face_classifier_trainer.py
   handler: train
   image: mlrun/mlrun
   kind: job

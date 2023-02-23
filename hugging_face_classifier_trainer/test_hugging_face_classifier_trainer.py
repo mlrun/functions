@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from typing import Tuple
 import os
+from typing import Tuple
+
 import mlrun
 import pandas as pd
 import pytest
 from mlrun import import_function
-
 
 MODELS = [
     ("sklearn.linear_model.LinearRegression", "regression"),
@@ -47,7 +47,9 @@ def _validate_environment_variables() -> bool:
 def _set_environment(env_file=None):
     if env_file:
         mlrun.set_env_from_file(env_file)
-    mlrun.get_or_create_project("hugging-face-classifier-trainer-test", context="./", user_project=True)
+    mlrun.get_or_create_project(
+        "hugging-face-classifier-trainer-test", context="./", user_project=True
+    )
 
 
 @pytest.mark.skipif(
@@ -73,7 +75,7 @@ def test_train_sequence_classification():
         "TRAIN_evaluation_strategy": "epoch",
         "TRAIN_eval_steps": 1,
         "TRAIN_logging_steps": 1,
-        "CLASS_num_labels": 2
+        "CLASS_num_labels": 2,
     }
 
     try:
@@ -91,7 +93,7 @@ def test_train_sequence_classification():
                 "num_of_train_samples": 100,
                 "metrics": ["accuracy", "f1"],
                 "random_state": 42,
-                **additional_parameters
+                **additional_parameters,
             },
             handler="train",
             local=True,

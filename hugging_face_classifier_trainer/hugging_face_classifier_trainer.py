@@ -2,11 +2,10 @@ import os
 import shutil
 import tempfile
 from abc import ABC
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 import mlrun
 import numpy as np
-
 import transformers
 from datasets import Dataset, load_dataset, load_metric
 from mlrun import MLClientCtx
@@ -14,18 +13,10 @@ from mlrun.artifacts import Artifact, PlotlyArtifact
 from mlrun.frameworks._common import CommonTypes, MLRunInterface
 from mlrun.utils import create_class
 from plotly import graph_objects as go
-
-from transformers import (
-    AutoTokenizer,
-    DataCollatorWithPadding,
-    PreTrainedModel,
-    PreTrainedTokenizer,
-    Trainer,
-    TrainerCallback,
-    TrainerControl,
-    TrainerState,
-    TrainingArguments,
-)
+from transformers import (AutoTokenizer, DataCollatorWithPadding,
+                          PreTrainedModel, PreTrainedTokenizer, Trainer,
+                          TrainerCallback, TrainerControl, TrainerState,
+                          TrainingArguments)
 
 
 # ----------------------from MLRUN--------------------------------
@@ -404,17 +395,15 @@ def _prepare_dataset(
     if train_test_split_size or num_of_train_samples:
         train_test_split_size = train_test_split_size or 0.2
         num_of_test_samples = int(
-            (train_dataset.num_rows * train_test_split_size) // (1 - train_test_split_size)
+            (train_dataset.num_rows * train_test_split_size)
+            // (1 - train_test_split_size)
         )
-        test_dataset = (
-            test_dataset
-            .shuffle(seed=random_state)
-            .select(list(range(num_of_test_samples)))
+        test_dataset = test_dataset.shuffle(seed=random_state).select(
+            list(range(num_of_test_samples))
         )
     test_dataset = _edit_columns(test_dataset, drop_columns, rename_cols)
 
     return train_dataset, test_dataset
-
 
 
 def train(

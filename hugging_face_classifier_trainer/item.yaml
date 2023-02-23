@@ -21,6 +21,6 @@ spec:
   handler: train
   image: mlrun/mlrun
   kind: job
-  requirements: []
+  requirements: ['transformers', 'datasets', 'plotly']
 url: ''
 version: 1.1.0

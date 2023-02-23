@@ -1,5 +1,6 @@
 mlrun
-pandas
-sklearn
-xgboost
-lightgbm
+transformers~=4.26.0
+numpy~=1.21.6
+pandas~=1.3.5
+datasets
+plotly==5.11.0

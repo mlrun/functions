@@ -24,6 +24,7 @@ spec:
   requirements:
   - onnx~=1.10.1
   - onnxruntime~=1.8.1
+  - optimum
   - transformers
   - datasets
 url: ''

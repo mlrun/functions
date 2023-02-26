@@ -777,7 +777,7 @@ def optimize(
     :param model_path:          The path of the model to optimize.
     :param model_name:          Name of the optimized model.
     :param target_dir:          The directory to save the ONNX model.
-    :param optimization_level:  Optimization level performed by ONNX Runtime of the loaded graph.
+    :param optimization_level:  Optimization level performed by ONNX Runtime of the loaded graph. (default is 1)
     """
     from optimum.onnxruntime import (ORTModelForSequenceClassification,
                                      ORTOptimizer)

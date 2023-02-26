@@ -13,10 +13,8 @@
 # limitations under the License.
 #
 import os
-from typing import Tuple
 
 import mlrun
-import pandas as pd
 import pytest
 from mlrun import import_function
 
@@ -34,6 +32,20 @@ REQUIRED_ENV_VARS = [
     "V3IO_API",
     "V3IO_ACCESS_KEY",
 ]
+
+ADDITIONAL_PARAM_FOR_TRAIN = {
+    "TRAIN_output_dir": "finetuning-sentiment-model-3000-samples",
+    "TRAIN_learning_rate": 2e-5,
+    "TRAIN_per_device_train_batch_size": 16,
+    "TRAIN_per_device_eval_batch_size": 16,
+    "TRAIN_num_train_epochs": 2,
+    "TRAIN_weight_decay": 0.01,
+    "TRAIN_push_to_hub": False,
+    "TRAIN_evaluation_strategy": "epoch",
+    "TRAIN_eval_steps": 1,
+    "TRAIN_logging_steps": 1,
+    "CLASS_num_labels": 2,
+}
 
 
 def _validate_environment_variables() -> bool:
@@ -64,24 +76,10 @@ def test_train_sequence_classification():
 
     train_run = None
 
-    additional_parameters = {
-        "TRAIN_output_dir": "finetuning-sentiment-model-3000-samples",
-        "TRAIN_learning_rate": 2e-5,
-        "TRAIN_per_device_train_batch_size": 16,
-        "TRAIN_per_device_eval_batch_size": 16,
-        "TRAIN_num_train_epochs": 2,
-        "TRAIN_weight_decay": 0.01,
-        "TRAIN_push_to_hub": False,
-        "TRAIN_evaluation_strategy": "epoch",
-        "TRAIN_eval_steps": 1,
-        "TRAIN_logging_steps": 1,
-        "CLASS_num_labels": 2,
-    }
-
     try:
         train_run = fn.run(
             params={
-                "dataset_name": "Shayanvsf/US_Airline_Sentiment",
+                "hf_dataset": "Shayanvsf/US_Airline_Sentiment",
                 "drop_columns": [
                     "airline_sentiment_confidence",
                     "negativereason_confidence",
@@ -93,7 +91,7 @@ def test_train_sequence_classification():
                 "num_of_train_samples": 100,
                 "metrics": ["accuracy", "f1"],
                 "random_state": 42,
-                **additional_parameters,
+                **ADDITIONAL_PARAM_FOR_TRAIN,
             },
             handler="train",
             local=True,
@@ -102,4 +100,53 @@ def test_train_sequence_classification():
         print(f"- The test failed - raised the following error:\n- {exception}")
     assert train_run and all(
         key in train_run.outputs for key in ["model", "loss"]
+    ), "outputs should include more data"
+
+
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
+def test_train_and_optimize_sequence_classification():
+    _set_environment()
+
+    # Importing function:
+    fn = import_function("function.yaml")
+
+    train_run = None
+    optimize_run = None
+
+    try:
+        train_run = fn.run(
+            params={
+                "hf_dataset": "Shayanvsf/US_Airline_Sentiment",
+                "drop_columns": [
+                    "airline_sentiment_confidence",
+                    "negativereason_confidence",
+                ],
+                "pretrained_tokenizer": "distilbert-base-uncased",
+                "pretrained_model": "distilbert-base-uncased",
+                "model_class": "transformers.AutoModelForSequenceClassification",
+                "label_name": "airline_sentiment",
+                "num_of_train_samples": 100,
+                "metrics": ["accuracy", "f1"],
+                "random_state": 42,
+                **ADDITIONAL_PARAM_FOR_TRAIN,
+            },
+            handler="train",
+            local=True,
+        )
+
+        optimize_run = fn.run(
+            params={"model_path": train_run.outputs["model"]},
+            handler="optimize",
+            local=True,
+        )
+    except Exception as exception:
+        print(f"- The test failed - raised the following error:\n- {exception}")
+    assert train_run and all(
+        key in train_run.outputs for key in ["model", "loss"]
+    ), "outputs should include more data"
+    assert optimize_run and all(
+        key in optimize_run.outputs for key in ["model"]
     ), "outputs should include more data"

@@ -1,18 +1,24 @@
 import os
 import shutil
 import tempfile
+import zipfile
 from abc import ABC
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import mlrun
 import numpy as np
+import pandas as pd
 import transformers
 from datasets import Dataset, load_dataset, load_metric
 from mlrun import MLClientCtx
+from mlrun import feature_store as fs
+from mlrun.api.schemas import ObjectKind
 from mlrun.artifacts import Artifact, PlotlyArtifact
+from mlrun.datastore import DataItem
 from mlrun.frameworks._common import CommonTypes, MLRunInterface
 from mlrun.utils import create_class
 from plotly import graph_objects as go
+from sklearn.model_selection import train_test_split
 from transformers import (AutoTokenizer, DataCollatorWithPadding,
                           PreTrainedModel, PreTrainedTokenizer, Trainer,
                           TrainerCallback, TrainerControl, TrainerState,
@@ -20,6 +26,105 @@ from transformers import (AutoTokenizer, DataCollatorWithPadding,
 
 
 # ----------------------from MLRUN--------------------------------
+class HFORTOptimizerMLRunInterface(MLRunInterface, ABC):
+    """
+    Interface for adding MLRun features for tensorflow keras API.
+    """
+
+    # MLRun's context default name:
+    DEFAULT_CONTEXT_NAME = "mlrun-huggingface"
+
+    # Attributes to be inserted so the MLRun interface will be fully enabled.
+    _PROPERTIES = {
+        "_auto_log": False,
+        "_context": None,
+        "_model_name": "model",
+        "_tag": "",
+        "_labels": None,
+        "_extra_data": None,
+    }
+    _METHODS = ["enable_auto_logging"]
+    # Attributes to replace so the MLRun interface will be fully enabled.
+    _REPLACED_METHODS = [
+        "optimize",
+    ]
+
+    @classmethod
+    def add_interface(
+        cls,
+        obj,
+        restoration: CommonTypes.MLRunInterfaceRestorationType = None,
+    ):
+        """
+        Enrich the object with this interface properties, methods and functions, so it will have this TensorFlow.Keras
+        MLRun's features.
+        :param obj:                     The object to enrich his interface.
+        :param restoration: Restoration information tuple as returned from 'remove_interface' in order to
+                                        add the interface in a certain state.
+        """
+        super(HFORTOptimizerMLRunInterface, cls).add_interface(
+            obj=obj, restoration=restoration
+        )
+
+    @classmethod
+    def mlrun_optimize(cls):
+        """
+        MLRun's tf.keras.Model.fit wrapper. It will setup the optimizer when using horovod. The optimizer must be
+        passed in a keyword argument and when using horovod, it must be passed as an Optimizer instance, not a string.
+
+        raise MLRunInvalidArgumentError: In case the optimizer provided did not follow the instructions above.
+        """
+
+        def wrapper(self, *args, **kwargs):
+            save_dir = cls._get_function_argument(
+                self.optimize,
+                argument_name="save_dir",
+                passed_args=args,
+                passed_kwargs=kwargs,
+            )[0]
+
+            # Call the original optimize method:
+            result = self.original_optimize(*args, **kwargs)
+
+            if self._auto_log:
+                # Zip the onnx model directory:
+                shutil.make_archive(
+                    base_name="onnx_model",
+                    format="zip",
+                    root_dir=save_dir,
+                )
+                # Log the onnx model:
+                self._context.log_model(
+                    key="model",
+                    db_key=self._model_name,
+                    model_file="onnx_model.zip",
+                    tag=self._tag,
+                    framework="ONNX",
+                    labels=self._labels,
+                    extra_data=self._extra_data,
+                )
+
+            return result
+
+        return wrapper
+
+    def enable_auto_logging(
+        self,
+        context: mlrun.MLClientCtx,
+        model_name: str = "model",
+        tag: str = "",
+        labels: Dict[str, str] = None,
+        extra_data: dict = None,
+    ):
+        self._auto_log = True
+
+        self._context = context
+        self._model_name = model_name
+        self._tag = tag
+        self._labels = labels
+        self._extra_data = extra_data
+
+
 class HFTrainerMLRunInterface(MLRunInterface, ABC):
     """
     Interface for adding MLRun features for tensorflow keras API.
@@ -254,8 +359,64 @@ class MLRunCallback(TrainerCallback):
         self._artifacts[artifact_name] = self._context.log_artifact(artifact)
 
 
+def _apply_mlrun_on_trainer(
+    trainer: transformers.Trainer,
+    model_name: str = None,
+    tag: str = "",
+    context: mlrun.MLClientCtx = None,
+    auto_log: bool = True,
+    labels: Dict[str, str] = None,
+    extra_data: dict = None,
+    **kwargs,
+):
+    # Get parameters defaults:
+    if context is None:
+        context = mlrun.get_or_create_ctx(HFTrainerMLRunInterface.DEFAULT_CONTEXT_NAME)
+
+    HFTrainerMLRunInterface.add_interface(obj=trainer)
+
+    if auto_log:
+        trainer.add_callback(
+            MLRunCallback(
+                context=context,
+                model_name=model_name,
+                tag=tag,
+                labels=labels,
+                extra_data=extra_data,
+            )
+        )
+
+
+def _apply_mlrun_on_optimizer(
+    optimizer,
+    model_name: str = None,
+    tag: str = "",
+    context: mlrun.MLClientCtx = None,
+    auto_log: bool = True,
+    labels: Dict[str, str] = None,
+    extra_data: dict = None,
+    **kwargs,
+):
+    # Get parameters defaults:
+    if context is None:
+        context = mlrun.get_or_create_ctx(
+            HFORTOptimizerMLRunInterface.DEFAULT_CONTEXT_NAME
+        )
+
+    HFORTOptimizerMLRunInterface.add_interface(obj=optimizer)
+
+    if auto_log:
+        optimizer.enable_auto_logging(
+            context=context,
+            model_name=model_name,
+            tag=tag,
+            labels=labels,
+            extra_data=extra_data,
+        )
+
+
 def apply_mlrun(
-    huggingface_object: transformers.Trainer,
+    huggingface_object,
     model_name: str = None,
     tag: str = "",
     context: mlrun.MLClientCtx = None,
@@ -273,25 +434,29 @@ def apply_mlrun(
                                'mlrun.get_or_create_ctx(None)'
     :param auto_log:           Whether to enable MLRun's auto logging. Default: True.
     """
+
     if isinstance(huggingface_object, transformers.Trainer):
-        if context is None:
-            context = mlrun.get_or_create_ctx(
-                HFTrainerMLRunInterface.DEFAULT_CONTEXT_NAME
-            )
+        return _apply_mlrun_on_trainer(
+            trainer=huggingface_object,
+            model_name=model_name,
+            tag=tag,
+            context=context,
+            auto_log=auto_log,
+            labels=labels,
+            extra_data=extra_data,
+        )
+    import optimum.onnxruntime as optimum_ort
 
-        HFTrainerMLRunInterface.add_interface(obj=huggingface_object)
-
-        if auto_log:
-            huggingface_object.add_callback(
-                MLRunCallback(
-                    context=context,
-                    model_name=model_name,
-                    tag=tag,
-                    labels=labels,
-                    extra_data=extra_data,
-                )
-            )
-        return
+    if isinstance(huggingface_object, optimum_ort.ORTOptimizer):
+        return _apply_mlrun_on_optimizer(
+            optimizer=huggingface_object,
+            model_name=model_name,
+            tag=tag,
+            context=context,
+            auto_log=auto_log,
+            labels=labels,
+            extra_data=extra_data,
+        )
     raise mlrun.errors.MLRunInvalidArgumentError
 
 
@@ -317,6 +482,59 @@ def _get_sub_dict_by_prefix(src: Dict, prefix_key: str) -> Dict[str, Any]:
         for key, val in src.items()
         if key.startswith(prefix_key)
     }
+
+
+def _get_dataframe(
+    context: MLClientCtx,
+    dataset: DataItem,
+    label_columns: Optional[Union[str, List[str]]] = None,
+    drop_columns: Union[str, List[str], int, List[int]] = None,
+) -> Tuple[pd.DataFrame, Optional[Union[str, List[str]]]]:
+    """
+    Getting the DataFrame of the dataset and drop the columns accordingly.
+
+    :param context:         MLRun context.
+    :param dataset:         The dataset to train the model on.
+                            Can be either a list of lists, dict, URI or a FeatureVector.
+    :param label_columns:   The target label(s) of the column(s) in the dataset. for Regression or
+                            Classification tasks.
+    :param drop_columns:    str/int or a list of strings/ints that represent the column names/indices to drop.
+    """
+    if isinstance(dataset, (list, dict)):
+        dataset = pd.DataFrame(dataset)
+        # Checking if drop_columns provided by integer type:
+        if drop_columns:
+            if isinstance(drop_columns, str) or (
+                isinstance(drop_columns, list)
+                and any(isinstance(col, str) for col in drop_columns)
+            ):
+                context.logger.error(
+                    "drop_columns must be an integer/list of integers if not provided with a URI/FeatureVector dataset"
+                )
+                raise ValueError
+            dataset.drop(drop_columns, axis=1, inplace=True)
+
+        return dataset, label_columns
+
+    if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
+        # feature-vector case:
+        label_columns = label_columns or dataset.meta.status.label_column
+        dataset = fs.get_offline_features(
+            dataset.meta.uri, drop_columns=drop_columns
+        ).to_dataframe()
+
+        context.logger.info(f"label columns: {label_columns}")
+    else:
+        # simple URL case:
+        dataset = dataset.as_df()
+        if drop_columns:
+            if all(col in dataset for col in drop_columns):
+                dataset = dataset.drop(drop_columns, axis=1)
+            else:
+                context.logger.info(
+                    "not all of the columns to drop in the dataset, drop columns process skipped"
+                )
+    return dataset, label_columns
 
 
 # ---------------------- Hugging Face Trainer --------------------------------
@@ -408,12 +626,13 @@ def _prepare_dataset(
 
 def train(
     context: MLClientCtx,
-    dataset_name: str = None,
+    hf_dataset: str = None,
+    dataset: DataItem = None,
     drop_columns: Optional[List[str]] = None,
     pretrained_tokenizer: str = None,
     pretrained_model: str = None,
     model_class: str = None,
-    model_name: str = "huggingface_model",
+    model_name: str = "huggingface-model",
     label_name: str = "labels",
     text_col: str = "text",
     num_of_train_samples: int = None,
@@ -423,9 +642,12 @@ def train(
 ):
     """
     Training and evaluating a pretrained model with a pretrained tokenizer over a dataset.
+    The dataset can be either be the name of the dataset that contains in the HuggingFace hub,
+    or a URI or a FeatureVector
 
     :param context:                 MLRun context
-    :param dataset_name:            The name of the dataset to get from the HuggingFace hub
+    :param hf_dataset:              The name of the dataset to get from the HuggingFace hub
+    :param dataset:                 The dataset to train the model on. Can be either a URI or a FeatureVector
     :param drop_columns:            The columns to drop from the dataset.
     :param pretrained_tokenizer:    The name of the pretrained tokenizer from the HuggingFace hub.
     :param pretrained_model:        The name of the pretrained model from the HuggingFace hub.
@@ -445,6 +667,12 @@ def train(
             "Must provide label_names and pretrained_tokenizer"
         )
 
+    if train_test_split_size is None:
+        context.logger.info(
+            "test_set or train_test_split_size are not provided, setting train_test_split_size to 0.2"
+        )
+        train_test_split_size = 0.2
+
     # Creating tokenizer:
     tokenizer = AutoTokenizer.from_pretrained(pretrained_tokenizer)
 
@@ -452,15 +680,30 @@ def train(
         return tokenizer(examples[text_col], truncation=True)
 
     # prepare data for training
-    train_dataset, test_dataset = _prepare_dataset(
-        context,
-        dataset_name,
-        label_name,
-        drop_columns,
-        num_of_train_samples,
-        train_test_split_size,
-        random_state=random_state,
-    )
+    if hf_dataset:
+        train_dataset, test_dataset = _prepare_dataset(
+            context,
+            hf_dataset,
+            label_name,
+            drop_columns,
+            num_of_train_samples,
+            train_test_split_size,
+            random_state=random_state,
+        )
+    elif dataset:
+        # Get DataFrame by URL or by FeatureVector:
+        dataset, label_name = _get_dataframe(
+            context=context,
+            dataset=dataset,
+            label_columns=label_name,
+            drop_columns=drop_columns,
+        )
+
+        train_dataset, test_dataset = train_test_split(
+            dataset, test_size=train_test_split_size, random_state=random_state
+        )
+        train_dataset = Dataset.from_pandas(train_dataset)
+        test_dataset = Dataset.from_pandas(test_dataset)
 
     # Mapping datasets with the tokenizer:
     tokenized_train = train_dataset.map(preprocess_function, batched=True)
@@ -509,3 +752,49 @@ def train(
     # Apply training with evaluation:
     context.logger.info(f"training '{model_name}'")
     trainer.train()
+
+
+def _get_model_dir(model_uri: str):
+    model_file, _, _ = mlrun.artifacts.get_model(model_uri)
+    model_dir = tempfile.gettempdir()
+    # Unzip the Model:
+    with zipfile.ZipFile(model_file, "r") as zip_file:
+        zip_file.extractall(model_dir)
+
+    return model_dir
+
+
+def optimize(
+    model_path: str,
+    model_name: str = "optimized_model",
+    target_dir: str = "./optimized",
+    optimization_level: int = 1,
+):
+    """
+    Optimizing the transformer model using ONNX optimization.
+
+
+    :param model_path:          The path of the model to optimize.
+    :param model_name:          Name of the optimized model.
+    :param target_dir:          The directory to save the ONNX model.
+    :param optimization_level:  Optimization level performed by ONNX Runtime of the loaded graph.
+    """
+    from optimum.onnxruntime import (ORTModelForSequenceClassification,
+                                     ORTOptimizer)
+    from optimum.onnxruntime.configuration import OptimizationConfig
+
+    model_dir = _get_model_dir(model_uri=model_path)
+    # Creating configuration for optimization step:
+    optimization_config = OptimizationConfig(optimization_level=optimization_level)
+
+    # Converting our pretrained model to an ONNX-Runtime model:
+    ort_model = ORTModelForSequenceClassification.from_pretrained(
+        model_dir, from_transformers=True
+    )
+
+    # Creating an ONNX-Runtime optimizer from ONNX model:
+    optimizer = ORTOptimizer.from_pretrained(ort_model)
+
+    apply_mlrun(optimizer, model_name=model_name)
+    # Optimizing and saving the ONNX model:
+    optimizer.optimize(save_dir=target_dir, optimization_config=optimization_config)

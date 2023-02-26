@@ -21,6 +21,10 @@ spec:
   handler: train
   image: mlrun/ml-models
   kind: job
-  requirements: ['transformers', 'datasets']
+  requirements:
+  - onnx~=1.10.1
+  - onnxruntime~=1.8.1
+  - transformers
+  - datasets
 url: ''
 version: 1.1.0

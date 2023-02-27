@@ -37,6 +37,15 @@ from cli.path_iterator import PathIterator
 
 _verbose = False
 
+# For preparing the assets section in catalog for each function
+# The tuple values represents (<location in item.yaml>, <relative path value>)
+ASSETS = {
+    "example": ("example", "src/{}"),
+    "source": ("spec.filename", "src/{}"),
+    "function": "src/function.yaml",
+    "docs": "static/documentation.html",
+}
+
 
 @click.command()
 @click.option("-s", "--source-dir", help="Path to the source directory")
@@ -304,11 +313,17 @@ def add_assets(item_yaml: dict):
 
     :param item_yaml: function's item yaml as a dict
     """
-    if item_yaml.get("example"):
-        item_yaml["example"] = "src/" + item_yaml["example"]
-    if item_yaml["spec"].get("filename"):
-        item_yaml["spec"]["filename"] = "src/" + item_yaml["spec"]["filename"]
-    item_yaml["docs"] = f"static/documentation.html"
+    item_yaml["assets"] = {}
+    for asset, template in ASSETS.items():
+        if isinstance(template, str) and "{}" not in template:
+            item_yaml["assets"][asset] = template
+        else:
+            key, template = template
+            asset_location = item_yaml
+            for loc in key.split("."):
+                asset_location = asset_location.get(loc)
+            if asset_location:
+                item_yaml["assets"][asset] = template.format(asset_location)
 
 
 def update_or_create_item(

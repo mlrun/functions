@@ -37,6 +37,8 @@ from cli.path_iterator import PathIterator
 
 _verbose = False
 
+# For preparing the assets section in catalog for each function
+# The tuple values represents (<location in item.yaml>, <relative path value>)
 ASSETS = {
     "example": ("example", "src/{}"),
     "source": ("spec.filename", "src/{}"),

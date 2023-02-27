@@ -19,17 +19,10 @@ from mlrun.frameworks._common import CommonTypes, MLRunInterface
 from mlrun.utils import create_class
 from plotly import graph_objects as go
 from sklearn.model_selection import train_test_split
-from transformers import (
-    AutoTokenizer,
-    DataCollatorWithPadding,
-    PreTrainedModel,
-    PreTrainedTokenizer,
-    Trainer,
-    TrainerCallback,
-    TrainerControl,
-    TrainerState,
-    TrainingArguments,
-)
+from transformers import (AutoTokenizer, DataCollatorWithPadding,
+                          PreTrainedModel, PreTrainedTokenizer, Trainer,
+                          TrainerCallback, TrainerControl, TrainerState,
+                          TrainingArguments)
 
 
 # ----------------------from MLRUN--------------------------------
@@ -94,17 +87,11 @@ class HFORTOptimizerMLRunInterface(MLRunInterface, ABC):
             result = self.original_optimize(*args, **kwargs)
 
             if self._auto_log:
-                # Zip the onnx model directory:
-                shutil.make_archive(
-                    base_name="onnx_model",
-                    format="zip",
-                    root_dir=save_dir,
-                )
                 # Log the onnx model:
                 self._context.log_model(
                     key="model",
                     db_key=self._model_name,
-                    model_file="onnx_model.zip",
+                    model_file=f"{save_dir}/model_optimized.onnx",
                     tag=self._tag,
                     framework="ONNX",
                     labels=self._labels,
@@ -786,7 +773,8 @@ def optimize(
     :param target_dir:          The directory to save the ONNX model.
     :param optimization_level:  Optimization level performed by ONNX Runtime of the loaded graph. (default is 1)
     """
-    from optimum.onnxruntime import ORTModelForSequenceClassification, ORTOptimizer
+    from optimum.onnxruntime import (ORTModelForSequenceClassification,
+                                     ORTOptimizer)
     from optimum.onnxruntime.configuration import OptimizationConfig
 
     model_dir = _get_model_dir(model_uri=model_path)

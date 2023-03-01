@@ -646,6 +646,7 @@ def train(
     context: MLClientCtx,
     hf_dataset: str = None,
     dataset: DataItem = None,
+    test_set: DataItem = None,
     drop_columns: Optional[List[str]] = None,
     pretrained_tokenizer: str = None,
     pretrained_model: str = None,
@@ -666,6 +667,7 @@ def train(
     :param context:                 MLRun context
     :param hf_dataset:              The name of the dataset to get from the HuggingFace hub
     :param dataset:                 The dataset to train the model on. Can be either a URI or a FeatureVector
+    :param test_set:                The test set to train the model with.
     :param drop_columns:            The columns to drop from the dataset.
     :param pretrained_tokenizer:    The name of the pretrained tokenizer from the HuggingFace hub.
     :param pretrained_model:        The name of the pretrained model from the HuggingFace hub.
@@ -680,7 +682,7 @@ def train(
     :param random_state:            Random state for train_test_split
     """
 
-    if train_test_split_size is None:
+    if train_test_split_size is None and test_set is None:
         context.logger.info(
             "'train_test_split_size' is not provided, setting train_test_split_size to 0.2"
         )
@@ -705,15 +707,25 @@ def train(
         )
     elif dataset:
         # Get DataFrame by URL or by FeatureVector:
-        dataset, label_name = _get_dataframe(
+        train_dataset, label_name = _get_dataframe(
             context=context,
             dataset=dataset,
             label_columns=label_name,
             drop_columns=drop_columns,
         )
-        train_dataset, test_dataset = train_test_split(
-            dataset, test_size=train_test_split_size, random_state=random_state
-        )
+        if test_set:
+            test_dataset, _ = _get_dataframe(
+                context=context,
+                dataset=test_set,
+                label_columns=label_name,
+                drop_columns=drop_columns,
+            )
+        else:
+            train_dataset, test_dataset = train_test_split(
+                train_dataset,
+                test_size=train_test_split_size,
+                random_state=random_state,
+            )
         train_dataset = Dataset.from_pandas(train_dataset)
         test_dataset = Dataset.from_pandas(test_dataset)
     else:

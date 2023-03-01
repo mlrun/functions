@@ -713,7 +713,6 @@ def train(
             "You have to provide 'hf_dataset' or 'dataset'"
         )
 
-
     # Mapping datasets with the tokenizer:
     tokenized_train = train_dataset.map(preprocess_function, batched=True)
     tokenized_test = test_dataset.map(preprocess_function, batched=True)
@@ -733,9 +732,7 @@ def train(
     model_class_kwargs["pretrained_model_name_or_path"] = (
         model_class_kwargs.get("pretrained_model_name_or_path") or pretrained_model
     )
-    model_class_kwargs["hub_token"] = (
-        model_class_kwargs.get("hub_token") or pretrained_tokenizer
-    )
+    train_kwargs["hub_token"] = train_kwargs.get("hub_token") or pretrained_tokenizer
     if not model_class_kwargs["pretrained_model_name_or_path"]:
         raise mlrun.errors.MLRunRuntimeError(
             "Must provide pretrained_model name as "

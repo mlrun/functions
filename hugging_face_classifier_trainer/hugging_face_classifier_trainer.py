@@ -539,8 +539,8 @@ def _create_compute_metrics(metrics: List[str]) -> Callable[[EvalPrediction], Di
     This function create and returns a function that will be used to compute metrics at evaluation.
     :param metrics: List of different metrics for evaluate the model such as f1, accuracy etc.
 
-    :return: Function that will be used to compute metrics at evaluation. Must take a [`EvalPrediction`] and return
-            a dictionary string to metric values.
+    :return Function that will be used to compute metrics at evaluation.
+             Must take a [`EvalPrediction`] and return a dictionary string to metric values.
     """
 
     def _compute_metrics(eval_pred):
@@ -570,7 +570,7 @@ def _edit_columns(
     :param drop_columns:    The columns to drop from the dataset.
     :param rename_columns:  Dict of columns ro rename : {<old_name>: <new_name>, ...}
 
-    :return: The dataset after the desired process
+    :return The dataset after the desired process
     """
     if drop_columns:
         dataset = dataset.remove_columns(drop_columns)
@@ -703,16 +703,16 @@ def train(
             label_columns=label_name,
             drop_columns=drop_columns,
         )
-    else:
-        raise mlrun.errors.MLRunInvalidArgumentError(
-            "You have to provide 'hf_dataset' or 'dataset'"
-        )
-
         train_dataset, test_dataset = train_test_split(
             dataset, test_size=train_test_split_size, random_state=random_state
         )
         train_dataset = Dataset.from_pandas(train_dataset)
         test_dataset = Dataset.from_pandas(test_dataset)
+    else:
+        raise mlrun.errors.MLRunInvalidArgumentError(
+            "You have to provide 'hf_dataset' or 'dataset'"
+        )
+
 
     # Mapping datasets with the tokenizer:
     tokenized_train = train_dataset.map(preprocess_function, batched=True)

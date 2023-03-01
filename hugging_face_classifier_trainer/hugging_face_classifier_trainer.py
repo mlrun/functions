@@ -539,7 +539,7 @@ def _create_compute_metrics(metrics: List[str]) -> Callable[[EvalPrediction], Di
     This function create and returns a function that will be used to compute metrics at evaluation.
     :param metrics: List of different metrics for evaluate the model such as f1, accuracy etc.
 
-    :return Function that will be used to compute metrics at evaluation.
+    :returns: Function that will be used to compute metrics at evaluation.
              Must take a [`EvalPrediction`] and return a dictionary string to metric values.
     """
 
@@ -570,7 +570,7 @@ def _edit_columns(
     :param drop_columns:    The columns to drop from the dataset.
     :param rename_columns:  Dict of columns ro rename : {<old_name>: <new_name>, ...}
 
-    :return The dataset after the desired process
+    :returns: The dataset after the desired process
     """
     if drop_columns:
         dataset = dataset.remove_columns(drop_columns)

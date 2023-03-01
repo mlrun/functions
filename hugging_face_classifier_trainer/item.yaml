@@ -2,7 +2,7 @@ apiVersion: v1
 categories:
 - machine-learning
 - model-training
-description: Automatic train and optimize functions for Hugging Face frameworks
+description: Automatic train and optimize functions for HuggingFace framework
 doc: ''
 example: hugging_face_classifier_trainer.ipynb
 generationDate: 2022-08-28:17-25

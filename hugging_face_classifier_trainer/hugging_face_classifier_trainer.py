@@ -718,7 +718,8 @@ def train(
         test_dataset = Dataset.from_pandas(test_dataset)
     else:
         raise mlrun.errors.MLRunInvalidArgumentError(
-            "You have to provide 'hf_dataset' or 'dataset'"
+            "Training data was not provided. A training dataset is mandatory for training."
+            " Please provide a training set using one of the arguments 'hf_dataset' or 'dataset'."
         )
 
     # Mapping datasets with the tokenizer:

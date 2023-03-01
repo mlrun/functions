@@ -19,10 +19,17 @@ from mlrun.frameworks._common import CommonTypes, MLRunInterface
 from mlrun.utils import create_class
 from plotly import graph_objects as go
 from sklearn.model_selection import train_test_split
-from transformers import (AutoTokenizer, DataCollatorWithPadding,
-                          PreTrainedModel, PreTrainedTokenizer, Trainer,
-                          TrainerCallback, TrainerControl, TrainerState,
-                          TrainingArguments)
+from transformers import (
+    AutoTokenizer,
+    DataCollatorWithPadding,
+    PreTrainedModel,
+    PreTrainedTokenizer,
+    Trainer,
+    TrainerCallback,
+    TrainerControl,
+    TrainerState,
+    TrainingArguments,
+)
 
 
 # ----------------------from MLRUN--------------------------------
@@ -773,8 +780,7 @@ def optimize(
     :param target_dir:          The directory to save the ONNX model.
     :param optimization_level:  Optimization level performed by ONNX Runtime of the loaded graph. (default is 1)
     """
-    from optimum.onnxruntime import (ORTModelForSequenceClassification,
-                                     ORTOptimizer)
+    from optimum.onnxruntime import ORTModelForSequenceClassification, ORTOptimizer
     from optimum.onnxruntime.configuration import OptimizationConfig
 
     model_dir = _get_model_dir(model_uri=model_path)

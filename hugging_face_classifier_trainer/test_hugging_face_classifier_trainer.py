@@ -12,7 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import os
+
+import mlrun
+import pytest
 from mlrun import import_function
+
+REQUIRED_ENV_VARS = [
+    "MLRUN_DBPATH",
+    "MLRUN_ARTIFACT_PATH",
+    "V3IO_USERNAME",
+    "V3IO_API",
+    "V3IO_ACCESS_KEY",
+]
 
 ADDITIONAL_PARAM_FOR_TRAIN = {
     "TRAIN_output_dir": "finetuning-sentiment-model-3000-samples",
@@ -29,7 +41,29 @@ ADDITIONAL_PARAM_FOR_TRAIN = {
 }
 
 
+def _validate_environment_variables() -> bool:
+    """
+    Checks that all required Environment variables are set.
+    """
+    environment_keys = os.environ.keys()
+    return all(key in environment_keys for key in REQUIRED_ENV_VARS)
+
+
+def _set_environment(env_file=None):
+    if env_file:
+        mlrun.set_env_from_file(env_file)
+    mlrun.get_or_create_project(
+        "hugging-face-classifier-trainer-test", context="./", user_project=True
+    )
+
+
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
 def test_train_sequence_classification():
+    _set_environment()
+
     # Importing function:
     fn = import_function("function.yaml")
 
@@ -62,7 +96,12 @@ def test_train_sequence_classification():
     ), "outputs should include more data"
 
 
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
 def test_train_and_optimize_sequence_classification():
+    _set_environment()
 
     # Importing function:
     fn = import_function("function.yaml")

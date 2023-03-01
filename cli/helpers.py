@@ -86,32 +86,43 @@ def install_python(directory: Union[str, Path]):
     return python_location
 
 
-def install_requirements(directory: str, requirements: Union[List[str], Set[str]]):
-    if not requirements:
-        print(f"No requirements found for {directory}...")
-        return
-    if 'mlrun' not in requirements:
-        requirements.append('mlrun')
-    print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
-    requirements_install: subprocess.CompletedProcess = subprocess.run(
-        f"pipenv install --skip-lock {' '.join(requirements)}",
+def _run_subprocess(cmd: str, directory):
+    completed_process: subprocess.CompletedProcess = subprocess.run(
+        cmd,
         stdout=sys.stdout,
         stderr=subprocess.PIPE,
         shell=True,
         cwd=directory,
     )
+    exit_on_non_zero_return(completed_process)
 
-    exit_on_non_zero_return(requirements_install)
 
+def install_requirements(
+    directory: str,
+    requirements: Union[List[str], Set[str]],
+):
+    """
+    Installing requirements from a requirements list/set and from a requirements.txt file if found in directory
+    :param directory:       The relevant directory were the requirements are installed and collected
+    :param requirements:    Requirement list/set with or without bounds
+    """
+    requirements_file = Path(directory) / 'requirements.txt'
 
-def get_txt_requirements(path: Union[Path, str]) -> List[str]:
-    txt_requirements = []
-    if (Path(path) / 'requirements.txt').exists():
-        with open(os.path.join(path, 'requirements.txt'), 'r') as req_file:
-            for req in req_file:
-                txt_requirements.append(req.strip('\n'))
+    if not requirements and not requirements_file.exists():
+        print(f"No requirements found for {directory}...")
+        return
 
-    return txt_requirements
+    if requirements_file.exists():
+        print(f"Installing requirements from {requirements_file}...")
+        _run_subprocess(
+            f"pipenv install --skip-lock -r {requirements_file}", directory
+        )
+
+    if requirements:
+        print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
+        _run_subprocess(
+            f"pipenv install --skip-lock {' '.join(requirements)}", directory
+        )
 
 
 def get_item_yaml_values(

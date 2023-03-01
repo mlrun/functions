@@ -3,7 +3,7 @@ import shutil
 import tempfile
 import zipfile
 from abc import ABC
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import mlrun
 import numpy as np
@@ -19,17 +19,10 @@ from mlrun.frameworks._common import CommonTypes, MLRunInterface
 from mlrun.utils import create_class
 from plotly import graph_objects as go
 from sklearn.model_selection import train_test_split
-from transformers import (
-    AutoTokenizer,
-    DataCollatorWithPadding,
-    PreTrainedModel,
-    PreTrainedTokenizer,
-    Trainer,
-    TrainerCallback,
-    TrainerControl,
-    TrainerState,
-    TrainingArguments,
-)
+from transformers import (AutoTokenizer, DataCollatorWithPadding,
+                          EvalPrediction, PreTrainedModel, PreTrainedTokenizer,
+                          Trainer, TrainerCallback, TrainerControl,
+                          TrainerState, TrainingArguments)
 
 
 # ----------------------from MLRUN--------------------------------
@@ -541,7 +534,15 @@ def _get_dataframe(
 # ---------------------- Hugging Face Trainer --------------------------------
 
 
-def _create_compute_metrics(metrics: List[str]):
+def _create_compute_metrics(metrics: List[str]) -> Callable[[EvalPrediction], Dict]:
+    """
+    This function create and returns a function that will be used to compute metrics at evaluation.
+    :param metrics: List of different metrics for evaluate the model such as f1, accuracy etc.
+
+    :return: Function that will be used to compute metrics at evaluation. Must take a [`EvalPrediction`] and return
+            a dictionary string to metric values.
+    """
+
     def _compute_metrics(eval_pred):
         logits, labels = eval_pred
         predictions = np.argmax(logits, axis=-1)
@@ -562,7 +563,15 @@ def _edit_columns(
     dataset: Dataset,
     drop_columns: List[str] = None,
     rename_columns: [str, str] = None,
-):
+) -> Dataset:
+    """
+    Drop and renames that columns of the given dataset
+    :param dataset:         Dataset to process
+    :param drop_columns:    The columns to drop from the dataset.
+    :param rename_columns:  Dict of columns ro rename : {<old_name>: <new_name>, ...}
+
+    :return: The dataset after the desired process
+    """
     if drop_columns:
         dataset = dataset.remove_columns(drop_columns)
     if rename_columns:
@@ -578,13 +587,13 @@ def _prepare_dataset(
     num_of_train_samples: int = None,
     train_test_split_size: float = None,
     random_state: int = None,
-):
+) -> Tuple[Dataset, Dataset]:
     """
     Loading the dataset and editing the columns
 
     :param context:                 MLRun contex
     :param dataset_name:            The name of the dataset to get from the HuggingFace hub
-    :param label_name:
+    :param label_name:              The target label of the column in the dataset.
     :param drop_columns:            The columns to drop from the dataset.
     :param num_of_train_samples:    Max number of training samples, for debugging.
     :param train_test_split_size:   Should be between 0.0 and 1.0 and represent the proportion of the dataset to include
@@ -663,14 +672,9 @@ def train(
     :param random_state:            Random state for train_test_split
     """
 
-    if not label_name or not pretrained_tokenizer:
-        raise mlrun.errors.MLRunRuntimeError(
-            "Must provide label_names and pretrained_tokenizer"
-        )
-
     if train_test_split_size is None:
         context.logger.info(
-            "test_set or train_test_split_size are not provided, setting train_test_split_size to 0.2"
+            "'train_test_split_size' is not provided, setting train_test_split_size to 0.2"
         )
         train_test_split_size = 0.2
 
@@ -699,6 +703,10 @@ def train(
             label_columns=label_name,
             drop_columns=drop_columns,
         )
+    else:
+        raise mlrun.errors.MLRunInvalidArgumentError(
+            "You have to provide 'hf_dataset' or 'dataset'"
+        )
 
         train_dataset, test_dataset = train_test_split(
             dataset, test_size=train_test_split_size, random_state=random_state
@@ -724,6 +732,9 @@ def train(
     # Loading our pretrained model:
     model_class_kwargs["pretrained_model_name_or_path"] = (
         model_class_kwargs.get("pretrained_model_name_or_path") or pretrained_model
+    )
+    model_class_kwargs["hub_token"] = (
+        model_class_kwargs.get("hub_token") or pretrained_tokenizer
     )
     if not model_class_kwargs["pretrained_model_name_or_path"]:
         raise mlrun.errors.MLRunRuntimeError(
@@ -780,7 +791,9 @@ def optimize(
     :param target_dir:          The directory to save the ONNX model.
     :param optimization_level:  Optimization level performed by ONNX Runtime of the loaded graph. (default is 1)
     """
-    from optimum.onnxruntime import ORTModelForSequenceClassification, ORTOptimizer
+    # We import these in the function scope so ONNX won't be mandatory for the other handlers:
+    from optimum.onnxruntime import (ORTModelForSequenceClassification,
+                                     ORTOptimizer)
     from optimum.onnxruntime.configuration import OptimizationConfig
 
     model_dir = _get_model_dir(model_uri=model_path)

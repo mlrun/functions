@@ -18,13 +18,6 @@ import mlrun
 import pytest
 from mlrun import import_function
 
-MODELS = [
-    ("sklearn.linear_model.LinearRegression", "regression"),
-    ("sklearn.ensemble.RandomForestClassifier", "classification"),
-    ("xgboost.XGBRegressor", "regression"),
-    ("lightgbm.LGBMClassifier", "classification"),
-]
-
 REQUIRED_ENV_VARS = [
     "MLRUN_DBPATH",
     "MLRUN_ARTIFACT_PATH",

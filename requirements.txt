@@ -8,3 +8,4 @@ black~=22.0
 isort~=5.7
 sphinx==4.0.2
 sphinx-book-theme==0.3.3
+sphinx-togglebutton==0.3.1

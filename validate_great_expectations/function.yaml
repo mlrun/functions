@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: validate-expectations
   tag: ''
-  hash: 97a18b324f1212e7663ba46a8bcee96de0d316c0
+  hash: b04e847f698fdd0df9f66f43cc3040b5a4f29a12
   project: great-expectations
 spec:
   command: ''
@@ -13,8 +13,8 @@ spec:
     base_image: mlrun/mlrun
     commands:
     - python -m pip install great-expectations==0.15.41
-    code_origin: ./great_expectations_mlrun.py
-    origin_filename: ./great_expectations_mlrun.py
+    code_origin: https://github.com/igz-us-sales/functions.git#ba6702ce2f42f570ae08168ac39b43829799374e:./validate_great_expectations.py
+    origin_filename: ./validate_great_expectations.py
   entry_points:
     get_default_datasource_config:
       name: get_default_datasource_config

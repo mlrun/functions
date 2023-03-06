@@ -13,11 +13,12 @@
 # limitations under the License.
 #
 import json
+import re
 import shutil
 import subprocess
 import uuid
 from pathlib import Path
-from typing import Union, Optional, Set, Dict, Tuple, List
+from typing import Union, Optional, Set, Dict, List
 
 import click
 import yaml
@@ -216,6 +217,7 @@ def copy_static_resources(marketplace_dir, temp_docs):
     if not marketplace_static.exists():
         click.echo("Copying static resources...")
         shutil.copytree(temp_docs / "_build/_static", marketplace_static)
+        shutil.copytree(temp_docs / "_build/_modules", marketplace_dir / "_modules")
 
 
 def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
@@ -261,7 +263,7 @@ def build_catalog_json(
         funcs = catalog[source][channel]
 
     for source_dir in marketplace_dir.iterdir():
-        if not source_dir.is_dir() or source_dir.name == "_static":
+        if not source_dir.is_dir() or source_dir.name in ["_static", "_modules"]:
             continue
 
         latest_dir = source_dir / "latest"
@@ -349,10 +351,12 @@ def update_or_create_item(
     example_html_name = f"{item_dir.stem}_example.html"
 
     build_path = temp_docs / "_build"
+    source_html = marketplace_dir / "_modules" / item_dir.stem / f"{item_dir.stem}.html"
+    update_html_resource_paths(source_html, relative_path="../")
 
     documentation_html = build_path / documentation_html_name
     update_html_resource_paths(
-        documentation_html, relative_path="../../../", with_download=False
+        documentation_html, relative_path="../../../", with_download=False, item_name=item_dir.stem
     )
 
     example_html = build_path / example_html_name
@@ -378,6 +382,9 @@ def update_or_create_item(
 
     latest_static.mkdir(parents=True, exist_ok=True)
     version_static.mkdir(parents=True, exist_ok=True)
+    if source_html.exists():
+        shutil.copy(source_html, latest_static / f"{item_dir.name}.html")
+        shutil.copy(source_html, version_static / f"{item_dir.name}.html")
 
     if documentation_html.exists():
         shutil.copy(documentation_html, latest_static / "documentation.html")
@@ -438,12 +445,19 @@ def update_or_create_item(
 
 
 def update_html_resource_paths(
-    html_path: Path, relative_path: str, with_download: bool = True
+    html_path: Path, relative_path: str, with_download: bool = True, item_name: str = None
 ):
     if html_path.exists():
         with open(html_path, "r", encoding="utf8") as html:
             parsed = BeautifulSoup(html.read(), features="html.parser")
 
+        # Update back to docs link (from source page)
+        back_to_docs_nodes = parsed.find_all(lambda node: "viewcode-back" in node.get("class", ""))
+        pattern = r"^.*?(?=.html)"
+        for node in back_to_docs_nodes:
+            node["href"] = re.sub(pattern, "documentation", node["href"])
+
+        # Remove _static from links and replace with src
         nodes = parsed.find_all(
             lambda node: node.name == "link" and "_static" in node.get("href", "")
         )
@@ -456,20 +470,26 @@ def update_html_resource_paths(
         )
         for node in nodes:
             node["src"] = f"{relative_path}{node['src']}"
-        if not with_download:
-            # Removing download option from documentation:
-            nodes = parsed.find_all(
-                lambda node: node.name == "a"
-                and "dropdown-buttons" in node.get("class", "")
-            )
-            for node in nodes:
-                node.decompose()
-        else:
+        if with_download:
             nodes = parsed.find_all(lambda node: "_sources" in node.get("href", ""))
             for node in nodes:
                 node[
                     "href"
                 ] = f'../{node["href"].replace("_sources", "src").replace("_example", "")}'
+        else:
+            # Removing download option from documentation:
+            nodes = parsed.find_all(
+                lambda node: node.name == "a" and "headerbtn" in node.get("class", "")
+            )
+            for node in nodes:
+                if node["href"].endswith(".rst"):
+                    node.decompose()
+
+        # Fix links in source page:
+        if item_name:
+            nodes = parsed.find_all(lambda node: node.name == "a" and "_modules" in node.get("href", ""))
+            for node in nodes:
+                node["href"] = node["href"].replace(f"_modules/{item_name}/", "")
 
         with open(html_path, "w", encoding="utf8") as new_html:
             new_html.write(str(parsed))

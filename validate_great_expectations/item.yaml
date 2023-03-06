@@ -14,7 +14,7 @@ labels:
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 1.1.0
-name: great-expectations
+name: validate-great-expectations
 platformVersion: 3.5.2
 spec:
   filename: validate_great_expectations.py

@@ -157,11 +157,13 @@ def build_marketplace(
     update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log)
     build_catalog_json(
         marketplace_dir=marketplace_dir,
+        source_directory=source_dir,
         catalog_path=(marketplace_root / "catalog.json"),
         change_log=change_log,
     )
     build_catalog_json(
         marketplace_dir=marketplace_dir,
+        source_directory=source_dir,
         catalog_path=(marketplace_dir / "catalog.json"),
         change_log=change_log,
         in_channel_directory=False,
@@ -228,6 +230,7 @@ def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
 
 def build_catalog_json(
     marketplace_dir: Union[str, Path],
+    source_directory: Union[str, Path],
     catalog_path: Union[str, Path],
     change_log: ChangeLog,
     in_channel_directory: bool = True,
@@ -239,6 +242,7 @@ def build_catalog_json(
     and in each version field, there is all the details that concerned the version.
 
     :param marketplace_dir:         the root directory of the marketplace
+    :param source_directory:        the source directory to build the marketplace from
     :param catalog_path:            the path to the catalog
     :param change_log:              logger of all changes
     :param in_channel_directory:    if True the catalog will be written relatively to channel,
@@ -271,7 +275,6 @@ def build_catalog_json(
 
         # removing hidden function from catalog:
         if latest_yaml["hidden"]:
-            change_log.hide_item(source_dir.name)
             funcs.pop(source_dir.name, None)
         else:
             funcs[source_dir.name] = {"latest": latest_yaml}
@@ -285,10 +288,11 @@ def build_catalog_json(
                     funcs[source_dir.name][version] = version_yaml
 
     # Remove deleted directories from catalog:
-    for function_dir in funcs.keys():
-        if not (marketplace_dir / function_dir).exists():
+    for function_dir in list(funcs.keys()):
+        if not (source_directory / function_dir).exists():
             change_log.deleted_item(function_dir)
             del funcs[function_dir]
+            shutil.rmtree(marketplace_dir / function_dir, ignore_errors=True)
 
     json.dump(catalog, open(catalog_path, "w"))
 

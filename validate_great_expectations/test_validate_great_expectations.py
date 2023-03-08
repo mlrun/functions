@@ -13,7 +13,7 @@ from great_expectations.data_context.types.base import (
 )
 from great_expectations.checkpoint.types.checkpoint_result import CheckpointResult
 
-from great_expectations_mlrun import (
+from validate_great_expectations import (
     get_default_datasource_config,
     get_default_checkpoint_config,
     get_data_doc_path,

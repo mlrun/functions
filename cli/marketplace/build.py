@@ -18,7 +18,7 @@ import shutil
 import subprocess
 import uuid
 from pathlib import Path
-from typing import Union, Optional, Set, Dict, List
+from typing import Dict, List, Optional, Set, Union
 
 import click
 import yaml
@@ -26,13 +26,8 @@ from bs4 import BeautifulSoup
 from sphinx.cmd.build import main as sphinx_build_cmd
 from sphinx.ext.apidoc import main as sphinx_apidoc_cmd
 
-from cli.helpers import (
-    is_item_dir,
-    render_jinja,
-    PROJECT_ROOT,
-    get_item_yaml_values,
-    get_mock_requirements,
-)
+from cli.helpers import (PROJECT_ROOT, get_item_yaml_values,
+                         get_mock_requirements, is_item_dir, render_jinja)
 from cli.marketplace.changelog import ChangeLog
 from cli.path_iterator import PathIterator
 
@@ -68,6 +63,14 @@ ASSETS = {
     default=False,
     help="When this flag is set, the process will output extra information",
 )
+@click.option(
+    "-f",
+    "--force-update",
+    "force_update_items",
+    is_flag=True,
+    default=False,
+    help="When this flag is set, item pages will be created even if the item did not changed",
+)
 def build_marketplace_cli(
     source_dir: str,
     source_name: str,
@@ -75,6 +78,7 @@ def build_marketplace_cli(
     temp_dir: str,
     channel: str,
     verbose: bool,
+    force_update_items: bool,
 ):
     build_marketplace(
         source_dir,
@@ -83,6 +87,7 @@ def build_marketplace_cli(
         temp_dir,
         channel,
         verbose,
+        force_update_items,
     )
 
 
@@ -93,6 +98,7 @@ def build_marketplace(
     temp_dir: str = "/tmp",
     channel: str = "development",
     verbose: bool = False,
+    force_update_items: bool = False,
 ):
     """Main entry point to marketplace building
 
@@ -103,6 +109,8 @@ def build_marketplace(
     if not provided '/tmp/<random_uuid>' will be used
     :param channel: The name of the marketplace channel to write to
     :param verbose: When True, additional debug information will be written to stdout
+    :param force_update_items: If True, items will be updated unrelated if they are not changed.
+                                The purpose of this flag is to fix existed broken pages (e.g. broken links)
     """
     global _verbose
     _verbose = verbose
@@ -152,9 +160,15 @@ def build_marketplace(
     render_html_files(temp_docs)
 
     change_log = ChangeLog()
-    copy_static_resources(marketplace_dir, temp_docs)
+    copy_resources(marketplace_dir, temp_docs)
 
-    update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log)
+    update_or_create_items(
+        source_dir,
+        marketplace_dir,
+        temp_docs,
+        change_log,
+        force_update=force_update_items,
+    )
     build_catalog_json(
         marketplace_dir=marketplace_dir,
         catalog_path=(marketplace_root / "catalog.json"),
@@ -212,18 +226,22 @@ def write_index_html(marketplace_root: Union[str, Path]):
     shutil.copy(template_path, index_path)
 
 
-def copy_static_resources(marketplace_dir, temp_docs):
+def copy_resources(marketplace_dir, temp_docs):
     marketplace_static = marketplace_dir / "_static"
-    if not marketplace_static.exists():
-        click.echo("Copying static resources...")
-        shutil.copytree(temp_docs / "_build/_static", marketplace_static)
-        shutil.copytree(temp_docs / "_build/_modules", marketplace_dir / "_modules")
+    click.echo("Copying static resources...")
+    shutil.copytree(
+        temp_docs / "_build/_static", marketplace_static, dirs_exist_ok=True
+    )
 
 
-def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
+def update_or_create_items(
+    source_dir, marketplace_dir, temp_docs, change_log, force_update: bool = False
+):
     click.echo("Creating items...")
     for item_dir in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
-        update_or_create_item(item_dir, marketplace_dir, temp_docs, change_log)
+        update_or_create_item(
+            item_dir, marketplace_dir, temp_docs, change_log, force_update
+        )
 
 
 def build_catalog_json(
@@ -329,17 +347,22 @@ def add_assets(item_yaml: dict):
 
 
 def update_or_create_item(
-    item_dir: Path, marketplace_dir: Path, temp_docs: Path, change_log: ChangeLog
+    item_dir: Path,
+    marketplace_dir: Path,
+    temp_docs: Path,
+    change_log: ChangeLog,
+    force_update: bool = False,
 ):
     # Copy source directories to target directories, if target already has the directory, archive previous version
     item_yaml = yaml.full_load(open(item_dir / "item.yaml", "r"))
     source_version = item_yaml["version"]
+    relative_path = "../../../"
 
     marketplace_item = marketplace_dir / item_dir.stem
     target_latest = marketplace_item / "latest"
     target_version = marketplace_item / source_version
 
-    if target_version.exists():
+    if target_version.exists() and not force_update:
         latest_item_yaml = yaml.full_load(
             open(target_latest / "src" / "item.yaml", "r")
         )
@@ -351,16 +374,21 @@ def update_or_create_item(
     example_html_name = f"{item_dir.stem}_example.html"
 
     build_path = temp_docs / "_build"
-    source_html = marketplace_dir / "_modules" / item_dir.stem / f"{item_dir.stem}.html"
-    update_html_resource_paths(source_html, relative_path="../")
+    source_html = (
+        temp_docs / "_build" / "_modules" / item_dir.stem / f"{item_dir.stem}.html"
+    )
+    update_html_resource_paths(source_html, relative_path=relative_path)
 
     documentation_html = build_path / documentation_html_name
     update_html_resource_paths(
-        documentation_html, relative_path="../../../", with_download=False, item_name=item_dir.stem
+        documentation_html,
+        relative_path=relative_path,
+        with_download=False,
+        item_name=item_dir.stem,
     )
 
     example_html = build_path / example_html_name
-    update_html_resource_paths(example_html, relative_path="../../../")
+    update_html_resource_paths(example_html, relative_path=relative_path)
 
     latest_src = target_latest / "src"
     version_src = target_version / "src"
@@ -445,34 +473,38 @@ def update_or_create_item(
 
 
 def update_html_resource_paths(
-    html_path: Path, relative_path: str, with_download: bool = True, item_name: str = None
+    html_path: Path,
+    relative_path: str,
+    with_download: bool = True,
+    item_name: str = None,
 ):
     if html_path.exists():
         with open(html_path, "r", encoding="utf8") as html:
             parsed = BeautifulSoup(html.read(), features="html.parser")
 
         # Update back to docs link (from source page)
-        back_to_docs_nodes = parsed.find_all(lambda node: "viewcode-back" in node.get("class", ""))
-        pattern = r"^.*?(?=.html)"
+        back_to_docs_nodes = parsed.find_all(
+            lambda node: "viewcode-back" in node.get("class", "")
+        )
+        pattern = r"^.*?(?={})"
         for node in back_to_docs_nodes:
-            node["href"] = re.sub(pattern, "documentation", node["href"])
+            node["href"] = re.sub(
+                pattern.format(".html"), "documentation", node["href"]
+            )
 
-        # Remove _static from links and replace with src
+        # Fix links with relative paths:
         nodes = parsed.find_all(
-            lambda node: node.name == "link" and "_static" in node.get("href", "")
+            lambda node: "_static" in node.get("src", "")
+            or "_static" in node.get("href", "")
         )
         for node in nodes:
-            node["href"] = f"{relative_path}{node['href']}"
+            key = "href" if "_static" in node.get("href", "") else "src"
+            node[key] = re.sub(pattern.format("_static"), relative_path, node[key])
 
-        nodes = parsed.find_all(
-            lambda node: node.name == "script"
-            and node.get("src", "").startswith("_static")
-        )
-        for node in nodes:
-            node["src"] = f"{relative_path}{node['src']}"
         if with_download:
             nodes = parsed.find_all(lambda node: "_sources" in node.get("href", ""))
             for node in nodes:
+                # fix path and remove example from name:
                 node[
                     "href"
                 ] = f'../{node["href"].replace("_sources", "src").replace("_example", "")}'
@@ -487,7 +519,9 @@ def update_html_resource_paths(
 
         # Fix links in source page:
         if item_name:
-            nodes = parsed.find_all(lambda node: node.name == "a" and "_modules" in node.get("href", ""))
+            nodes = parsed.find_all(
+                lambda node: node.name == "a" and "_modules" in node.get("href", "")
+            )
             for node in nodes:
                 node["href"] = node["href"].replace(f"_modules/{item_name}/", "")
 
@@ -653,4 +687,10 @@ def build_temp_docs(temp_root, temp_docs):
 
 if __name__ == "__main__":
     # build_marketplace_cli()
-    build_marketplace("../../", "../../../marketp", verbose=True)
+    build_marketplace(
+        source_dir="../../../functions",
+        marketplace_dir="../../../marketplace",
+        verbose=True,
+        channel="development",
+        force_update_items=True,
+    )

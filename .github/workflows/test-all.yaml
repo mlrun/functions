@@ -167,7 +167,7 @@ jobs:
           pwd
           git pull origin
           cd ..
-          python functions/functions.py build-marketplace -s functions -m marketplace -c $CHANNEL -v
+          python functions/functions.py build-marketplace -s functions -m marketplace -c $CHANNEL -v -f
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V3 }}

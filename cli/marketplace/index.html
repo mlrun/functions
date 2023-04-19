@@ -115,6 +115,7 @@
         item.example = item.example ? `${base_url}/static/example.html` : null;
         item.functionPath = `${base_url}/static/function.html`;
         item.itemPath = `${base_url}/static/item.html`;
+        item.code = `${base_url}/static/${item.rawName}.html`;
 
         table.addRow(item);
     }
@@ -186,6 +187,18 @@
                 formatterParams: {
                     label: (cell) => {
                         return (cell._cell.value === undefined ? '' : 'View');
+                    },
+                },
+                width: 150
+            },
+                        {
+                title: "Source Code",
+                field: "code",
+                headerSort: false,
+                formatter: "link",
+                formatterParams: {
+                    label: (cell) => {
+                        return (cell._cell.value === undefined ? '': 'View');
                     },
                 },
                 width: 150

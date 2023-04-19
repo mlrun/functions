@@ -104,10 +104,10 @@ jobs:
        with:
          path: functions
      # Install python
-     - name: Install python
+     - name: Install python 3.9
        uses: actions/setup-python@v2
        with:
-         python-version: 3.7
+         python-version: 3.9
      # Install dependencies
      - uses: actions/cache@v1
        id: cache

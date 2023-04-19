@@ -37,8 +37,7 @@ def test_local_xgb_serving():
                                      "CLASS_objective": "binary:logistic",
                                      "CLASS_booster": "gbtree",
                                      "FIT_verbose": 0,
-                                     "label_column": "labels",
-                                     "test_set": "./"},
+                                     "label_column": "labels"},
                              local=True,
                              inputs={"dataset": gen_data_run.artifact('classifier-data').url},
                              artifact_path='./')

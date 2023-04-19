@@ -29,6 +29,7 @@ def get_class_data():
                          'file_ext': 'csv'}, local=True, artifact_path='./')
     return run
 
+
 def test_xgb_trainer_code_to_function():
     gen_data_run = get_class_data()
     fn = code_to_function(name='test_xgb_trainer',
@@ -41,8 +42,7 @@ def test_xgb_trainer_code_to_function():
                          'CLASS_objective': 'binary:logistic',
                          'CLASS_booster': 'gbtree',
                          'FIT_verbose': 0,
-                         'label_column': 'labels',
-                         'test_set': './'},
+                         'label_column': 'labels'},
                  local=False,
                  inputs={'dataset': gen_data_run.artifact('classifier-data').url})
 
@@ -59,8 +59,7 @@ def test_local_xgb_trainer_import_function():
                          'CLASS_objective': 'binary:logistic',
                          'CLASS_booster': 'gbtree',
                          'FIT_verbose': 0,
-                         'label_column': 'labels',
-                         'test_set': './'},
+                         'label_column': 'labels'},
                  local=True, inputs={'dataset': gen_data_run.artifact('classifier-data').url})
 
     assert (run.artifact('model'))

@@ -12,7 +12,7 @@ import transformers
 from datasets import Dataset, load_dataset, load_metric
 from mlrun import MLClientCtx
 from mlrun import feature_store as fs
-from mlrun.api.schemas import ObjectKind
+from mlrun.common.schemas import ObjectKind
 from mlrun.artifacts import Artifact, PlotlyArtifact
 from mlrun.datastore import DataItem
 from mlrun.frameworks._common import CommonTypes, MLRunInterface

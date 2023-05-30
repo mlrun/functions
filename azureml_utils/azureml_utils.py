@@ -19,7 +19,7 @@ from typing import Tuple, List
 
 from mlrun import MLClientCtx, DataItem, get_dataitem
 import mlrun.feature_store as f_store
-from mlrun.api.schemas import ObjectKind
+from mlrun.common.schemas import ObjectKind
 from mlrun.datastore.targets import ParquetTarget
 
 from azureml.core.authentication import ServicePrincipalAuthentication

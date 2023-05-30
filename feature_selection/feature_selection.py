@@ -17,7 +17,7 @@ import os
 
 import matplotlib.pyplot as plt
 import mlrun
-import mlrun.api.schemas
+import mlrun.common.schemas
 import mlrun.feature_store as fs
 import numpy as np
 import pandas as pd
@@ -146,7 +146,7 @@ def feature_selection(
     model_filters = model_filters or DEFAULT_MODEL_FILTERS
     # Check if df.meta is valid, if it is, look for a feature vector
     if df_artifact.meta:
-        if df_artifact.meta.kind == mlrun.api.schemas.ObjectKind.feature_vector:
+        if df_artifact.meta.kind == mlrun.common.schemas.ObjectKind.feature_vector:
             is_feature_vector = True
 
     # Look inside meta.spec.label_feature to identify the label_column if the user did not specify it

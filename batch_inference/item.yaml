@@ -12,7 +12,7 @@ labels:
   author: guyl
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.2.0
+mlrunVersion: 1.4.0
 name: batch_inference
 platformVersion: 3.5.0
 spec:
@@ -27,4 +27,4 @@ spec:
   kind: job
   requirements:
 url: ''
-version: 1.2.0
+version: 1.3.0

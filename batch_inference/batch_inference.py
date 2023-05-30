@@ -21,7 +21,7 @@ import mlrun
 import numpy as np
 import pandas as pd
 from mlrun import feature_store as fs
-from mlrun.api.schemas import ObjectKind
+from mlrun.common.schemas import ObjectKind
 from mlrun.artifacts import Artifact
 from mlrun.data_types.infer import InferOptions, get_df_stats
 from mlrun.frameworks.auto_mlrun import AutoMLRun

@@ -6,7 +6,7 @@ description: train any classifier using scikit-learn's API
 doc: ''
 example: sklearn_classifier.ipynb
 generationDate: 2022-08-28:17-25
-hidden: false
+hidden: true
 icon: ''
 labels:
   author: yjb

@@ -13,11 +13,12 @@
 # limitations under the License.
 #
 import json
+import re
 import shutil
 import subprocess
 import uuid
 from pathlib import Path
-from typing import Union, Optional, Set, Dict, Tuple, List
+from typing import Dict, List, Optional, Set, Union
 
 import click
 import yaml
@@ -25,17 +26,21 @@ from bs4 import BeautifulSoup
 from sphinx.cmd.build import main as sphinx_build_cmd
 from sphinx.ext.apidoc import main as sphinx_apidoc_cmd
 
-from cli.helpers import (
-    is_item_dir,
-    render_jinja,
-    PROJECT_ROOT,
-    get_item_yaml_values,
-    get_mock_requirements,
-)
+from cli.helpers import (PROJECT_ROOT, get_item_yaml_values,
+                         get_mock_requirements, is_item_dir, render_jinja)
 from cli.marketplace.changelog import ChangeLog
 from cli.path_iterator import PathIterator
 
 _verbose = False
+
+# For preparing the assets section in catalog for each function
+# The tuple values represents (<location in item.yaml>, <relative path value>)
+ASSETS = {
+    "example": ("example", "src/{}"),
+    "source": ("spec.filename", "src/{}"),
+    "function": "src/function.yaml",
+    "docs": "static/documentation.html",
+}
 
 
 @click.command()
@@ -58,6 +63,14 @@ _verbose = False
     default=False,
     help="When this flag is set, the process will output extra information",
 )
+@click.option(
+    "-f",
+    "--force-update",
+    "force_update_items",
+    is_flag=True,
+    default=False,
+    help="When this flag is set, item pages will be created even if the item did not changed",
+)
 def build_marketplace_cli(
     source_dir: str,
     source_name: str,
@@ -65,6 +78,7 @@ def build_marketplace_cli(
     temp_dir: str,
     channel: str,
     verbose: bool,
+    force_update_items: bool,
 ):
     build_marketplace(
         source_dir,
@@ -73,6 +87,7 @@ def build_marketplace_cli(
         temp_dir,
         channel,
         verbose,
+        force_update_items,
     )
 
 
@@ -83,6 +98,7 @@ def build_marketplace(
     temp_dir: str = "/tmp",
     channel: str = "development",
     verbose: bool = False,
+    force_update_items: bool = False,
 ):
     """Main entry point to marketplace building
 
@@ -93,6 +109,8 @@ def build_marketplace(
     if not provided '/tmp/<random_uuid>' will be used
     :param channel: The name of the marketplace channel to write to
     :param verbose: When True, additional debug information will be written to stdout
+    :param force_update_items: If True, items will be updated unrelated if they are not changed.
+                                The purpose of this flag is to fix existed broken pages (e.g. broken links)
     """
     global _verbose
     _verbose = verbose
@@ -142,20 +160,28 @@ def build_marketplace(
     render_html_files(temp_docs)
 
     change_log = ChangeLog()
-    copy_static_resources(marketplace_dir, temp_docs)
+    copy_resources(marketplace_dir, temp_docs)
 
-    update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log)
+    update_or_create_items(
+        source_dir,
+        marketplace_dir,
+        temp_docs,
+        change_log,
+        force_update=force_update_items,
+    )
     build_catalog_json(
         marketplace_dir=marketplace_dir,
+        source_directory=source_dir,
         catalog_path=(marketplace_root / "catalog.json"),
         change_log=change_log,
     )
     build_catalog_json(
         marketplace_dir=marketplace_dir,
+        source_directory=source_dir,
         catalog_path=(marketplace_dir / "catalog.json"),
         change_log=change_log,
-        with_functions_legacy=False,
-        add_artifacts=True,
+        in_channel_directory=False,
+        with_assets=True,
     )
 
     if _verbose:
@@ -202,32 +228,46 @@ def write_index_html(marketplace_root: Union[str, Path]):
     shutil.copy(template_path, index_path)
 
 
-def copy_static_resources(marketplace_dir, temp_docs):
+def copy_resources(marketplace_dir, temp_docs):
     marketplace_static = marketplace_dir / "_static"
-    if not marketplace_static.exists():
-        click.echo("Copying static resources...")
-        shutil.copytree(temp_docs / "_build/_static", marketplace_static)
+    click.echo("Copying static resources...")
+    shutil.copytree(
+        temp_docs / "_build/_static", marketplace_static, dirs_exist_ok=True
+    )
 
 
-def update_or_create_items(source_dir, marketplace_dir, temp_docs, change_log):
+def update_or_create_items(
+    source_dir, marketplace_dir, temp_docs, change_log, force_update: bool = False
+):
     click.echo("Creating items...")
     for item_dir in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
-        update_or_create_item(item_dir, marketplace_dir, temp_docs, change_log)
-
-
-def add_object_and_source(function_name: str, yaml_obj):
-    yaml_obj["object"] = "src/function.yaml"
-    yaml_obj["source"] = f"src/{function_name}.py"
-    return yaml_obj
+        update_or_create_item(
+            item_dir, marketplace_dir, temp_docs, change_log, force_update
+        )
 
 
 def build_catalog_json(
     marketplace_dir: Union[str, Path],
+    source_directory: Union[str, Path],
     catalog_path: Union[str, Path],
     change_log: ChangeLog,
-    with_functions_legacy: bool = True,
-    add_artifacts: bool = False,
+    in_channel_directory: bool = True,
+    with_assets: bool = False,
 ):
+    """
+    Building JSON catalog with all the details of the functions in marketplace
+    Each function in the catalog is seperated into different versions of the function,
+    and in each version field, there is all the details that concerned the version.
+
+    :param marketplace_dir:         the root directory of the marketplace
+    :param source_directory:        the source directory to build the marketplace from
+    :param catalog_path:            the path to the catalog
+    :param change_log:              logger of all changes
+    :param in_channel_directory:    if True the catalog will be written relatively to channel,
+                                    false is relatively to root (the catalog will contain the channels inside)
+    :param with_assets:             if True assets will be added to each version with the relative path to them
+                                    (API requirement)
+    """
     click.echo("Building catalog.json...")
 
     marketplace_dir = Path(marketplace_dir)
@@ -237,7 +277,7 @@ def build_catalog_json(
     catalog = json.load(open(catalog_path, "r")) if catalog_path.exists() else {}
 
     funcs = catalog
-    if with_functions_legacy:
+    if in_channel_directory:
         if source not in catalog:
             catalog[source] = {}
         if channel not in catalog[source]:
@@ -245,23 +285,14 @@ def build_catalog_json(
         funcs = catalog[source][channel]
 
     for source_dir in marketplace_dir.iterdir():
-        if not source_dir.is_dir() or source_dir.name == "_static":
+        if not source_dir.is_dir() or source_dir.name in ["_static", "_modules"]:
             continue
 
         latest_dir = source_dir / "latest"
-        source_yaml_path = latest_dir / "src" / "item.yaml"
-
-        latest_yaml = yaml.full_load(open(source_yaml_path, "r"))
-        latest_yaml["generationDate"] = str(latest_yaml["generationDate"])
-        latest_version = latest_yaml["version"]
-        if add_artifacts:
-            latest_yaml = add_object_and_source(
-                function_name=source_dir.name, yaml_obj=latest_yaml
-            )
+        latest_yaml = update_item_in_catalog(latest_dir, with_assets)
 
         # removing hidden function from catalog:
         if latest_yaml["hidden"]:
-            change_log.hide_item(source_dir.name)
             funcs.pop(source_dir.name, None)
         else:
             funcs[source_dir.name] = {"latest": latest_yaml}
@@ -270,37 +301,72 @@ def build_catalog_json(
             version = version_dir.name
 
             if version != "latest":
-                version_yaml_path = version_dir / "src" / "item.yaml"
-                version_yaml = yaml.full_load(open(version_yaml_path, "r"))
-                version_yaml["generationDate"] = str(version_yaml["generationDate"])
-                if add_artifacts:
-                    version_yaml = add_object_and_source(
-                        function_name=source_dir.name, yaml_obj=version_yaml
-                    )
+                version_yaml = update_item_in_catalog(version_dir, with_assets)
                 if not latest_yaml["hidden"]:
                     funcs[source_dir.name][version] = version_yaml
 
     # Remove deleted directories from catalog:
-    for function_dir in funcs.keys():
-        if not (marketplace_dir / function_dir).exists():
+    for function_dir in list(funcs.keys()):
+        if not (source_directory / function_dir).exists():
             change_log.deleted_item(function_dir)
             del funcs[function_dir]
+            shutil.rmtree(marketplace_dir / function_dir, ignore_errors=True)
 
     json.dump(catalog, open(catalog_path, "w"))
 
 
+def update_item_in_catalog(directory: Path, with_assets: bool) -> dict:
+    """
+    Updates the item yaml in catalog with and add assets if required
+    :param directory:   the version directory of the function
+    :param with_assets: add function's assets to support MLRun API
+    :return: Updated item yaml dictionary
+    """
+    source_yaml_path = directory / "src" / "item.yaml"
+
+    item_yaml = yaml.full_load(open(source_yaml_path, "r"))
+    item_yaml["generationDate"] = str(item_yaml["generationDate"])
+    if with_assets:
+        add_assets(item_yaml)
+    return item_yaml
+
+
+def add_assets(item_yaml: dict):
+    """
+    Adding assets to function's item yaml with the relative path for MLRun API
+
+    :param item_yaml: function's item yaml as a dict
+    """
+    item_yaml["assets"] = {}
+    for asset, template in ASSETS.items():
+        if isinstance(template, str) and "{}" not in template:
+            item_yaml["assets"][asset] = template
+        else:
+            key, template = template
+            asset_location = item_yaml
+            for loc in key.split("."):
+                asset_location = asset_location.get(loc)
+            if asset_location:
+                item_yaml["assets"][asset] = template.format(asset_location)
+
+
 def update_or_create_item(
-    item_dir: Path, marketplace_dir: Path, temp_docs: Path, change_log: ChangeLog
+    item_dir: Path,
+    marketplace_dir: Path,
+    temp_docs: Path,
+    change_log: ChangeLog,
+    force_update: bool = False,
 ):
     # Copy source directories to target directories, if target already has the directory, archive previous version
     item_yaml = yaml.full_load(open(item_dir / "item.yaml", "r"))
     source_version = item_yaml["version"]
+    relative_path = "../../../"
 
     marketplace_item = marketplace_dir / item_dir.stem
     target_latest = marketplace_item / "latest"
     target_version = marketplace_item / source_version
 
-    if target_version.exists():
+    if target_version.exists() and not force_update:
         latest_item_yaml = yaml.full_load(
             open(target_latest / "src" / "item.yaml", "r")
         )
@@ -312,14 +378,21 @@ def update_or_create_item(
     example_html_name = f"{item_dir.stem}_example.html"
 
     build_path = temp_docs / "_build"
+    source_html = (
+        temp_docs / "_build" / "_modules" / item_dir.stem / f"{item_dir.stem}.html"
+    )
+    update_html_resource_paths(source_html, relative_path=relative_path)
 
     documentation_html = build_path / documentation_html_name
     update_html_resource_paths(
-        documentation_html, relative_path="../../../", with_download=False
+        documentation_html,
+        relative_path=relative_path,
+        with_download=False,
+        item_name=item_dir.stem,
     )
 
     example_html = build_path / example_html_name
-    update_html_resource_paths(example_html, relative_path="../../../")
+    update_html_resource_paths(example_html, relative_path=relative_path)
 
     latest_src = target_latest / "src"
     version_src = target_version / "src"
@@ -341,6 +414,9 @@ def update_or_create_item(
 
     latest_static.mkdir(parents=True, exist_ok=True)
     version_static.mkdir(parents=True, exist_ok=True)
+    if source_html.exists():
+        shutil.copy(source_html, latest_static / f"{item_dir.name}.html")
+        shutil.copy(source_html, version_static / f"{item_dir.name}.html")
 
     if documentation_html.exists():
         shutil.copy(documentation_html, latest_static / "documentation.html")
@@ -401,38 +477,57 @@ def update_or_create_item(
 
 
 def update_html_resource_paths(
-    html_path: Path, relative_path: str, with_download: bool = True
+    html_path: Path,
+    relative_path: str,
+    with_download: bool = True,
+    item_name: str = None,
 ):
     if html_path.exists():
         with open(html_path, "r", encoding="utf8") as html:
             parsed = BeautifulSoup(html.read(), features="html.parser")
 
-        nodes = parsed.find_all(
-            lambda node: node.name == "link" and "_static" in node.get("href", "")
+        # Update back to docs link (from source page)
+        back_to_docs_nodes = parsed.find_all(
+            lambda node: "viewcode-back" in node.get("class", "")
         )
-        for node in nodes:
-            node["href"] = f"{relative_path}{node['href']}"
-
-        nodes = parsed.find_all(
-            lambda node: node.name == "script"
-            and node.get("src", "").startswith("_static")
-        )
-        for node in nodes:
-            node["src"] = f"{relative_path}{node['src']}"
-        if not with_download:
-            # Removing download option from documentation:
-            nodes = parsed.find_all(
-                lambda node: node.name == "a"
-                and "dropdown-buttons" in node.get("class", "")
+        pattern = r"^.*?(?={})"
+        for node in back_to_docs_nodes:
+            node["href"] = re.sub(
+                pattern.format(".html"), "documentation", node["href"]
             )
-            for node in nodes:
-                node.decompose()
-        else:
+
+        # Fix links with relative paths:
+        nodes = parsed.find_all(
+            lambda node: "_static" in node.get("src", "")
+            or "_static" in node.get("href", "")
+        )
+        for node in nodes:
+            key = "href" if "_static" in node.get("href", "") else "src"
+            node[key] = re.sub(pattern.format("_static"), relative_path, node[key])
+
+        if with_download:
             nodes = parsed.find_all(lambda node: "_sources" in node.get("href", ""))
             for node in nodes:
+                # fix path and remove example from name:
                 node[
                     "href"
                 ] = f'../{node["href"].replace("_sources", "src").replace("_example", "")}'
+        else:
+            # Removing download option from documentation:
+            nodes = parsed.find_all(
+                lambda node: node.name == "a" and "headerbtn" in node.get("class", "")
+            )
+            for node in nodes:
+                if node["href"].endswith(".rst"):
+                    node.decompose()
+
+        # Fix links in source page:
+        if item_name:
+            nodes = parsed.find_all(
+                lambda node: node.name == "a" and "_modules" in node.get("href", "")
+            )
+            for node in nodes:
+                node["href"] = node["href"].replace(f"_modules/{item_name}/", "")
 
         with open(html_path, "w", encoding="utf8") as new_html:
             new_html.write(str(parsed))
@@ -596,4 +691,10 @@ def build_temp_docs(temp_root, temp_docs):
 
 if __name__ == "__main__":
     # build_marketplace_cli()
-    build_marketplace("../../", "../../../marketp", verbose=True)
+    build_marketplace(
+        source_dir="../../../functions",
+        marketplace_dir="../../../marketplace",
+        verbose=True,
+        channel="development",
+        force_update_items=True,
+    )

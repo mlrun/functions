@@ -7,7 +7,7 @@ description: simulate data with outliers.
 doc: ''
 example: xgb_custom.ipynb
 generationDate: 2022-08-28:17-25
-hidden: false
+hidden: true
 icon: ''
 labels:
   author: Daniel

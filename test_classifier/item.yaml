@@ -6,7 +6,7 @@ description: test a classifier using held-out or new data
 doc: README.md
 example: test_classifier.ipynb
 generationDate: 2022-08-28:17-25
-hidden: false
+hidden: true
 icon: ''
 labels:
   author: yjb

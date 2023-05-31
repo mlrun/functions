@@ -41,7 +41,7 @@ def test_local_xgb_custom():
             "verbose_eval": False,
             "XGB_max_depth": 2,
             "XGB_subsample": 0.9,
-            "test_set_key": "./artifacts/inputs/test-set",
+            "test_set_key": "test-set",
         },
         inputs={"dataset": run.artifact('xgb-outs').url},
         handler="fit",

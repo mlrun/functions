@@ -6,13 +6,14 @@ from abc import ABC
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import mlrun
+import mlrun.datastore
+import mlrun.utils
 import numpy as np
 import pandas as pd
 import transformers
 from datasets import Dataset, load_dataset, load_metric
 from mlrun import MLClientCtx
 from mlrun import feature_store as fs
-from mlrun.api.schemas import ObjectKind
 from mlrun.artifacts import Artifact, PlotlyArtifact
 from mlrun.datastore import DataItem
 from mlrun.frameworks._common import CommonTypes, MLRunInterface
@@ -518,7 +519,8 @@ def _get_dataframe(
 
         return dataset, label_columns
 
-    if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
+    store_uri_prefix = mlrun.datastore.parse_store_uri(dataset.artifact_url)[0]
+    if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
         # feature-vector case:
         label_columns = label_columns or dataset.meta.status.label_column
         dataset = fs.get_offline_features(

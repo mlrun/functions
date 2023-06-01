@@ -16,6 +16,8 @@ from typing import List, Dict, Optional, Union, Tuple, Any
 from pathlib import Path
 
 import mlrun
+import mlrun.datastore
+import mlrun.utils
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -23,7 +25,6 @@ from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.frameworks.auto_mlrun import AutoMLRun
 from mlrun import feature_store as fs
-from mlrun.api.schemas import ObjectKind
 from mlrun.utils.helpers import create_class, create_function
 
 PathType = Union[str, Path]
@@ -84,7 +85,8 @@ def _get_dataframe(
 
         return dataset, label_columns
 
-    if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
+    store_uri_prefix = mlrun.datastore.parse_store_uri(dataset.artifact_url)[0]
+    if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
         # feature-vector case:
         label_columns = label_columns or dataset.meta.status.label_column
         dataset = fs.get_offline_features(

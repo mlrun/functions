@@ -64,7 +64,7 @@ def _read_dataset_as_dataframe(
             drop_columns = [drop_columns]
 
     # Check if the dataset is in fact a Feature Vector:
-    store_uri_prefix = mlrun.datastore.parse_store_uri(dataset.artifact_url)[0]
+    store_uri_prefix, _ = mlrun.datastore.parse_store_uri(dataset.artifact_url)
     if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
         # Try to get the label columns if not provided:
         if label_columns is None:

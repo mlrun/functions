@@ -146,7 +146,7 @@ def feature_selection(
     stat_filters = stat_filters or DEFAULT_STAT_FILTERS
     model_filters = model_filters or DEFAULT_MODEL_FILTERS
     # Check if df.meta is valid, if it is, look for a feature vector
-    store_uri_prefix = mlrun.datastore.parse_store_uri(df_artifact.artifact_url)[0]
+    store_uri_prefix, _ = mlrun.datastore.parse_store_uri(df_artifact.artifact_url)
     is_feature_vector = mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix
 
     # Look inside meta.spec.label_feature to identify the label_column if the user did not specify it

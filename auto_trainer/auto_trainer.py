@@ -85,7 +85,7 @@ def _get_dataframe(
 
         return dataset, label_columns
 
-    store_uri_prefix = mlrun.datastore.parse_store_uri(dataset.artifact_url)[0]
+    store_uri_prefix, _ = mlrun.datastore.parse_store_uri(dataset.artifact_url)
     if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
         # feature-vector case:
         label_columns = label_columns or dataset.meta.status.label_column

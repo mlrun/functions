@@ -114,7 +114,7 @@ def train(
     model_class: str = None,
     model_name: str = "model",
     tag: str = "",
-    label_columns: Union[str, List[str]] = None,
+    label_columns: Optional[Union[str, List[str]]] = None,
     sample_set: DataItem = None,
     test_set: DataItem = None,
     train_test_split_size: float = None,

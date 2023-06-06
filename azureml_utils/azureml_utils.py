@@ -19,7 +19,8 @@ from typing import Tuple, List
 
 from mlrun import MLClientCtx, DataItem, get_dataitem
 import mlrun.feature_store as f_store
-from mlrun.api.schemas import ObjectKind
+import mlrun.datastore
+import mlrun.utils
 from mlrun.datastore.targets import ParquetTarget
 
 from azureml.core.authentication import ServicePrincipalAuthentication
@@ -168,7 +169,8 @@ def register_dataset(
     # Azure blob path (default datastore for workspace):
     blob_path = f"az://{datastore.container_name}/{dataset_name}"
 
-    feature_vector_case = data.meta and data.meta.kind == ObjectKind.feature_vector
+    store_uri_prefix, _ = mlrun.datastore.parse_store_uri(data.artifact_url)
+    feature_vector_case = mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix
     # Retrieve data source as dataframe:
     if feature_vector_case:
         # FeatureVector case:
@@ -384,7 +386,8 @@ def submit_training_job(
 
     # Get training set to log with model:
     feature_vector = None
-    if training_set.meta and training_set.meta.kind == ObjectKind.feature_vector:
+    store_uri_prefix, _ = mlrun.datastore.parse_store_uri(training_set.artifact_url)
+    if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
         feature_vector = training_set.meta.uri
         label_column_name = label_column_name or training_set.meta.status.label_column
         context.logger.info(f'label column name: {label_column_name}')

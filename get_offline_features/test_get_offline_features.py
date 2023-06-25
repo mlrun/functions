@@ -234,5 +234,6 @@ def test_get_offline_vector():
     vector_df = get_dataitem(gof_run.outputs["feature_vector"]).as_df()
 
     # Asserting that the target and FeatureVector dataframes are the same:
+    assert mlrun.datastore.is_store_uri(gof_run.outputs["feature_vector_uri"])
     assert vector_df.equals(target_df), "Target and feature vector are not the same"
     _cleanup_environment(artifact_path)

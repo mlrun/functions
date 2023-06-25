@@ -92,7 +92,13 @@ def get_offline_features(
         vector.metadata.project = project
         vector.metadata.tag = tag
         vector.save()
-        feature_vector = vector.uri
+        feature_vector_uri = vector.uri
+    else:
+        if is_store_uri(feature_vector):
+            feature_vector_uri = feature_vector
+        else:
+            vector = fs.get_feature_vector(feature_vector)
+            feature_vector_uri = vector.uri
 
     # Preparing entity_rows:
     if entity_rows is not None:
@@ -120,7 +126,7 @@ def get_offline_features(
         f"getting offline features from the FeatureVector {feature_vector}"
     )
     fs.get_offline_features(
-        feature_vector=feature_vector,
+        feature_vector=feature_vector_uri,
         entity_rows=entity_rows,
         entity_timestamp_column=entity_timestamp_column,
         target=target,
@@ -133,3 +139,4 @@ def get_offline_features(
     )
 
     context.log_result("feature_vector", feature_vector)
+    context.log_result("feature_vector_uri", feature_vector_uri)

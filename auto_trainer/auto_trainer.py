@@ -119,6 +119,7 @@ def train(
     test_set: DataItem = None,
     train_test_split_size: float = None,
     random_state: int = None,
+    labels: dict = None,
 ):
     """
     Training the given model on the given dataset.
@@ -138,6 +139,7 @@ def train(
                                     in the test split. The size of the Training set is set to the complement of this
                                     value. Default = 0.2
     :param random_state:            Random state for `train_test_split`
+    :param labels:                  Labels to log with the model
     """
     # Validate inputs:
     # Check if exactly one of them is supplied:
@@ -223,6 +225,7 @@ def train(
         x_test=x_test,
         y_test=y_test,
         artifacts=context.artifacts,
+        labels=labels,
     )
     context.logger.info(f"training '{model_name}'")
     model.fit(x_train, y_train, **fit_kwargs)

@@ -119,7 +119,7 @@ def train(
     test_set: DataItem = None,
     train_test_split_size: float = None,
     random_state: int = None,
-    labels: Dict[str, Union[str, int, float]] = None,
+    labels: dict = None,
 ):
     """
     Training the given model on the given dataset.

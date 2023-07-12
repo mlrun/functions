@@ -1,0 +1,9 @@
+mlrun==1.4.0-rc19
+pandas
+streamlit
+presidio-anonymizer
+presidio-analyzer
+torch
+flair@git+https://github.com/flairNLP/flair.git@d4ed67bf663e4066517f00397412510d90043653
+st-annotated-text
+https://huggingface.co/beki/en_spacy_pii_distilbert/resolve/main/en_spacy_pii_distilbert-any-py3-none-any.whl

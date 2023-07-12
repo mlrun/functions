@@ -1,0 +1,31 @@
+apiVersion: v1
+categories:
+  - machine-learning
+  - data-preparation
+description: This function is used to recognize PII entity and generate the anonymized text, highlighted html and json report of explaination. 
+doc: ''
+example: pii_recognizer.ipynb
+generationDate: 2023-07-11:23-11
+icon: ''
+labels: {}
+maintainers: []
+marketplaceType: ''
+mlrunVersion: '1.4.0-rc19'
+name: pii-recognizer
+platformVersion: ''
+spec:
+  filename: pii_recognizer.py
+  handler: pii_recognize
+  image: mlrun/mlrun
+  kind: job
+  requirements: 
+    - mlrun==1.4.0-rc19
+    - pandas
+    - presidio-anonymizer
+    - presidio-analyzer
+    - torch
+    - flair@git+https://github.com/flairNLP/flair.git@d4ed67bf663e4066517f00397412510d90043653
+    - st-annotated-text
+    - https://huggingface.co/beki/en_spacy_pii_distilbert/resolve/main/en_spacy_pii_distilbert-any-py3-none-any.whl
+url: ''
+version: 0.0.1

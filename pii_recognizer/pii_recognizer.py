@@ -13,31 +13,19 @@
 # limitations under the License.
 #
 
+import warnings
+import os
+import logging
 import mlrun
+from typing import Optional, List, Tuple, Set
+import presidio_analyzer as pa
+from presidio_analyzer.nlp_engine import NlpArtifacts
+from presidio_analyzer.predefined_recognizers.spacy_recognizer import SpacyRecognizer
 from mlrun.datastore import DataItem
 from mlrun.artifacts import Artifact
 from presidio_anonymizer import AnonymizerEngine
 from annotated_text.util import get_annotated_html
 from json import JSONEncoder
-import json
-import warnings
-import os
-import logging
-from typing import Optional, List, Tuple, Set
-import presidio_anonymizer as pa
-
-from presidio_analyzer import (
-    RecognizerRegistry,
-    AnalyzerEngine,
-    RecognizerResult,
-    LocalRecognizer,
-    EntityRecognizer,
-    Pattern,
-    PatternRecognizer,
-    AnalysisExplanation,
-)
-from presidio_analyzer.nlp_engine import NlpArtifacts
-from presidio_analyzer.predefined_recognizers.spacy_recognizer import SpacyRecognizer
 
 try:
     from flair.data import Sentence
@@ -54,18 +42,18 @@ class PatternRecognizerFactory:
     @staticmethod
     def create_pattern_recognizer():
         ENTITIES = {
-            "CREDIT_CARD": [Pattern("CREDIT_CARD", r"\b(?:\d[ -]*?){13,16}\b", 0.5)],
-            "SSN": [Pattern("SSN", r"\b\d{3}-?\d{2}-?\d{4}\b", 0.5)],
-            "PHONE": [Pattern("PHONE", r"\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}", 0.5)],
-            "EMAIL": [Pattern("EMAIL", r"\S+@\S+", 0.5)],
+            "CREDIT_CARD": [pa.Pattern("CREDIT_CARD", r"\b(?:\d[ -]*?){13,16}\b", 0.5)],
+            "SSN": [pa.Pattern("SSN", r"\b\d{3}-?\d{2}-?\d{4}\b", 0.5)],
+            "PHONE": [pa.Pattern("PHONE", r"\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}", 0.5)],
+            "EMAIL": [pa.Pattern("EMAIL", r"\S+@\S+", 0.5)],
         }
         res = []
         for entity, pattern in ENTITIES.items():
-            res.append(PatternRecognizer(supported_entity=entity, patterns=pattern))
+            res.append(pa.PatternRecognizer(supported_entity=entity, patterns=pattern))
         return res
 
 
-class CustomSpacyRecognizer(LocalRecognizer):
+class CustomSpacyRecognizer(pa.LocalRecognizer):
     ENTITIES = [
         "LOCATION",
         "PERSON",
@@ -136,14 +124,14 @@ class CustomSpacyRecognizer(LocalRecognizer):
 
     def build_spacy_explanation(
         self, original_score: float, explanation: str
-    ) -> AnalysisExplanation:
+    ) -> pa.AnalysisExplanation:
         """
         Create explanation for why this result was detected.
         :param original_score: Score given by this recognizer
         :param explanation: Explanation string
-        :returns: AnalysisExplanation object
+        :returns: Presidio AnalysisExplanation object
         """
-        explanation = AnalysisExplanation(
+        explanation = pa.AnalysisExplanation(
             recognizer=self.__class__.__name__,
             original_score=original_score,
             textual_explanation=explanation,
@@ -156,7 +144,7 @@ class CustomSpacyRecognizer(LocalRecognizer):
         :param text: Text to analyze
         :param entities: Entities to analyze
         :param nlp_artifacts: NLP artifacts to use
-        :returns: List of RecognizerResult objects
+        :returns: List of Presidio RecognizerResult objects
         """
         results = []
         if not nlp_artifacts:
@@ -175,14 +163,14 @@ class CustomSpacyRecognizer(LocalRecognizer):
                 explanation = self.build_spacy_explanation(
                     self.ner_strength, textual_explanation
                 )
-                spacy_result = RecognizerResult(
+                spacy_result = pa.RecognizerResult(
                     entity_type=entity,
                     start=ent.start_char,
                     end=ent.end_char,
                     score=self.ner_strength,
                     analysis_explanation=explanation,
                     recognition_metadata={
-                        RecognizerResult.RECOGNIZER_NAME_KEY: self.name
+                        pa.RecognizerResult.RECOGNIZER_NAME_KEY: self.name
                     },
                 )
                 results.append(spacy_result)
@@ -205,7 +193,7 @@ class CustomSpacyRecognizer(LocalRecognizer):
         )
 
 
-class FlairRecognizer(EntityRecognizer):
+class FlairRecognizer(pa.EntityRecognizer):
     """
     Wrapper for a flair model, if needed to be used within Presidio Analyzer.
     """
@@ -322,7 +310,7 @@ class FlairRecognizer(EntityRecognizer):
     # Class to use Flair with Presidio as an external recognizer.
     def analyze(
         self, text: str, entities: List[str], nlp_artifacts: NlpArtifacts = None
-    ) -> List[RecognizerResult]:
+    ) -> List[pa.RecognizerResult]:
         """
         Analyze text using Text Analytics.
         :param text: The text for analysis.
@@ -363,17 +351,17 @@ class FlairRecognizer(EntityRecognizer):
 
         return results
 
-    def _convert_to_recognizer_result(self, entity, explanation) -> RecognizerResult:
+    def _convert_to_recognizer_result(self, entity, explanation) -> pa.RecognizerResult:
         """
         Convert Flair result to Presidio RecognizerResult.
         :param entity: Flair entity
-        :param explanation: AnalysisExplanation
-        :returns: RecognizerResult
+        :param explanation: Presidio AnalysisExplanation
+        :returns: Presidio RecognizerResult
         """
         entity_type = self.PRESIDIO_EQUIVALENCES.get(entity.tag, entity.tag)
         flair_score = round(entity.score, 2)
 
-        flair_results = RecognizerResult(
+        flair_results = pa.RecognizerResult(
             entity_type=entity_type,
             start=entity.start_position,
             end=entity.end_position,
@@ -385,14 +373,14 @@ class FlairRecognizer(EntityRecognizer):
 
     def build_flair_explanation(
         self, original_score: float, explanation: str
-    ) -> AnalysisExplanation:
+    ) -> pa.AnalysisExplanation:
         """
         Create explanation for why this result was detected.
         :param original_score: Score given by this recognizer
         :param explanation: Explanation string
-        :returns: AnalysisExplanation
+        :returns: Presidio AnalysisExplanation
         """
-        explanation = AnalysisExplanation(
+        explanation = pa.AnalysisExplanation(
             recognizer=self.__class__.__name__,
             original_score=original_score,
             textual_explanation=explanation,
@@ -409,11 +397,11 @@ class FlairRecognizer(EntityRecognizer):
 
 
 def get_analyzer_engine(model="whole"):
-    """Return AnalyzerEngine.
+    """Return pa.AnalyzerEngine.
     :param model: The model to use. Can be "spacy", "flair", "pattern" or "whole".
-    :returns: AnalyzerEngine
+    :returns: pa.AnalyzerEngine
     """
-    registry = RecognizerRegistry()
+    registry = pa.RecognizerRegistry()
 
     spacy_recognizer = CustomSpacyRecognizer()
 
@@ -438,7 +426,7 @@ def get_analyzer_engine(model="whole"):
         for recognizer in pattern_recognizer_factory.create_pattern_recognizer():
             registry.add_recognizer(recognizer)
 
-    analyzer = AnalyzerEngine(registry=registry, supported_languages=["en"])
+    analyzer = pa.AnalyzerEngine(registry=registry, supported_languages=["en"])
     return analyzer
 
 
@@ -453,7 +441,7 @@ def get_supported_entities():
     """Return supported entities from the Analyzer Engine.
     :returns: The list of supported entities.
     """
-    return analyzer_engine().get_supported_entities()
+    return get_analyzer_engine().get_supported_entities()
 
 
 def analyze(**kwargs):
@@ -474,7 +462,7 @@ def anonymize(text, analyze_results):
     """
     if not text:
         return
-    res = anonymizer_engine().anonymize(text, analyze_results)
+    res = get_anonymizer_engine().anonymize(text, analyze_results)
     return res.text
 
 
@@ -515,7 +503,7 @@ class CustomEncoder(JSONEncoder):
         return o.__dict__
 
 
-def process(text: str, model: AnalyzerEngine):
+def process(text: str, model: pa.AnalyzerEngine):
     """
     Process the text of str using the model.
     :param txt: Text to process

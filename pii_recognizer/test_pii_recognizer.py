@@ -19,7 +19,7 @@ import random
 from faker import Faker
 from pii_recognizer import (
     process,
-    analyzer_engine,
+    get_analyzer_engine,
     anonymize,
     annotate,
     get_supported_entities,
@@ -98,7 +98,7 @@ def test_pattern_process(fake_data):
         "EMAIL": "email",
     }
 
-    analyzer = analyzer_engine("partern")
+    analyzer = get_analyzer_engine("partern")
     text = f"He can be reached at {fake_data['email']} or {fake_data['phone']}.His credit card number is {fake_data['credit_card']} and his SSN is {fake_data['ssn']}."
     res, html, rpt = process(text, analyzer)
 
@@ -111,7 +111,7 @@ def test_spacy_process(fake_data):
         "ORGANIZATION": "organization",
     }
 
-    analyzer = analyzer_engine("spacy")
+    analyzer = get_analyzer_engine("spacy")
     text = f"{fake_data['name']}'s employer is {fake_data['organization']}."
     res, html, rpt = process(text, analyzer)
 
@@ -138,7 +138,7 @@ def test_flair_process(fake_data):
         "SWIFT_CODE": "swift_code",
     }
 
-    analyzer = analyzer_engine("flair")
+    analyzer = get_analyzer_engine("flair")
     text = " ".join(
         [item + " is " + str(fake_data[item]) for item in ENTITIES.values()]
     )
@@ -172,6 +172,6 @@ def test_whole_process(fake_data):
     text = " ".join(
         [item + " is " + str(fake_data[item]) for item in ENTITIES.values()]
     )
-    analyzer = analyzer_engine("whole")
+    analyzer = get_analyzer_engine("whole")
     res, html, rpt = process(text, analyzer)
     assert any(entity in res for entity in ENTITIES.keys())

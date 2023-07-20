@@ -528,7 +528,7 @@ def process(text: str, model: AnalyzerEngine):
     return anonymized_text, html_str, stats
 
 
-def pii_recognize(
+def recognize_pii(
     context: mlrun.MLClientCtx,
     input_path: str,
     output_path: str,

@@ -100,9 +100,7 @@ class CustomSpacyRecognizer(LocalRecognizer):
         :returns SpacyRecognizer object
         """
         self.ner_strength = ner_strength
-        self.check_label_groups = (
-            check_label_groups if check_label_groups else self.CHECK_LABEL_GROUPS
-        )
+        self.check_label_groups = check_label_groups or self.CHECK_LABEL_GROUPS
         supported_entities = supported_entities if supported_entities else self.ENTITIES
         super().__init__(
             supported_entities=supported_entities,

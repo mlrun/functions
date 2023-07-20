@@ -26,7 +26,7 @@ from presidio_analyzer.predefined_recognizers.spacy_recognizer import SpacyRecog
 try:
     from flair.data import Sentence
     from flair.models import SequenceTagger
-except ImportError:
+except ModuleNotFoundError:
     print("Flair is not installed")
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"

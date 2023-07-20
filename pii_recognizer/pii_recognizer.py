@@ -426,7 +426,7 @@ def get_analyzer_engine(model="whole"):
     return analyzer
 
 
-def anonymizer_engine():
+def get_anonymizer_engine() -> AnonymizerEngine:
     """Return AnonymizerEngine.
     :returns: The AnonymizerEngine.
     """

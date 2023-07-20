@@ -392,7 +392,7 @@ class FlairRecognizer(EntityRecognizer):
         )
 
 
-def analyzer_engine(model="whole"):
+def get_analyzer_engine(model="whole"):
     """Return AnalyzerEngine.
     :param model: The model to use. Can be "spacy", "flair", "pattern" or "whole".
     :returns: AnalyzerEngine

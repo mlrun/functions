@@ -30,11 +30,6 @@ from presidio_anonymizer import AnonymizerEngine
 from annotated_text.util import get_annotated_html
 from json import JSONEncoder
 
-try:
-    from flair.data import Sentence
-    from flair.models import SequenceTagger
-except ModuleNotFoundError:
-    print("Flair is not installed")
 
 # There is a conflict between Rust-based tokenizers' parallel processing
 # and Python's fork operations during multiprocessing. To avoid this, we need
@@ -249,7 +244,7 @@ class FlairRecognizer(pa.EntityRecognizer):
     Wrapper for a flair model, if needed to be used within Presidio Analyzer.
     This is to make sure the recognizer can be registered with Presidio registry.
     """
-
+    
     ENTITIES = [
         "LOCATION",
         "PERSON",
@@ -322,27 +317,31 @@ class FlairRecognizer(pa.EntityRecognizer):
         supported_language: str = "en",
         supported_entities: Optional[List[str]] = None,
         check_label_groups: Optional[Tuple[Set, Set]] = None,
-        model: SequenceTagger = None,
     ):
         """
         Initialize the FlairRecognizer.
         :param supported_language:      Language to use
         :param supported_entities:      Entities to use
         :param check_label_groups:      Label groups to check
-        :param model:                   Flair model to use
 
         :returns:                       FlairRecognizer object
 
         """
+
+        try:
+            from flair.data import Sentence
+            from flair.models import SequenceTagger
+            self.Sentence = Sentence
+            self.SequenceTagger = SequenceTagger
+        except ModuleNotFoundError:
+            print("Flair is not installed")
         self.check_label_groups = (
             check_label_groups if check_label_groups else self.CHECK_LABEL_GROUPS
         )
 
         supported_entities = supported_entities if supported_entities else self.ENTITIES
         self.model = (
-            model
-            if model
-            else SequenceTagger.load(self.MODEL_LANGUAGES.get(supported_language))
+            self.SequenceTagger.load(self.MODEL_LANGUAGES.get(supported_language))
         )
 
         super().__init__(
@@ -379,7 +378,7 @@ class FlairRecognizer(pa.EntityRecognizer):
 
         results = []
 
-        sentences = Sentence(text)
+        sentences = self.Sentence(text)
         self.model.predict(sentences)
 
         # If there are no specific list of entities, we will look for all of it.
@@ -479,16 +478,14 @@ def _get_analyzer_engine(model="whole"):
     # recognizer registry that can store multiple recognizers
     registry = pa.RecognizerRegistry()
 
-    # custom spacy recognizer
-    spacy_recognizer = CustomSpacyRecognizer()
-
-    # pre-trained flair recognizer
-    flair_recognizer = FlairRecognizer()
-
     if model == "spacy":
+        # custom spacy recognizer
+        spacy_recognizer = CustomSpacyRecognizer()
         # add the custom build spacy recognizer
         registry.add_recognizer(spacy_recognizer)
     if model == "flair":
+        # pre-trained flair recognizer
+        flair_recognizer = FlairRecognizer()
         # add the custom build flair recognizer
         registry.add_recognizer(flair_recognizer)
     if model == "pattern":
@@ -497,6 +494,8 @@ def _get_analyzer_engine(model="whole"):
         for recognizer in pattern_recognizer_factory.create_pattern_recognizer():
             registry.add_recognizer(recognizer)
     if model == "whole":
+        spacy_recognizer = CustomSpacyRecognizer() 
+        flair_recognizer = FlairRecognizer()
         registry.add_recognizer(spacy_recognizer)
         registry.add_recognizer(flair_recognizer)
         # add the pattern recognizer
@@ -635,7 +634,7 @@ def recognize_pii(
     output_suffix: str,
     html_key: str,
     model: str = "whole",
-) -> Tuple[pathlib.Path, dict]:
+) -> Tuple[pathlib.Path, dict, dict]:
     """
     Walk through the input path, recognize PII in text and store the anonymized text in the output path. Generate the html with different colors for each entity, json report of the explaination.
 
@@ -685,7 +684,7 @@ def recognize_pii(
             # Load the str from the text file
             text = txt_file.read_text()
             # Process the text to recoginze the pii entities in it
-            anonymized_text, html_str, stats = process(text, analyzer)
+            anonymized_text, html_str, stats = _process(text, analyzer)
             # Add the index at the top of the html
             html_index += f'<li><a href="#{str(txt_file)}">{str(txt_file)}</a></li>'
             # Add the hightlighted html to the html content
@@ -698,7 +697,7 @@ def recognize_pii(
             )
 
             output_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(outputfile, "w") as f:
+            with open(output_file, "w") as f:
                 f.write(anonymized_text)
 
             # Placeholder for the json report for a single file

@@ -22,7 +22,6 @@ from pii_recognizer import (
     _get_analyzer_engine,
     _anonymize,
     _annotate,
-    _get_supported_entities,
 )
 
 

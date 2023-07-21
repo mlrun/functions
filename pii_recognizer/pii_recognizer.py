@@ -474,7 +474,6 @@ def _get_analyzer_engine(model="whole"):
     :param model:           The model to use. Can be "spacy", "flair", "pattern" or "whole".
     :returns:               pa.AnalyzerEngine
     """
-
     # recognizer registry that can store multiple recognizers
     registry = pa.RecognizerRegistry()
 
@@ -512,14 +511,6 @@ def _get_anonymizer_engine() -> AnonymizerEngine:
     :returns:               The AnonymizerEngine.
     """
     return AnonymizerEngine()
-
-
-def _get_supported_entities():
-    """Return supported entities from the Analyzer Engine.
-    :returns:               The list of supported entities.
-    """
-    return _get_analyzer_engine().get_supported_entities()
-
 
 def _analyze(**kwargs):
     """Analyze input using Analyzer engine and input arguments (kwargs).
@@ -604,7 +595,7 @@ def _process(text: str, model: pa.AnalyzerEngine):
     results = analyzer.analyze(
         text=text,
         language="en",
-        entities=_get_supported_entities(),
+        entities=analyzer.get_supported_entities(),
         return_decision_process=True,
     )
 
@@ -612,7 +603,7 @@ def _process(text: str, model: pa.AnalyzerEngine):
     anonymized_text = _anonymize(text, results)
 
     # convert the results to tokens to generate the html
-    annotated_tokens = _annotate(text, results, _get_supported_entities())
+    annotated_tokens = _annotate(text, results, analyzer.get_supported_entities())
 
     # generate the html with different colors for each entity
     html = get_annotated_html(*annotated_tokens)

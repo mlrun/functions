@@ -48,7 +48,7 @@ logger = logging.getLogger("pii-recognizer")
 
 class PatternRecognizerFactory:
     """
-    Factory for creating pattern recognizers, it can be extended in the future to 
+    Factory for creating pattern recognizers, it can be extended in the future to
     add more regex pattern for different entities.
     """
 
@@ -246,7 +246,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
 # Class to use Flair with Presidio as an external recognizer.
 class FlairRecognizer(pa.EntityRecognizer):
     """
-    Wrapper for a flair model, if needed to be used within Presidio Analyzer. 
+    Wrapper for a flair model, if needed to be used within Presidio Analyzer.
     This is to make sure the recognizer can be registered with Presidio registry.
     """
 
@@ -591,7 +591,7 @@ def _process(text: str, model: pa.AnalyzerEngine):
     :param model:               Model to use for processing
 
     :returns:  A tuple of:
-               
+
                * the anonymized text
                * the html string with entities highlighted
                * the stats report
@@ -611,7 +611,6 @@ def _process(text: str, model: pa.AnalyzerEngine):
 
     # anonymize the text, replace the pii entities with the labels
     anonymized_text = _anonymize(text, results)
-
 
     # convert the results to tokens to generate the html
     annotated_tokens = _annotate(text, results, _get_supported_entities())
@@ -638,7 +637,7 @@ def recognize_pii(
     model: str = "whole",
 ) -> Tuple[pathlib.Path, dict]:
     """
-    Walk through the input path, recognize PII in text and store the anonymized text in the output path. Generate the html with different colors for each entity, json report of the explaination.  
+    Walk through the input path, recognize PII in text and store the anonymized text in the output path. Generate the html with different colors for each entity, json report of the explaination.
 
     :param context:             The MLRun context. this is needed for log the artifacts.
     :param input_path:          The input path of the text files needs to be analyzied.
@@ -673,10 +672,14 @@ def recognize_pii(
     html_content = ""
     rpt_json = {}
     errors = {}
-    
+
     # Go over the text files in the input path, analyze and anonymize them:
     for i, txt_file in enumerate(
-        tqdm(list(txt_files_directory.glob("*.txt")), desc="Processing files", unit="file")
+        tqdm(
+            list(txt_files_directory.glob("*.txt")),
+            desc="Processing files",
+            unit="file",
+        )
     ):
         try:
             # Load the str from the text file
@@ -689,13 +692,16 @@ def recognize_pii(
             html_content += f'<h2 id="{str(txt_file)}">{str(txt_file)}</h2>{html_str}'
 
             # Store the anonymized text in the output path
-            output_file = output_directory / f"{str(txt_file.relative_to(txt_files_directory)).split(".")[0]_{output_suffix}.txt"
+            output_file = (
+                output_directory
+                / f"{str(txt_file.relative_to(txt_files_directory)).split('.')[0]}_{output_suffix}.txt"
+            )
 
             output_file.parent.mkdir(parents=True, exist_ok=True)
             with open(outputfile, "w") as f:
                 f.write(anonymized_text)
 
-            #Placeholder for the json report for a single file
+            # Placeholder for the json report for a single file
             new_stats = []
             for item in stats:
                 item.analysis_explanation = item.analysis_explanation.to_dict()

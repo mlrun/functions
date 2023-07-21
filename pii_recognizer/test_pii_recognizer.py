@@ -18,11 +18,11 @@ import pytest
 import random
 from faker import Faker
 from pii_recognizer import (
-    process,
-    get_analyzer_engine,
-    anonymize,
-    annotate,
-    get_supported_entities,
+    _process,
+    _get_analyzer_engine,
+    _anonymize,
+    _annotate,
+    _get_supported_entities,
 )
 
 
@@ -98,9 +98,9 @@ def test_pattern_process(fake_data):
         "EMAIL": "email",
     }
 
-    analyzer = get_analyzer_engine("partern")
+    analyzer = _get_analyzer_engine("partern")
     text = f"He can be reached at {fake_data['email']} or {fake_data['phone']}.His credit card number is {fake_data['credit_card']} and his SSN is {fake_data['ssn']}."
-    res, html, rpt = process(text, analyzer)
+    res, html, rpt = _process(text, analyzer)
 
     assert any(entity in res for entity in ENTITIES.keys())
 
@@ -111,9 +111,9 @@ def test_spacy_process(fake_data):
         "ORGANIZATION": "organization",
     }
 
-    analyzer = get_analyzer_engine("spacy")
+    analyzer = _get_analyzer_engine("spacy")
     text = f"{fake_data['name']}'s employer is {fake_data['organization']}."
-    res, html, rpt = process(text, analyzer)
+    res, html, rpt = _process(text, analyzer)
 
     assert any(entity in res for entity in ENTITIES.keys())
 
@@ -138,11 +138,11 @@ def test_flair_process(fake_data):
         "SWIFT_CODE": "swift_code",
     }
 
-    analyzer = get_analyzer_engine("flair")
+    analyzer = _get_analyzer_engine("flair")
     text = " ".join(
         [item + " is " + str(fake_data[item]) for item in ENTITIES.values()]
     )
-    res, html, rpt = process(text, analyzer)
+    res, html, rpt = _process(text, analyzer)
     assert any(entity in res for entity in ENTITIES.keys())
 
 
@@ -172,6 +172,6 @@ def test_whole_process(fake_data):
     text = " ".join(
         [item + " is " + str(fake_data[item]) for item in ENTITIES.values()]
     )
-    analyzer = get_analyzer_engine("whole")
-    res, html, rpt = process(text, analyzer)
+    analyzer = _get_analyzer_engine("whole")
+    res, html, rpt = _process(text, analyzer)
     assert any(entity in res for entity in ENTITIES.keys())

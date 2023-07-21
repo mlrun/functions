@@ -33,12 +33,20 @@ try:
 except ModuleNotFoundError:
     print("Flair is not installed")
 
+# There is a conflict between Rust-based tokenizers' parallel processing 
+# and Python's fork operations during multiprocessing. To avoid this, we need
+# the following two lines
+
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 warnings.filterwarnings("ignore")
 logger = logging.getLogger("pii-recognizer")
 
 
+
 class PatternRecognizerFactory:
+    """
+    Factory for creating pattern recognizers
+    """
     @staticmethod
     def create_pattern_recognizer():
         ENTITIES = {
@@ -54,6 +62,10 @@ class PatternRecognizerFactory:
 
 
 class CustomSpacyRecognizer(pa.LocalRecognizer):
+    """
+    Custom Spacy Recognizer from Presidio Analyzer
+    It can be used to recognize custom entities
+    """
     ENTITIES = [
         "LOCATION",
         "PERSON",
@@ -396,7 +408,7 @@ class FlairRecognizer(pa.EntityRecognizer):
         )
 
 
-def get_analyzer_engine(model="whole"):
+def _get_analyzer_engine(model="whole"):
     """Return pa.AnalyzerEngine.
     :param model: The model to use. Can be "spacy", "flair", "pattern" or "whole".
     :returns: pa.AnalyzerEngine
@@ -430,21 +442,21 @@ def get_analyzer_engine(model="whole"):
     return analyzer
 
 
-def get_anonymizer_engine() -> AnonymizerEngine:
+def _get_anonymizer_engine() -> AnonymizerEngine:
     """Return AnonymizerEngine.
     :returns: The AnonymizerEngine.
     """
     return AnonymizerEngine()
 
 
-def get_supported_entities():
+def _get_supported_entities():
     """Return supported entities from the Analyzer Engine.
     :returns: The list of supported entities.
     """
-    return get_analyzer_engine().get_supported_entities()
+    return _get_analyzer_engine().get_supported_entities()
 
 
-def analyze(**kwargs):
+def _analyze(**kwargs):
     """Analyze input using Analyzer engine and input arguments (kwargs).
     :param kwargs: The input arguments for the analyzer engine.
     :returns: The list of Presidio RecognizerResult constructed from the recognized
@@ -454,7 +466,7 @@ def analyze(**kwargs):
     return analyzer_engine().analyze(**kwargs)
 
 
-def anonymize(text, analyze_results):
+def _anonymize(text, analyze_results):
     """Anonymize identified input using Presidio Abonymizer.
     :param text: The text for analysis.
     :param analyze_results: The list of Presidio RecognizerResult constructed from
@@ -462,11 +474,11 @@ def anonymize(text, analyze_results):
     """
     if not text:
         return
-    res = get_anonymizer_engine().anonymize(text, analyze_results)
+    res = _get_anonymizer_engine().anonymize(text, analyze_results)
     return res.text
 
 
-def annotate(text, st_analyze_results, st_entities):
+def _annotate(text, st_analyze_results, st_entities):
     """Annotate identified input using Presidio Anonymizer.
     :param text: The text for analysis.
     :param st_analyze_results: The list of Presidio RecognizerResult constructed from
@@ -503,7 +515,7 @@ class CustomEncoder(JSONEncoder):
         return o.__dict__
 
 
-def process(text: str, model: pa.AnalyzerEngine):
+def _process(text: str, model: pa.AnalyzerEngine):
     """
     Process the text of str using the model.
     :param txt: Text to process
@@ -514,12 +526,12 @@ def process(text: str, model: pa.AnalyzerEngine):
     results = analyzer.analyze(
         text=text,
         language="en",
-        entities=get_supported_entities(),
+        entities=_get_supported_entities(),
         return_decision_process=True,
     )
-    anonymized_text = anonymize(text, results)
+    anonymized_text = _anonymize(text, results)
 
-    annotated_tokens = annotate(text, results, get_supported_entities())
+    annotated_tokens = _annotate(text, results, _get_supported_entities())
     html = get_annotated_html(*annotated_tokens)
     backslash_char = "\\"
 
@@ -551,8 +563,8 @@ def recognize_pii(
     """
     if not output_path:
         output_path = input_path + "/output/"
-    analyzer = analyzer_engine(model)
-    txt_file_paths, txt_file_names = get_text_files(input_path)
+    analyzer = _get_analyzer_engine(model)
+    txt_file_paths, txt_file_names = _get_text_files(input_path)
     html_index = "<html><head><title>Highlighted Pii Entities</title></head><body><h1>Highlighted Pii Entities</h1><ul>"
     html_content = ""
     rpt_json = {}
@@ -575,7 +587,7 @@ def recognize_pii(
     return rpt_json, output_path
 
 
-def get_text_files(path):
+def _get_text_files(path):
     """
     Get a list of text file paths from a given path.
     :param path: The path to walk through.

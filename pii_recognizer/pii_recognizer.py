@@ -17,6 +17,8 @@ import warnings
 import os
 import logging
 import mlrun
+import pathlib
+import tempfile
 from tqdm.auto import tqdm
 from typing import Optional, List, Tuple, Set
 import presidio_analyzer as pa
@@ -230,10 +232,11 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
     ) -> bool:
         """
         Check if the label is in the label group.
-        :param entity: Entity to check
-        :param label: Label to check
-        :param check_label_groups: Label groups to check
-        :returns: True if the label is in the label group, False otherwise
+        :param entity:              Entity to check
+        :param label:               Label to check
+        :param check_label_groups:  Label groups to check
+
+        :returns:           True if the label is in the label group, False otherwise
         """
         return any(
             [entity in egrp and label in lgrp for egrp, lgrp in check_label_groups]
@@ -383,21 +386,28 @@ class FlairRecognizer(pa.EntityRecognizer):
         if not entities:
             entities = self.supported_entities
 
+        # Go over the entities and check if they are in the supported entities list.
         for entity in entities:
             if entity not in self.supported_entities:
                 continue
 
+            # Go over the sentences and check if the entity is in the sentence.
             for ent in sentences.get_spans("ner"):
                 if not self.__check_label(
                     entity, ent.labels[0].value, self.check_label_groups
                 ):
                     continue
+
+                # If the entity is in the sentence, we will add it to the results.
                 textual_explanation = self.DEFAULT_EXPLANATION.format(
                     ent.labels[0].value
                 )
+
+                # Build the explanation for the result
                 explanation = self.build_flair_explanation(
                     round(ent.score, 2), textual_explanation
                 )
+
                 flair_result = self._convert_to_recognizer_result(ent, explanation)
 
                 results.append(flair_result)
@@ -412,9 +422,14 @@ class FlairRecognizer(pa.EntityRecognizer):
 
         :returns:               Presidio RecognizerResult
         """
+
+        # Convert the entity type to Presidio entity type
         entity_type = self.PRESIDIO_EQUIVALENCES.get(entity.tag, entity.tag)
+
+        # Convert the score to Presidio score
         flair_score = round(entity.score, 2)
 
+        # Create the Presidio RecognizerResult from the Flair entity
         flair_results = pa.RecognizerResult(
             entity_type=entity_type,
             start=entity.start_position,
@@ -435,6 +450,8 @@ class FlairRecognizer(pa.EntityRecognizer):
 
         :returns:                   Presidio AnalysisExplanation
         """
+
+        # Create the Presidio AnalysisExplanation for the result
         explanation = pa.AnalysisExplanation(
             recognizer=self.__class__.__name__,
             original_score=original_score,
@@ -619,57 +636,79 @@ def recognize_pii(
     output_suffix: str,
     html_key: str,
     model: str = "whole",
-) -> str:
+) -> Tuple[pathlib.Path, dict]:
     """
-    Walk through the input path, recognize PII in text and store the anonymized text in the output path. Generate the html with different colors for each entity, json report of the explaination. 
+    Walk through the input path, recognize PII in text and store the anonymized text in the output path. Generate the html with different colors for each entity, json report of the explaination.  
 
-    :param context:             The MLRun context.
-    :param input_path: The input path to the artifact.
-    :param output_path: The output path to store the anonymized text.
-    :param output_suffix: The surfix of output key for the anonymized text. for example if the input file is pii.txt, the output key will be pii_anonymized.txt.
-    :param html_key: The html key for the artifact.
-    :param model: The model to use. Can be "spacy", "flair", "pattern" or "whole".
-    :returns: output_path
+    :param context:             The MLRun context. this is needed for log the artifacts.
+    :param input_path:          The input path of the text files needs to be analyzied.
+    :param output_path:         The output path to store the anonymized text.
+    :param output_suffix:       The surfix of output key for the anonymized text. for example if the input file is pii.txt, the output key is anoymized, the output file name will be pii_anonymized.txt.
+    :param html_key:            The html key for the artifact.
+    :param model:               The model to use. Can be "spacy", "flair", "pattern" or "whole".
+    :returns:  A tuple of:
+               * Path to the output directory
+               * The json report of the explaination
+               * A dictionary of errors files that were not processed
 
     """
-    if not output_path:
-        output_path = input_path + "/output/"
+
+    # Set output directory
+    if output_path is None:
+        output_path = tempfile.mkdtemp()
+
+    # Create the output directory:
+    output_directory = pathlib.Path(output_path)
+    if not output_directory.exists():
+        output_directory.mkdir()
+
+    # Load the model:
     analyzer = _get_analyzer_engine(model)
-    txt_file_paths, txt_file_names = _get_text_files(input_path)
+    print("Model loaded")
+
+    # Go over the text files in the input path, analyze and anonymize them:
+    txt_files_directory = pathlib.Path(input_path)
+    # These are placeholder for the html string and the stats report
     html_index = "<html><head><title>Highlighted Pii Entities</title></head><body><h1>Highlighted Pii Entities</h1><ul>"
     html_content = ""
     rpt_json = {}
-    for file_path, file_name in zip(txt_file_paths, txt_file_names):
-        text = mlrun.get_dataitem(file_path).get().decode("utf-8")
-        anonymized_text, html_str, stats = process(text, analyzer)
-        html_index += f'<li><a href="#{file_name}">{file_name}</a></li>'
-        html_content += f'<h2 id="{file_name}">{file_name}</h2>{html_str}'
-        with open(f"{output_path}/{file_name}_{output_suffix}.txt", "w") as f:
-            f.write(anonymized_text)
-        new_stats = []
-        for item in stats:
-            item.analysis_explanation = item.analysis_explanation.to_dict()
-            new_stats.append(item.to_dict())
-        rpt_json[file_name] = new_stats
+    errors = {}
+    
+    # Go over the text files in the input path, analyze and anonymize them:
+    for i, txt_file in enumerate(
+        tqdm(list(txt_files_directory.glob("*.txt")), desc="Processing files", unit="file")
+    ):
+        try:
+            # Load the str from the text file
+            text = txt_file.read_text()
+            # Process the text to recoginze the pii entities in it
+            anonymized_text, html_str, stats = process(text, analyzer)
+            # Add the index at the top of the html
+            html_index += f'<li><a href="#{str(txt_file)}">{str(txt_file)}</a></li>'
+            # Add the hightlighted html to the html content
+            html_content += f'<h2 id="{str(txt_file)}">{str(txt_file)}</h2>{html_str}'
+
+            # Store the anonymized text in the output path
+            output_file = output_directory / f"{str(txt_file.relative_to(txt_files_directory)).split(".")[0]_{output_suffix}.txt"
+
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(outputfile, "w") as f:
+                f.write(anonymized_text)
+
+            #Placeholder for the json report for a single file
+            new_stats = []
+            for item in stats:
+                item.analysis_explanation = item.analysis_explanation.to_dict()
+                new_stats.append(item.to_dict())
+
+            # Add the json report to the json report dict with filename as key
+            rpt_json[str(txt_file)] = new_stats
+        except Exception as e:
+            errors[str(txt_file)] = str(e)
+            print(f"Error processing {txt_file}: {e}")
+
     html_index += "</ul>"
     html_res = f"{html_index}{html_content}</body></html>"
     arti_html = Artifact(body=html_res, format="html", key=html_key)
     context.log_artifact(arti_html)
-    return rpt_json, output_path
-
-
-def _get_text_files(path):
-    """
-    Get a list of text file paths from a given path.
-    :param path: The path to walk through.
-    :returns: A list of text file paths and list of file names.
-    """
-    txt_file_lst = []
-    txt_file_names = []
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            if file.endswith(".txt"):
-                txt_file_lst.append(os.path.join(root, file))
-                txt_file_names.append(file[:-4])
-        break
-    return txt_file_lst, txt_file_names
+    return output_path, rpt_json, errors

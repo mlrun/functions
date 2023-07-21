@@ -17,6 +17,7 @@ import warnings
 import os
 import logging
 import mlrun
+from tqdm.auto import tqdm
 from typing import Optional, List, Tuple, Set
 import presidio_analyzer as pa
 from presidio_analyzer.nlp_engine import NlpArtifacts
@@ -33,22 +34,31 @@ try:
 except ModuleNotFoundError:
     print("Flair is not installed")
 
-# There is a conflict between Rust-based tokenizers' parallel processing 
+# There is a conflict between Rust-based tokenizers' parallel processing
 # and Python's fork operations during multiprocessing. To avoid this, we need
 # the following two lines
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 warnings.filterwarnings("ignore")
-logger = logging.getLogger("pii-recognizer")
 
+logger = logging.getLogger("pii-recognizer")
 
 
 class PatternRecognizerFactory:
     """
     Factory for creating pattern recognizers
     """
+
+    # create a list of pattern recognizers
+
     @staticmethod
     def create_pattern_recognizer():
+        """
+        For each entity, create a list of patterns to recognize it
+        """
+
+        # Entities to recognize and their regex patterns
+
         ENTITIES = {
             "CREDIT_CARD": [pa.Pattern("CREDIT_CARD", r"\b(?:\d[ -]*?){13,16}\b", 0.5)],
             "SSN": [pa.Pattern("SSN", r"\b\d{3}-?\d{2}-?\d{4}\b", 0.5)],
@@ -66,6 +76,9 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
     Custom Spacy Recognizer from Presidio Analyzer
     It can be used to recognize custom entities
     """
+
+    # Entities to recognize
+
     ENTITIES = [
         "LOCATION",
         "PERSON",
@@ -74,9 +87,13 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         "DATE_TIME",
     ]
 
+    # Default explanation for this recognizer
+
     DEFAULT_EXPLANATION = (
         "Identified as {} by Spacy's Named Entity Recognition (Privy-trained)"
     )
+
+    # Label groups to check
 
     CHECK_LABEL_GROUPS = [
         ({"LOCATION"}, {"LOC", "LOCATION", "STREET_ADDRESS", "COORDINATE"}),
@@ -85,6 +102,8 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         ({"ORGANIZATION"}, {"ORG"}),
         ({"DATE_TIME"}, {"DATE_TIME"}),
     ]
+
+    # pretrained model
 
     MODEL_LANGUAGES = {
         "en": "beki/en_spacy_pii_distilbert",
@@ -115,13 +134,18 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         :param ner_strength: NER strength to use
         :returns SpacyRecognizer object
         """
+
+        # Default confidence for NER prediction
         self.ner_strength = ner_strength
+
         self.check_label_groups = check_label_groups or self.CHECK_LABEL_GROUPS
-        supported_entities = supported_entities if supported_entities else self.ENTITIES
+        supported_entities = supported_entities or self.ENTITIES
         super().__init__(
             supported_entities=supported_entities,
             supported_language=supported_language,
         )
+
+    # load method is need for presidio-analyzer classes
 
     def load(self) -> None:
         """Load the model, not used. Model is loaded during initialization."""
@@ -133,6 +157,8 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         :returns List of the supported entities.
         """
         return self.supported_entities
+
+    # get the presidio explanation for the result
 
     def build_spacy_explanation(
         self, original_score: float, explanation: str
@@ -150,6 +176,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         )
         return explanation
 
+    # main method for the recognizer
     def analyze(self, text, entities, nlp_artifacts=None):  # noqa D102
         """
         Analyze text using Spacy.
@@ -165,16 +192,21 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
 
         ner_entities = nlp_artifacts.entities
 
+        # recognize the supported entities
         for entity in entities:
             if entity not in self.supported_entities:
                 continue
             for ent in ner_entities:
                 if not self.__check_label(entity, ent.label_, self.check_label_groups):
                     continue
+
+                # string of the explanation saying the entity is recognized by spacy
                 textual_explanation = self.DEFAULT_EXPLANATION.format(ent.label_)
                 explanation = self.build_spacy_explanation(
                     self.ner_strength, textual_explanation
                 )
+
+                # create the standard result with the entity, start, end, score, and explanation
                 spacy_result = pa.RecognizerResult(
                     entity_type=entity,
                     start=ent.start_char,
@@ -205,6 +237,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         )
 
 
+# Use flair to recognize entities
 class FlairRecognizer(pa.EntityRecognizer):
     """
     Wrapper for a flair model, if needed to be used within Presidio Analyzer.
@@ -399,6 +432,7 @@ class FlairRecognizer(pa.EntityRecognizer):
         )
         return explanation
 
+    # sanity check of the entity and label before recognition
     @staticmethod
     def __check_label(
         entity: str, label: str, check_label_groups: Tuple[Set, Set]
@@ -408,15 +442,20 @@ class FlairRecognizer(pa.EntityRecognizer):
         )
 
 
+# get the analyzer engine based on the model
 def _get_analyzer_engine(model="whole"):
     """Return pa.AnalyzerEngine.
     :param model: The model to use. Can be "spacy", "flair", "pattern" or "whole".
     :returns: pa.AnalyzerEngine
     """
+
+    # recognizer registry that can store multiple recognizers
     registry = pa.RecognizerRegistry()
 
+    # custom spacy recognizer
     spacy_recognizer = CustomSpacyRecognizer()
 
+    # pre-trained flair recognizer
     flair_recognizer = FlairRecognizer()
 
     if model == "spacy":

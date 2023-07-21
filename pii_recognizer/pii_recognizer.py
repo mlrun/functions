@@ -57,27 +57,27 @@ class PatternRecognizerFactory:
 
         # Entities to recognize and their regex patterns
 
-        ENTITIES = {
+        _DEFAULT_ENTITIES = {
             "CREDIT_CARD": [pa.Pattern("CREDIT_CARD", r"\b(?:\d[ -]*?){13,16}\b", 0.5)],
             "SSN": [pa.Pattern("SSN", r"\b\d{3}-?\d{2}-?\d{4}\b", 0.5)],
             "PHONE": [pa.Pattern("PHONE", r"\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}", 0.5)],
             "EMAIL": [pa.Pattern("EMAIL", r"\S+@\S+", 0.5)],
         }
         res = []
-        for entity, pattern in ENTITIES.items():
+        for entity, pattern in _DEFAULT_ENTITIES.items():
             res.append(pa.PatternRecognizer(supported_entity=entity, patterns=pattern))
         return res
 
 
 class CustomSpacyRecognizer(pa.LocalRecognizer):
     """
-    Custom Spacy Recognizer from Presidio Analyzer
+    Custom Spacy Recognizer from Presidio Analyzer trained on Privy data.
     It can be used to recognize custom entities
     """
 
     # Entities to recognize
 
-    ENTITIES = [
+    _DEFAULT_ENTITIES = [
         "LOCATION",
         "PERSON",
         "NRP",
@@ -87,13 +87,13 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
 
     # Default explanation for this recognizer
 
-    DEFAULT_EXPLANATION = (
+    _DEFAULT_EXPLANATION = (
         "Identified as {} by Spacy's Named Entity Recognition (Privy-trained)"
     )
 
     # Label groups to check
 
-    CHECK_LABEL_GROUPS = [
+    _DEFAULT_CHECK_LABEL_GROUPS = [
         ({"LOCATION"}, {"LOC", "LOCATION", "STREET_ADDRESS", "COORDINATE"}),
         ({"PERSON"}, {"PER", "PERSON"}),
         ({"NRP"}, {"NORP", "NRP"}),
@@ -103,11 +103,11 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
 
     # pretrained model for this recognizer
 
-    MODEL_LANGUAGES = {
+    _DEFAULT_MODEL_LANGUAGES = {
         "en": "beki/en_spacy_pii_distilbert",
     }
 
-    PRESIDIO_EQUIVALENCES = {
+    _DEFAULT_PRESIDIO_EQUIVALENCES = {
         "PER": "PERSON",
         "LOC": "LOCATION",
         "ORG": "ORGANIZATION",
@@ -137,8 +137,8 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         # Default confidence for NER prediction
         self.ner_strength = ner_strength
 
-        self.check_label_groups = check_label_groups or self.CHECK_LABEL_GROUPS
-        supported_entities = supported_entities or self.ENTITIES
+        self.check_label_groups = check_label_groups or self._DEFAULT_CHECK_LABEL_GROUPS
+        supported_entities = supported_entities or self._DEFAULT_ENTITIES
         super().__init__(
             supported_entities=supported_entities,
             supported_language=supported_language,
@@ -201,7 +201,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
                     continue
 
                 # string of the explanation saying the entity is recognized by spacy
-                textual_explanation = self.DEFAULT_EXPLANATION.format(ent.label_)
+                textual_explanation = self._DEFAULT_EXPLANATION.format(ent.label_)
                 explanation = self.build_spacy_explanation(
                     self.ner_strength, textual_explanation
                 )
@@ -244,8 +244,8 @@ class FlairRecognizer(pa.EntityRecognizer):
     Wrapper for a flair model, if needed to be used within Presidio Analyzer.
     This is to make sure the recognizer can be registered with Presidio registry.
     """
-    
-    ENTITIES = [
+
+    _DEFAULT_ENTITIES = [
         "LOCATION",
         "PERSON",
         "NRP",
@@ -269,9 +269,9 @@ class FlairRecognizer(pa.EntityRecognizer):
 
     # This is used to construct the explanation for the result
 
-    DEFAULT_EXPLANATION = "Identified as {} by Flair's Named Entity Recognition"
+    _DEFAULT_EXPLANATION = "Identified as {} by Flair's Named Entity Recognition"
 
-    CHECK_LABEL_GROUPS = [
+    _DEFAULT_CHECK_LABEL_GROUPS = [
         ({"LOCATION"}, {"LOC", "LOCATION", "STREET_ADDRESS", "COORDINATE"}),
         ({"PERSON"}, {"PER", "PERSON"}),
         ({"NRP"}, {"NORP", "NRP"}),
@@ -293,11 +293,11 @@ class FlairRecognizer(pa.EntityRecognizer):
         ({"US_DRIVER_LICENSE"}, {"US_DRIVER_LICENSE"}),
     ]
 
-    MODEL_LANGUAGES = {
+    _DEFAULT_MODEL_LANGUAGES = {
         "en": "beki/flair-pii-distilbert",
     }
 
-    PRESIDIO_EQUIVALENCES = {
+    _DEFAULT_PRESIDIO_EQUIVALENCES = {
         "PER": "PERSON",
         "LOC": "LOCATION",
         "ORG": "ORGANIZATION",
@@ -327,21 +327,20 @@ class FlairRecognizer(pa.EntityRecognizer):
         :returns:                       FlairRecognizer object
 
         """
-
+        # this is used to avoid mutiple loading of the model
         try:
             from flair.data import Sentence
             from flair.models import SequenceTagger
+
             self.Sentence = Sentence
             self.SequenceTagger = SequenceTagger
         except ModuleNotFoundError:
             print("Flair is not installed")
-        self.check_label_groups = (
-            check_label_groups if check_label_groups else self.CHECK_LABEL_GROUPS
-        )
+        self.check_label_groups = check_label_groups or self._DEFAULT_CHECK_LABEL_GROUPS
 
-        supported_entities = supported_entities if supported_entities else self.ENTITIES
-        self.model = (
-            self.SequenceTagger.load(self.MODEL_LANGUAGES.get(supported_language))
+        supported_entities = supported_entities or self._DEFAULT_ENTITIES
+        self.model = self.SequenceTagger.load(
+            self._DEFAULT_MODEL_LANGUAGES.get(supported_language)
         )
 
         super().__init__(
@@ -398,7 +397,7 @@ class FlairRecognizer(pa.EntityRecognizer):
                     continue
 
                 # If the entity is in the sentence, we will add it to the results.
-                textual_explanation = self.DEFAULT_EXPLANATION.format(
+                textual_explanation = self._DEFAULT_EXPLANATION.format(
                     ent.labels[0].value
                 )
 
@@ -423,7 +422,7 @@ class FlairRecognizer(pa.EntityRecognizer):
         """
 
         # Convert the entity type to Presidio entity type
-        entity_type = self.PRESIDIO_EQUIVALENCES.get(entity.tag, entity.tag)
+        entity_type = self._DEFAULT_PRESIDIO_EQUIVALENCES.get(entity.tag, entity.tag)
 
         # Convert the score to Presidio score
         flair_score = round(entity.score, 2)
@@ -493,7 +492,7 @@ def _get_analyzer_engine(model="whole"):
         for recognizer in pattern_recognizer_factory.create_pattern_recognizer():
             registry.add_recognizer(recognizer)
     if model == "whole":
-        spacy_recognizer = CustomSpacyRecognizer() 
+        spacy_recognizer = CustomSpacyRecognizer()
         flair_recognizer = FlairRecognizer()
         registry.add_recognizer(spacy_recognizer)
         registry.add_recognizer(flair_recognizer)
@@ -511,6 +510,7 @@ def _get_anonymizer_engine() -> AnonymizerEngine:
     :returns:               The AnonymizerEngine.
     """
     return AnonymizerEngine()
+
 
 def _analyze(**kwargs):
     """Analyze input using Analyzer engine and input arguments (kwargs).

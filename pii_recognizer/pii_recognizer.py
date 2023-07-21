@@ -237,10 +237,11 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         )
 
 
-# Use flair to recognize entities
+# Class to use Flair with Presidio as an external recognizer.
 class FlairRecognizer(pa.EntityRecognizer):
     """
-    Wrapper for a flair model, if needed to be used within Presidio Analyzer.
+    Wrapper for a flair model, if needed to be used within Presidio Analyzer. 
+    This is to make sure the recognizer can be registered with Presidio registry.
     """
 
     ENTITIES = [
@@ -352,7 +353,6 @@ class FlairRecognizer(pa.EntityRecognizer):
         """
         return self.supported_entities
 
-    # Class to use Flair with Presidio as an external recognizer.
     def analyze(
         self, text: str, entities: List[str], nlp_artifacts: NlpArtifacts = None
     ) -> List[pa.RecognizerResult]:

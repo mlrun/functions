@@ -24,12 +24,16 @@ from typing import Optional, List, Tuple, Set
 import presidio_analyzer as pa
 from presidio_analyzer.nlp_engine import NlpArtifacts
 from presidio_analyzer.predefined_recognizers.spacy_recognizer import SpacyRecognizer
-from mlrun.datastore import DataItem
 from mlrun.artifacts import Artifact
 from presidio_anonymizer import AnonymizerEngine
 from annotated_text.util import get_annotated_html
 from json import JSONEncoder
 
+try:
+    from flair.data import Sentence, Span
+    from flair.models import SequenceTagger
+except ModuleNotFoundError:
+    print("Flair is not installed")
 
 # There is a conflict between Rust-based tokenizers' parallel processing
 # and Python's fork operations during multiprocessing. To avoid this, we need
@@ -327,19 +331,10 @@ class FlairRecognizer(pa.EntityRecognizer):
         :returns:                       FlairRecognizer object
 
         """
-        # this is used to avoid mutiple loading of the model
-        try:
-            from flair.data import Sentence
-            from flair.models import SequenceTagger
-
-            self.Sentence = Sentence
-            self.SequenceTagger = SequenceTagger
-        except ModuleNotFoundError:
-            print("Flair is not installed")
         self.check_label_groups = check_label_groups or self._DEFAULT_CHECK_LABEL_GROUPS
 
         supported_entities = supported_entities or self._DEFAULT_ENTITIES
-        self.model = self.SequenceTagger.load(
+        self.model = SequenceTagger.load(
             self._DEFAULT_MODEL_LANGUAGES.get(supported_language)
         )
 
@@ -377,7 +372,7 @@ class FlairRecognizer(pa.EntityRecognizer):
 
         results = []
 
-        sentences = self.Sentence(text)
+        sentences = Sentence(text)
         self.model.predict(sentences)
 
         # If there are no specific list of entities, we will look for all of it.
@@ -412,7 +407,7 @@ class FlairRecognizer(pa.EntityRecognizer):
 
         return results
 
-    def _convert_to_recognizer_result(self, entity, explanation) -> pa.RecognizerResult:
+    def _convert_to_recognizer_result(self, entity: Span, explanation: str) -> pa.RecognizerResult:
         """
         Convert Flair result to Presidio RecognizerResult.
         :param entity:          Flair entity

@@ -19,7 +19,6 @@ import logging
 import mlrun
 import pathlib
 import tempfile
-from json import JSONEncoder
 from tqdm.auto import tqdm
 from typing import List, Tuple, Set
 import presidio_analyzer as pa
@@ -45,7 +44,8 @@ logger = logging.getLogger("pii-recognizer")
 class PatternRecognizerFactory:
     """
     Factory for creating pattern recognizers, it can be extended in the future to
-    add more regex pattern for different entities.
+    add more regex pattern for different entities. For the pattern recognizer to work,
+    we need construct a list of regex patterns for each entity.
     """
 
     # create a list of pattern recognizers
@@ -74,7 +74,8 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
     """
     Custom Spacy Recognizer from Presidio Analyzer trained on Privy data.
     The privy data is generated using this https://github.com/pixie-io/pixie/tree/main/src/datagen/pii/privy
-    It can be used to recognize custom entities
+    It can be used to recognize custom entities, Since we want to use Presidio's Registries to generate AnalyzerEngine,
+    it inherits from Presidio Analyzer's LocalRecognizer class.
     """
 
     # Entities to recognize
@@ -151,13 +152,6 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
     def load(self):
         """Load the model, not used. Model is loaded during initialization."""
         pass
-
-    def get_supported_entities(self) -> List[str]:
-        """
-        Return supported entities by this model.
-        :returns                        List of the supported entities.
-        """
-        return self.supported_entities
 
     # get the presidio explanation for the result
 
@@ -345,14 +339,6 @@ class FlairRecognizer(pa.EntityRecognizer):
     def load(self):
         """Load the model, not used. Model is loaded during initialization."""
         pass
-
-    def get_supported_entities(self) -> List[str]:
-        """
-        Return supported entities by this model.
-
-        :returns: List of the supported entities.
-        """
-        return self.supported_entities
 
     def analyze(
         self,
@@ -560,16 +546,6 @@ def _annotate(text: str, st_analyze_results: List[pa.RecognizerResult]) -> List[
         else:
             tokens.append(text[res.end :])
     return tokens
-
-
-class CustomEncoder(JSONEncoder):
-    """Custom encoder for JSONEncoder to handle Presidio objects.
-    :param JSONEncoder:         The JSONEncoder.
-    :returns:                   The JSONEncoder.
-    """
-
-    def default(self, o):
-        return o.__dict__
 
 
 def _process(text: str, model: pa.AnalyzerEngine):

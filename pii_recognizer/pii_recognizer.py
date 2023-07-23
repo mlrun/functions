@@ -330,6 +330,7 @@ class FlairRecognizer(pa.EntityRecognizer):
             name="Flair Analytics",
         )
 
+    # main method for the recognizer
     def analyze(
         self,
         text: str,

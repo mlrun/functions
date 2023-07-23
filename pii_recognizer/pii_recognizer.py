@@ -48,24 +48,28 @@ class PatternRecognizerFactory:
     we need construct a list of regex patterns for each entity.
     """
 
-    # create a list of pattern recognizers
+    _DEFAULT_ENTITIES = {
+        "CREDIT_CARD": [pa.Pattern("CREDIT_CARD", r"\b(?:\d[ -]*?){13,16}\b", 0.5)],
+        "SSN": [pa.Pattern("SSN", r"\b\d{3}-?\d{2}-?\d{4}\b", 0.5)],
+        "PHONE": [pa.Pattern("PHONE", r"\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}", 0.5)],
+        "EMAIL": [pa.Pattern("EMAIL", r"\S+@\S+", 0.5)],
+    }
 
-    @staticmethod
-    def _create_pattern_recognizer():
+    # create a list of pattern recognizers
+    @classmethod
+    def _create_pattern_recognizer(cls):
         """
         For each entity, create a list of patterns to recognize it
+
+        :param cls:    PatternRecognizerFactory class
+
+        :returns:      List of pattern recognizers
         """
 
         # Entities to recognize and their regex patterns
 
-        _DEFAULT_ENTITIES = {
-            "CREDIT_CARD": [pa.Pattern("CREDIT_CARD", r"\b(?:\d[ -]*?){13,16}\b", 0.5)],
-            "SSN": [pa.Pattern("SSN", r"\b\d{3}-?\d{2}-?\d{4}\b", 0.5)],
-            "PHONE": [pa.Pattern("PHONE", r"\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}", 0.5)],
-            "EMAIL": [pa.Pattern("EMAIL", r"\S+@\S+", 0.5)],
-        }
         res = []
-        for entity, pattern in _DEFAULT_ENTITIES.items():
+        for entity, pattern in cls._DEFAULT_ENTITIES.items():
             res.append(pa.PatternRecognizer(supported_entity=entity, patterns=pattern))
         return res
 
@@ -176,7 +180,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         :param text:                    Text to analyze
         :param entities:                Entities to analyze
         :param nlp_artifacts:           NLP artifacts to use
-        
+
         :returns:                       List of Presidio RecognizerResult objects
         """
         results = []

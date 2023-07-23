@@ -68,10 +68,10 @@ class PatternRecognizerFactory:
 
         # Entities to recognize and their regex patterns
 
-        res = []
-        for entity, pattern in cls._DEFAULT_ENTITIES.items():
-            res.append(pa.PatternRecognizer(supported_entity=entity, patterns=pattern))
-        return res
+        return [
+            pa.PatternRecognizer(supported_entity=entity, patterns=pattern)
+            for entity, pattern in cls._DEFAULT_ENTITIES.items()
+        ]
 
 
 class CustomSpacyRecognizer(pa.LocalRecognizer):

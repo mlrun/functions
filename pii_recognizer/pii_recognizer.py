@@ -51,7 +51,7 @@ class PatternRecognizerFactory:
     # create a list of pattern recognizers
 
     @staticmethod
-    def create_pattern_recognizer():
+    def _create_pattern_recognizer():
         """
         For each entity, create a list of patterns to recognize it
         """
@@ -147,15 +147,9 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
             supported_language=supported_language,
         )
 
-    # load method is need for presidio-analyzer classes
-
-    def load(self):
-        """Load the model, not used. Model is loaded during initialization."""
-        pass
-
     # get the presidio explanation for the result
 
-    def build_spacy_explanation(
+    def _build_spacy_explanation(
         self, original_score: float, explanation: str
     ) -> pa.AnalysisExplanation:
         """
@@ -198,7 +192,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
 
                 # string of the explanation saying the entity is recognized by spacy
                 textual_explanation = self._DEFAULT_EXPLANATION.format(ent.label_)
-                explanation = self.build_spacy_explanation(
+                explanation = self._build_spacy_explanation(
                     self.ner_strength, textual_explanation
                 )
 
@@ -336,10 +330,6 @@ class FlairRecognizer(pa.EntityRecognizer):
             name="Flair Analytics",
         )
 
-    def load(self):
-        """Load the model, not used. Model is loaded during initialization."""
-        pass
-
     def analyze(
         self,
         text: str,
@@ -384,7 +374,7 @@ class FlairRecognizer(pa.EntityRecognizer):
                 )
 
                 # Build the explanation for the result
-                explanation = self.build_flair_explanation(
+                explanation = self._build_flair_explanation(
                     round(ent.score, 2), textual_explanation
                 )
 
@@ -422,7 +412,7 @@ class FlairRecognizer(pa.EntityRecognizer):
 
         return flair_results
 
-    def build_flair_explanation(
+    def _build_flair_explanation(
         self, original_score: float, explanation: str
     ) -> pa.AnalysisExplanation:
         """
@@ -473,7 +463,7 @@ def _get_analyzer_engine(model: str = "whole") -> pa.AnalyzerEngine:
     if model == "pattern":
         # add the pattern recognizer
         pattern_recognizer_factory = PatternRecognizerFactory()
-        for recognizer in pattern_recognizer_factory.create_pattern_recognizer():
+        for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
             registry.add_recognizer(recognizer)
     if model == "whole":
         spacy_recognizer = CustomSpacyRecognizer()
@@ -482,7 +472,7 @@ def _get_analyzer_engine(model: str = "whole") -> pa.AnalyzerEngine:
         registry.add_recognizer(flair_recognizer)
         # add the pattern recognizer
         pattern_recognizer_factory = PatternRecognizerFactory()
-        for recognizer in pattern_recognizer_factory.create_pattern_recognizer():
+        for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
             registry.add_recognizer(recognizer)
 
     analyzer = pa.AnalyzerEngine(registry=registry, supported_languages=["en"])

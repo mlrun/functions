@@ -19,15 +19,12 @@ import logging
 import mlrun
 import pathlib
 import tempfile
+from json import JSONEncoder
 from tqdm.auto import tqdm
-from typing import Optional, List, Tuple, Set
+from typing import List, Tuple, Set
 import presidio_analyzer as pa
-from presidio_analyzer.nlp_engine import NlpArtifacts
-from presidio_analyzer.predefined_recognizers.spacy_recognizer import SpacyRecognizer
-from mlrun.artifacts import Artifact
 from presidio_anonymizer import AnonymizerEngine
 from annotated_text.util import get_annotated_html
-from json import JSONEncoder
 
 try:
     from flair.data import Sentence, Span
@@ -76,6 +73,7 @@ class PatternRecognizerFactory:
 class CustomSpacyRecognizer(pa.LocalRecognizer):
     """
     Custom Spacy Recognizer from Presidio Analyzer trained on Privy data.
+    The privy data is generated using this https://github.com/pixie-io/pixie/tree/main/src/datagen/pii/privy
     It can be used to recognize custom entities
     """
 
@@ -122,9 +120,9 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
     def __init__(
         self,
         supported_language: str = "en",
-        supported_entities: Optional[List[str]] = None,
-        check_label_groups: Optional[Tuple[Set, Set]] = None,
-        context: Optional[List[str]] = None,
+        supported_entities: List[str] = None,
+        check_label_groups: Tuple[Set, Set] = None,
+        context: List[str] = None,
         ner_strength: float = 0.85,
     ):
         """
@@ -150,7 +148,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
 
     # load method is need for presidio-analyzer classes
 
-    def load(self) -> None:
+    def load(self):
         """Load the model, not used. Model is loaded during initialization."""
         pass
 
@@ -181,7 +179,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         return explanation
 
     # main method for the recognizer
-    def analyze(self, text, entities, nlp_artifacts=None):  # noqa D102
+    def analyze(self, text: str, entities: List[str], nlp_artifacts=None):  # noqa D102
         """
         Analyze text using Spacy.
         :param text:                    Text to analyze
@@ -238,7 +236,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         :returns:           True if the label is in the label group, False otherwise
         """
         return any(
-            [entity in egrp and label in lgrp for egrp, lgrp in check_label_groups]
+            entity in egrp and label in lgrp for egrp, lgrp in check_label_groups
         )
 
 
@@ -319,8 +317,8 @@ class FlairRecognizer(pa.EntityRecognizer):
     def __init__(
         self,
         supported_language: str = "en",
-        supported_entities: Optional[List[str]] = None,
-        check_label_groups: Optional[Tuple[Set, Set]] = None,
+        supported_entities: List[str] = None,
+        check_label_groups: Tuple[Set, Set] = None,
     ):
         """
         Initialize the FlairRecognizer.
@@ -344,7 +342,7 @@ class FlairRecognizer(pa.EntityRecognizer):
             name="Flair Analytics",
         )
 
-    def load(self) -> None:
+    def load(self):
         """Load the model, not used. Model is loaded during initialization."""
         pass
 
@@ -357,7 +355,7 @@ class FlairRecognizer(pa.EntityRecognizer):
         return self.supported_entities
 
     def analyze(
-        self, text: str, entities: List[str], nlp_artifacts: NlpArtifacts = None
+        self, text: str, entities: List[str], nlp_artifacts: pa.nlp_engine.NlpArtifacts = None
     ) -> List[pa.RecognizerResult]:
         """
         Analyze text and return the results.
@@ -410,7 +408,7 @@ class FlairRecognizer(pa.EntityRecognizer):
     def _convert_to_recognizer_result(self, entity: Span, explanation: str) -> pa.RecognizerResult:
         """
         Convert Flair result to Presidio RecognizerResult.
-        :param entity:          Flair entity
+        :param entity:          Flair entity of Span
         :param explanation:     Presidio AnalysisExplanation
 
         :returns:               Presidio RecognizerResult
@@ -458,12 +456,12 @@ class FlairRecognizer(pa.EntityRecognizer):
         entity: str, label: str, check_label_groups: Tuple[Set, Set]
     ) -> bool:
         return any(
-            [entity in egrp and label in lgrp for egrp, lgrp in check_label_groups]
+            entity in egrp and label in lgrp for egrp, lgrp in check_label_groups
         )
 
 
 # get the analyzer engine based on the model
-def _get_analyzer_engine(model="whole"):
+def _get_analyzer_engine(model: str="whole") -> pa.AnalyzerEngine:
     """Return pa.AnalyzerEngine.
     :param model:           The model to use. Can be "spacy", "flair", "pattern" or "whole".
     :returns:               pa.AnalyzerEngine
@@ -507,7 +505,7 @@ def _get_anonymizer_engine() -> AnonymizerEngine:
     return AnonymizerEngine()
 
 
-def _analyze(**kwargs):
+def _analyze(**kwargs) -> List[pa.RecognizerResult]:
     """Analyze input using Analyzer engine and input arguments (kwargs).
     :param kwargs:          The input arguments for the analyzer engine.
 
@@ -518,7 +516,7 @@ def _analyze(**kwargs):
     return analyzer_engine().analyze(**kwargs)
 
 
-def _anonymize(text, analyze_results):
+def _anonymize(text: str, analyze_results: List[pa.RecognizerResult]) -> str:
     """Anonymize identified input using Presidio Abonymizer.
     :param text:                The text for analysis.
     :param analyze_results:     The list of Presidio RecognizerResult constructed from
@@ -531,10 +529,10 @@ def _anonymize(text, analyze_results):
     return res.text
 
 
-def _annotate(text, st_analyze_results, st_entities):
+def _annotate(text: str, st_analyze_results: List[pa.RecognizerResult]) -> List[str]:
     """Annotate identified input using Presidio Anonymizer.
     :param text:                The text for analysis.
-    :param st_analyze_results:  The list of Presidio RecognizerResult constructed from
+    :param st_analyze_results:  The list of Presidio RecognizerResult constructed from analysis.
 
     :returns:                   The list of tokens with the identified entities.
 
@@ -598,7 +596,7 @@ def _process(text: str, model: pa.AnalyzerEngine):
     anonymized_text = _anonymize(text, results)
 
     # convert the results to tokens to generate the html
-    annotated_tokens = _annotate(text, results, analyzer.get_supported_entities())
+    annotated_tokens = _annotate(text, results)
 
     # generate the html with different colors for each entity
     html = get_annotated_html(*annotated_tokens)
@@ -700,6 +698,6 @@ def recognize_pii(
 
     html_index += "</ul>"
     html_res = f"{html_index}{html_content}</body></html>"
-    arti_html = Artifact(body=html_res, format="html", key=html_key)
+    arti_html = mlrun.artifacts.Artifact(body=html_res, format="html", key=html_key)
     context.log_artifact(arti_html)
     return output_path, rpt_json, errors

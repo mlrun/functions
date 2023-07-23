@@ -355,7 +355,10 @@ class FlairRecognizer(pa.EntityRecognizer):
         return self.supported_entities
 
     def analyze(
-        self, text: str, entities: List[str], nlp_artifacts: pa.nlp_engine.NlpArtifacts = None
+        self,
+        text: str,
+        entities: List[str],
+        nlp_artifacts: pa.nlp_engine.NlpArtifacts = None,
     ) -> List[pa.RecognizerResult]:
         """
         Analyze text and return the results.
@@ -405,7 +408,9 @@ class FlairRecognizer(pa.EntityRecognizer):
 
         return results
 
-    def _convert_to_recognizer_result(self, entity: Span, explanation: str) -> pa.RecognizerResult:
+    def _convert_to_recognizer_result(
+        self, entity: Span, explanation: str
+    ) -> pa.RecognizerResult:
         """
         Convert Flair result to Presidio RecognizerResult.
         :param entity:          Flair entity of Span
@@ -461,7 +466,7 @@ class FlairRecognizer(pa.EntityRecognizer):
 
 
 # get the analyzer engine based on the model
-def _get_analyzer_engine(model: str="whole") -> pa.AnalyzerEngine:
+def _get_analyzer_engine(model: str = "whole") -> pa.AnalyzerEngine:
     """Return pa.AnalyzerEngine.
     :param model:           The model to use. Can be "spacy", "flair", "pattern" or "whole".
     :returns:               pa.AnalyzerEngine

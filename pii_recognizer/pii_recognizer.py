@@ -128,6 +128,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
     ):
         """
         Initialize Spacy Recognizer.
+
         :param supported_language:      Language to use, default is English
         :param supported_entities:      Entities to use for recognition
         :param check_label_groups:      Label groups to check for the entities
@@ -154,6 +155,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
     ) -> pa.AnalysisExplanation:
         """
         Create explanation for why this result was detected.
+
         :param original_score:          Score given by this recognizer
         :param explanation:             Explanation string
 
@@ -170,9 +172,11 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
     def analyze(self, text: str, entities: List[str], nlp_artifacts=None):  # noqa D102
         """
         Analyze text using Spacy.
+
         :param text:                    Text to analyze
         :param entities:                Entities to analyze
         :param nlp_artifacts:           NLP artifacts to use
+        
         :returns:                       List of Presidio RecognizerResult objects
         """
         results = []
@@ -217,6 +221,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
     ) -> bool:
         """
         Check if the label is in the label group.
+
         :param entity:              Entity to check
         :param label:               Label to check
         :param check_label_groups:  Label groups to check
@@ -310,6 +315,7 @@ class FlairRecognizer(pa.EntityRecognizer):
     ):
         """
         Initialize the FlairRecognizer.
+
         :param supported_language:      Language to use
         :param supported_entities:      Entities to use
         :param check_label_groups:      Label groups to check
@@ -390,6 +396,7 @@ class FlairRecognizer(pa.EntityRecognizer):
     ) -> pa.RecognizerResult:
         """
         Convert Flair result to Presidio RecognizerResult.
+
         :param entity:          Flair entity of Span
         :param explanation:     Presidio AnalysisExplanation
 
@@ -418,6 +425,7 @@ class FlairRecognizer(pa.EntityRecognizer):
     ) -> pa.AnalysisExplanation:
         """
         Create explanation for why this result was detected.
+
         :param original_score:      Score given by this recognizer
         :param explanation:         Explanation string
 
@@ -444,8 +452,11 @@ class FlairRecognizer(pa.EntityRecognizer):
 
 # get the analyzer engine based on the model
 def _get_analyzer_engine(model: str = "whole") -> pa.AnalyzerEngine:
-    """Return pa.AnalyzerEngine.
+    """
+    Return pa.AnalyzerEngine.
+
     :param model:           The model to use. Can be "spacy", "flair", "pattern" or "whole".
+
     :returns:               pa.AnalyzerEngine
     """
     # recognizer registry that can store multiple recognizers
@@ -481,14 +492,18 @@ def _get_analyzer_engine(model: str = "whole") -> pa.AnalyzerEngine:
 
 
 def _get_anonymizer_engine() -> AnonymizerEngine:
-    """Return AnonymizerEngine.
+    """
+    Return AnonymizerEngine.
+
     :returns:               The AnonymizerEngine.
     """
     return AnonymizerEngine()
 
 
 def _analyze(**kwargs) -> List[pa.RecognizerResult]:
-    """Analyze input using Analyzer engine and input arguments (kwargs).
+    """
+    Analyze input using Analyzer engine and input arguments (kwargs).
+
     :param kwargs:          The input arguments for the analyzer engine.
 
     :returns:               The list of Presidio RecognizerResult constructed from the recognized
@@ -499,7 +514,9 @@ def _analyze(**kwargs) -> List[pa.RecognizerResult]:
 
 
 def _anonymize(text: str, analyze_results: List[pa.RecognizerResult]) -> str:
-    """Anonymize identified input using Presidio Abonymizer.
+    """
+    Anonymize identified input using Presidio Abonymizer.
+
     :param text:                The text for analysis.
     :param analyze_results:     The list of Presidio RecognizerResult constructed from
 
@@ -512,7 +529,9 @@ def _anonymize(text: str, analyze_results: List[pa.RecognizerResult]) -> str:
 
 
 def _annotate(text: str, st_analyze_results: List[pa.RecognizerResult]) -> List[str]:
-    """Annotate identified input using Presidio Anonymizer.
+    """
+    Annotate identified input using Presidio Anonymizer.
+
     :param text:                The text for analysis.
     :param st_analyze_results:  The list of Presidio RecognizerResult constructed from analysis.
 
@@ -539,9 +558,10 @@ def _annotate(text: str, st_analyze_results: List[pa.RecognizerResult]) -> List[
     return tokens
 
 
-def _process(text: str, model: pa.AnalyzerEngine):
+def _process(text: str, model: pa.AnalyzerEngine) -> Tuple[str, str, str]:
     """
     Process the text of str using the model.
+
     :param txt:                 Text to process
     :param model:               Model to use for processing
 
@@ -600,6 +620,7 @@ def recognize_pii(
     :param output_suffix:       The surfix of output key for the anonymized text. for example if the input file is pii.txt, the output key is anoymized, the output file name will be pii_anonymized.txt.
     :param html_key:            The html key for the artifact.
     :param model:               The model to use. Can be "spacy", "flair", "pattern" or "whole".
+
     :returns:  A tuple of:
                * Path to the output directory
                * The json report of the explaination

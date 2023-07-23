@@ -22,12 +22,11 @@ import tempfile
 from tqdm.auto import tqdm
 from typing import List, Tuple, Set
 import presidio_analyzer as pa
-from presidio_anonymizer import AnonymizerEngine
-from annotated_text.util import get_annotated_html
+import presidio_anonymizer as pre_anoymizer
+import annotated_text.util as at_util
 
 try:
-    from flair.data import Sentence, Span
-    from flair.models import SequenceTagger
+    import flair as fl
 except ModuleNotFoundError:
     print("Flair is not installed")
 
@@ -330,7 +329,7 @@ class FlairRecognizer(pa.EntityRecognizer):
         self.check_label_groups = check_label_groups or self._DEFAULT_CHECK_LABEL_GROUPS
 
         supported_entities = supported_entities or self._DEFAULT_ENTITIES
-        self.model = SequenceTagger.load(
+        self.model = fl.models.SequenceTagger.load(
             self._DEFAULT_MODEL_LANGUAGES.get(supported_language)
         )
 
@@ -360,7 +359,7 @@ class FlairRecognizer(pa.EntityRecognizer):
 
         results = []
 
-        sentences = Sentence(text)
+        sentences = fl.data.Sentence(text)
         self.model.predict(sentences)
 
         # If there are no specific list of entities, we will look for all of it.
@@ -396,7 +395,7 @@ class FlairRecognizer(pa.EntityRecognizer):
         return results
 
     def _convert_to_recognizer_result(
-        self, entity: Span, explanation: str
+        self, entity: fl.data.Span, explanation: str
     ) -> pa.RecognizerResult:
         """
         Convert Flair result to Presidio RecognizerResult.
@@ -495,13 +494,13 @@ def _get_analyzer_engine(model: str = "whole") -> pa.AnalyzerEngine:
     return analyzer
 
 
-def _get_anonymizer_engine() -> AnonymizerEngine:
+def _get_anonymizer_engine() -> pre_anoymizer.AnonymizerEngine:
     """
     Return AnonymizerEngine.
 
     :returns:               The AnonymizerEngine.
     """
-    return AnonymizerEngine()
+    return pre_anoymizer.AnonymizerEngine()
 
 
 def _analyze(**kwargs) -> List[pa.RecognizerResult]:
@@ -595,7 +594,7 @@ def _process(text: str, model: pa.AnalyzerEngine) -> Tuple[str, str, str]:
     annotated_tokens = _annotate(text, results)
 
     # generate the html with different colors for each entity
-    html = get_annotated_html(*annotated_tokens)
+    html = at_util.get_annotated_html(*annotated_tokens)
 
     # avoid the error during rendering of the \n in the html
     backslash_char = "\\"

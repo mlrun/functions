@@ -650,7 +650,7 @@ def recognize_pii(
     :param html_key:      The html key for the artifact.
     :param model:         The model to use. Can be "spacy", "flair", "pattern" or "whole".
     :param is_full_html:   Whether to return the full html or just the annotated text
-    :param is_full_report: Whether to return the full report or just the score
+    :param is_full_report: Whether to return the full report or just the score and start, end index
 
     :returns: A tuple of:
 

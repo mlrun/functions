@@ -98,7 +98,7 @@ def test_pattern_process(fake_data):
     }
 
     analyzer = _get_analyzer_engine("partern")
-    text = f"He can be reached at {fake_data['email']} or {fake_data['phone']}.His credit card number is {fake_data['credit_card']} and his SSN is {fake_data['ssn']}."
+    text = f"He can be reached at {fake_data['email']} or {fake_data['phone']}. His credit card number is {fake_data['credit_card']} and his SSN is {fake_data['ssn']}."
     res, html, rpt = _process(text, analyzer)
 
     assert any(entity in res for entity in ENTITIES.keys())

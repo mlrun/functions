@@ -561,12 +561,19 @@ def _annotate(text: str, st_analyze_results: List[pa.RecognizerResult]) -> List[
     return tokens
 
 
-def _process(text: str, model: pa.AnalyzerEngine) -> Tuple[str, str, str]:
+def _process(
+    text: str,
+    model: pa.AnalyzerEngine,
+    is_full_html: bool = True,
+    is_full_report: bool = True,
+) -> Tuple[str, str, str]:
     """
     Process the text of str using the model.
 
-    :param txt:   Text to process
-    :param model: Model to use for processing
+    :param txt:            Text to process
+    :param model:          Model to use for processing
+    :param is_full_html:   Whether to return the full html or just the annotated text
+    :param is_full_report: Whether to return the full report or just the score
 
     :returns: A tuple of:
 
@@ -592,16 +599,33 @@ def _process(text: str, model: pa.AnalyzerEngine) -> Tuple[str, str, str]:
 
     # convert the results to tokens to generate the html
     annotated_tokens = _annotate(text, results)
-
-    # generate the html with different colors for each entity
-    html = at_util.get_annotated_html(*annotated_tokens)
+    part_annontated_tokens = []
+    if not is_full_html:
+        last_end_sentence = 0
+        for i, token in enumerate(annotated_tokens):
+            if any(item in token for item in [".", "!", "?"]) and any(
+                type(item) is tuple for item in annotated_tokens[last_end_sentence:i]
+            ):
+                part_annontated_tokens.append(annotated_tokens[last_end_sentence:i])
+                last_end_sentence = i
+        html = at_util.get_annotated_html(*part_annontated_tokens)
+    else:
+        html = at_util.get_annotated_html(*annotated_tokens)
 
     # avoid the error during rendering of the \n in the html
     backslash_char = "\\"
 
     html_str = f"<p>{html.replace('{backslash_char}n', '<br>')}</p>"
 
-    stats = results
+    # generate the stats report if needed
+    if not is_full_report:
+        stats = []
+        # add the simplify stats logic here
+        for item in results:
+            item.analysis_explanation = None
+            stats.append(item)
+    else:
+        stats = results
 
     return anonymized_text, html_str, stats
 
@@ -613,6 +637,8 @@ def recognize_pii(
     output_suffix: str,
     html_key: str,
     model: str = "whole",
+    is_full_html: bool = True,
+    is_full_report: bool = True,
 ) -> Tuple[pathlib.Path, dict, dict]:
     """
     Walk through the input path, recognize PII in text and store the anonymized text in the output path. Generate the html with different colors for each entity, json report of the explaination.
@@ -623,6 +649,8 @@ def recognize_pii(
     :param output_suffix: The surfix of output key for the anonymized text. for example if the input file is pii.txt, the output key is anoymized, the output file name will be pii_anonymized.txt.
     :param html_key:      The html key for the artifact.
     :param model:         The model to use. Can be "spacy", "flair", "pattern" or "whole".
+    :param is_full_html:   Whether to return the full html or just the annotated text
+    :param is_full_report: Whether to return the full report or just the score
 
     :returns: A tuple of:
 
@@ -665,7 +693,9 @@ def recognize_pii(
             # Load the str from the text file
             text = txt_file.read_text()
             # Process the text to recoginze the pii entities in it
-            anonymized_text, html_str, stats = _process(text, analyzer)
+            anonymized_text, html_str, stats = _process(
+                text, analyzer, is_full_html, is_full_report
+            )
             # Add the index at the top of the html
             html_index += f'<li><a href="#{str(txt_file)}">{str(txt_file)}</a></li>'
             # Add the hightlighted html to the html content
@@ -684,8 +714,14 @@ def recognize_pii(
             # Placeholder for the json report for a single file
             new_stats = []
             for item in stats:
-                item.analysis_explanation = item.analysis_explanation.to_dict()
-                new_stats.append(item.to_dict())
+                if is_full_report:
+                    item.analysis_explanation = item.analysis_explanation.to_dict()
+                    new_stats.append(item.to_dict())
+                else:
+                    tmp_dict = item.to_dict()
+                    tmp_dict.pop("analysis_explanation")
+                    tmp_dict.pop("recognition_metadata")
+                    new_stats.append(tmp_dict)
 
             # Add the json report to the json report dict with filename as key
             rpt_json[str(txt_file)] = new_stats

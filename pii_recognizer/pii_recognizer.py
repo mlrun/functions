@@ -25,7 +25,7 @@ import mlrun
 import pathlib
 import tempfile
 from tqdm.auto import tqdm
-from typing import List, Tuple, Set
+from typing import List, Tuple, Set, Optional, Dict, Any, Union
 import presidio_analyzer as pa
 import presidio_anonymizer as pre_anoymizer
 import annotated_text.util as at_util
@@ -634,14 +634,24 @@ def _process(
 
     return anonymized_text, html_str, stats
 
+# Recognition configurations - What entities to recognize? what technique / technology (model) to use? From which score to mark the recogniztion as trusted?
+# Masking configurations - what to do with recognized tokens? Mask them? mask them with what? remove them? replace them?
+# Output configurations - All text or only masked sentences, produce json or not? produce html or not?
 
 def recognize_pii(
     context: mlrun.MLClientCtx,
+    entities: List[str],
+    score_threshold: float,
+    masking: str, # mask, remove, replace
+    masking_dict: Optional[dict[str:str]], # if masking is mask, what to replace with 
     input_path: str,
     output_path: str,
     output_suffix: str,
     html_key: str,
     model: str = "whole",
+    generate_json_rpt: bool = True,
+    generate_html_rpt: bool = True,
+    is_full_text: bool = True,
     is_full_html: bool = True,
     is_full_report: bool = True,
 ) -> Tuple[pathlib.Path, dict, dict]:

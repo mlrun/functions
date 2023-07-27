@@ -13,6 +13,11 @@
 # limitations under the License.
 #
 
+
+# Recognition configurations - What entities to recognize? what technique / technology (model) to use? From which score to mark the recogniztion as trusted?
+# Masking configurations - what to do with recognized tokens? Mask them? mask them with what? remove them? replace them?
+# Output configurations - All text or only masked sentences, produce json or not? produce html or not?
+
 import warnings
 import os
 import logging

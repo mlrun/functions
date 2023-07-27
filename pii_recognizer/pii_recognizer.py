@@ -13,11 +13,6 @@
 # limitations under the License.
 #
 
-
-# Recognition configurations - What entities to recognize? what technique / technology (model) to use? From which score to mark the recogniztion as trusted?
-# Masking configurations - what to do with recognized tokens? Mask them? mask them with what? remove them? replace them?
-# Output configurations - All text or only masked sentences, produce json or not? produce html or not?
-
 import warnings
 import os
 import logging
@@ -132,7 +127,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         supported_entities: List[str] = None,
         check_label_groups: Tuple[Set, Set] = None,
         context: List[str] = None,
-        ner_strength: float = 0.85,
+        ner_strength: float = 0,
     ):
         """
         Initialize Spacy Recognizer.
@@ -459,7 +454,7 @@ class FlairRecognizer(pa.EntityRecognizer):
 
 
 # get the analyzer engine based on the model
-def _get_analyzer_engine(model: str = "whole") -> pa.AnalyzerEngine:
+def _get_analyzer_engine(score_threshold: float, model: str = "whole") -> pa.AnalyzerEngine:
     """
     Return pa.AnalyzerEngine.
 
@@ -495,7 +490,7 @@ def _get_analyzer_engine(model: str = "whole") -> pa.AnalyzerEngine:
         for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
             registry.add_recognizer(recognizer)
 
-    analyzer = pa.AnalyzerEngine(registry=registry, supported_languages=["en"])
+    analyzer = pa.AnalyzerEngine(default_score_threshold = score_threshold, registry=registry, supported_languages=["en"])
     return analyzer
 
 
@@ -638,16 +633,26 @@ def _process(
 # Masking configurations - what to do with recognized tokens? Mask them? mask them with what? remove them? replace them?
 # Output configurations - All text or only masked sentences, produce json or not? produce html or not?
 
+"""
+Some thoughts of the implementation:
+    1. change _get_analyzer_engine to accept the score_threshold
+    2. analyze function should accept the eneities list,
+    3. anonymize function should accept the masking and masking_dict
+    4. process function should split into 2 functions, one for anonymize and one for annotate
+    5. For html and json should split into its own function
+
+"""
+
 def recognize_pii(
     context: mlrun.MLClientCtx,
     entities: List[str],
-    score_threshold: float,
     masking: str, # mask, remove, replace
     masking_dict: Optional[dict[str:str]], # if masking is mask, what to replace with 
     input_path: str,
     output_path: str,
     output_suffix: str,
     html_key: str,
+    score_threshold: float = 0, # Minimum confidence value, set to 0 to aliagn with presidio.AnalyzerEngine
     model: str = "whole",
     generate_json_rpt: bool = True,
     generate_html_rpt: bool = True,
@@ -658,19 +663,26 @@ def recognize_pii(
     """
     Walk through the input path, recognize PII in text and store the anonymized text in the output path. Generate the html with different colors for each entity, json report of the explaination.
 
-    :param context:       The MLRun context. this is needed for log the artifacts.
-    :param input_path:    The input path of the text files needs to be analyzied.
-    :param output_path:   The output path to store the anonymized text.
-    :param output_suffix: The surfix of output key for the anonymized text. for example if the input file is pii.txt, the output key is anoymized, the output file name will be pii_anonymized.txt.
-    :param html_key:      The html key for the artifact.
-    :param model:         The model to use. Can be "spacy", "flair", "pattern" or "whole".
-    :param is_full_html:   Whether to return the full html or just the annotated text
-    :param is_full_report: Whether to return the full report or just the score and start, end index
+    :param context:              The MLRun context. this is needed for log the artifacts.
+    :param entities:             The list of entities to recognize.
+    :param masking:              The masking method. Can be "mask", "remove" or "replace".
+    :param masking_dict:         The masking dictionary. Only needed when masking is "replace".
+    :param input_path:           The input path of the text files needs to be analyzied.
+    :param output_path:          The output path to store the anonymized text.
+    :param output_suffix:        The surfix of output key for the anonymized text. for example if the input file is pii.txt, the output key is anoymized, the output file name will be pii_anonymized.txt.
+    :param html_key:             The html key for the artifact.
+    :param score_threshold:      The score threshold to mark the recognition as trusted.
+    :param model:                The model to use. Can be "spacy", "flair", "pattern" or "whole".
+    :param is_generate_json_rpt: Whether to generate the json report of the explaination.
+    :param is_generate_html:     Whether to generate the html report of the explaination.
+    :param is_full_text:         Whether to return the full text or only the masked text.
+    :param is_full_html:         Whether to return the full html or just the annotated text
+    :param is_full_report:       Whether to return the full report or just the score and start, end index
 
     :returns: A tuple of:
 
               * Path to the output directory
-              * The json report of the explaination
+              * The json report of the explaination (if is_generate_json_rpt is True)
               * A dictionary of errors files that were not processed
 
     """

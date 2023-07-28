@@ -97,7 +97,7 @@ def test_pattern_process(fake_data):
         "EMAIL": "email",
     }
 
-    analyzer = _get_analyzer_engine(score_threshold = 0.85, model = "partern")
+    analyzer = _get_analyzer_engine(score_threshold = 0.5, model = "partern")
     text = f"He can be reached at {fake_data['email']} or {fake_data['phone']}. His credit card number is {fake_data['credit_card']} and his SSN is {fake_data['ssn']}."
     res, html, rpt = _process(text, analyzer)
 
@@ -110,7 +110,7 @@ def test_spacy_process(fake_data):
         "ORGANIZATION": "organization",
     }
 
-    analyzer = _get_analyzer_engine(score_threshold = 0.85, model = "spacy")
+    analyzer = _get_analyzer_engine(score_threshold = 0.5, model = "spacy")
     text = f"{fake_data['name']}'s employer is {fake_data['organization']}."
     res, html, rpt = _process(text, analyzer)
 
@@ -137,7 +137,7 @@ def test_flair_process(fake_data):
         "SWIFT_CODE": "swift_code",
     }
 
-    analyzer = _get_analyzer_engine(score_threshold = 0.85, model = "flair")
+    analyzer = _get_analyzer_engine(score_threshold = 0.5, model = "flair")
     text = " ".join(
         [item + " is " + str(fake_data[item]) for item in ENTITIES.values()]
     )

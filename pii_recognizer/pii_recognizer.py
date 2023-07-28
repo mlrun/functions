@@ -647,7 +647,7 @@ def recognize_pii(
     context: mlrun.MLClientCtx,
     entities: List[str],
     masking: str, # mask, remove, replace
-    masking_dict: Optional[dict[str:str]], # if masking is mask, what to replace with 
+    masking_dict: Optional[dict], # if masking is mask, what to replace with 
     input_path: str,
     output_path: str,
     output_suffix: str,

@@ -19,9 +19,9 @@ import logging
 import mlrun
 import pathlib
 import tempfile
-import nltk
 from tqdm.auto import tqdm
 from typing import List, Tuple, Set, Optional, Dict, Any, Union
+from collections.abc import Iterable
 import presidio_analyzer as pa
 import presidio_anonymizer as pre_anoymizer
 from presidio_anonymizer.entities import OperatorConfig
@@ -547,45 +547,51 @@ def _anonymize(
         ).text
 
     # Tokenize the text to sentences
-    sentences = nltk.sent_tokenize(text)
-    anonymized_sentences = []
-    start_position = 0
+    part_annontated_tokens = _get_tokens(text, analyze_results, is_full_text)
 
-    for sentence in sentences:
-        end_position = (
-            start_position + len(sentence) - 1
-        )  # End position of the sentence
-        sentence_results = [
-            result
-            for result in analyze_results
-            if result.start >= start_position and result.end <= end_position
-        ]
-        if sentence_results:  # If PII is detected
-            anonymized_sentence = anonymizer_engine.anonymize(
-                text=sentence, analyzer_results=sentence_results, operators=operators
-            ).text
-            anonymized_sentences.append(anonymized_sentence)
-
-        start_position = end_position + 2  # Start position of the next sentence
-
-    return " ".join(anonymized_sentences)
+    return " ".join(_flattern_tokens_to_string(part_annontated_tokens))
 
 
-def _annotate(
-    text: str, st_analyze_results: List[pa.RecognizerResult], is_full_html: bool = True
+def _flattern_tokens_to_string(input_list: List) -> list:
+    """
+    Flatten the tokens to list of string.
+
+    :param part_annontated_tokens: The list of tokens.
+
+    :returns: The list of string.
+    """
+    
+    flat_list = []
+    items = list(input_list)
+    
+    while items:
+        item = items.pop(0)
+        if isinstance(item, str):
+            flat_list.append(item)
+        elif isinstance(item, Iterable) and not isinstance(item, (str, bytes)):
+            items = list(item) + items
+        else:
+            flat_list.append(str(item))
+            
+    return flat_list
+
+
+def _get_tokens(
+    text: str, analyze_results: List[pa.RecognizerResult], is_full: bool = True
 ) -> List[str]:
-    """
-    Annotate identified input using Presidio Anonymizer.
+    """ 
+    Get the full tokens or only contains the entities that can form a sentence.
 
-    :param text:               The text for analysis.
-    :param st_analyze_results: The list of Presidio RecognizerResult constructed from analysis.
-    :param is_full_html:       Whether generate full html or not.
-    :returns: The list of tokens with the identified entities.
+    :param text:            The text for analysis.
+    :param analyze_results: The list of Presidio RecognizerResult constructed from
+    :param is_full:         Whether return full tokens or just the tokens that only contains the entities that can form a sentence.
 
+    :returns: The tokens.
     """
+
     tokens = []
     # sort by start index
-    results = sorted(st_analyze_results, key=lambda x: x.start)
+    results = sorted(analyze_results, key=lambda x: x.start)
     for i, res in enumerate(results):
         if i == 0:
             tokens.append(text[: res.start])
@@ -603,22 +609,39 @@ def _annotate(
 
     # get the tokens that only contains the entities that can form a sentence
     part_annontated_tokens = []
-    if not is_full_html:
+    if not is_full:
         last_end_sentence = 0
         for i, token in enumerate(tokens):
             if any(item in token for item in [".", "!", "?"]) and any(
-                type(item) is tuple for item in annotated_tokens[last_end_sentence:i]
+                type(item) is tuple for item in tokens[last_end_sentence:i]
             ):
-                part_annontated_tokens.append(annotated_tokens[last_end_sentence:i])
+                part_annontated_tokens.append(tokens[last_end_sentence:i])
                 last_end_sentence = i
         return part_annontated_tokens
     return tokens
 
 
+def _annotate(
+    text: str, st_analyze_results: List[pa.RecognizerResult], is_full_html: bool = True
+) -> List[str]:
+    """
+    Annotate identified input using Presidio Anonymizer.
+
+    :param text:               The text for analysis.
+    :param st_analyze_results: The list of Presidio RecognizerResult constructed from analysis.
+    :param is_full_html:       Whether generate full html or not.
+    :returns: The list of tokens with the identified entities.
+
+    """
+    return _get_tokens(text, st_analyze_results, is_full_html)
+
+
 def _process(
     text: str,
     model: pa.AnalyzerEngine,
-    entities: List[str] = None,  # set to All to recognize all entities that the model supports, or a list of entities of Upper letters to recognize
+    entities: List[
+        str
+    ] = None,  # set to All to recognize all entities that the model supports, or a list of entities of Upper letters to recognize
     entities_operator_map: dict = None,
     score_threshold: float = 0.85,
     is_full_text: bool = True,
@@ -659,7 +682,7 @@ def _process(
 
 
 def _get_single_html(
-    text: str, resutls: List[pa.RecognizerResult], is_full_html: bool = True
+    text: str, results: List[pa.RecognizerResult], is_full_html: bool = True
 ):
     """
     Generate the html for a single txt file.
@@ -671,8 +694,8 @@ def _get_single_html(
     :returns: The html string for a single txt file.
     """
     # convert the results to tokens to generate the html
-    annotated_tokens = _annotate(text, results, is_full_html)
-    html = at_util.get_annotated_html(*annontated_tokens)
+    tokens = _annotate(text, results, is_full_html)
+    html = at_util.get_annotated_html(*tokens)
 
     # avoid the error during rendering of the \n in the html
     backslash_char = "\\"
@@ -732,9 +755,7 @@ def _get_all_html(
     return html_res
 
 
-def _get_all_rpt(
-    res_dict: dict, is_full_report: bool = True
-):
+def _get_all_rpt(res_dict: dict, is_full_report: bool = True):
     """
     Generate the stats report for all txt files.
 
@@ -766,7 +787,9 @@ def recognize_pii(
     output_path: str,
     output_suffix: str,
     html_key: str,
-    entities: List[str] = None,  # List of entities to recognize, default is recognize all
+    entities: List[
+        str
+    ] = None,  # List of entities to recognize, default is recognize all
     entity_operator_map: dict = None,
     score_threshold: float = 0,  # Minimum confidence value, set to 0 to aliagn with presidio.AnalyzerEngine
     model: str = "whole",
@@ -861,8 +884,8 @@ def recognize_pii(
         # Store the html report in the context
         arti_html = mlrun.artifacts.Artifact(body=html_res, format="html", key=html_key)
         context.log_artifact(arti_html)
-    if generate_json_rpt:
+    if generate_json:
         # Generate the json report
-        json_res = _get_all_rpt(txt_content, res_dict, is_full_report)
+        json_res = _get_all_rpt(res_dict, is_full_report)
         return output_path, json_res, errors
     return output_path, errors

@@ -511,19 +511,6 @@ def _get_anonymizer_engine() -> pre_anoymizer.AnonymizerEngine:
     return pre_anoymizer.AnonymizerEngine()
 
 
-def _analyze(**kwargs) -> List[pa.RecognizerResult]:
-    """
-    Analyze input using Analyzer engine and input arguments (kwargs).
-
-    :param kwargs: The input arguments for the analyzer engine.
-
-    :returns: The list of Presidio RecognizerResult constructed from the recognized
-    """
-    if "entities" not in kwargs or "All" in kwargs["entities"]:
-        kwargs["entities"] = None
-    return analyzer_engine().analyze(**kwargs)
-
-
 def _anonymize(
     text: str,
     analyze_results: List[pa.RecognizerResult],
@@ -631,11 +618,9 @@ def _annotate(
 def _process(
     text: str,
     model: pa.AnalyzerEngine,
-    entities: List[str] = [
-        "All"
-    ],  # set to All to recognize all entities that the model supports, or a list of entities of Upper letters to recognize
+    entities: List[str] = None,  # set to All to recognize all entities that the model supports, or a list of entities of Upper letters to recognize
     entities_operator_map: dict = None,
-    score_threshold: float = 0.5,
+    score_threshold: float = 0.85,
     is_full_text: bool = True,
 ) -> Tuple[str, str, str]:
     """
@@ -782,9 +767,7 @@ def recognize_pii(
     output_path: str,
     output_suffix: str,
     html_key: str,
-    entities: List[str] = [
-        "All"
-    ],  # List of entities to recognize, default is All to recognize all entities that the model supports
+    entities: List[str] = None,  # List of entities to recognize, default is All to recognize all entities that the model supports
     score_threshold: float = 0,  # Minimum confidence value, set to 0 to aliagn with presidio.AnalyzerEngine
     model: str = "whole",
     generate_json_rpt: bool = True,

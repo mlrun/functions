@@ -99,7 +99,7 @@ def test_pattern_process(fake_data):
 
     analyzer = _get_analyzer_engine(score_threshold=0.5, model="partern")
     text = f"He can be reached at {fake_data['email']} or {fake_data['phone']}. His credit card number is {fake_data['credit_card']} and his SSN is {fake_data['ssn']}."
-    res, html, rpt = _process(text, analyzer)
+    res, results = _process(text, analyzer)
 
     assert any(entity in res for entity in ENTITIES.keys())
 
@@ -112,7 +112,7 @@ def test_spacy_process(fake_data):
 
     analyzer = _get_analyzer_engine(score_threshold=0.5, model="spacy")
     text = f"{fake_data['name']}'s employer is {fake_data['organization']}."
-    res, html, rpt = _process(text, analyzer)
+    res, results = _process(text, analyzer)
 
     assert any(entity in res for entity in ENTITIES.keys())
 
@@ -141,7 +141,7 @@ def test_flair_process(fake_data):
     text = " ".join(
         [item + " is " + str(fake_data[item]) for item in ENTITIES.values()]
     )
-    res, html, rpt = _process(text, analyzer)
+    res, results = _process(text, analyzer)
     assert any(entity in res for entity in ENTITIES.keys())
 
 
@@ -172,5 +172,5 @@ def test_whole_process(fake_data):
         [item + " is " + str(fake_data[item]) for item in ENTITIES.values()]
     )
     analyzer = _get_analyzer_engine(score_threshold=0.85, model="whole")
-    res, html, rpt = _process(text, analyzer)
+    res, results = _process(text, analyzer)
     assert any(entity in res for entity in ENTITIES.keys())

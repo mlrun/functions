@@ -762,16 +762,16 @@ def _get_all_rpt(
 
 def recognize_pii(
     context: mlrun.MLClientCtx,
-    entity_operator_map: dict,
     input_path: str,
     output_path: str,
     output_suffix: str,
     html_key: str,
-    entities: List[str] = None,  # List of entities to recognize, default is All to recognize all entities that the model supports
+    entities: List[str] = None,  # List of entities to recognize, default is recognize all
+    entity_operator_map: dict = None,
     score_threshold: float = 0,  # Minimum confidence value, set to 0 to aliagn with presidio.AnalyzerEngine
     model: str = "whole",
-    generate_json_rpt: bool = True,
-    generate_html_rpt: bool = True,
+    generate_json: bool = True,
+    generate_html: bool = True,
     is_full_text: bool = True,
     is_full_html: bool = True,
     is_full_report: bool = True,

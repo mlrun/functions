@@ -19,10 +19,12 @@ import logging
 import mlrun
 import pathlib
 import tempfile
+import nltk
 from tqdm.auto import tqdm
 from typing import List, Tuple, Set, Optional, Dict, Any, Union
 import presidio_analyzer as pa
 import presidio_anonymizer as pre_anoymizer
+from presidio_anonymizer.entities import OperatorConfig
 import annotated_text.util as at_util
 
 try:
@@ -127,7 +129,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         supported_entities: List[str] = None,
         check_label_groups: Tuple[Set, Set] = None,
         context: List[str] = None,
-        ner_strength: float = 0,
+        ner_strength: float = 1,
     ):
         """
         Initialize Spacy Recognizer.
@@ -454,7 +456,9 @@ class FlairRecognizer(pa.EntityRecognizer):
 
 
 # get the analyzer engine based on the model
-def _get_analyzer_engine(score_threshold: float, model: str = "whole") -> pa.AnalyzerEngine:
+def _get_analyzer_engine(
+    score_threshold: float, model: str = "whole"
+) -> pa.AnalyzerEngine:
     """
     Return pa.AnalyzerEngine.
 
@@ -490,7 +494,11 @@ def _get_analyzer_engine(score_threshold: float, model: str = "whole") -> pa.Ana
         for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
             registry.add_recognizer(recognizer)
 
-    analyzer = pa.AnalyzerEngine(default_score_threshold = score_threshold, registry=registry, supported_languages=["en"])
+    analyzer = pa.AnalyzerEngine(
+        default_score_threshold=score_threshold,
+        registry=registry,
+        supported_languages=["en"],
+    )
     return analyzer
 
 
@@ -516,28 +524,75 @@ def _analyze(**kwargs) -> List[pa.RecognizerResult]:
     return analyzer_engine().analyze(**kwargs)
 
 
-def _anonymize(text: str, analyze_results: List[pa.RecognizerResult]) -> str:
+def _anonymize(
+    text: str,
+    analyze_results: List[pa.RecognizerResult],
+    entity_operator_map: dict = None,
+    is_full_text: bool = True,
+) -> str:
     """
     Anonymize identified input using Presidio Abonymizer.
 
     :param text:            The text for analysis.
     :param analyze_results: The list of Presidio RecognizerResult constructed from
+    :param entity_operator_map: The entity_operator_map is a dictionary that maps entity to operator name and operator params.
+    :param is_full_text:    Whether the text is full text or not.
 
     :returns: The anonymized text.
     """
     if not text:
-        return
-    res = _get_anonymizer_engine().anonymize(text, analyze_results)
-    return res.text
+        return ""
+
+    anonymizer_engine = _get_anonymizer_engine()
+    if not entity_operator_map:
+        operators = None
+    else:
+        # Create OperatorConfig based on the entity_operator_map
+        operators = {
+            entity: OperatorConfig(operator_name, operator_params)
+            for entity, (operator_name, operator_params) in entity_operator_map.items()
+        }
+
+    if is_full_text:
+        # Anonymize the entire text
+        return anonymizer_engine.anonymize(
+            text=text, analyzer_results=analyze_results, operators=operators
+        ).text
+
+    # Tokenize the text to sentences
+    sentences = nltk.sent_tokenize(text)
+    anonymized_sentences = []
+    start_position = 0
+
+    for sentence in sentences:
+        end_position = (
+            start_position + len(sentence) - 1
+        )  # End position of the sentence
+        sentence_results = [
+            result
+            for result in analyze_results
+            if result.start >= start_position and result.end <= end_position
+        ]
+        if sentence_results:  # If PII is detected
+            anonymized_sentence = anonymizer_engine.anonymize(
+                text=sentence, analyzer_results=sentence_results, operators=operators
+            ).text
+            anonymized_sentences.append(anonymized_sentence)
+
+        start_position = end_position + 2  # Start position of the next sentence
+
+    return " ".join(anonymized_sentences)
 
 
-def _annotate(text: str, st_analyze_results: List[pa.RecognizerResult]) -> List[str]:
+def _annotate(
+    text: str, st_analyze_results: List[pa.RecognizerResult], is_full_html: bool = True
+) -> List[str]:
     """
     Annotate identified input using Presidio Anonymizer.
 
     :param text:               The text for analysis.
     :param st_analyze_results: The list of Presidio RecognizerResult constructed from analysis.
-
+    :param is_full_html:       Whether generate full html or not.
     :returns: The list of tokens with the identified entities.
 
     """
@@ -558,28 +613,45 @@ def _annotate(text: str, st_analyze_results: List[pa.RecognizerResult]) -> List[
         # if no more entities coming, add all remaining text
         else:
             tokens.append(text[res.end :])
+
+    # get the tokens that only contains the entities that can form a sentence
+    part_annontated_tokens = []
+    if not is_full_html:
+        last_end_sentence = 0
+        for i, token in enumerate(tokens):
+            if any(item in token for item in [".", "!", "?"]) and any(
+                type(item) is tuple for item in annotated_tokens[last_end_sentence:i]
+            ):
+                part_annontated_tokens.append(annotated_tokens[last_end_sentence:i])
+                last_end_sentence = i
+        return part_annontated_tokens
     return tokens
 
 
 def _process(
     text: str,
     model: pa.AnalyzerEngine,
-    is_full_html: bool = True,
-    is_full_report: bool = True,
+    entities: List[str] = [
+        "All"
+    ],  # set to All to recognize all entities that the model supports, or a list of entities of Upper letters to recognize
+    entities_operator_map: dict = None,
+    score_threshold: float = 0.5,
+    is_full_text: bool = True,
 ) -> Tuple[str, str, str]:
     """
     Process the text of str using the model.
 
-    :param txt:            Text to process
-    :param model:          Model to use for processing
-    :param is_full_html:   Whether to return the full html or just the annotated text
-    :param is_full_report: Whether to return the full report or just the score
+    :param txt:                   Text to process
+    :param model:                 Model to use for processing
+    :param entities:              Entities to recognize
+    :param entities_operator_map: The entity_operator_map is a dictionary that maps entity to operator name and operator params.
+    :param score_threshold:       The score threshold to use for recognition
+    :param is_full_text:          Whether to return the full text or just the annotated text
 
     :returns: A tuple of:
 
               * the anonymized text
-              * the html string with entities highlighted
-              * the stats report
+              * the list of Presidio RecognizerResult constructed from analysis
     """
 
     # get the analyzer engine
@@ -590,33 +662,50 @@ def _process(
     results = analyzer.analyze(
         text=text,
         language="en",
-        entities=analyzer.get_supported_entities(),
+        entities=entities,
+        score_threshold=score_threshold,
         return_decision_process=True,
     )
 
     # anonymize the text, replace the pii entities with the labels
-    anonymized_text = _anonymize(text, results)
+    anonymized_text = _anonymize(text, results, entities_operator_map, is_full_text)
 
+    return anonymized_text, results
+
+
+def _get_single_html(
+    text: str, resutls: List[pa.RecognizerResult], is_full_html: bool = True
+):
+    """
+    Generate the html for a single txt file.
+
+    :param text: The text for analysis.
+    :param results: The list of Presidio RecognizerResult constructed from analysis.
+    :param is_full_html: Whether generate full html or not.
+
+    :returns: The html string for a single txt file.
+    """
     # convert the results to tokens to generate the html
-    annotated_tokens = _annotate(text, results)
-    part_annontated_tokens = []
-    if not is_full_html:
-        last_end_sentence = 0
-        for i, token in enumerate(annotated_tokens):
-            if any(item in token for item in [".", "!", "?"]) and any(
-                type(item) is tuple for item in annotated_tokens[last_end_sentence:i]
-            ):
-                part_annontated_tokens.append(annotated_tokens[last_end_sentence:i])
-                last_end_sentence = i
-        html = at_util.get_annotated_html(*part_annontated_tokens)
-    else:
-        html = at_util.get_annotated_html(*annotated_tokens)
+    annotated_tokens = _annotate(text, results, is_full_html)
+    html = at_util.get_annotated_html(*annontated_tokens)
 
     # avoid the error during rendering of the \n in the html
     backslash_char = "\\"
 
     html_str = f"<p>{html.replace('{backslash_char}n', '<br>')}</p>"
 
+    return html_str
+
+
+def _get_single_json(results: List[pa.RecognizerResult], is_full_report: bool = True):
+    """
+    Generate the json for a single txt file.
+
+    :param results: The list of Presidio RecognizerResult constructed from analysis.
+    :param is_full_report: Whether generate full json or not.
+
+    :returns: The json string for a single txt file.
+    """
     # generate the stats report if needed
     if not is_full_report:
         stats = []
@@ -627,32 +716,76 @@ def _process(
     else:
         stats = results
 
-    return anonymized_text, html_str, stats
+    return stats
 
-# Recognition configurations - What entities to recognize? what technique / technology (model) to use? From which score to mark the recogniztion as trusted?
-# Masking configurations - what to do with recognized tokens? Mask them? mask them with what? remove them? replace them?
-# Output configurations - All text or only masked sentences, produce json or not? produce html or not?
 
-"""
-Some thoughts of the implementation:
-    1. change _get_analyzer_engine to accept the score_threshold
-    2. analyze function should accept the eneities list,
-    3. anonymize function should accept the masking and masking_dict
-    4. process function should split into 2 functions, one for anonymize and one for annotate
-    5. For html and json should split into its own function
+def _get_all_html(
+    txt_content: dict,
+    res_dict: dict,
+    is_full_html: bool = True,
+):
+    """
+    Generate the html for all txt files.
 
-"""
+    :param txt_content: The dictionary of txt file name and content.
+    :param res_dict:    The dictionary of txt file name and the list of Presidio RecognizerResult constructed from analysis.
+    :param is_full_html: Whether generate full html or not.
+
+    :returns: The html string for all txt files.
+
+    """
+    # These are placeholder for the html string
+    html_index = "<html><head><title>Highlighted Pii Entities</title></head><body><h1>Highlighted Pii Entities</h1><ul>"
+    html_content = ""
+    for txt_file, results in res_dict.items():
+        txt = txt_content[txt_file]
+        html_index += f"<li><a href='#{txt_file}'>{txt_file}</a></li>"
+        html_content += f"<li><h2>{txt_file}</h2><p>{_get_single_html(txt, results, is_full_html)}</p></li>"
+    html_index += "</ul>"
+    html_res = f"{html_index}{html_content}</body></html>"
+
+    return html_res
+
+
+def _get_all_rpt(
+    res_dict: dict, is_full_report: bool = True
+):
+    """
+    Generate the stats report for all txt files.
+
+    :param res_dict: The dictionary of txt file name and the list of Presidio RecognizerResult constructed from analysis.
+    :param is_full_report: Whether generate full report or not.
+
+    :returns: The stats report for all txt files.
+    """
+    # These are placeholder for the html string
+    stats_dict = {}
+    for txt_file, results in res_dict.items():
+        new_stats = []
+        for item in _get_single_json(results, is_full_report):
+            if is_full_report:
+                item.analysis_explanation = item.analysis_explanation.to_dict()
+                new_stats.append(item.to_dict())
+            else:
+                tmp_dict = item.to_dict()
+                tmp_dict.pop("analysis_explanation")
+                tmp_dict.pop("recognition_metadata")
+                new_stats.append(tmp_dict)
+        stats_dict[txt_file] = new_stats
+    return stats_dict
+
 
 def recognize_pii(
     context: mlrun.MLClientCtx,
-    entities: List[str],
-    masking: str, # mask, remove, replace
-    masking_dict: Optional[dict], # if masking is mask, what to replace with 
+    entity_operator_map: dict,
     input_path: str,
     output_path: str,
     output_suffix: str,
     html_key: str,
-    score_threshold: float = 0, # Minimum confidence value, set to 0 to aliagn with presidio.AnalyzerEngine
+    entities: List[str] = [
+        "All"
+    ],  # List of entities to recognize, default is All to recognize all entities that the model supports
+    score_threshold: float = 0,  # Minimum confidence value, set to 0 to aliagn with presidio.AnalyzerEngine
     model: str = "whole",
     generate_json_rpt: bool = True,
     generate_html_rpt: bool = True,
@@ -665,8 +798,7 @@ def recognize_pii(
 
     :param context:              The MLRun context. this is needed for log the artifacts.
     :param entities:             The list of entities to recognize.
-    :param masking:              The masking method. Can be "mask", "remove" or "replace".
-    :param masking_dict:         The masking dictionary. Only needed when masking is "replace".
+    :param entity_operator_map:  The map of entity to operator (mask, redact, replace, keep, hash, and its params)
     :param input_path:           The input path of the text files needs to be analyzied.
     :param output_path:          The output path to store the anonymized text.
     :param output_suffix:        The surfix of output key for the anonymized text. for example if the input file is pii.txt, the output key is anoymized, the output file name will be pii_anonymized.txt.
@@ -702,12 +834,10 @@ def recognize_pii(
 
     # Go over the text files in the input path, analyze and anonymize them:
     txt_files_directory = pathlib.Path(input_path)
-    # These are placeholder for the html string and the stats report
-    html_index = "<html><head><title>Highlighted Pii Entities</title></head><body><h1>Highlighted Pii Entities</h1><ul>"
-    html_content = ""
-    rpt_json = {}
     errors = {}
 
+    res_dict = {}
+    txt_content = {}
     # Go over the text files in the input path, analyze and anonymize them:
     for i, txt_file in enumerate(
         tqdm(
@@ -719,45 +849,37 @@ def recognize_pii(
         try:
             # Load the str from the text file
             text = txt_file.read_text()
+            txt_content[str(txt_file)] = text
             # Process the text to recoginze the pii entities in it
-            anonymized_text, html_str, stats = _process(
-                text, analyzer, is_full_html, is_full_report
+            anonymized_text, results = _process(
+                text,
+                analyzer,
+                entities,
+                entity_operator_map,
+                score_threshold,
+                is_full_text,
             )
-            # Add the index at the top of the html
-            html_index += f'<li><a href="#{str(txt_file)}">{str(txt_file)}</a></li>'
-            # Add the hightlighted html to the html content
-            html_content += f'<h2 id="{str(txt_file)}">{str(txt_file)}</h2>{html_str}'
-
+            res_dict[str(txt_file)] = results
             # Store the anonymized text in the output path
             output_file = (
                 output_directory
                 / f"{str(txt_file.relative_to(txt_files_directory)).split('.')[0]}_{output_suffix}.txt"
             )
-
             output_file.parent.mkdir(parents=True, exist_ok=True)
             with open(output_file, "w") as f:
                 f.write(anonymized_text)
 
-            # Placeholder for the json report for a single file
-            new_stats = []
-            for item in stats:
-                if is_full_report:
-                    item.analysis_explanation = item.analysis_explanation.to_dict()
-                    new_stats.append(item.to_dict())
-                else:
-                    tmp_dict = item.to_dict()
-                    tmp_dict.pop("analysis_explanation")
-                    tmp_dict.pop("recognition_metadata")
-                    new_stats.append(tmp_dict)
-
-            # Add the json report to the json report dict with filename as key
-            rpt_json[str(txt_file)] = new_stats
         except Exception as e:
             errors[str(txt_file)] = str(e)
             print(f"Error processing {txt_file}: {e}")
-
-    html_index += "</ul>"
-    html_res = f"{html_index}{html_content}</body></html>"
-    arti_html = mlrun.artifacts.Artifact(body=html_res, format="html", key=html_key)
-    context.log_artifact(arti_html)
-    return output_path, rpt_json, errors
+    if generate_html:
+        # Generate the html report
+        html_res = _get_all_html(txt_content, res_dict, is_full_html)
+        # Store the html report in the context
+        arti_html = mlrun.artifacts.Artifact(body=html_res, format="html", key=html_key)
+        context.log_artifact(arti_html)
+    if generate_json_rpt:
+        # Generate the json report
+        json_res = _get_all_rpt(txt_content, res_dict, is_full_report)
+        return output_path, json_res, errors
+    return output_path, errors

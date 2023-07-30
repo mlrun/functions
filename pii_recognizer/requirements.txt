@@ -1,4 +1,5 @@
 mlrun==1.4.0-rc19
+nltk
 pandas
 streamlit
 presidio-anonymizer

@@ -5,7 +5,7 @@ categories:
 description: This function is used to recognize PII in a given text
 doc: ''
 example: pii_recognizer.ipynb
-generationDate: 2023-07-23:21-01
+generationDate: 2023-07-30:21-01
 icon: ''
 labels: {}
 maintainers: []
@@ -20,12 +20,13 @@ spec:
   kind: job
   requirements:
    - mlrun==1.4.0-rc19
-    - pandas
-    - presidio-anonymizer
-    - presidio-analyzer
-    - torch
-    - flair@git+https://github.com/flairNLP/flair.git@d4ed67bf663e4066517f00397412510d90043653
-    - st-annotated-text
-    - https://huggingface.co/beki/en_spacy_pii_distilbert/resolve/main/en_spacy_pii_distilbert-any-py3-none-any.whl
+   - nltk
+   - pandas
+   - presidio-anonymizer
+   - presidio-analyzer
+   - torch
+   - flair@git+https://github.com/flairNLP/flair.git@d4ed67bf663e4066517f00397412510d90043653
+   - st-annotated-text
+   - https://huggingface.co/beki/en_spacy_pii_distilbert/resolve/main/en_spacy_pii_distilbert-any-py3-none-any.whl
 url: ''
 version: 0.0.1

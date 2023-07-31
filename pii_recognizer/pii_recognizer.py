@@ -639,11 +639,9 @@ def _annotate(
 def _process(
     text: str,
     model: pa.AnalyzerEngine,
-    entities: List[
-        str
-    ] = None,  # set to All to recognize all entities that the model supports, or a list of entities of Upper letters to recognize
+    score_threshold: float,
+    entities: List[str] = None,
     entities_operator_map: dict = None,
-    score_threshold: float = 0.85,
     is_full_text: bool = True,
 ) -> Tuple[str, str, str]:
     """
@@ -787,11 +785,11 @@ def recognize_pii(
     output_path: str,
     output_suffix: str,
     html_key: str,
+    score_threshold: float,
     entities: List[
         str
     ] = None,  # List of entities to recognize, default is recognize all
     entity_operator_map: dict = None,
-    score_threshold: float = 0,  # Minimum confidence value, set to 0 to aliagn with presidio.AnalyzerEngine
     model: str = "whole",
     generate_json: bool = True,
     generate_html: bool = True,

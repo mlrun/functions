@@ -576,30 +576,6 @@ def _anonymize(
     return " ".join(anonymized_sentences)
 
 
-def _flattern_tokens_to_string(input_list: List) -> list:
-    """
-    Flatten the tokens to list of string.
-
-    :param part_annontated_tokens: The list of tokens.
-
-    :returns: The list of string.
-    """
-
-    flat_list = []
-    items = list(input_list)
-
-    while items:
-        item = items.pop(0)
-        if isinstance(item, str):
-            flat_list.append(item)
-        elif isinstance(item, Iterable) and not isinstance(item, (str, bytes)):
-            items = list(item) + items
-        else:
-            flat_list.append(str(item))
-
-    return flat_list
-
-
 def _get_tokens(
     text: str, analyze_results: List[pa.RecognizerResult], is_full: bool = True
 ) -> List[str]:

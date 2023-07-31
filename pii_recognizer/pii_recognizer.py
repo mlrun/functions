@@ -19,6 +19,7 @@ import logging
 import mlrun
 import pathlib
 import tempfile
+import nltk
 from tqdm.auto import tqdm
 from typing import List, Tuple, Set, Optional, Dict, Any, Union
 from collections.abc import Iterable
@@ -545,11 +546,34 @@ def _anonymize(
         return anonymizer_engine.anonymize(
             text=text, analyzer_results=analyze_results, operators=operators
         ).text
-
     # Tokenize the text to sentences
-    part_annontated_tokens = _get_tokens(text, analyze_results, is_full_text)
+    sentences = nltk.sent_tokenize(text)
+    anonymized_sentences = []
+    current_idx = 0
 
-    return " ".join(_flattern_tokens_to_string(part_annontated_tokens))
+    for sentence in sentences:
+        start_idx = current_idx
+        end_idx = start_idx + len(sentence)
+        sentence_results = [
+            pa.RecognizerResult(
+                result.entity_type,
+                start=result.start - start_idx,
+                end=result.end - start_idx,
+                score=result.score,
+            )
+            for result in analyze_results
+            if result.start >= start_idx and result.end <= end_idx
+        ]
+
+        if sentence_results:  # If PII is detected
+            anonymized_sentence = anonymizer_engine.anonymize(
+                text=sentence, analyzer_results=sentence_results, operators=operators
+            ).text
+            anonymized_sentences.append(anonymized_sentence)
+
+        current_idx = end_idx
+
+    return " ".join(anonymized_sentences)
 
 
 def _flattern_tokens_to_string(input_list: List) -> list:
@@ -560,10 +584,10 @@ def _flattern_tokens_to_string(input_list: List) -> list:
 
     :returns: The list of string.
     """
-    
+
     flat_list = []
     items = list(input_list)
-    
+
     while items:
         item = items.pop(0)
         if isinstance(item, str):
@@ -572,14 +596,14 @@ def _flattern_tokens_to_string(input_list: List) -> list:
             items = list(item) + items
         else:
             flat_list.append(str(item))
-            
+
     return flat_list
 
 
 def _get_tokens(
     text: str, analyze_results: List[pa.RecognizerResult], is_full: bool = True
 ) -> List[str]:
-    """ 
+    """
     Get the full tokens or only contains the entities that can form a sentence.
 
     :param text:            The text for analysis.

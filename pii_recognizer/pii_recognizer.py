@@ -801,16 +801,16 @@ def recognize_pii(
     Walk through the input path, recognize PII in text and store the anonymized text in the output path. Generate the html with different colors for each entity, json report of the explaination.
 
     :param context:              The MLRun context. this is needed for log the artifacts.
-    :param entities:             The list of entities to recognize.
-    :param entity_operator_map:  The map of entity to operator (mask, redact, replace, keep, hash, and its params)
     :param input_path:           The input path of the text files needs to be analyzied.
     :param output_path:          The output path to store the anonymized text.
     :param output_suffix:        The surfix of output key for the anonymized text. for example if the input file is pii.txt, the output key is anoymized, the output file name will be pii_anonymized.txt.
     :param html_key:             The html key for the artifact.
     :param score_threshold:      The score threshold to mark the recognition as trusted.
+    :param entities:             The list of entities to recognize.
+    :param entity_operator_map:  The map of entity to operator (mask, redact, replace, keep, hash, and its params)
     :param model:                The model to use. Can be "spacy", "flair", "pattern" or "whole".
-    :param is_generate_json_rpt: Whether to generate the json report of the explaination.
-    :param is_generate_html:     Whether to generate the html report of the explaination.
+    :param generate_json:        Whether to generate the json report of the explaination.
+    :param generate_html:        Whether to generate the html report of the explaination.
     :param is_full_text:         Whether to return the full text or only the masked text.
     :param is_full_html:         Whether to return the full html or just the annotated text
     :param is_full_report:       Whether to return the full report or just the score and start, end index
@@ -818,7 +818,7 @@ def recognize_pii(
     :returns: A tuple of:
 
               * Path to the output directory
-              * The json report of the explaination (if is_generate_json_rpt is True)
+              * The json report of the explaination (if generate_json is True)
               * A dictionary of errors files that were not processed
 
     """

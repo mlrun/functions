@@ -521,10 +521,10 @@ def _anonymize(
     """
     Anonymize identified input using Presidio Abonymizer.
 
-    :param text:            The text for analysis.
-    :param analyze_results: The list of Presidio RecognizerResult constructed from
+    :param text:                The text for analysis.
+    :param analyze_results:     The list of Presidio RecognizerResult constructed from
     :param entity_operator_map: The entity_operator_map is a dictionary that maps entity to operator name and operator params.
-    :param is_full_text:    Whether the text is full text or not.
+    :param is_full_text:        Whether the text is full text or not.
 
     :returns: The anonymized text.
     """
@@ -551,9 +551,12 @@ def _anonymize(
     anonymized_sentences = []
     current_idx = 0
 
+    # Find the sentence that has pii entity
     for sentence in sentences:
         start_idx = current_idx
         end_idx = start_idx + len(sentence)
+
+        # Get the entities that are in the sentence, update hte start_idx and end_idx
         sentence_results = [
             pa.RecognizerResult(
                 result.entity_type,
@@ -565,7 +568,8 @@ def _anonymize(
             if result.start >= start_idx and result.end <= end_idx
         ]
 
-        if sentence_results:  # If PII is detected
+        # If PII is detected
+        if sentence_results:
             anonymized_sentence = anonymizer_engine.anonymize(
                 text=sentence, analyzer_results=sentence_results, operators=operators
             ).text
@@ -630,6 +634,7 @@ def _annotate(
     :param text:               The text for analysis.
     :param st_analyze_results: The list of Presidio RecognizerResult constructed from analysis.
     :param is_full_html:       Whether generate full html or not.
+
     :returns: The list of tokens with the identified entities.
 
     """
@@ -685,8 +690,8 @@ def _get_single_html(
     """
     Generate the html for a single txt file.
 
-    :param text: The text for analysis.
-    :param results: The list of Presidio RecognizerResult constructed from analysis.
+    :param text:         The text for analysis.
+    :param results:      The list of Presidio RecognizerResult constructed from analysis.
     :param is_full_html: Whether generate full html or not.
 
     :returns: The html string for a single txt file.
@@ -707,7 +712,7 @@ def _get_single_json(results: List[pa.RecognizerResult], is_full_report: bool = 
     """
     Generate the json for a single txt file.
 
-    :param results: The list of Presidio RecognizerResult constructed from analysis.
+    :param results:        The list of Presidio RecognizerResult constructed from analysis.
     :param is_full_report: Whether generate full json or not.
 
     :returns: The json string for a single txt file.
@@ -733,8 +738,8 @@ def _get_all_html(
     """
     Generate the html for all txt files.
 
-    :param txt_content: The dictionary of txt file name and content.
-    :param res_dict:    The dictionary of txt file name and the list of Presidio RecognizerResult constructed from analysis.
+    :param txt_content:  The dictionary of txt file name and content.
+    :param res_dict:     The dictionary of txt file name and the list of Presidio RecognizerResult constructed from analysis.
     :param is_full_html: Whether generate full html or not.
 
     :returns: The html string for all txt files.
@@ -757,12 +762,12 @@ def _get_all_rpt(res_dict: dict, is_full_report: bool = True):
     """
     Generate the stats report for all txt files.
 
-    :param res_dict: The dictionary of txt file name and the list of Presidio RecognizerResult constructed from analysis.
+    :param res_dict:       The dictionary of txt file name and the list of Presidio RecognizerResult constructed from analysis.
     :param is_full_report: Whether generate full report or not.
 
     :returns: The stats report for all txt files.
     """
-    # These are placeholder for the html string
+    # These are placeholder for the json report
     stats_dict = {}
     for txt_file, results in res_dict.items():
         new_stats = []
@@ -788,7 +793,7 @@ def recognize_pii(
     score_threshold: float,
     entities: List[
         str
-    ] = None,  # List of entities to recognize, default is recognize all
+    ] = None,  # List of entities to recognize, default is recognizing all
     entity_operator_map: dict = None,
     model: str = "whole",
     generate_json: bool = True,

@@ -458,7 +458,7 @@ class FlairRecognizer(pa.EntityRecognizer):
 
 # get the analyzer engine based on the model
 def _get_analyzer_engine(
-    score_threshold: float, model: str = "whole"
+    model: str = "whole", entities: List[str] = None
 ) -> pa.AnalyzerEngine:
     """
     Return pa.AnalyzerEngine.
@@ -496,10 +496,20 @@ def _get_analyzer_engine(
             registry.add_recognizer(recognizer)
 
     analyzer = pa.AnalyzerEngine(
-        default_score_threshold=score_threshold,
         registry=registry,
         supported_languages=["en"],
     )
+
+    supported_entities = analyzer.get_supported_entities()
+    if not all(item in supported_entities for item in entities):
+        not_supported_entities = [
+            item for item in entities if item not in supported_entities
+        ]
+        raise ValueError(
+            f"The current model {model} doesn't support the following entities: {not_supported_entities}. "
+            f"Supported entities are: {supported_entities}"
+        )
+
     return analyzer
 
 
@@ -838,7 +848,7 @@ def recognize_pii(
         output_directory.mkdir()
 
     # Load the model:
-    analyzer = _get_analyzer_engine(model)
+    analyzer = _get_analyzer_engine(model, entities)
     print("Model loaded")
 
     # Go over the text files in the input path, analyze and anonymize them:

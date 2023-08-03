@@ -59,7 +59,11 @@ def test_transcribe(model_name: str, audio_path: str):
     )
 
     # Getting actual files from run (text and errored):
-    input_files = os.listdir(audio_path) if pathlib.Path(audio_path).is_dir() else [pathlib.Path(audio_path).name]
+    input_files = (
+        os.listdir(audio_path)
+        if pathlib.Path(audio_path).is_dir()
+        else [pathlib.Path(audio_path).name]
+    )
     expected_text_files = sorted([f for f in input_files if f.endswith("mp3")])
     error_files = list(set(input_files) - set(expected_text_files))
     expected_text_files = [f.replace("mp3", "txt") for f in expected_text_files]

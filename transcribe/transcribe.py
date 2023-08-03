@@ -111,11 +111,12 @@ def transcribe(
             errors[str(audio_file)] = str(exception)
         else:
             # Write the transcription to file:
-            saved_filename = str(audio_file.relative_to(audio_files_path)).split('.')[0] if is_dir else audio_file.stem
-            transcription_file = (
-                output_directory
-                / f"{saved_filename}.txt"
+            saved_filename = (
+                str(audio_file.relative_to(audio_files_path)).split(".")[0]
+                if is_dir
+                else audio_file.stem
             )
+            transcription_file = output_directory / f"{saved_filename}.txt"
             transcription_file.parent.mkdir(exist_ok=True, parents=True)
             with open(transcription_file, "w") as fp:
                 fp.write(transcription)

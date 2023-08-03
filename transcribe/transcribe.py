@@ -15,9 +15,10 @@
 
 import pathlib
 import tempfile
-from typing import Literal, Tuple
+from typing import Literal, Tuple, Union
 
 import mlrun
+import numpy as np
 import pandas as pd
 import whisper
 from mutagen.mp3 import MP3
@@ -44,7 +45,7 @@ def transcribe(
     * rate_of_speech - The number of words divided by the audio file length.
 
     :param context:               MLRun context.
-    :param audio_files_directory: A directory of the audio files to transcribe.
+    :param audio_files_directory: A directory of the audio files or a single file to transcribe.
     :param output_directory:      Path to a directory to save all transcribed audio files.
     :param model_name:            One of the official model names listed by `whisper.available_models()`.
     :param device:                Device to load the model. Can be one of {"cuda", "cpu"}.
@@ -60,8 +61,6 @@ def transcribe(
     # Set output directory:
     if output_directory is None:
         output_directory = tempfile.mkdtemp()
-
-    decoding_options = decoding_options or dict()
 
     # Load the model:
     context.logger.info(f"Loading whisper model: '{model_name}'")
@@ -86,44 +85,72 @@ def transcribe(
         output_directory.mkdir()
 
     # Go over the audio files and transcribe:
-    audio_files_directory = pathlib.Path(audio_files_directory).absolute()
-    for i, audio_file in enumerate(
-        tqdm(list(audio_files_directory.rglob("*.*")), desc="Transcribing", unit="file")
-    ):
+    audio_files_path = pathlib.Path(audio_files_directory).absolute()
+    is_dir = True
+    if audio_files_path.is_dir():
+        audio_files = list(audio_files_path.rglob("*.*"))
+    elif audio_files_path.is_file():
+        is_dir = False
+        audio_files = [audio_files_path]
+    else:
+        raise ValueError(
+            f"audio_files {str(audio_files_path)} must be either a directory path or a file path"
+        )
+
+    for i, audio_file in enumerate(tqdm(audio_files, desc="Transcribing", unit="file")):
         try:
-            # Load the audio:
-            audio = whisper.audio.load_audio(file=str(audio_file))
-            # Get audio length:
-            length = MP3(audio_file).info.length
-            # Transcribe:
-            result = model.transcribe(audio=audio, **decoding_options)
-            # Unpack the model's result:
-            transcription = result["text"]
-            language = result["language"] or decoding_options.language
+            transcription, length, rate_of_speech, language = _single_transcribe(
+                audio_file=audio_file,
+                model=model,
+                decoding_options=decoding_options,
+            )
+
+        except Exception as exception:
+            # Collect the exception:
+            context.logger.warn(f"Error in file: '{audio_file}'")
+            errors[str(audio_file)] = str(exception)
+        else:
+            # Write the transcription to file:
+            saved_filename = str(audio_file.relative_to(audio_files_path)).split('.')[0] if is_dir else audio_file.stem
             transcription_file = (
                 output_directory
-                / f"{str(audio_file.relative_to(audio_files_directory)).split('.')[0]}.txt"
+                / f"{saved_filename}.txt"
             )
             transcription_file.parent.mkdir(exist_ok=True, parents=True)
-            # Write the transcription to file:
             with open(transcription_file, "w") as fp:
                 fp.write(transcription)
-            # Calculate rate of speech (number of words / audio length):
-            rate_of_speech = len(transcription.split()) / length
+
             # Note in the dataframe:
             df.loc[i - len(errors)] = [
-                str(audio_file.relative_to(audio_files_directory)),
+                str(audio_file.relative_to(audio_files_path)),
                 str(transcription_file.relative_to(output_directory)),
                 language,
                 length,
                 rate_of_speech,
             ]
-        except Exception as exception:
-            # Collect the exception:
-            context.logger.warn(f"Error in file: '{audio_file}'")
-            errors[str(audio_file)] = str(exception)
-
     # Return the dataframe:
     context.logger.info(f"Done:\n{df.head()}")
 
     return output_directory, df, errors
+
+
+def _single_transcribe(
+    audio_file: str,
+    model: whisper.Whisper,
+    decoding_options: dict = None,
+) -> Tuple[str, int, float, str]:
+    decoding_options = decoding_options or dict()
+    # Load the audio:
+    audio = whisper.audio.load_audio(file=str(audio_file))
+    # Get audio length:
+    length = MP3(audio_file).info.length
+    # Transcribe:
+    result = model.transcribe(audio=audio, **decoding_options)
+    # Unpack the model's result:
+    transcription = result["text"]
+    language = result.get("language") or decoding_options.get("language", "")
+
+    # Calculate rate of speech (number of words / audio length):
+    rate_of_speech = len(transcription.split()) / length
+
+    return transcription, length, rate_of_speech, language

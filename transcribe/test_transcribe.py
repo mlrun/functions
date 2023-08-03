@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 import os
+import pathlib
 import tempfile
 from difflib import SequenceMatcher
 
@@ -32,10 +33,10 @@ expected_outputs = [
 
 
 @pytest.mark.parametrize("model_name", whisper.available_models()[:4])
-def test_transcribe(model_name: str):
+@pytest.mark.parametrize("audio_path", ("./data", "./data/speech_01.mp3"))
+def test_transcribe(model_name: str, audio_path: str):
     # Setting variables and importing function:
     artifact_path = tempfile.mkdtemp()
-    data_dir = "./data"
     transcribe_function = mlrun.import_function("function.yaml")
     temp_dir = tempfile.mkdtemp()
 
@@ -43,7 +44,7 @@ def test_transcribe(model_name: str):
     transcribe_run = transcribe_function.run(
         handler="transcribe",
         params={
-            "audio_files_directory": "./data",
+            "audio_files_directory": audio_path,
             "model_name": model_name,
             "device": "cpu",
             "output_directory": temp_dir,
@@ -58,7 +59,7 @@ def test_transcribe(model_name: str):
     )
 
     # Getting actual files from run (text and errored):
-    input_files = os.listdir(data_dir)
+    input_files = os.listdir(audio_path) if pathlib.Path(audio_path).is_dir() else [pathlib.Path(audio_path).name]
     expected_text_files = sorted([f for f in input_files if f.endswith("mp3")])
     error_files = list(set(input_files) - set(expected_text_files))
     expected_text_files = [f.replace("mp3", "txt") for f in expected_text_files]
@@ -79,10 +80,13 @@ def test_transcribe(model_name: str):
     assert len(df) == len(expected_text_files)
 
     # Check errored files:
-    actual_errored_files = [
-        os.path.basename(errored)
-        for errored in transcribe_run.outputs["errored_files"].keys()
-    ]
+    if isinstance(transcribe_run.outputs["errored_files"], str):
+        actual_errored_files = []
+    else:
+        actual_errored_files = [
+            os.path.basename(errored)
+            for errored in transcribe_run.outputs["errored_files"].keys()
+        ]
     assert actual_errored_files == error_files
 
     # Check output_dir:

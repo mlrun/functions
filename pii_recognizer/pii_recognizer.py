@@ -458,7 +458,7 @@ class FlairRecognizer(pa.EntityRecognizer):
 
 # get the analyzer engine based on the model
 def _get_analyzer_engine(
-    model: str = "whole", entities: List[str] = None
+    model: str = None, entities: List[str] = None
 ) -> pa.AnalyzerEngine:
     """
     Return pa.AnalyzerEngine.
@@ -475,17 +475,17 @@ def _get_analyzer_engine(
         spacy_recognizer = CustomSpacyRecognizer()
         # add the custom build spacy recognizer
         registry.add_recognizer(spacy_recognizer)
-    if model == "flair":
+    elif model == "flair":
         # pre-trained flair recognizer
         flair_recognizer = FlairRecognizer()
         # add the custom build flair recognizer
         registry.add_recognizer(flair_recognizer)
-    if model == "pattern":
+    elif model == "pattern":
         # add the pattern recognizer
         pattern_recognizer_factory = PatternRecognizerFactory()
         for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
             registry.add_recognizer(recognizer)
-    if model == "whole":
+    elif model == "whole":
         spacy_recognizer = CustomSpacyRecognizer()
         flair_recognizer = FlairRecognizer()
         registry.add_recognizer(spacy_recognizer)
@@ -494,6 +494,44 @@ def _get_analyzer_engine(
         pattern_recognizer_factory = PatternRecognizerFactory()
         for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
             registry.add_recognizer(recognizer)
+    else:
+        if set(entities).intersection(
+            set(["LOCATION", "PERSON", "NRP", "ORGANIZATION", "DATE_TIME"])
+        ):
+            spacy_recognizer = CustomSpacyRecognizer()
+            registry.add_recognizer(spacy_recognizer)
+        if set(entities).intersection(
+            set(
+                [
+                    "LOCATION",
+                    "PERSON",
+                    "NRP",
+                    "GPE",
+                    "ORGANIZATION",
+                    "MAC_ADDRESS",
+                    "US_BANK_NUMBER",
+                    "IMEI",
+                    "TITLE",
+                    "LICENSE_PLATE",
+                    "US_PASSPORT",
+                    "CURRENCY",
+                    "ROUTING_NUMBER",
+                    "US_ITIN",
+                    "US_BANK_NUMBER",
+                    "US_DRIVER_LICENSE",
+                    "AGE",
+                    "PASSWORD",
+                    "SWIFT_CODE",
+                ]
+            )
+        ):
+            flair_recognizer = FlairRecognizer()
+            registry.add_recognizer(flair_recognizer)
+        # add the pattern recognizer
+        if set(entities).intersection(set(["CREDIT_CARD", "SSN", "PHONE", "EMAIL"])):
+            pattern_recognizer_factory = PatternRecognizerFactory()
+            for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
+                registry.add_recognizer(recognizer)
 
     analyzer = pa.AnalyzerEngine(
         registry=registry,
@@ -805,7 +843,7 @@ def recognize_pii(
         str
     ] = None,  # List of entities to recognize, default is recognizing all
     entity_operator_map: dict = None,
-    model: str = "whole",
+    model: str = None,
     generate_json: bool = True,
     generate_html: bool = True,
     is_full_text: bool = True,
@@ -849,7 +887,8 @@ def recognize_pii(
 
     # Load the model:
     analyzer = _get_analyzer_engine(model, entities)
-    print("Model loaded")
+
+    logger.info("Model loaded")
 
     # Go over the text files in the input path, analyze and anonymize them:
     txt_files_directory = pathlib.Path(input_path)

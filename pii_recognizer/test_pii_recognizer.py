@@ -97,9 +97,9 @@ def test_pattern_process(fake_data):
         "EMAIL": "email",
     }
 
-    analyzer = _get_analyzer_engine(score_threshold=0.5, model="partern")
+    analyzer = _get_analyzer_engine(model="pattern")
     text = f"He can be reached at {fake_data['email']} or {fake_data['phone']}. His credit card number is {fake_data['credit_card']} and his SSN is {fake_data['ssn']}."
-    res, results = _process(text, analyzer)
+    res, results = _process(text, analyzer, score_threshold=0.5)
 
     assert any(entity in res for entity in ENTITIES.keys())
 
@@ -110,9 +110,9 @@ def test_spacy_process(fake_data):
         "ORGANIZATION": "organization",
     }
 
-    analyzer = _get_analyzer_engine(score_threshold=0.5, model="spacy")
+    analyzer = _get_analyzer_engine(model="spacy")
     text = f"{fake_data['name']}'s employer is {fake_data['organization']}."
-    res, results = _process(text, analyzer)
+    res, results = _process(text, analyzer, score_threshold=0.5)
 
     assert any(entity in res for entity in ENTITIES.keys())
 
@@ -137,11 +137,11 @@ def test_flair_process(fake_data):
         "SWIFT_CODE": "swift_code",
     }
 
-    analyzer = _get_analyzer_engine(score_threshold=0.5, model="flair")
+    analyzer = _get_analyzer_engine(model="flair")
     text = " ".join(
         [item + " is " + str(fake_data[item]) for item in ENTITIES.values()]
     )
-    res, results = _process(text, analyzer)
+    res, results = _process(text, analyzer, score_threshold=0.5)
     assert any(entity in res for entity in ENTITIES.keys())
 
 
@@ -171,6 +171,38 @@ def test_whole_process(fake_data):
     text = " ".join(
         [item + " is " + str(fake_data[item]) for item in ENTITIES.values()]
     )
-    analyzer = _get_analyzer_engine(score_threshold=0.85, model="whole")
-    res, results = _process(text, analyzer)
+    analyzer = _get_analyzer_engine(model="whole")
+    res, results = _process(text, analyzer, score_threshold=0.5)
+    assert any(entity in res for entity in ENTITIES.keys())
+
+
+def test_only_entities(fake_data):
+    ENTITIES = {
+        "LOCATION": "location",
+        "PERSON": "name",
+        "ORGANIZATION": "organization",
+        "MAC_ADDRESS": "mac_address",
+        "US_BANK_NUMBER": "us_bank_number",
+        "IMEI": "imei",
+        "TITLE": "title",
+        "LICENSE_PLATE": "license_plate",
+        "US_PASSPORT": "us_passport",
+        "CURRENCY": "currency",
+        "ROUTING_NUMBER": "routing_number",
+        "US_ITIN": "us_itin",
+        "US_BANK_NUMBER": "us_bank_number",
+        "AGE": "age",
+        "CREDIT_CARD": "credit_card",
+        "SSN": "ssn",
+        "PHONE": "phone",
+        "EMAIL": "email",
+        "PASSWORD": "password",
+        "SWIFT_CODE": "swift_code",
+    }
+
+    text = " ".join(
+        [item + " is " + str(fake_data[item]) for item in ENTITIES.values()]
+    )
+    analyzer = _get_analyzer_engine(entities=list(ENTITIES.keys())[:5])
+    res, results = _process(text, analyzer, score_threshold=0.5)
     assert any(entity in res for entity in ENTITIES.keys())

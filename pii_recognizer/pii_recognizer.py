@@ -494,7 +494,7 @@ def _get_analyzer_engine(
         pattern_recognizer_factory = PatternRecognizerFactory()
         for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
             registry.add_recognizer(recognizer)
-    else:
+    elif not model and entities:
         if set(entities).intersection(
             set(["LOCATION", "PERSON", "NRP", "ORGANIZATION", "DATE_TIME"])
         ):
@@ -532,6 +532,10 @@ def _get_analyzer_engine(
             pattern_recognizer_factory = PatternRecognizerFactory()
             for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
                 registry.add_recognizer(recognizer)
+    else:
+        raise ValueError(
+            f"argument of model and entities can not be None at the same time"
+        )
 
     analyzer = pa.AnalyzerEngine(
         registry=registry,
@@ -539,7 +543,8 @@ def _get_analyzer_engine(
     )
 
     supported_entities = analyzer.get_supported_entities()
-    if not all(item in supported_entities for item in entities):
+
+    if entities and not all(item in supported_entities for item in entities):
         not_supported_entities = [
             item for item in entities if item not in supported_entities
         ]
@@ -885,17 +890,19 @@ def recognize_pii(
     if not output_directory.exists():
         output_directory.mkdir()
 
-    # Load the model:
-    analyzer = _get_analyzer_engine(model, entities)
-
-    logger.info("Model loaded")
-
-    # Go over the text files in the input path, analyze and anonymize them:
     txt_files_directory = pathlib.Path(input_path)
     errors = {}
 
     res_dict = {}
     txt_content = {}
+    # Load the model:
+    try:
+        analyzer = _get_analyzer_engine(model, entities)
+    except Exception as e:
+        errors["model"] = str(e)
+        logger.error(f"Error when get the model: {e}")
+
+    logger.info("Model loaded")
     # Go over the text files in the input path, analyze and anonymize them:
     for i, txt_file in enumerate(
         tqdm(
@@ -929,7 +936,7 @@ def recognize_pii(
 
         except Exception as e:
             errors[str(txt_file)] = str(e)
-            print(f"Error processing {txt_file}: {e}")
+            logger.error(f"Error processing {txt_file}: {e}")
     if generate_html:
         # Generate the html report
         html_res = _get_all_html(txt_content, res_dict, is_full_html)

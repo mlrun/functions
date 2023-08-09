@@ -14,23 +14,38 @@
 #
 import json
 import os
-import tempfile
 
 import mlrun
+import mlrun.common.schemas
 import numpy as np
 import pandas as pd
+import pytest
 from mlrun.frameworks.sklearn import apply_mlrun
 from sklearn.datasets import make_classification
 from sklearn.tree import DecisionTreeClassifier
 
+REQUIRED_ENV_VARS = [
+    "MLRUN_DBPATH",
+    "V3IO_USERNAME",
+    "V3IO_API",
+    "V3IO_ACCESS_KEY",
+]
 
-@mlrun.handler(outputs=["training_set", "prediction_set"])
-def generate_data(n_samples: int = 5000, n_features: int = 20, n_classes: int = 2):
+
+def _validate_environment_variables() -> bool:
+    """
+    Checks that all required Environment variables are set.
+    """
+    environment_keys = os.environ.keys()
+    return all(key in environment_keys for key in REQUIRED_ENV_VARS)
+
+
+def generate_data(n_samples: int = 5000, n_features: int = 20):
     # Generate a classification data:
     x, y = make_classification(n_samples=n_samples, n_features=n_features, n_classes=2)
 
     # Split the data into a training set and a prediction set:
-    x_train, x_prediction = x[: n_samples // 2], x[n_samples // 2 :]
+    x_train, x_prediction = x[: n_samples // 2], x[n_samples // 2:]
     y_train = y[: n_samples // 2]
 
     # Randomly drift some features:
@@ -49,7 +64,6 @@ def generate_data(n_samples: int = 5000, n_features: int = 20, n_classes: int = 
     return training_set, prediction_set
 
 
-@mlrun.handler()
 def train(training_set: pd.DataFrame):
     # Get the data into x, y:
     labels = pd.DataFrame(training_set["target_label"])
@@ -65,61 +79,73 @@ def train(training_set: pd.DataFrame):
     model.fit(training_set, labels)
 
 
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
 def test_batch_predict():
+    project = mlrun.get_or_create_project(
+        "batch-infer-test-v6", context="./", user_project=True
+    )
+
     # Configure test:
     n_samples = 5000
     n_features = 20
 
     # Create the function and run:
     test_function = mlrun.code_to_function(filename=__file__, kind="job")
-    artifact_path = tempfile.TemporaryDirectory()
     generate_data_run = test_function.run(
         handler="generate_data",
-        artifact_path=artifact_path.name,
         params={"n_samples": n_samples, "n_features": n_features},
+        returns=["training_set : dataset", "prediction_set : dataset"],
         local=True,
     )
     train_run = test_function.run(
         handler="train",
-        artifact_path=artifact_path.name,
         inputs={"training_set": generate_data_run.outputs["training_set"]},
         local=True,
     )
 
     batch_predict_function = mlrun.import_function("function.yaml")
-    batch_predict_run = batch_predict_function.run(
+    batch_inference_run = batch_predict_function.run(
         handler="infer",
-        artifact_path=artifact_path.name,
         inputs={"dataset": generate_data_run.outputs["prediction_set"]},
         params={
-            "model": train_run.outputs["model"],
-            # "label_columns": "label",
-            "result_set_name": "result_set",
+            "model_path": train_run.outputs["model"],
+            "trigger_monitoring_job": True,
+            "perform_drift_analysis": True,
+            "drift_threshold": 0.2,
+            "possible_drift_threshold": 0.1,
+            "batch_image_job": "quay.io/eyaligu/mlrun-api:servingv2",
         },
-        local=True,
     )
 
-    # Check the result set:
-    result_set = batch_predict_run.artifact("result_set").as_df()
-    assert result_set.shape == (n_samples // 2, n_features + 1)
-    assert "target_label" in result_set.columns
-    assert "batch_id" in batch_predict_run.status.results
+    # Check the logged results:
+    assert "batch_id" in batch_inference_run.status.results
+    assert "drift_metric" in batch_inference_run.status.results
+    assert batch_inference_run.status.results["drift_status"] is True
 
-    # Check the drift table plot:
+    # Check that 3 artifacts were generated
+    assert len(batch_inference_run.status.artifacts) == 3
+
+    # Check drift table artifact url
     assert (
-        os.path.basename(batch_predict_run.artifact("drift_table_plot").local())
-        == "drift_table_plot.html"
+        batch_inference_run.artifact("drift_table_plot").artifact_url
+        == batch_inference_run.outputs["drift_table_plot"]
     )
 
     # Check the features drift results json:
-    drift_results_file = batch_predict_run.artifact("features_drift_results").local()
+    drift_results_file = batch_inference_run.artifact("features_drift_results").local()
     with open(drift_results_file, "r") as json_file:
         drift_results = json.load(json_file)
     assert len(drift_results) == n_features + 1
 
-    # Check the final analysis logged results:
-    assert "drift_status" in batch_predict_run.status.results
-    assert "drift_metric" in batch_predict_run.status.results
+    # Clean resources
+    _delete_project(project=project.metadata.name)
 
-    # Clear outputs:
-    artifact_path.cleanup()
+
+def _delete_project(project: str):
+    mlrun.get_run_db().delete_project(
+        project,
+        deletion_strategy=mlrun.common.schemas.DeletionStrategy.cascading,
+    )

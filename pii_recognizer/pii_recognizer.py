@@ -59,7 +59,7 @@ class PatternRecognizerFactory:
 
     # create a list of pattern recognizers
     @classmethod
-    def _create_pattern_recognizer(cls):
+    def create_pattern_recognizer(cls):
         """
         For each entity, create a list of patterns to recognize it
 
@@ -483,7 +483,7 @@ def _get_analyzer_engine(
     elif model == "pattern":
         # add the pattern recognizer
         pattern_recognizer_factory = PatternRecognizerFactory()
-        for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
+        for recognizer in pattern_recognizer_factory.create_pattern_recognizer():
             registry.add_recognizer(recognizer)
     elif model == "whole":
         spacy_recognizer = CustomSpacyRecognizer()
@@ -492,7 +492,7 @@ def _get_analyzer_engine(
         registry.add_recognizer(flair_recognizer)
         # add the pattern recognizer
         pattern_recognizer_factory = PatternRecognizerFactory()
-        for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
+        for recognizer in pattern_recognizer_factory.create_pattern_recognizer():
             registry.add_recognizer(recognizer)
     elif not model and entities:
         if set(entities).intersection(

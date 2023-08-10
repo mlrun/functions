@@ -42,6 +42,40 @@ warnings.filterwarnings("ignore")
 
 logger = logging.getLogger("pii-recognizer")
 
+# Add the constant classes of Models and Entities to govern the whole package
+class Models:
+    WHOLE = "whole"
+    PATTERN = "pattern"
+    SPACY = "spacy"
+    FLAIR = "flair"
+
+
+class Entities:
+    CREDIT_CARD = "CREDIT_CARD"
+    SSN = "SSN"
+    PHONE = "PHONE"
+    EMAIL = "EMAIL"
+    LOCATION = "LOCATION"
+    PERSON = "PERSON"
+    NRP = "NRP"
+    ORGANIZATION = "ORGANIZATION"
+    DATE_TIME = "DATE_TIME"
+    GPE = "GPE",
+    MAC_ADDRESS = "MAC_ADDRESS"
+    US_BANK_NUMBER = "US_BANK_NUMBER"
+    IMEI = "IMEI"
+    TITLE = "TITLE"
+    LICENSE_PLATE = "LICENSE_PLATE"
+    US_PASSPORT = "US_PASSPORT"
+    CURRENCY = "CURRENCY"
+    ROUTING_NUMBER = "ROUTING_NUMBER"
+    US_ITIN = "US_ITIN"
+    US_BANK_NUMBER = "US_BANK_NUMBER"
+    US_DRIVER_LICENSE = "US_DRIVER_LICENSE"
+    AGE = "AGE"
+    PASSWORD = "PASSWORD"
+    SWIFT_CODE = "SWIFT_CODE"
+
 
 class PatternRecognizerFactory:
     """
@@ -50,7 +84,7 @@ class PatternRecognizerFactory:
     we need construct a list of regex patterns for each entity.
     """
 
-    _DEFAULT_ENTITIES = {
+    RECOGNIZABLE_ENTITIES = {
         "CREDIT_CARD": [pa.Pattern("CREDIT_CARD", r"\b(?:\d[ -]*?){13,16}\b", 0.5)],
         "SSN": [pa.Pattern("SSN", r"\b\d{3}-?\d{2}-?\d{4}\b", 0.5)],
         "PHONE": [pa.Pattern("PHONE", r"\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}", 0.5)],
@@ -72,7 +106,7 @@ class PatternRecognizerFactory:
 
         return [
             pa.PatternRecognizer(supported_entity=entity, patterns=pattern)
-            for entity, pattern in cls._DEFAULT_ENTITIES.items()
+            for entity, pattern in cls.RECOGNIZABLE_ENTITIES.items()
         ]
 
 
@@ -86,13 +120,13 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
 
     # Entities to recognize
 
-    _DEFAULT_ENTITIES = [
+    RECOGNIZABLE_ENTITIES = {
         "LOCATION",
         "PERSON",
         "NRP",
         "ORGANIZATION",
         "DATE_TIME",
-    ]
+    }
 
     # Default explanation for this recognizer
 
@@ -148,7 +182,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
         self.ner_strength = ner_strength
 
         self.check_label_groups = check_label_groups or self._DEFAULT_CHECK_LABEL_GROUPS
-        supported_entities = supported_entities or self._DEFAULT_ENTITIES
+        supported_entities = supported_entities or self.RECOGNIZABLE_ENTITIES
         super().__init__(
             supported_entities=supported_entities,
             supported_language=supported_language,
@@ -246,7 +280,7 @@ class FlairRecognizer(pa.EntityRecognizer):
     This is to make sure the recognizer can be registered with Presidio registry.
     """
 
-    _DEFAULT_ENTITIES = [
+    RECOGNIZABLE_ENTITIES = {
         "LOCATION",
         "PERSON",
         "NRP",
@@ -266,7 +300,7 @@ class FlairRecognizer(pa.EntityRecognizer):
         "AGE",
         "PASSWORD",
         "SWIFT_CODE",
-    ]
+        }
 
     # This is used to construct the explanation for the result
 
@@ -331,7 +365,7 @@ class FlairRecognizer(pa.EntityRecognizer):
         """
         self.check_label_groups = check_label_groups or self._DEFAULT_CHECK_LABEL_GROUPS
 
-        supported_entities = supported_entities or self._DEFAULT_ENTITIES
+        supported_entities = supported_entities or self.RECOGNIZABLE_ENTITIES
         self.model = fl.models.SequenceTagger.load(
             self._DEFAULT_MODEL_LANGUAGES.get(supported_language)
         )
@@ -495,40 +529,14 @@ def _get_analyzer_engine(
         for recognizer in pattern_recognizer_factory.create_pattern_recognizer():
             registry.add_recognizer(recognizer)
     elif not model and entities:
-        if set(entities).intersection(
-            set(["LOCATION", "PERSON", "NRP", "ORGANIZATION", "DATE_TIME"])
-        ):
+        if set(entities) & CustomSpacyRecognizer.RECOGNIZE_ENTITIES:
             spacy_recognizer = CustomSpacyRecognizer()
             registry.add_recognizer(spacy_recognizer)
-        if set(entities).intersection(
-            set(
-                [
-                    "LOCATION",
-                    "PERSON",
-                    "NRP",
-                    "GPE",
-                    "ORGANIZATION",
-                    "MAC_ADDRESS",
-                    "US_BANK_NUMBER",
-                    "IMEI",
-                    "TITLE",
-                    "LICENSE_PLATE",
-                    "US_PASSPORT",
-                    "CURRENCY",
-                    "ROUTING_NUMBER",
-                    "US_ITIN",
-                    "US_BANK_NUMBER",
-                    "US_DRIVER_LICENSE",
-                    "AGE",
-                    "PASSWORD",
-                    "SWIFT_CODE",
-                ]
-            )
-        ):
+        if set(entities) & FlairRecognizer.RECOGNIZE_ENTITIES:
             flair_recognizer = FlairRecognizer()
             registry.add_recognizer(flair_recognizer)
         # add the pattern recognizer
-        if set(entities).intersection(set(["CREDIT_CARD", "SSN", "PHONE", "EMAIL"])):
+        if set(entities) & (set(PatternRecognizerFactory.RECOGNIZE_ENTITIES.keys())):
             pattern_recognizer_factory = PatternRecognizerFactory()
             for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
                 registry.add_recognizer(recognizer)

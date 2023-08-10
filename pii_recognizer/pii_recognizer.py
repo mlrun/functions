@@ -529,14 +529,14 @@ def _get_analyzer_engine(
         for recognizer in pattern_recognizer_factory.create_pattern_recognizer():
             registry.add_recognizer(recognizer)
     elif not model and entities:
-        if set(entities) & CustomSpacyRecognizer.RECOGNIZE_ENTITIES:
+        if set(entities) & CustomSpacyRecognizer.RECOGNIZABLE_ENTITIES:
             spacy_recognizer = CustomSpacyRecognizer()
             registry.add_recognizer(spacy_recognizer)
-        if set(entities) & FlairRecognizer.RECOGNIZE_ENTITIES:
+        if set(entities) & FlairRecognizer.RECOGNIZABLE_ENTITIES:
             flair_recognizer = FlairRecognizer()
             registry.add_recognizer(flair_recognizer)
         # add the pattern recognizer
-        if set(entities) & (set(PatternRecognizerFactory.RECOGNIZE_ENTITIES.keys())):
+        if set(entities) & (set(PatternRecognizerFactory.RECOGNIZABLE_ENTITIES.keys())):
             pattern_recognizer_factory = PatternRecognizerFactory()
             for recognizer in pattern_recognizer_factory._create_pattern_recognizer():
                 registry.add_recognizer(recognizer)

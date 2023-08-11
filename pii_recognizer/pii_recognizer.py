@@ -42,6 +42,7 @@ warnings.filterwarnings("ignore")
 
 logger = logging.getLogger("pii-recognizer")
 
+
 # Add the constant classes of Models and Entities to govern the whole package
 class Models:
     WHOLE = "whole"
@@ -60,7 +61,7 @@ class Entities:
     NRP = "NRP"
     ORGANIZATION = "ORGANIZATION"
     DATE_TIME = "DATE_TIME"
-    GPE = "GPE",
+    GPE = ("GPE",)
     MAC_ADDRESS = "MAC_ADDRESS"
     US_BANK_NUMBER = "US_BANK_NUMBER"
     IMEI = "IMEI"
@@ -300,7 +301,7 @@ class FlairRecognizer(pa.EntityRecognizer):
         "AGE",
         "PASSWORD",
         "SWIFT_CODE",
-        }
+    }
 
     # This is used to construct the explanation for the result
 
@@ -498,28 +499,29 @@ def _get_analyzer_engine(
     Return pa.AnalyzerEngine.
 
     :param model: The model to use. Can be "spacy", "flair", "pattern" or "whole".
+    :param entities: The list of entities to use.
 
     :returns: pa.AnalyzerEngine
     """
     # recognizer registry that can store multiple recognizers
     registry = pa.RecognizerRegistry()
 
-    if model == "spacy":
+    if model == Models.SPACY:
         # custom spacy recognizer
         spacy_recognizer = CustomSpacyRecognizer()
         # add the custom build spacy recognizer
         registry.add_recognizer(spacy_recognizer)
-    elif model == "flair":
+    elif model == Models.FLAIR:
         # pre-trained flair recognizer
         flair_recognizer = FlairRecognizer()
         # add the custom build flair recognizer
         registry.add_recognizer(flair_recognizer)
-    elif model == "pattern":
+    elif model == Models.PATTERN:
         # add the pattern recognizer
         pattern_recognizer_factory = PatternRecognizerFactory()
         for recognizer in pattern_recognizer_factory.create_pattern_recognizer():
             registry.add_recognizer(recognizer)
-    elif model == "whole":
+    elif model == Models.WHOLE:
         spacy_recognizer = CustomSpacyRecognizer()
         flair_recognizer = FlairRecognizer()
         registry.add_recognizer(spacy_recognizer)

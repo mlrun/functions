@@ -27,7 +27,7 @@ from tqdm.auto import tqdm
 
 def transcribe(
     context: mlrun.MLClientCtx,
-    audio_files_directory: str,
+    input_path: str,
     model_name: str = "base",
     device: Literal["cuda", "cpu"] = None,
     decoding_options: dict = None,
@@ -45,7 +45,7 @@ def transcribe(
     * rate_of_speech - The number of words divided by the audio file length.
 
     :param context:               MLRun context.
-    :param audio_files_directory: A directory of the audio files or a single file to transcribe.
+    :param input_path:            A directory of the audio files or a single file to transcribe.
     :param output_directory:      Path to a directory to save all transcribed audio files.
     :param model_name:            One of the official model names listed by `whisper.available_models()`.
     :param device:                Device to load the model. Can be one of {"cuda", "cpu"}.
@@ -85,7 +85,7 @@ def transcribe(
         output_directory.mkdir()
 
     # Go over the audio files and transcribe:
-    audio_files_path = pathlib.Path(audio_files_directory).absolute()
+    audio_files_path = pathlib.Path(input_path).absolute()
     is_dir = True
     if audio_files_path.is_dir():
         audio_files = list(audio_files_path.rglob("*.*"))

@@ -23,17 +23,16 @@ import whisper
 
 expected_outputs = [
     "This is a speech to text test.",
-    "Easily convert your US English text into professional speech for free. "
-    "Perfect for e-learning, "
-    "presentations, YouTube videos and increasing the accessibility of your website."
-    " Our voices pronounce your texts in their own language using a specific accent. "
-    "Plus, these texts can be downloaded as MP3. "
-    "In some languages, multiple speakers are available.",
+    "In the heart of the stadium, "
+    "cheers paint the air as the ball weaves its tale across the pitch. "
+    "With each kick, players chase their dreams, guided by the rhythmic dance of teamwork. "
+    "The crowd roars, a symphony of passion, "
+    "as the game writes its unpredictable story on the field of destiny.",
 ]
 
 
 @pytest.mark.parametrize("model_name", whisper.available_models()[:4])
-@pytest.mark.parametrize("audio_path", ("./data", "./data/speech_01.mp3"))
+@pytest.mark.parametrize("audio_path", ["./data", "./data/speech_01.mp3"])
 def test_transcribe(model_name: str, audio_path: str):
     # Setting variables and importing function:
     artifact_path = tempfile.mkdtemp()
@@ -44,7 +43,7 @@ def test_transcribe(model_name: str, audio_path: str):
     transcribe_run = transcribe_function.run(
         handler="transcribe",
         params={
-            "audio_files_directory": audio_path,
+            "input_path": audio_path,
             "model_name": model_name,
             "device": "cpu",
             "output_directory": temp_dir,

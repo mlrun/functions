@@ -1,2 +1,3 @@
 openai-whisper
 tqdm
+librosa

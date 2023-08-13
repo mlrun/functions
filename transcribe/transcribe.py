@@ -15,13 +15,12 @@
 
 import pathlib
 import tempfile
-from typing import Literal, Tuple, Union
+from typing import Literal, Tuple
 
+import librosa
 import mlrun
-import numpy as np
 import pandas as pd
 import whisper
-from mutagen.mp3 import MP3
 from tqdm.auto import tqdm
 
 
@@ -136,7 +135,7 @@ def transcribe(
 
 
 def _single_transcribe(
-    audio_file: str,
+    audio_file: pathlib.Path,
     model: whisper.Whisper,
     decoding_options: dict = None,
 ) -> Tuple[str, int, float, str]:
@@ -144,7 +143,7 @@ def _single_transcribe(
     # Load the audio:
     audio = whisper.audio.load_audio(file=str(audio_file))
     # Get audio length:
-    length = MP3(audio_file).info.length
+    length = librosa.get_duration(path=audio_file)
     # Transcribe:
     result = model.transcribe(audio=audio, **decoding_options)
     # Unpack the model's result:

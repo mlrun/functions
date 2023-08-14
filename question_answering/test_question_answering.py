@@ -33,15 +33,14 @@ def _make_data_dir_for_test():
 
 def test_question_answering(monkeypatch):
     monkeypatch.setattr(transformers.Pipeline, "__call__", mock_pipeline_call)
-    # text_files_directory = _make_data_dir_for_test()
-    text_files_directory = "./data"
+    input_path = "./data"
     artifact_path = tempfile.mkdtemp()
     qa_function = mlrun.import_function("function.yaml")
     qa_run = qa_function.run(
         handler="answer_questions",
-        inputs={"text_files_directory": text_files_directory},
         params={
             "model": "distilgpt2",
+            "input_path": input_path,
             "text_wrapper": (
                 "Given the following sentence:\n"
                 "-----\n"

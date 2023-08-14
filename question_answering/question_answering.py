@@ -67,7 +67,7 @@ def _get_prompt_template(
 
 def answer_questions(
     context: mlrun.MLClientCtx,
-    text_files_directory: str,
+    input_path: str,
     model: str,
     questions: List[str],
     tokenizer: str = None,
@@ -83,7 +83,7 @@ def answer_questions(
     Answer questions with context to the given text files by a pretrained LLM model.
 
     :param context:                 MLRun context.
-    :param text_files_directory:    A path to a directory of text files to ask questions about.
+    :param input_path:              A path to a directory of text files or a path to a text file to ask questions about.
     :param model:                   The pre-trained model to use for asking questions.
     :param questions:               The questions to ask.
     :param tokenizer:               The pre-trained tokenizer to use. Defaulted to the model given.
@@ -151,10 +151,14 @@ def answer_questions(
     context.logger.info("Model loaded, pipeline created")
 
     # Go over the audio files and infer through the model:
-    text_files_directory = pathlib.Path(text_files_directory).absolute()
+    if pathlib.Path(input_path).is_file():
+        input_path = [input_path]
+    else:
+        text_files_directory = pathlib.Path(input_path).absolute()
+        input_path = list(text_files_directory.rglob("*.*"))
     for i, text_file in enumerate(
         tqdm(
-            list(text_files_directory.rglob("*.*")),
+            input_path,
             desc="Generating answers",
             unit="file",
         )

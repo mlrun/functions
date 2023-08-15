@@ -6,13 +6,15 @@ description: This function is used to recognize PII in a directory of text files
 doc: ''
 example: pii_recognizer.ipynb
 generationDate: 2023-08-15:10-24
+hidden: false
 icon: ''
-labels: {}
+labels:
+  author: pgw
 maintainers: []
 marketplaceType: ''
-mlrunVersion: ''
+mlrunVersion: 1.4.0
 name: pii-recognizer
-platformVersion: ''
+platformVersion: 3.5.3
 spec:
   filename: pii_recognizer.py
   handler: recognize_pii

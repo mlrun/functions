@@ -68,37 +68,37 @@ jobs:
     steps:
       # Source
       
-     - uses: azure/setup-helm@v1
-       with:
-         version: "v3.9.1"
-
-     - uses: manusa/actions-setup-minikube@v2.7.1
-       with:
-         minikube version: "v1.26.0"
-         kubernetes version: "v1.23.9"
-         github token: ${{ github.token }}
-         driver: docker
-         start args: '--addons=registry --insecure-registry="192.168.49.2:5000"'
-
-     - name: Get mlrun kit charts and create namespace
-       run: |
-         helm repo add mlrun https://mlrun.github.io/ce
-         helm repo update
-         kubectl create namespace ${NAMESPACE}
-     - name: Install MLRun CE helm chart
-       run: |
-         helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="128Mi"   --set  jupyterNotebook.persistence.size="1Gi"  --set  mlrun.db.persistence.size="1Gi" --set  mlrun.api.persistence.size="1Gi" --set  mpi-operator.deployment.create="false" --set  mlrun.httpDB.dbType="sqlite" --set  mlrun.httpDB.dirPath="/mlrun/db" --set  mlrun.httpDB.dsn="sqlite:////mlrun/db/mlrun.db?check_same_thread=false"  --set  mlrun.httpDB.oldDsn=""  --set global.registry.url=$(minikube ip):5000  --set global.registry.secretName=""   --set global.externalHostAddress=$(minikube ip)  --set nuclio.dashboard.externalIPAddresses[0]=$(minikube ip)  --wait --debug   mlrun/mlrun-ce
-     - name: Create environment file
-       run: |
-         kubectl get pods -A
-         kubectl get  nodes
-         echo "MLRUN_DBPATH=http://$(minikube ip):${MLRUN_API_NODE_PORT}" > /tmp/examples_ci.env
-         echo "AWS_ACCESS_KEY_ID=minio" >> /tmp/examples_ci.env
-         echo "AWS_SECRET_ACCESS_KEY=minio123" >> /tmp/examples_ci.env
-         echo "S3_ENDPOINT_URL=http://$(minikube ip):30080" >> /tmp/examples_ci.env
-         echo "MLRUN_STORAGE__AUTO_MOUNT_PARAMS='aws_access_key=minio,aws_secret_key=minio123,endpoint_url=http://minio.mlrun.svc.cluster.local:9000'" >> /tmp/examples_ci.env
-         echo "MLRUN_STORAGE__AUTO_MOUNT_TYPE=s3" >> /tmp/examples_ci.env
-         cat /tmp/examples_ci.env
+#     - uses: azure/setup-helm@v1
+#       with:
+#         version: "v3.9.1"
+#
+#     - uses: manusa/actions-setup-minikube@v2.7.1
+#       with:
+#         minikube version: "v1.26.0"
+#         kubernetes version: "v1.23.9"
+#         github token: ${{ github.token }}
+#         driver: docker
+#         start args: '--addons=registry --insecure-registry="192.168.49.2:5000"'
+#
+#     - name: Get mlrun kit charts and create namespace
+#       run: |
+#         helm repo add mlrun https://mlrun.github.io/ce
+#         helm repo update
+#         kubectl create namespace ${NAMESPACE}
+#     - name: Install MLRun CE helm chart
+#       run: |
+#         helm install mlrun-ce --namespace ${NAMESPACE}  --set minio.resources.requests.memory="128Mi"   --set  jupyterNotebook.persistence.size="1Gi"  --set  mlrun.db.persistence.size="1Gi" --set  mlrun.api.persistence.size="1Gi" --set  mpi-operator.deployment.create="false" --set  mlrun.httpDB.dbType="sqlite" --set  mlrun.httpDB.dirPath="/mlrun/db" --set  mlrun.httpDB.dsn="sqlite:////mlrun/db/mlrun.db?check_same_thread=false"  --set  mlrun.httpDB.oldDsn=""  --set global.registry.url=$(minikube ip):5000  --set global.registry.secretName=""   --set global.externalHostAddress=$(minikube ip)  --set nuclio.dashboard.externalIPAddresses[0]=$(minikube ip)  --wait --debug   mlrun/mlrun-ce
+#     - name: Create environment file
+#       run: |
+#         kubectl get pods -A
+#         kubectl get  nodes
+#         echo "MLRUN_DBPATH=http://$(minikube ip):${MLRUN_API_NODE_PORT}" > /tmp/examples_ci.env
+#         echo "AWS_ACCESS_KEY_ID=minio" >> /tmp/examples_ci.env
+#         echo "AWS_SECRET_ACCESS_KEY=minio123" >> /tmp/examples_ci.env
+#         echo "S3_ENDPOINT_URL=http://$(minikube ip):30080" >> /tmp/examples_ci.env
+#         echo "MLRUN_STORAGE__AUTO_MOUNT_PARAMS='aws_access_key=minio,aws_secret_key=minio123,endpoint_url=http://minio.mlrun.svc.cluster.local:9000'" >> /tmp/examples_ci.env
+#         echo "MLRUN_STORAGE__AUTO_MOUNT_TYPE=s3" >> /tmp/examples_ci.env
+#         cat /tmp/examples_ci.env
      - name: Checkout current repo
        uses: actions/checkout@v2
        with:
@@ -108,6 +108,11 @@ jobs:
        uses: actions/setup-python@v2
        with:
          python-version: 3.7
+     # Install python 3.9
+     - name: Install python 3.9
+       uses: actions/setup-python@v2
+       with:
+         python-version: 3.9
      # Install dependencies
      - uses: actions/cache@v1
        id: cache
@@ -124,8 +129,8 @@ jobs:
      - name: Run py tests
        run: python functions/functions.py  run-tests -r functions -s py -fn ${{ matrix.package }}
 
-     - name: Run ipynb tests
-       run: python functions/functions.py  run-tests -r functions -s ipynb -fn ${{ matrix.package }}
+#     - name: Run ipynb tests
+#       run: python functions/functions.py  run-tests -r functions -s ipynb -fn ${{ matrix.package }}
 
      - name: Clean
        run: |

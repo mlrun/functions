@@ -1,9 +1,15 @@
 kind: job
 metadata:
-  name: validate-expectations
+  name: validate-great-expectations
   tag: ''
-  hash: 97a18b324f1212e7663ba46a8bcee96de0d316c0
-  project: great-expectations
+  hash: 82d0b647d443eb6e643d9dbfc8c0a650d74da018
+  project: ''
+  labels:
+    author: nicks
+    framework: great-expectations
+  categories:
+  - data-validation
+  - data-analysis
 spec:
   command: ''
   args: []
@@ -13,8 +19,8 @@ spec:
     base_image: mlrun/mlrun
     commands:
     - python -m pip install great-expectations==0.15.41
-    code_origin: ./great_expectations_mlrun.py
-    origin_filename: ./great_expectations_mlrun.py
+    code_origin: https://github.com/igz-us-sales/functions.git#c7b44af35294494a531a014f3d02a28eff3f4105:/User/functions/validate_great_expectations/validate_great_expectations.py
+    origin_filename: /User/functions/validate_great_expectations/validate_great_expectations.py
   entry_points:
     get_default_datasource_config:
       name: get_default_datasource_config
@@ -129,18 +135,10 @@ spec:
       outputs:
       - default: ''
       lineno: 80
-  description: ''
+  description: Validate a dataset using Great Expectations
   default_handler: validate_expectations
   disable_auto_mount: false
-  env:
-  - name: V3IO_API
-    value: ''
-  - name: V3IO_USERNAME
-    value: ''
-  - name: V3IO_ACCESS_KEY
-    value: ''
-  - name: V3IO_FRAMESD
-    value: ''
+  env: []
   resources:
     requests:
       memory: 1Mi

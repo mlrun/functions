@@ -150,10 +150,10 @@ jobs:
         with:
           repository: mlrun/marketplace
           path: marketplace
-      - name: Install python
+      - name: Install python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.9
       - name: Install requirements
         run: |
           cd functions
@@ -167,7 +167,7 @@ jobs:
           pwd
           git pull origin
           cd ..
-          python functions/functions.py build-marketplace -s functions -m marketplace -c $CHANNEL -v
+          python functions/functions.py build-marketplace -s functions -m marketplace -c $CHANNEL -v -f
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V3 }}

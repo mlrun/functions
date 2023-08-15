@@ -185,7 +185,6 @@ class TestSuite(ABC):
         self.after_each(directory, result)
 
 
-
 class TestPY(TestSuite):
     def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True, multi_process: bool= False):
         super().__init__(stop_on_failure)
@@ -233,7 +232,8 @@ class TestPY(TestSuite):
         print("PY run path {}".format(path))
         install_python(path)
         item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
-        install_requirements(path, ["pytest", "mlrun"] + item_requirements)
+        mlrun_version = get_item_yaml_values(path, "mlrunVersion")["mlrunVersion"]
+        install_requirements(path, ["pytest", f"mlrun=={mlrun_version}"] + item_requirements)
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ; pipenv run python -m pytest",

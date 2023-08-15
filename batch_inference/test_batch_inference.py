@@ -15,7 +15,7 @@
 import json
 import os
 import tempfile
-
+import pytest
 import mlrun
 import numpy as np
 import pandas as pd
@@ -24,7 +24,6 @@ from sklearn.datasets import make_classification
 from sklearn.tree import DecisionTreeClassifier
 
 
-@mlrun.handler(outputs=["training_set", "prediction_set"])
 def generate_data(n_samples: int = 5000, n_features: int = 20, n_classes: int = 2):
     # Generate a classification data:
     x, y = make_classification(n_samples=n_samples, n_features=n_features, n_classes=2)
@@ -49,7 +48,6 @@ def generate_data(n_samples: int = 5000, n_features: int = 20, n_classes: int = 
     return training_set, prediction_set
 
 
-@mlrun.handler()
 def train(training_set: pd.DataFrame):
     # Get the data into x, y:
     labels = pd.DataFrame(training_set["target_label"])
@@ -65,7 +63,9 @@ def train(training_set: pd.DataFrame):
     model.fit(training_set, labels)
 
 
-def test_batch_predict():
+@pytest.mark.parametrize("weights", [None, {"feature_1": 0.25, "feature_2": 0.7, "feature_3": 0.05}])
+@pytest.mark.parametrize("label_columns", [None, "target_label"])
+def test_batch_predict(weights: dict, label_columns: str):
     # Configure test:
     n_samples = 5000
     n_features = 20
@@ -77,6 +77,7 @@ def test_batch_predict():
         handler="generate_data",
         artifact_path=artifact_path.name,
         params={"n_samples": n_samples, "n_features": n_features},
+        returns=["training_set", "prediction_set"],
         local=True,
     )
     train_run = test_function.run(
@@ -93,9 +94,9 @@ def test_batch_predict():
         inputs={"dataset": generate_data_run.outputs["prediction_set"]},
         params={
             "model": train_run.outputs["model"],
-            # "label_columns": "label",
+            "label_columns": label_columns,
             "result_set_name": "result_set",
-            "weights": {"feature_1": 0.25, "feature_2": 0.7, "feature_3": 0.05},
+            "weights": weights,
         },
         local=True,
     )

@@ -27,9 +27,7 @@ from mlrun.data_types.infer import InferOptions, get_df_stats
 from mlrun.frameworks.auto_mlrun import AutoMLRun
 from mlrun.model_monitoring.features_drift_table import FeaturesDriftTablePlot
 from mlrun.model_monitoring.model_monitoring_batch import (
-    VirtualDrift,
-    calculate_inputs_statistics,
-)
+    VirtualDrift, calculate_inputs_statistics)
 
 # A union of all supported dataset types:
 DatasetType = Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray]
@@ -163,7 +161,7 @@ def _parse_weights(
     :param labels:   List of labels.
     :param weights:  The user's weights.
 
-    :return: The parsed weights.
+    :returns: The parsed weights.
     """
     # If no weights are given, make weights all equal (to represent a simple average):
     if weights is None:

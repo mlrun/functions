@@ -15,7 +15,6 @@ spec:
     code_origin: git@github.com-personal:pengwei715/functions.git#2ac6b569dc005515cfc0adf6ccb88e9844dcee14:pii_recognizer.py
     origin_filename: pii_recognizer.py
     requirements:
-    - mlrun==1.4.0
     - pandas
     - presidio-anonymizer
     - presidio-analyzer

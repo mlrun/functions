@@ -2,10 +2,10 @@ apiVersion: v1
 categories: 
   - machine-learning
   - data-preparation
-description: This function is used to recognize PII in a given text
+description: This function is used to recognize PII in a directory of text files
 doc: ''
 example: pii_recognizer.ipynb
-generationDate: 2023-07-30:21-01
+generationDate: 2023-08-15:10-24
 icon: ''
 labels: {}
 maintainers: []
@@ -19,7 +19,7 @@ spec:
   image: mlrun/mlrun
   kind: job
   requirements:
-   - mlrun==1.4.0-rc19
+   - mlrun==1.4.0
    - nltk
    - pandas
    - presidio-anonymizer

@@ -232,7 +232,7 @@ class TestPY(TestSuite):
         print("PY run path {}".format(path))
         install_python(path)
         item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
-        mlrun_version = get_item_yaml_values(path, "mlrunVersion")["mlrunVersion"]
+        mlrun_version = list(get_item_yaml_values(path, "mlrunVersion")["mlrunVersion"])[0]
         install_requirements(path, ["pytest", f"mlrun=={mlrun_version}"] + item_requirements)
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(

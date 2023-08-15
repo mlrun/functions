@@ -19,7 +19,6 @@ spec:
   image: mlrun/mlrun
   kind: job
   requirements:
-   - mlrun==1.4.0
    - nltk
    - pandas
    - presidio-anonymizer

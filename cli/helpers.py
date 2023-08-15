@@ -162,10 +162,6 @@ def get_item_yaml_values(
                 values_set.add(values)
         values_dict[key] = values_set
 
-    # unpack single valued keys:
-    for key, value in values_dict.items():
-        if len(value) == 1:
-            values_dict[key] = list(value)[0]
     return values_dict
 
 

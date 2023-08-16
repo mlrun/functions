@@ -120,7 +120,7 @@ def install_requirements(
         with open(requirements_file, "r") as f:
             mlrun_version = [l.replace("\n", "") for l in f.readlines() if "mlrun" in l]
             # remove mlrun from requirements if installed with version limits:
-            if mlrun_version and mlrun_version[0].replace("mlrun", ""):
+            if mlrun_version and any([c in mlrun_version[0] for c in "<>=~"]):
                 requirements = [r for r in requirements if "mlrun" not in r]
 
     if requirements:

@@ -65,7 +65,7 @@ def install_pipenv():
 def install_python(directory: Union[str, Path]):
     print(f"Installing python for {directory}...")
     python_install: subprocess.CompletedProcess = subprocess.run(
-        f"pipenv --rm;pipenv --python 3.7",
+        f"pipenv --rm;pipenv --python 3.8",
         stdout=sys.stdout,
         stderr=subprocess.PIPE,
         cwd=directory,

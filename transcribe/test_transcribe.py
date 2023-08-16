@@ -20,7 +20,6 @@ from difflib import SequenceMatcher
 
 import mlrun
 import pytest
-import whisper
 
 expected_outputs = [
     "This is a speech to text test.",
@@ -30,13 +29,13 @@ expected_outputs = [
     "The crowd roars, a symphony of passion, "
     "as the game writes its unpredictable story on the field of destiny.",
 ]
-
+whisper_models = ["tiny_en", "tiny", "base_en", "base_en"]
 
 @pytest.mark.skipif(
     condition=sys.version_info[:2] < (3, 8),
     reason="whisper requires python 3.8 and above"
 )
-@pytest.mark.parametrize("model_name", whisper.available_models()[:4])
+@pytest.mark.parametrize("model_name", whisper_models)
 @pytest.mark.parametrize("audio_path", ["./data", "./data/speech_01.mp3"])
 def test_transcribe(model_name: str, audio_path: str):
     # Setting variables and importing function:

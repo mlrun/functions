@@ -14,6 +14,7 @@
 #
 import os
 import pathlib
+import sys
 import tempfile
 from difflib import SequenceMatcher
 
@@ -31,6 +32,10 @@ expected_outputs = [
 ]
 
 
+@pytest.mark.skipif(
+    condition=sys.version_info[:2] < (3, 8),
+    reason="whisper requires python 3.8 and above"
+)
 @pytest.mark.parametrize("model_name", whisper.available_models()[:4])
 @pytest.mark.parametrize("audio_path", ["./data", "./data/speech_01.mp3"])
 def test_transcribe(model_name: str, audio_path: str):

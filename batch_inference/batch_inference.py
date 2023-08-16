@@ -17,7 +17,16 @@
 from typing import Any, Dict, List, Union
 
 import mlrun
-import mlrun.model_monitoring.api
+
+try:
+    import mlrun.model_monitoring.api
+except ModuleNotFoundError:
+    raise mlrun.errors.MLRunNotFoundError(
+        f"Please update your `mlrun` version to >=1.5.0 or use an "
+        f"older version of the batch inference function."
+    )
+
+
 import numpy as np
 import pandas as pd
 from mlrun.frameworks.auto_mlrun import AutoMLRun
@@ -107,6 +116,8 @@ def infer(
     :param dataset:                  The dataset to infer through the model. Can be passed in `inputs` as either a
                                      Dataset artifact / Feature vector URI. Or, in `parameters` as a list, dictionary or
                                      numpy array.
+    :param model_name:               If a new model endpoint is generated, the model name will be presented under this
+                                     endpoint.
     :param drop_columns:             A string / integer or a list of strings / integers that represent the column names
                                      / indices to drop. When the dataset is a list or a numpy array this parameter must
                                      be represented by integers.
@@ -185,7 +196,6 @@ def infer(
             sample_set=sample_set,
             model_artifact_feature_stats=model_handler._model_artifact.spec.feature_stats,
         )
-
         mlrun.model_monitoring.api.get_or_create_model_endpoint(
             project=context.project,
             context=context,

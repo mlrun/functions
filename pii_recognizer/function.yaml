@@ -22,40 +22,6 @@ spec:
     code_origin: git@github.com-personal:pengwei715/functions.git#8a3391a3f1de3f74ce7c481448ae6a9a16d271cc:/Users/Peng_Wei/work/mlrun_related/functions/pii_recognizer/pii_recognizer.py
     origin_filename: /Users/Peng_Wei/work/mlrun_related/functions/pii_recognizer/pii_recognizer.py
   entry_points:
-    create_pattern_recognizer:
-      name: create_pattern_recognizer
-      doc: For each entity, create a list of patterns to recognize it
-      parameters:
-      - name: cls
-        doc: PatternRecognizerFactory class
-        default: ''
-      outputs:
-      - default: ''
-        doc: List of pattern recognizers
-      lineno: 97
-    analyze:
-      name: analyze
-      doc: Analyze text and return the results.
-      parameters:
-      - name: self
-        default: ''
-      - name: text
-        type: str
-        doc: The text for analysis.
-        default: ''
-      - name: entities
-        type: List[str]
-        doc: The list of entities to recognize.
-        default: ''
-      - name: nlp_artifacts
-        type: NlpArtifacts
-        doc: Not used by this recognizer but needed for the interface.
-        default: null
-      outputs:
-      - default: ''
-        doc: The list of Presidio RecognizerResult constructed from the recognized
-          Flair detections.
-      lineno: 381
     recognize_pii:
       name: recognize_pii
       doc: Walk through the input path, recognize PII in text and store the anonymized

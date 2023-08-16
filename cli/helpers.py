@@ -112,16 +112,21 @@ def install_requirements(
         print(f"No requirements found for {directory}...")
         return
 
-    if requirements:
-        print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
-        _run_subprocess(
-            f"pipenv install --skip-lock {' '.join(requirements)}", directory
-        )
-
     if requirements_file.exists():
         print(f"Installing requirements from {requirements_file}...")
         _run_subprocess(
             f"pipenv install --skip-lock -r {requirements_file}", directory
+        )
+        with open(requirements_file, "r") as f:
+            mlrun_version = [l.removesuffix("\n") for l in f.readlines() if "mlrun" in l]
+            # remove mlrun from requirements if installed with version limits:
+            if mlrun_version and mlrun_version[0].removeprefix("mlrun"):
+                requirements = [r for r in requirements if "mlrun" not in r]
+
+    if requirements:
+        print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
+        _run_subprocess(
+            f"pipenv install --skip-lock {' '.join(requirements)}", directory
         )
 
 

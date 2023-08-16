@@ -13,24 +13,21 @@
 # limitations under the License.
 #
 import os.path
+import re
 import subprocess
+import sys
+import traceback
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from subprocess import CompletedProcess
-from typing import List, Union, Optional
-import sys
+from typing import List, Optional, Union
+
 import click
 import yaml
-import re
 
-from cli.helpers import (
-    is_item_dir,
-    install_pipenv,
-    install_python,
-    install_requirements,
-    get_item_yaml_values,
-)
+from cli.helpers import (get_item_yaml_values, install_pipenv, install_python,
+                         install_requirements, is_item_dir)
 from cli.path_iterator import PathIterator
 
 
@@ -46,11 +43,13 @@ from cli.path_iterator import PathIterator
     default=False,
     help="When true, test suite will stop running after the first test ran",
 )
-def test_suite(root_directory: str,
-               suite: str,
-               stop_on_failure: bool,
-               multi_processing: bool = False,
-               function_name: str = None):
+def test_suite(
+    root_directory: str,
+    suite: str,
+    stop_on_failure: bool,
+    multi_processing: bool = False,
+    function_name: str = None,
+):
     if not suite:
         click.echo("-s/--suite is required")
         exit(1)
@@ -155,9 +154,10 @@ class TestSuite(ABC):
 
     def _run(self, path: Union[str, Path], multiprocess, function_name):
         import multiprocessing as mp
+
         process_count = 1
         if multiprocess:
-            process_count = mp.cpu_count()-1
+            process_count = mp.cpu_count() - 1
         print("running tests with {} process".format(process_count))
         discovered = self.discover(path)
         if function_name is not None:
@@ -165,7 +165,11 @@ class TestSuite(ABC):
         for path in discovered:
             if re.match(".+/test_*", path):
                 discovered.remove(path)
-                print("a function name cannot start with test, please rename {} ".format(path))
+                print(
+                    "a function name cannot start with test, please rename {} ".format(
+                        path
+                    )
+                )
 
         self.before_run()
 
@@ -175,7 +179,7 @@ class TestSuite(ABC):
             self.directory_process(directory)
         self.after_run()
 
-        #pool.close()
+        # pool.close()
         sys.exit(0)
 
     def directory_process(self, directory):
@@ -186,7 +190,12 @@ class TestSuite(ABC):
 
 
 class TestPY(TestSuite):
-    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True, multi_process: bool= False):
+    def __init__(
+        self,
+        stop_on_failure: bool = True,
+        clean_env_artifacts: bool = True,
+        multi_process: bool = False,
+    ):
         super().__init__(stop_on_failure)
         self.clean_env_artifacts = clean_env_artifacts
         self.results = []
@@ -231,9 +240,23 @@ class TestPY(TestSuite):
     def run(self, path: Union[str, Path]):
         print("PY run path {}".format(path))
         install_python(path)
-        item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
-        mlrun_version = list(get_item_yaml_values(path, "mlrunVersion")["mlrunVersion"])[0]
-        install_requirements(path, ["pytest", f"mlrun=={mlrun_version}"] + item_requirements)
+        item_requirements = list(
+            get_item_yaml_values(path, "requirements")["requirements"]
+        )
+        mlrun_version = list(
+            get_item_yaml_values(path, "mlrunVersion")["mlrunVersion"]
+        )[0]
+        try:
+            install_requirements(
+                path, ["pytest", f"mlrun=={mlrun_version}"] + item_requirements
+            )
+        except Exception as e:
+            trace = traceback.format_exc()
+            print(
+                f"Ignoring test. Failed to install test requirements with error={e}\n{trace}"
+            )
+            meta_data = {"test_path": path}
+            return TestResult.ignored(meta_data=meta_data)
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ; pipenv run python -m pytest",
@@ -341,9 +364,9 @@ class TestIPYNB(TestSuite):
             for inner_dir in item_iterator:
                 # Iterate individual files in each directory
                 for inner_file in inner_dir.iterdir():
-                    #click.echo("test inner file"+str(inner_file))
+                    # click.echo("test inner file"+str(inner_file))
                     if self.is_test_ipynb(inner_file):
-                        #click.echo("adding "+str(inner_file))
+                        # click.echo("adding "+str(inner_file))
                         testables.append(str(inner_dir.resolve()))
             click.echo(f"Found {len(testables)} testable items...")
 
@@ -353,9 +376,7 @@ class TestIPYNB(TestSuite):
             )
             exit(0)
         testables.sort()
-        click.echo(
-            "tests list "+str(testables)
-        )
+        click.echo("tests list " + str(testables))
         return testables
 
     def before_run(self):
@@ -364,23 +385,25 @@ class TestIPYNB(TestSuite):
     def before_each(self, path: Union[str, Path]):
         pass
 
-#    def run(self, path: Union[str, Path]) -> TestResult:
+    #    def run(self, path: Union[str, Path]) -> TestResult:
     def run(self, path: Union[str, Path]) -> TestResult:
         print("IPYNB run path {}".format(path))
         install_python(path)
-        item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
+        item_requirements = list(
+            get_item_yaml_values(path, "requirements")["requirements"]
+        )
         install_requirements(path, ["papermill"] + item_requirements)
 
         click.echo(f"Running tests for {path}...")
-        running_ipynb = Path(path).name+".ipynb"
+        running_ipynb = Path(path).name + ".ipynb"
         click.echo(f"Running notebook {running_ipynb}")
-        command = f'pipenv run papermill {running_ipynb} out.ipynb --log-output'
+        command = f"pipenv run papermill {running_ipynb} out.ipynb --log-output"
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ;echo {command} ; {command}",
             stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
-            shell=True
+            shell=True,
         )
 
         meta_data = {"completed_process": completed_process, "test_path": path}
@@ -451,14 +474,11 @@ class TestIPYNB(TestSuite):
                 exit(test_result.status_code)
 
     def _run(self, path: Union[str, Path], multi_processing, function_name):
-        super()._run(path, multi_processing, function_name )
+        super()._run(path, multi_processing, function_name)
 
     @staticmethod
     def is_test_ipynb(path: Path):
-        return (
-            path.is_file()
-            and path.name.endswith(".ipynb")
-        )
+        return path.is_file() and path.name.endswith(".ipynb")
 
 
 class TestItemYamls(TestSuite):

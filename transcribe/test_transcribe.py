@@ -20,6 +20,8 @@ from difflib import SequenceMatcher
 import mlrun
 import pytest
 import whisper
+from transcribe import _convert_to_support_format
+
 
 expected_outputs = [
     "This is a speech to text test.",
@@ -95,3 +97,22 @@ def test_transcribe(model_name: str, audio_path: str):
     # Check output_dir:
     zip_dir = mlrun.get_dataitem(artifact_path + "output_dir.zip")
     assert zip_dir.kind == "file"
+
+
+@pytest.mark.parametrize("audio_file", os.listdir("./data"))
+def test_convert_to_support_format(audio_file):
+    # Ensure the audio file is an MP3
+    if not audio_file.endswith('.mp3'):
+        pytest.skip("Skipping non-mp3 file")
+    
+    # Path to the audio file
+    audio_path = os.path.join("./data", audio_file)
+    
+    # Convert to supported format
+    converted_file_path = _convert_to_support_format(audio_path)
+    
+    # Check if the converted file exists
+    assert os.path.exists(converted_file_path), f"Converted file {converted_file_path} does not exist."
+    
+    # Check if the converted file is in the expected format (e.g., .wav)
+    assert converted_file_path.endswith('.wav'), f"Converted file {converted_file_path} is not in .wav format."

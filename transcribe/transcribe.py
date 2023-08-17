@@ -225,7 +225,7 @@ class Diarizator:
                 raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
 
 
-    def _split_audio_by_speaker(audio_file_path):
+    def _split_audio_by_speaker(self, audio_file_path):
         """
         Splits the audio based on speaker diarization using pyannote-audio.
 

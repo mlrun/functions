@@ -219,8 +219,8 @@ class Diarizator:
             wav_file = tempfile.mkstemp(prefix="converted_audio_", suffix=".wav")
             if audio_file_obj.suffix in convert_func_dict.keys():
                 audio_file_obj = convert_func_dict[audio_file_obj.suffix](audio_file_path)
-                audio_file_obj.export(wav_file, format="wav")
-                return wav_file
+                audio_file_obj.export(wav_file[1], format="wav")
+                return wav_file[1]
             else:
                 raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
 

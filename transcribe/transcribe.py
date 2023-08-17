@@ -26,7 +26,7 @@ from tqdm.auto import tqdm
 
 from pyannote.audio import Pipeline
 import torch
-import pyhub
+import pydub
 
 
 def transcribe(
@@ -179,7 +179,7 @@ class Diarizator:
     A class for speaker diarization using pyannote-audio.
     """
 
-    def __init__(self, auth_token, **kwargs):
+    def __init__(self, auth_token=None, **kwargs):
         """
         :param auth_token: The authorization token for the model.
         :param kwargs: Additional arguments to pass to the model.

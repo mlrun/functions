@@ -20,7 +20,7 @@ from difflib import SequenceMatcher
 import mlrun
 import pytest
 import whisper
-from transcribe import _convert_to_support_format
+from transcribe import Diarizator 
 
 
 expected_outputs = [
@@ -107,9 +107,12 @@ def test_convert_to_support_format(audio_file):
     
     # Path to the audio file
     audio_path = os.path.join("./data", audio_file)
+
+    # Create a diarizator object
+    diarizator = Diarizator()
     
     # Convert to supported format
-    converted_file_path = _convert_to_support_format(audio_path)
+    converted_file_path = diarizator._convert_to_support_format(audio_path)
     
     # Check if the converted file exists
     assert os.path.exists(converted_file_path), f"Converted file {converted_file_path} does not exist."

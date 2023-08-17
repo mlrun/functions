@@ -1,6 +1,7 @@
 openai-whisper
 tqdm
 librosa
-git+https://github.com/pyannote/pyannote-audio
+https://github.com/pyannote/pyannote-audio/archive/refs/heads/develop.zip
 torch
 torchaudio
+pydub

@@ -16,6 +16,7 @@ import os
 import pathlib
 import tempfile
 from typing import Literal, Tuple
+from functools import partial
 
 import librosa
 import mlrun
@@ -25,6 +26,7 @@ from tqdm.auto import tqdm
 
 from pyannote.audio import Pipeline
 import torch
+import pyhub
 
 
 def transcribe(
@@ -158,6 +160,20 @@ def _single_transcribe(
 
     return transcription, length, rate_of_speech, language
 
+
+def _build_context(audio_file_path, start_time, end_time):
+    """
+    Builds a context for the the current speaker's speech for transcribe
+    The context should have all the conversation up to the current speaker's speech
+    :param audio_file_path: The path to the audio file
+    :param start_time: The start time of the current speaker's speech
+    :param end_time: The end time of the current speaker's speech
+    :returns: A string of the context
+    """
+    pass
+
+
+
 class Diarizator:
     """
     A class for speaker diarization using pyannote-audio.
@@ -179,6 +195,32 @@ class Diarizator:
                 "pyannote/speaker-diarization@2.1",
                 use_auth_token = self.auth_token
             )
+
+    def _convert_to_support_format(self, audio_file_path):
+        """
+        Converts the audio file to wav format. diarization_pipeline expects the following format wav, flac, ogg, mat
+
+        :param audio_file_path: Path to the audio file
+        """
+        audio_file_obj = pathlib.Path(audio_file_path)
+        convert_func_dict = {
+                ".mp3": pydub.AudioSegment.from_mp3,
+                ".flv": pydub.AudioSegment.from_flv,
+                ".mp4": partial(pydub.AudioSegment.from_file, format="mp4"),
+                ".wma": partial(pydub.AudioSegment.from_file, format="wma"),
+                }
+        # Check if the file is already in supported format
+        if audio_file_obj.suffix in [".wav", ".flac", ".ogg", ".mat"]:
+            return audio_file_path
+        else:
+            wav_file = tempfile.mkstemp(prefix="converted_audio_", suffix=".wav")
+            if audio_file_obj.suffix in convert_func_dict.keys():
+                audio_file_obj = convert_func_dict[audio_file_obj.suffix](audio_file_path)
+                audio_file_obj.export(wav_file, format="wav")
+                return wav_file
+            else:
+                raise ValueError("Unsupported audio format")
+
 
     def _split_audio_by_speaker(audio_file_path):
         """

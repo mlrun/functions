@@ -195,6 +195,9 @@ class Diarizator:
                 "pyannote/speaker-diarization@2.1",
                 use_auth_token = self.auth_token
             )
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        if device == "cuda":
+            self.pipeline = self.pipeline.to(torch.device(0))
 
     def _convert_to_support_format(self, audio_file_path):
         """
@@ -219,7 +222,7 @@ class Diarizator:
                 audio_file_obj.export(wav_file, format="wav")
                 return wav_file
             else:
-                raise ValueError("Unsupported audio format")
+                raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
 
 
     def _split_audio_by_speaker(audio_file_path):

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+import os
 import pathlib
 import tempfile
 from typing import Literal, Tuple
@@ -22,6 +22,9 @@ import mlrun
 import pandas as pd
 import whisper
 from tqdm.auto import tqdm
+
+from pyannote.audio import Pipeline
+import torch
 
 
 def transcribe(
@@ -154,3 +157,45 @@ def _single_transcribe(
     rate_of_speech = len(transcription.split()) / length
 
     return transcription, length, rate_of_speech, language
+
+class Diarizator:
+    """
+    A class for speaker diarization using pyannote-audio.
+    """
+
+    def __init__(self, auth_token, **kwargs):
+        """
+        :param auth_token: The authorization token for the model.
+        :param kwargs: Additional arguments to pass to the model.
+        """
+        if auth_token:
+            self.auth_token = auth_token
+        elif os.environ.get("HK_ACCESS_TOKEN"):
+            self.auth_token = os.environ.get("HK_ACCESS_TOKEN")
+        else:
+            raise ValueError("auth_token must be provided, or set as an environment variable HK_ACCESS_TOKEN")
+
+        self.pipeline = Pipeline.from_pretrained(
+                "pyannote/speaker-diarization@2.1",
+                use_auth_token = self.auth_token
+            )
+
+    def _split_audio_by_speaker(audio_file_path):
+        """
+        Splits the audio based on speaker diarization using pyannote-audio.
+
+        :param audio_file_path: Path to the audio file
+
+        :returns: A list of tuples where each tuple contains:
+            * start_time: Start time of the speaker's segment
+            * end_time: End time of the speaker's segment
+            * audio_chunk: The audio segment for the speaker
+        """
+        # diarization_pipeline = ...
+        
+        # speaker_segments = ...
+        
+        # audio_chunks = ...
+        
+        # Placeholder return
+        return []

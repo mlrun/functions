@@ -1,3 +1,4 @@
 openai-whisper
 tqdm
 librosa
+git+https://github.com/pyannote/pyannote-audio

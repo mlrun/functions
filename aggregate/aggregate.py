@@ -70,7 +70,7 @@ def aggregate(context,
     :param drop_na:     Will drop na lines due to the Rolling.
     :param files_to_select: Specifies the number of *latest* files to select (and concat) for aggregation.
     """
-    
+    print("ci-test-1")  # delete
     from_model = type(df_artifact) == pd.DataFrame
     if from_model:
         context.logger.info('Aggregating from Buffer')

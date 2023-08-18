@@ -226,32 +226,22 @@ class Diarizator:
             else:
                 raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
 
-    def _split_audio_by_speaker(self, audio_file_path):
+    def _run(self, audio_file_path):
         """
-        Splits the audio based on speaker diarization using pyannote-audio.
+        speaker diarization using pyannote-audio.
 
         :param audio_file_path: Path to the audio file
 
-        :returns: A list of tuples where each tuple contains:
-            * start_time: Start time of the speaker's segment
-            * end_time: End time of the speaker's segment
-            * audio_chunk: The audio segment for the speaker
+        :returns:  pyannote.core.Annotation
         """
         audio_file_path = self._convert_to_support_format(audio_file_path)
 
         # diarization_pipeline to get speaker segments
         res = self.pipeline(audio_file_path, num_speakers=2)
-
         import pdb
 
         pdb.set_trace()
-
-        # speaker_segments = ...
-
-        # audio_chunks = ...
-
-        # Placeholder return
-        return []
+        return res
 
 
 class Rttm:
@@ -332,7 +322,6 @@ class RttmCollection:
 
     def add(self, rttm_line):
         self.entries.append(Rttm(rttm_line))
-
 
     def to_pandas(self):
         df = pd.DataFrame([entry.to_dict() for entry in self.entries])

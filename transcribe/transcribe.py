@@ -173,7 +173,6 @@ def _build_context(audio_file_path, start_time, end_time):
     pass
 
 
-
 class Diarizator:
     """
     A class for speaker diarization using pyannote-audio.
@@ -189,12 +188,13 @@ class Diarizator:
         elif os.environ.get("HK_ACCESS_TOKEN"):
             self.auth_token = os.environ.get("HK_ACCESS_TOKEN")
         else:
-            raise ValueError("auth_token must be provided, or set as an environment variable HK_ACCESS_TOKEN")
+            raise ValueError(
+                "auth_token must be provided, or set as an environment variable HK_ACCESS_TOKEN"
+            )
 
         self.pipeline = Pipeline.from_pretrained(
-                "pyannote/speaker-diarization@2.1",
-                use_auth_token = self.auth_token
-            )
+            "pyannote/speaker-diarization@2.1", use_auth_token=self.auth_token
+        )
         device = "cuda" if torch.cuda.is_available() else "cpu"
         if device == "cuda":
             self.pipeline = self.pipeline.to(torch.device(0))
@@ -207,23 +207,24 @@ class Diarizator:
         """
         audio_file_obj = pathlib.Path(audio_file_path)
         convert_func_dict = {
-                ".mp3": pydub.AudioSegment.from_mp3,
-                ".flv": pydub.AudioSegment.from_flv,
-                ".mp4": partial(pydub.AudioSegment.from_file, format="mp4"),
-                ".wma": partial(pydub.AudioSegment.from_file, format="wma"),
-                }
+            ".mp3": pydub.AudioSegment.from_mp3,
+            ".flv": pydub.AudioSegment.from_flv,
+            ".mp4": partial(pydub.AudioSegment.from_file, format="mp4"),
+            ".wma": partial(pydub.AudioSegment.from_file, format="wma"),
+        }
         # Check if the file is already in supported format
         if audio_file_obj.suffix in [".wav", ".flac", ".ogg", ".mat"]:
             return audio_file_path
         else:
             wav_file = tempfile.mkstemp(prefix="converted_audio_", suffix=".wav")
             if audio_file_obj.suffix in convert_func_dict.keys():
-                audio_file_obj = convert_func_dict[audio_file_obj.suffix](audio_file_path)
+                audio_file_obj = convert_func_dict[audio_file_obj.suffix](
+                    audio_file_path
+                )
                 audio_file_obj.export(wav_file[1], format="wav")
                 return wav_file[1]
             else:
                 raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
-
 
     def _split_audio_by_speaker(self, audio_file_path):
         """
@@ -238,15 +239,16 @@ class Diarizator:
         """
         audio_file_path = self._convert_to_support_format(audio_file_path)
         import pdb
+
         pdb.set_trace()
 
         # diarization_pipeline to get speaker segments
         res = self.pipeline(audio_file_path, num_speakers=2)
 
         # speaker_segments = ...
-        
+
         # audio_chunks = ...
-        
+
         # Placeholder return
         return []
 
@@ -255,6 +257,7 @@ class Rttm:
     """
     A class for parsing RTTM files.
     """
+
     def __init__(self, rttm_line=None):
         self.type = None
         self.file_id = None
@@ -274,10 +277,20 @@ class Rttm:
         parts = rttm_line.strip().split()
         if len(parts) != 10:
             raise ValueError("RTTM line does not have 10 columns.")
-        
-        self.type, self.file_id, self.channel_id, self.begin_time, self.duration, \
-            self.label, self.NA_1, self.NA_2, self.speaker, self.confidence = parts
-        
+
+        (
+            self.type,
+            self.file_id,
+            self.channel_id,
+            self.begin_time,
+            self.duration,
+            self.label,
+            self.NA_1,
+            self.NA_2,
+            self.speaker,
+            self.confidence,
+        ) = parts
+
         # Convert numerical values to appropriate types
         self.channel_id = int(self.channel_id)
         self.begin_time = float(self.begin_time)
@@ -285,24 +298,26 @@ class Rttm:
         self.confidence = float(self.confidence)
 
     def __str__(self):
-        return f"{self.type} {self.file_id} {self.channel_id} {self.begin_time} {self.duration} " \
-               f"{self.label} {self.NA_1} {self.NA_2} {self.speaker} {self.confidence}"
-    
+        return (
+            f"{self.type} {self.file_id} {self.channel_id} {self.begin_time} {self.duration} "
+            f"{self.label} {self.NA_1} {self.NA_2} {self.speaker} {self.confidence}"
+        )
+
     def __repr__(self):
         return self.__str__()
 
     def to_dict(self):
         return {
-            'type': self.type,
-            'file_id': self.file_id,
-            'channel_id': self.channel_id,
-            'begin_time': self.begin_time,
-            'duration': self.duration,
-            'label': self.label,
-            'NA_1': self.NA_1,
-            'NA_2': self.NA_2,
-            'speaker': self.speaker,
-            'confidence': self.confidence
+            "type": self.type,
+            "file_id": self.file_id,
+            "channel_id": self.channel_id,
+            "begin_time": self.begin_time,
+            "duration": self.duration,
+            "label": self.label,
+            "NA_1": self.NA_1,
+            "NA_2": self.NA_2,
+            "speaker": self.speaker,
+            "confidence": self.confidence,
         }
 
 
@@ -310,6 +325,7 @@ class RttmCollection:
     """
     A class for storing a collection of RTTM entries.
     """
+
     def __init__(self):
         self.entries = []
 
@@ -317,12 +333,21 @@ class RttmCollection:
         self.entries.append(Rttm(rttm_line))
 
     def to_csv(self, filename):
-        with open(filename, 'w', newline='') as csvfile:
-            fieldnames = ['type', 'file_id', 'channel_id', 'begin_time', 'duration', 
-                          'label', 'NA_1', 'NA_2', 'speaker', 'confidence']
+        with open(filename, "w", newline="") as csvfile:
+            fieldnames = [
+                "type",
+                "file_id",
+                "channel_id",
+                "begin_time",
+                "duration",
+                "label",
+                "NA_1",
+                "NA_2",
+                "speaker",
+                "confidence",
+            ]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             writer.writeheader()
             for entry in self.entries:
                 writer.writerow(entry.to_dict())
-

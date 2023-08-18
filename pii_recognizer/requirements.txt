@@ -1,4 +1,5 @@
 mlrun==1.4.0
+faker
 nltk
 pandas
 streamlit

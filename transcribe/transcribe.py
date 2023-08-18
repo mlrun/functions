@@ -238,12 +238,13 @@ class Diarizator:
             * audio_chunk: The audio segment for the speaker
         """
         audio_file_path = self._convert_to_support_format(audio_file_path)
-        import pdb
-
-        pdb.set_trace()
 
         # diarization_pipeline to get speaker segments
         res = self.pipeline(audio_file_path, num_speakers=2)
+
+        import pdb
+
+        pdb.set_trace()
 
         # speaker_segments = ...
 
@@ -331,6 +332,11 @@ class RttmCollection:
 
     def add(self, rttm_line):
         self.entries.append(Rttm(rttm_line))
+
+
+    def to_pandas(self):
+        df = pd.DataFrame([entry.to_dict() for entry in self.entries])
+        return df
 
     def to_csv(self, filename):
         with open(filename, "w", newline="") as csvfile:

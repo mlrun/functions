@@ -236,11 +236,93 @@ class Diarizator:
             * end_time: End time of the speaker's segment
             * audio_chunk: The audio segment for the speaker
         """
-        # diarization_pipeline = ...
-        
+        audio_file_path = self._convert_to_support_format(audio_file_path)
+        import pdb
+        pdb.set_trace()
+
+        # diarization_pipeline to get speaker segments
+        res = self.pipeline(audio_file_path, num_speakers=2)
+
         # speaker_segments = ...
         
         # audio_chunks = ...
         
         # Placeholder return
         return []
+
+
+class Rttm:
+    """
+    A class for parsing RTTM files.
+    """
+    def __init__(self, rttm_line=None):
+        self.type = None
+        self.file_id = None
+        self.channel_id = None
+        self.begin_time = None
+        self.duration = None
+        self.label = None
+        self.NA_1 = None
+        self.NA_2 = None
+        self.speaker = None
+        self.confidence = None
+
+        if rttm_line:
+            self.parse(rttm_line)
+
+    def parse(self, rttm_line):
+        parts = rttm_line.strip().split()
+        if len(parts) != 10:
+            raise ValueError("RTTM line does not have 10 columns.")
+        
+        self.type, self.file_id, self.channel_id, self.begin_time, self.duration, \
+            self.label, self.NA_1, self.NA_2, self.speaker, self.confidence = parts
+        
+        # Convert numerical values to appropriate types
+        self.channel_id = int(self.channel_id)
+        self.begin_time = float(self.begin_time)
+        self.duration = float(self.duration)
+        self.confidence = float(self.confidence)
+
+    def __str__(self):
+        return f"{self.type} {self.file_id} {self.channel_id} {self.begin_time} {self.duration} " \
+               f"{self.label} {self.NA_1} {self.NA_2} {self.speaker} {self.confidence}"
+    
+    def __repr__(self):
+        return self.__str__()
+
+    def to_dict(self):
+        return {
+            'type': self.type,
+            'file_id': self.file_id,
+            'channel_id': self.channel_id,
+            'begin_time': self.begin_time,
+            'duration': self.duration,
+            'label': self.label,
+            'NA_1': self.NA_1,
+            'NA_2': self.NA_2,
+            'speaker': self.speaker,
+            'confidence': self.confidence
+        }
+
+
+class RttmCollection:
+    """
+    A class for storing a collection of RTTM entries.
+    """
+    def __init__(self):
+        self.entries = []
+
+    def add(self, rttm_line):
+        self.entries.append(Rttm(rttm_line))
+
+    def to_csv(self, filename):
+        with open(filename, 'w', newline='') as csvfile:
+            fieldnames = ['type', 'file_id', 'channel_id', 'begin_time', 'duration', 
+                          'label', 'NA_1', 'NA_2', 'speaker', 'confidence']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            writer.writeheader()
+            for entry in self.entries:
+                writer.writerow(entry.to_dict())
+

@@ -238,9 +238,6 @@ class Diarizator:
 
         # diarization_pipeline to get speaker segments
         res = self.pipeline(audio_file_path, num_speakers=2)
-        import pdb
-
-        pdb.set_trace()
         return res
 
 

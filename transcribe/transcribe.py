@@ -161,16 +161,6 @@ def _single_transcribe(
     return transcription, length, rate_of_speech, language
 
 
-def _build_context(audio_file_path, start_time, end_time):
-    """
-    Builds a context for the the current speaker's speech for transcribe
-    The context should have all the conversation up to the current speaker's speech
-    :param audio_file_path: The path to the audio file
-    :param start_time: The start time of the current speaker's speech
-    :param end_time: The end time of the current speaker's speech
-    :returns: A string of the context
-    """
-    pass
 
 
 class Diarizator:
@@ -238,108 +228,27 @@ class Diarizator:
 
         # diarization_pipeline to get speaker segments
         res = self.pipeline(audio_file_path, num_speakers=2)
-        return res
+        return res, audio_file_path
 
+    def _split_audio(audio_file_path, annotation):
+        """
+        Split an audio file based on a pyannote.core.Annotation object.
+        
+        :param audio_file_path: path to the audio file to split.
+        :param annotation: pyannote.core.Annotation object with diarization results.
+        
+        :returns: A list of AudioSegment objects corresponding to the split segments.
+        """
+        audio = AudioSegment.from_wav(audio_file_path)
+        segments = []
+        idx = 0
+        for segment, _, label in annotation.itertracks(yield_label=True):
+            start_time = segment.start * 1000  # Convert to milliseconds
+            end_time = segment.end * 1000
+            segment_audio = audio[start_time:end_time]
+            with tempfile.NamedTemporaryFile(suffix=".wav") as temp_file:
+                segment_audio.export(temp_file.name, format="wav")
+            segments.append((idx, label, temp_file.name))
+            idx += 1
 
-class Rttm:
-    """
-    A class for parsing RTTM files.
-    """
-
-    def __init__(self, rttm_line=None):
-        self.type = None
-        self.file_id = None
-        self.channel_id = None
-        self.begin_time = None
-        self.duration = None
-        self.label = None
-        self.NA_1 = None
-        self.NA_2 = None
-        self.speaker = None
-        self.confidence = None
-
-        if rttm_line:
-            self.parse(rttm_line)
-
-    def parse(self, rttm_line):
-        parts = rttm_line.strip().split()
-        if len(parts) != 10:
-            raise ValueError("RTTM line does not have 10 columns.")
-
-        (
-            self.type,
-            self.file_id,
-            self.channel_id,
-            self.begin_time,
-            self.duration,
-            self.label,
-            self.NA_1,
-            self.NA_2,
-            self.speaker,
-            self.confidence,
-        ) = parts
-
-        # Convert numerical values to appropriate types
-        self.channel_id = int(self.channel_id)
-        self.begin_time = float(self.begin_time)
-        self.duration = float(self.duration)
-        self.confidence = float(self.confidence)
-
-    def __str__(self):
-        return (
-            f"{self.type} {self.file_id} {self.channel_id} {self.begin_time} {self.duration} "
-            f"{self.label} {self.NA_1} {self.NA_2} {self.speaker} {self.confidence}"
-        )
-
-    def __repr__(self):
-        return self.__str__()
-
-    def to_dict(self):
-        return {
-            "type": self.type,
-            "file_id": self.file_id,
-            "channel_id": self.channel_id,
-            "begin_time": self.begin_time,
-            "duration": self.duration,
-            "label": self.label,
-            "NA_1": self.NA_1,
-            "NA_2": self.NA_2,
-            "speaker": self.speaker,
-            "confidence": self.confidence,
-        }
-
-
-class RttmCollection:
-    """
-    A class for storing a collection of RTTM entries.
-    """
-
-    def __init__(self):
-        self.entries = []
-
-    def add(self, rttm_line):
-        self.entries.append(Rttm(rttm_line))
-
-    def to_pandas(self):
-        df = pd.DataFrame([entry.to_dict() for entry in self.entries])
-        return df
-
-    def to_csv(self, filename):
-        with open(filename, "w", newline="") as csvfile:
-            fieldnames = [
-                "type",
-                "file_id",
-                "channel_id",
-                "begin_time",
-                "duration",
-                "label",
-                "NA_1",
-                "NA_2",
-                "speaker",
-                "confidence",
-            ]
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-            writer.writeheader()
-            for entry in self.entries:
-                writer.writerow(entry.to_dict())
+        return segments

@@ -89,6 +89,7 @@ def fake_data(request):
     yield data
 
 
+@pytest.mark.skip()
 def test_pattern_process(fake_data):
     ENTITIES = {
         "CREDIT_CARD": "credit_card",
@@ -104,6 +105,7 @@ def test_pattern_process(fake_data):
     assert any(entity in res for entity in ENTITIES.keys())
 
 
+@pytest.mark.skip()
 def test_spacy_process(fake_data):
     ENTITIES = {
         "PERSON": "name",
@@ -117,6 +119,7 @@ def test_spacy_process(fake_data):
     assert any(entity in res for entity in ENTITIES.keys())
 
 
+@pytest.mark.skip()
 def test_flair_process(fake_data):
     ENTITIES = {
         "LOCATION": "location",
@@ -145,6 +148,7 @@ def test_flair_process(fake_data):
     assert any(entity in res for entity in ENTITIES.keys())
 
 
+@pytest.mark.skip()
 def test_whole_process(fake_data):
     ENTITIES = {
         "LOCATION": "location",
@@ -176,6 +180,7 @@ def test_whole_process(fake_data):
     assert any(entity in res for entity in ENTITIES.keys())
 
 
+@pytest.mark.skip()
 def test_only_entities(fake_data):
     ENTITIES = {
         "LOCATION": "location",

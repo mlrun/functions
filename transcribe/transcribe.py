@@ -106,7 +106,7 @@ def transcribe(
         )
 
     #Speaker diarization
-    diarizator = Diaziator()
+    diarizator = Diarizator()
 
     for i, audio_file in enumerate(tqdm(audio_files, desc="Transcribing", unit="file")):
         try:

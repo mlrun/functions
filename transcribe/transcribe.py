@@ -147,11 +147,11 @@ def transcribe(
                 rate_of_speech,
             ]
 
-            seg_df_lst.append(locals()[f"{audio_file}_segment_df"]['audio_file'])
+            seg_df_lst.append(locals()[f"{audio_file}_segment_df"])
     # Return the dataframe:
     context.logger.info(f"Done:\n{df.head()}")
 
-    return output_directory, df, errors, *seg_df_lst
+    return output_directory, df, errors, seg_df_lst
 
 
 def _single_transcribe(

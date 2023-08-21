@@ -286,7 +286,7 @@ class Diarizator:
             start_time = segment.start * 1000
             end_time = segment.end * 1000
             segment_audio = audio[start_time:end_time]
-            with tempfile.NamedTemporaryFile(suffix=".wav") as temp_file:
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
                 segment_audio.export(f"{idx}_{temp_file.name}", format="wav")
             segments.append((idx, label, start_time, end_time, temp_file.name))
             idx += 1

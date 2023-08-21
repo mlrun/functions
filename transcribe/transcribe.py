@@ -83,8 +83,6 @@ def transcribe(
         ]
     )
 
-    seg_df_lst = []
-
     errors = {}
 
     # Create the output directory:
@@ -112,7 +110,7 @@ def transcribe(
         try:
             #Get the results of speaker diarization
             res, audio_file_path = diarizator._run(audio_file) 
-            locals()[f"{audio_file}_segment_df"] = diarizator._to_df(res)
+            locals()[f"{audio_file}_segments_df"] = diarizator._to_df(res)
             segments = diarizator._split_audio(audio_file_path, res)
 
             transcription, length, rate_of_speech, language = _single_transcribe(
@@ -146,12 +144,12 @@ def transcribe(
                 length,
                 rate_of_speech,
             ]
+            context.log_dataset(f'{audio_file}_segments_df', df=locals()[f"{audio_file}_segments_df"], index=False, format='csv')
 
-            seg_df_lst.append(locals()[f"{audio_file}_segment_df"])
     # Return the dataframe:
     context.logger.info(f"Done:\n{df.head()}")
 
-    return output_directory, df, errors, seg_df_lst
+    return output_directory, df, errors
 
 
 def _single_transcribe(

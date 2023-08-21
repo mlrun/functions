@@ -26,7 +26,7 @@ import whisper
 from tqdm.auto import tqdm
 
 from pyannote.audio import Pipeline
-from pyannote.core import notebook
+from pyannote.core import notebook, Segment, Annotation
 import torch
 import pydub
 
@@ -196,7 +196,6 @@ def _single_transcribe(
     for idx, label, start_time, end_time, file in sorted(segments, key=lambda x: x[0]):
         # Load the audio:
         audio = whisper.audio.load_audio(file=str(file))
-        # Transcribe:
         # The initail_prompt is the all the previous transcriptions.
         result = model.transcribe(
             audio=audio, **decoding_options, initial_prompt="\n".join(res[: idx + 1])
@@ -224,11 +223,12 @@ class Diarizator:
     A class for speaker diarization using pyannote-audio.
     """
 
-    def __init__(self, auth_token=None, **kwargs):
+    def __init__(self, auth_token: str = None, **kwargs):
         """
         :param auth_token: The authorization token for the model.
-        :param kwargs: Additional arguments to pass to the model.
+        :param kwargs:     Additional arguments to pass to the model.
         """
+        # Check if the auth_token is provided or set as an environment variable:
         if auth_token:
             self.auth_token = auth_token
         elif os.environ.get("HK_ACCESS_TOKEN"):
@@ -238,18 +238,22 @@ class Diarizator:
                 "auth_token must be provided, or set as an environment variable HK_ACCESS_TOKEN"
             )
 
+        # Load the model:
         self.pipeline = Pipeline.from_pretrained(
             "pyannote/speaker-diarization@2.1", use_auth_token=self.auth_token
         )
+
+        # Set the device:
         device = "cuda" if torch.cuda.is_available() else "cpu"
         if device == "cuda":
             self.pipeline = self.pipeline.to(torch.device(0))
 
-    def _convert_to_support_format(self, audio_file_path):
+    def _convert_to_support_format(self, audio_file_path: str) -> str:
         """
         Converts the audio file to wav format. diarization_pipeline expects the following format wav, flac, ogg, mat
 
-        :param audio_file_path: Path to the audio file
+        :param audio_file_path:   Path to the audio file
+        :returns audio_file_path: Path to the converted audio file
         """
         audio_file_obj = pathlib.Path(audio_file_path)
         convert_func_dict = {
@@ -272,13 +276,14 @@ class Diarizator:
             else:
                 raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
 
-    def _run(self, audio_file_path):
+    def _run(self, audio_file_path: str) -> Tuple[Annotation, str]:
         """
         Speaker diarization using pyannote-audio.
 
         :param audio_file_path: Path to the audio file
 
-        :returns:  pyannote.core.Annotation
+        :returns:  res: pyannote.core.Annotation
+                   audio_file_path: Path to the converted audio file
         """
         audio_file_path = self._convert_to_support_format(audio_file_path)
 
@@ -286,14 +291,21 @@ class Diarizator:
         res = self.pipeline(audio_file_path, num_speakers=2)
         return res, audio_file_path
 
-    def _split_audio(self, audio_file_path, annotation):
+    def _split_audio(
+        self, audio_file_path: str, annotation: Annotation
+    ) -> List[Tuple[int, str, float, float, str]]:
         """
         Split an audio file based on a pyannote.core.Annotation object.
 
         :param audio_file_path: path to the audio file to split.
         :param annotation: pyannote.core.Annotation object with diarization results.
 
-        :returns: A list of AudioSegment objects corresponding to the split segments.
+        :returns: A list of tuples with the following items:
+                    * The index of the segment.
+                    * The label of the speaker.
+                    * The start time of the segment.
+                    * The end time of the segment.
+                    * The path to the temporary audio file.
         """
         audio = pydub.AudioSegment.from_wav(audio_file_path)
         segments = []
@@ -302,7 +314,10 @@ class Diarizator:
             # Convert to milliseconds:
             start_time = segment.start * 1000
             end_time = segment.end * 1000
+
+            # Extract the segment:
             segment_audio = audio[start_time:end_time]
+            # Save the segment to a temporary file:
             with tempfile.NamedTemporaryFile(
                 suffix=".wav", prefix="tmp_", delete=False
             ) as temp_file:
@@ -312,7 +327,7 @@ class Diarizator:
 
         return segments
 
-    def _to_df(self, annotation):
+    def _to_df(self, annotation: Annotation) -> pd.DataFrame:
         """
         Convert a pyannote.core.Annotation object to a pandas.DataFrame object.
 

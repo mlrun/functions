@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 import os
+from collections import Counter
 import pathlib
 import tempfile
 from typing import Literal, Tuple
@@ -141,22 +142,33 @@ def transcribe(
 
 def _single_transcribe(
     audio_file: pathlib.Path,
+    segment: Tuple[int, str, float, float, pathlib.Path],
     model: whisper.Whisper,
     decoding_options: dict = None,
 ) -> Tuple[str, int, float, str]:
     decoding_options = decoding_options or dict()
-    # Load the audio:
-    audio = whisper.audio.load_audio(file=str(audio_file))
+
+    res = []
+    langs = []
+
+    for idx, label, start_time, end_time, file in sorted(segments, key=lambda x: x[0]):
+        # Load the audio:
+        audio = whisper.audio.load_audio(file=str(file))
+        # Transcribe:
+        # The initail_prompt is the all the previous transcriptions.
+        result = model.transcribe(audio=audio, **decoding_options, initial_prompt="\n".join(result[:idx+1]))
+        # Unpack the model's result:
+        transcription = f"{label}: \n {result['text']}"
+        langs.append(result.get("language") or decoding_options.get("language", ""))
+        res.append(transcription)
+
     # Get audio length:
     length = librosa.get_duration(path=audio_file)
-    # Transcribe:
-    result = model.transcribe(audio=audio, **decoding_options)
-    # Unpack the model's result:
-    transcription = result["text"]
-    language = result.get("language") or decoding_options.get("language", "")
-
+    transcription = "\n".join(res)
     # Calculate rate of speech (number of words / audio length):
     rate_of_speech = len(transcription.split()) / length
+    # Get the language:
+    language = Counter(langs).most_common(1)[0][0]
 
     return transcription, length, rate_of_speech, language
 
@@ -218,7 +230,7 @@ class Diarizator:
 
     def _run(self, audio_file_path):
         """
-        speaker diarization using pyannote-audio.
+        Speaker diarization using pyannote-audio.
 
         :param audio_file_path: Path to the audio file
 
@@ -243,12 +255,13 @@ class Diarizator:
         segments = []
         idx = 0
         for segment, _, label in annotation.itertracks(yield_label=True):
-            start_time = segment.start * 1000  # Convert to milliseconds
+            # Convert to milliseconds:
+            start_time = segment.start * 1000
             end_time = segment.end * 1000
             segment_audio = audio[start_time:end_time]
             with tempfile.NamedTemporaryFile(suffix=".wav") as temp_file:
-                segment_audio.export(temp_file.name, format="wav")
-            segments.append((idx, label, temp_file.name))
+                segment_audio.export(f"{idx}_{temp_file.name}", format="wav")
+            segments.append((idx, label, start_time, end_time, temp_file.name))
             idx += 1
 
         return segments

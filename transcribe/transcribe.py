@@ -127,7 +127,7 @@ def transcribe(
             os.remove(audio_file_path)
 
             if condition_show_plot:
-                notebook.plot_annotation(segments)
+                notebook.plot_annotation(res)
 
         except Exception as exception:
             # Collect the exception:

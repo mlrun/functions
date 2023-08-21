@@ -37,7 +37,7 @@ def transcribe(
     device: Literal["cuda", "cpu"] = None,
     decoding_options: dict = None,
     output_directory: str = None,
-) -> Tuple[pathlib.Path, pd.DataFrame, dict]:
+) -> Tuple[pathlib.Path, pd.DataFrame, dict, list]:
     """
     Transcribe audio files into text files and collect additional data.
     The end result is a directory of transcribed text files
@@ -82,6 +82,9 @@ def transcribe(
             "rate_of_speech",
         ]
     )
+
+    seg_df_res = []
+
     errors = {}
 
     # Create the output directory:
@@ -102,10 +105,19 @@ def transcribe(
             f"audio_files {str(audio_files_path)} must be either a directory path or a file path"
         )
 
+    #Speaker diarization
+    diarizator = Diaziator()
+
     for i, audio_file in enumerate(tqdm(audio_files, desc="Transcribing", unit="file")):
         try:
+            #Get the results of speaker diarization
+            res, audio_file_path = diarizator._run(audio_file) 
+            locals()[f"{audio_file}_segment_df"] = diarizator._to_df(res)
+            segments = diarizator._split_audio(audio_file_path, res)
+
             transcription, length, rate_of_speech, language = _single_transcribe(
-                audio_file=audio_file,
+                audio_file=audio_file_path,
+                segments=segments,
                 model=model,
                 decoding_options=decoding_options,
             )
@@ -134,18 +146,35 @@ def transcribe(
                 length,
                 rate_of_speech,
             ]
+
+            seg_df_lst.append(locals()[f"{audio_file}_segment_df"]['audio_file'])
     # Return the dataframe:
     context.logger.info(f"Done:\n{df.head()}")
 
-    return output_directory, df, errors
+    return output_directory, df, errors, *seg_df_lst
 
 
 def _single_transcribe(
     audio_file: pathlib.Path,
-    segment: Tuple[int, str, float, float, pathlib.Path],
+    segments: Tuple[int, str, float, float, pathlib.Path],
     model: whisper.Whisper,
     decoding_options: dict = None,
 ) -> Tuple[str, int, float, str]:
+    """
+    Transcribe a single audio file with the speaker segmentation
+    and return the transcription, length, rate of speech and language.
+
+    :param audio_file:       Path to the audio file.
+    :param segments:         A list of tuples of (idx, label, start_time, end_time, file).
+    :param model:            A whisper model.
+    :param decoding_options: A dictionary of options to construct a `whisper.DecodingOptions`.
+
+    :returns: A tuple of:
+            * The transcription.
+            * The length of the audio file.
+            * The rate of speech.
+            * The detected language.
+    """
     decoding_options = decoding_options or dict()
 
     res = []
@@ -242,7 +271,7 @@ class Diarizator:
         res = self.pipeline(audio_file_path, num_speakers=2)
         return res, audio_file_path
 
-    def _split_audio(audio_file_path, annotation):
+    def _split_audio(self, audio_file_path, annotation):
         """
         Split an audio file based on a pyannote.core.Annotation object.
         
@@ -265,3 +294,17 @@ class Diarizator:
             idx += 1
 
         return segments
+
+
+    def _to_df(self, annotation):
+        """
+        Convert a pyannote.core.Annotation object to a pandas.DataFrame object.
+
+        :param annotation: pyannote.core.Annotation object with diarization results.
+
+        :returns: A pandas.DataFrame object with the diarization results.
+        """
+        lst = [item.split(' ') for item in annotation.to_lab().split('\n')]
+        lst = [item for item in lst if item]
+        df = pd.DataFrame(lst, columns=['start', 'end', 'speaker'])
+        return df

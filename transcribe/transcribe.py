@@ -147,8 +147,9 @@ def transcribe(
                 length,
                 rate_of_speech,
             ]
+            file_name = str(audio_file).split("/")[-1].split(".")[0]
             context.log_dataset(
-                f"{audio_file}_segments_df",
+                f"{file_name}_segments_df",
                 df=locals()[f"{audio_file}_segments_df"],
                 index=False,
                 format="csv",

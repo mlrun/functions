@@ -192,7 +192,7 @@ def _single_transcribe(
         # Transcribe:
         # The initail_prompt is the all the previous transcriptions.
         result = model.transcribe(
-            audio=audio, **decoding_options, initial_prompt="\n".join(result[: idx + 1])
+            audio=audio, **decoding_options, initial_prompt="\n".join(res[: idx + 1])
         )
         # Unpack the model's result:
         transcription = f"{label}: \n {result['text']}"

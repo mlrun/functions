@@ -137,8 +137,6 @@ def test_split_audio_by_speaker(audio_file):
     # Create a diarizator object
     diarizator = Diarizator()
     res, audio_file_path = diarizator._run(audio_path)
-    
+
     segments = diarizator._split_audio(audio_file_path, res)
     assert len(segments) > 0, "No segments were found."
-
-

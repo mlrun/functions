@@ -103,13 +103,13 @@ def transcribe(
             f"audio_files {str(audio_files_path)} must be either a directory path or a file path"
         )
 
-    #Speaker diarization
+    # Speaker diarization
     diarizator = Diarizator()
 
     for i, audio_file in enumerate(tqdm(audio_files, desc="Transcribing", unit="file")):
         try:
-            #Get the results of speaker diarization
-            res, audio_file_path = diarizator._run(audio_file) 
+            # Get the results of speaker diarization
+            res, audio_file_path = diarizator._run(audio_file)
             locals()[f"{audio_file}_segments_df"] = diarizator._to_df(res)
             segments = diarizator._split_audio(audio_file_path, res)
 
@@ -119,6 +119,9 @@ def transcribe(
                 model=model,
                 decoding_options=decoding_options,
             )
+
+            # clean up the temporary files
+            os.remove(audio_file_path)
 
         except Exception as exception:
             # Collect the exception:
@@ -144,7 +147,12 @@ def transcribe(
                 length,
                 rate_of_speech,
             ]
-            context.log_dataset(f'{audio_file}_segments_df', df=locals()[f"{audio_file}_segments_df"], index=False, format='csv')
+            context.log_dataset(
+                f"{audio_file}_segments_df",
+                df=locals()[f"{audio_file}_segments_df"],
+                index=False,
+                format="csv",
+            )
 
     # Return the dataframe:
     context.logger.info(f"Done:\n{df.head()}")
@@ -183,11 +191,15 @@ def _single_transcribe(
         audio = whisper.audio.load_audio(file=str(file))
         # Transcribe:
         # The initail_prompt is the all the previous transcriptions.
-        result = model.transcribe(audio=audio, **decoding_options, initial_prompt="\n".join(result[:idx+1]))
+        result = model.transcribe(
+            audio=audio, **decoding_options, initial_prompt="\n".join(result[: idx + 1])
+        )
         # Unpack the model's result:
         transcription = f"{label}: \n {result['text']}"
         langs.append(result.get("language") or decoding_options.get("language", ""))
         res.append(transcription)
+        # clean up the temporary files
+        os.remove(file)
 
     # Get audio length:
     length = librosa.get_duration(path=audio_file)
@@ -198,8 +210,6 @@ def _single_transcribe(
     language = Counter(langs).most_common(1)[0][0]
 
     return transcription, length, rate_of_speech, language
-
-
 
 
 class Diarizator:
@@ -272,10 +282,10 @@ class Diarizator:
     def _split_audio(self, audio_file_path, annotation):
         """
         Split an audio file based on a pyannote.core.Annotation object.
-        
+
         :param audio_file_path: path to the audio file to split.
         :param annotation: pyannote.core.Annotation object with diarization results.
-        
+
         :returns: A list of AudioSegment objects corresponding to the split segments.
         """
         audio = pydub.AudioSegment.from_wav(audio_file_path)
@@ -286,13 +296,14 @@ class Diarizator:
             start_time = segment.start * 1000
             end_time = segment.end * 1000
             segment_audio = audio[start_time:end_time]
-            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
-                segment_audio.export(f"{idx}_{temp_file.name}", format="wav")
+            with tempfile.NamedTemporaryFile(
+                suffix=".wav", prefix="tmp_", delete=False
+            ) as temp_file:
+                segment_audio.export(f"{temp_file.name}", format="wav")
             segments.append((idx, label, start_time, end_time, temp_file.name))
             idx += 1
 
         return segments
-
 
     def _to_df(self, annotation):
         """
@@ -302,7 +313,7 @@ class Diarizator:
 
         :returns: A pandas.DataFrame object with the diarization results.
         """
-        lst = [item.split(' ') for item in annotation.to_lab().split('\n')]
+        lst = [item.split(" ") for item in annotation.to_lab().split("\n")]
         lst = [item for item in lst if item]
-        df = pd.DataFrame(lst, columns=['start', 'end', 'speaker'])
+        df = pd.DataFrame(lst, columns=["start", "end", "speaker"])
         return df

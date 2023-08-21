@@ -202,7 +202,7 @@ def _single_transcribe(
             audio=audio, **decoding_options, initial_prompt="\n".join(res[: idx + 1])
         )
         # Unpack the model's result:
-        transcription = f"{label}: \n {result['text']}"
+        transcription = f"{label}  {start_time}  {end_time}: \n {result['text']}"
         langs.append(result.get("language") or decoding_options.get("language", ""))
         res.append(transcription)
         # clean up the temporary files

@@ -196,7 +196,7 @@ def infer(
             sample_set=sample_set,
             model_artifact_feature_stats=model_handler._model_artifact.spec.feature_stats,
         )
-        mlrun.model_monitoring.api.get_or_create_model_endpoint(
+        mlrun.model_monitoring.api.record_results(
             project=context.project,
             context=context,
             endpoint_id=endpoint_id,

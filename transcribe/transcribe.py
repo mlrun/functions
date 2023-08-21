@@ -16,7 +16,7 @@ import os
 from collections import Counter
 import pathlib
 import tempfile
-from typing import Literal, Tuple
+from typing import Literal, Tuple, List
 from functools import partial
 
 import librosa

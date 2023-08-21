@@ -83,7 +83,7 @@ def transcribe(
         ]
     )
 
-    seg_df_res = []
+    seg_df_lst = []
 
     errors = {}
 

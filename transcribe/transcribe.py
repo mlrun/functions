@@ -280,7 +280,7 @@ class Diarizator:
         
         :returns: A list of AudioSegment objects corresponding to the split segments.
         """
-        audio = AudioSegment.from_wav(audio_file_path)
+        audio = pydub.AudioSegment.from_wav(audio_file_path)
         segments = []
         idx = 0
         for segment, _, label in annotation.itertracks(yield_label=True):

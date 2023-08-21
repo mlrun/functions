@@ -26,6 +26,7 @@ import whisper
 from tqdm.auto import tqdm
 
 from pyannote.audio import Pipeline
+from pyannote.core import notebook
 import torch
 import pydub
 
@@ -37,6 +38,7 @@ def transcribe(
     device: Literal["cuda", "cpu"] = None,
     decoding_options: dict = None,
     output_directory: str = None,
+    condition_show_plot: bool = False,
 ) -> Tuple[pathlib.Path, pd.DataFrame, dict, list]:
     """
     Transcribe audio files into text files and collect additional data.
@@ -56,6 +58,7 @@ def transcribe(
     :param device:                Device to load the model. Can be one of {"cuda", "cpu"}.
                                   Default will prefer "cuda" if available.
     :param decoding_options:      A dictionary of options to construct a `whisper.DecodingOptions`.
+    :param condition_show_plot:   Whether to show the plot of the segments of audio file.
 
     :returns: A tuple of:
 
@@ -122,6 +125,9 @@ def transcribe(
 
             # clean up the temporary files
             os.remove(audio_file_path)
+
+            if condition_show_plot:
+                notebook.plot_annotation(segments)
 
         except Exception as exception:
             # Collect the exception:

@@ -17,14 +17,21 @@ from mlrun.artifacts.manager import Artifact, PlotlyArtifact
 from mlrun.datastore import is_store_uri
 from mlrun.frameworks._common import CommonTypes, MLRunInterface
 from mlrun.utils import logger
-from peft import (LoraConfig, PeftModel, get_peft_model,
-                  prepare_model_for_kbit_training)
+from peft import LoraConfig, PeftModel, get_peft_model, prepare_model_for_kbit_training
 from plotly import graph_objects as go
-from transformers import (AutoModelForCausalLM, AutoTokenizer,
-                          BitsAndBytesConfig, DataCollatorForLanguageModeling,
-                          PreTrainedModel, PreTrainedTokenizer, Trainer,
-                          TrainerCallback, TrainerControl, TrainerState,
-                          TrainingArguments)
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig,
+    DataCollatorForLanguageModeling,
+    PreTrainedModel,
+    PreTrainedTokenizer,
+    Trainer,
+    TrainerCallback,
+    TrainerControl,
+    TrainerState,
+    TrainingArguments,
+)
 
 supported_tasks = [
     "question-answering",
@@ -67,18 +74,18 @@ class HFTrainerMLRunInterface(MLRunInterface, ABC):
     ]
 
     @classmethod
-    def add_interface(
+    def _add_interface(
         cls,
         obj: Trainer,
         restoration: CommonTypes.MLRunInterfaceRestorationType = None,
     ):
-        super(HFTrainerMLRunInterface, cls).add_interface(
+        super(HFTrainerMLRunInterface, cls)._add_interface(
             obj=obj, restoration=restoration
         )
 
     @classmethod
-    def mlrun_train(cls):
-        def wrapper(self: Trainer, *args, **kwargs):
+    def _mlrun_train(cls):
+        def _wrapper(self: Trainer, *args, **kwargs):
             # Restore the evaluation method as `train` will use it:
             # cls._restore_attribute(obj=self, attribute_name="evaluate")
 
@@ -90,7 +97,7 @@ class HFTrainerMLRunInterface(MLRunInterface, ABC):
 
             return result
 
-        return wrapper
+        return _wrapper
 
 
 class MLRunCallback(TrainerCallback):
@@ -126,7 +133,7 @@ class MLRunCallback(TrainerCallback):
         self._metric_scores: Dict[str, List[float]] = {}
         self._artifacts: Dict[str, Artifact] = {}
 
-    def on_epoch_begin(
+    def _on_epoch_begin(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -137,7 +144,7 @@ class MLRunCallback(TrainerCallback):
             return
         self._steps.append([])
 
-    def on_epoch_end(
+    def _on_epoch_end(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -148,7 +155,7 @@ class MLRunCallback(TrainerCallback):
             return
         self._log_metrics()
 
-    def on_log(
+    def _on_log(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -174,7 +181,7 @@ class MLRunCallback(TrainerCallback):
                 self._metric_scores[metric_name] = []
             self._metric_scores[metric_name].append(metric_score)
 
-    def on_train_begin(
+    def _on_train_begin(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -185,7 +192,7 @@ class MLRunCallback(TrainerCallback):
             return
         self._is_training = True
 
-    def on_train_end(
+    def _on_train_end(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -198,7 +205,7 @@ class MLRunCallback(TrainerCallback):
             return
         self._log_metrics()
 
-    def on_evaluate(
+    def _on_evaluate(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -241,7 +248,7 @@ class MLRunCallback(TrainerCallback):
         self._artifacts[artifact_name] = self._context.log_artifact(artifact)
 
 
-def apply_mlrun(
+def _apply_mlrun(
     trainer: transformers.Trainer,
     model_name: str = None,
     tag: str = "",
@@ -258,7 +265,7 @@ def apply_mlrun(
     if context is None:
         context = mlrun.get_or_create_ctx(HFTrainerMLRunInterface.DEFAULT_CONTEXT_NAME)
 
-    HFTrainerMLRunInterface.add_interface(obj=trainer)
+    HFTrainerMLRunInterface._add_interface(obj=trainer)
 
     if auto_log:
         trainer.add_callback(
@@ -275,7 +282,7 @@ def apply_mlrun(
 # ----------------------end from MLRUN--------------------------------
 
 
-def print_trainable_parameters(model):
+def _print_trainable_parameters(model):
     """
     Prints the number of trainable parameters in the model.
     """
@@ -325,7 +332,7 @@ DEEPSPEED_CONFIG = {
 }
 
 
-def update_config(src: dict, dst: dict):
+def _update_config(src: dict, dst: dict):
     """
     update configs according to user, this way the user can add/modify values in default configs for e.g.
 
@@ -367,7 +374,7 @@ def update_config(src: dict, dst: dict):
         dst.update({config_name: config})
 
 
-def get_class_object(class_path: str) -> type:
+def _get_class_object(class_path: str) -> type:
     """
     given a full class name, this function returns the correct class
 
@@ -380,7 +387,7 @@ def get_class_object(class_path: str) -> type:
     return getattr(module, class_name)
 
 
-def set_model_and_tokenizer(
+def _set_model_and_tokenizer(
     model: Union[str, Tuple[str, str]],
     tokenizer: Union[str, Tuple[str, str]],
     task: str,
@@ -421,7 +428,7 @@ def set_model_and_tokenizer(
     # if it's a tuple them we assume it contains of both name and class
     if isinstance(model, tuple):
         model_name, model_class = model
-        model_class = get_class_object(model_class)
+        model_class = _get_class_object(model_class)
 
     # in the case we don't get the model class we need the task in order to choose the correct model
     else:
@@ -485,7 +492,7 @@ def set_model_and_tokenizer(
     # if it's not a str then it's a tuple of both name and class
     else:
         tokenizer_name, tokenizer_class = tokenizer
-        tokenizer_class = get_class_object(tokenizer_class)
+        tokenizer_class = _get_class_object(tokenizer_class)
 
     tokenizer = tokenizer_class.from_pretrained(
         tokenizer_name, **tokenizer_pretrained_config
@@ -497,7 +504,7 @@ def set_model_and_tokenizer(
     return model_name, model, tokenizer
 
 
-def dataset_loader(dataset: str, is_train: bool = True, **kwargs) -> Dataset:
+def _dataset_loader(dataset: str, is_train: bool = True, **kwargs) -> Dataset:
     """
     loads the specific dataset provided by the user
 
@@ -525,7 +532,7 @@ def dataset_loader(dataset: str, is_train: bool = True, **kwargs) -> Dataset:
         return dataset.get("validation")
 
 
-def prepare_dataset(
+def _prepare_dataset(
     train_dataset: str,
     eval_dataset: str,
     train_load_dataset_kwargs,
@@ -554,10 +561,10 @@ def prepare_dataset(
     # Load datasets
     # if provided two paths/names we load each separately using designated func
     if eval_dataset:
-        train_dataset = dataset_loader(
+        train_dataset = _dataset_loader(
             dataset=train_dataset, is_train=True, **train_load_dataset_kwargs
         )
-        eval_dataset = dataset_loader(
+        eval_dataset = _dataset_loader(
             dataset=eval_dataset, is_train=False, **eval_load_dataset_kwargs
         )
 
@@ -672,7 +679,7 @@ def finetune_llm(
         ConfigKeys.tokenizer_pretrained: tokenizer_pretrained_config,
         ConfigKeys.data_collator: data_collator_config,
     }
-    update_config(dst=configs, src=kwargs)
+    _update_config(dst=configs, src=kwargs)
 
     # check gpu permission and availability
     if use_cuda:
@@ -683,7 +690,7 @@ def finetune_llm(
             logger.warning("'use_cuda' is set to True, but no cuda device is available")
 
     # get model and tokenizer
-    model_name, model, tokenizer = set_model_and_tokenizer(
+    model_name, model, tokenizer = _set_model_and_tokenizer(
         model=model,
         tokenizer=tokenizer,
         task=task,
@@ -697,7 +704,7 @@ def finetune_llm(
     )
 
     # Load datasets
-    tokenized_train, tokenized_eval = prepare_dataset(
+    tokenized_train, tokenized_eval = _prepare_dataset(
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         train_load_dataset_kwargs=train_load_dataset_kwargs,
@@ -719,7 +726,7 @@ def finetune_llm(
         train_kwargs["deepspeed"] = configs[ConfigKeys.deepspeed]
 
     # Take a look at the trainable parameters in the model
-    print_trainable_parameters(model)
+    _print_trainable_parameters(model)
 
     # Preparing training arguments:
     training_args = transformers.TrainingArguments(
@@ -736,7 +743,7 @@ def finetune_llm(
         args=training_args,
     )
 
-    apply_mlrun(trainer, model_name=model_name)
+    _apply_mlrun(trainer, model_name=model_name)
     model.config.use_cache = (
         False  # silence the warnings. Please re-enable for inference!
     )

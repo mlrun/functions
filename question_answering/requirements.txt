@@ -1,3 +1,5 @@
 transformers
 tqdm
 torch
+openai
+langchain

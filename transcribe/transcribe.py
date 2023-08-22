@@ -112,7 +112,7 @@ def transcribe(
     for i, audio_file in enumerate(tqdm(audio_files, desc="Transcribing", unit="file")):
         try:
             # Get the results of speaker diarization
-            res, audio_file_path = diarizator._run(audio_file)
+            res, audio_file_path = diarizator._run(audio_file, num_speakers=2)
             locals()[f"{audio_file}_segments_df"] = diarizator._to_df(res)
             segments = diarizator._split_audio(audio_file_path, res)
 
@@ -276,11 +276,20 @@ class Diarizator:
             else:
                 raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
 
-    def _run(self, audio_file_path: str) -> Tuple[Annotation, str]:
+    def _run(
+        self,
+        audio_file_path: str,
+        min_speakers: int = None,
+        max_speakers: int = None,
+        num_speakers: int = 2,
+    ) -> Tuple[Annotation, str]:
         """
-        Speaker diarization using pyannote-audio.
+        Speaker diarization using pyannote-audio. if num_speakers is provided, min_speakers and max_speakers are ignored.
 
         :param audio_file_path: Path to the audio file
+        :param min_speakers:    Minimum number of speakers
+        :param max_speakers:    Maximum number of speakers
+        :param num_speakers:    Number of speakers
 
         :returns:  res: pyannote.core.Annotation
                    audio_file_path: Path to the converted audio file
@@ -288,7 +297,14 @@ class Diarizator:
         audio_file_path = self._convert_to_support_format(audio_file_path)
 
         # diarization_pipeline to get speaker segments
-        res = self.pipeline(audio_file_path, num_speakers=2)
+        if num_speakers:
+            res = self.pipeline(audio_file_path, num_speakers=num_speakers)
+        elif min_speakers and max_speakers:
+            res = self.pipeline(
+                audio_file_path, min_speakers=min_speakers, max_speakers=max_speakers
+            )
+        else:
+            res = self.pipeline(audio_file_path)
         return res, audio_file_path
 
     def _split_audio(

@@ -1,3 +1,4 @@
+Cython
 Cmake
 openai-whisper
 tqdm

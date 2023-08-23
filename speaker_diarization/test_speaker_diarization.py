@@ -21,7 +21,7 @@ from nemo.collections.asr.models import ClusteringDiarizer
 
 def test_get_clustering_diarizer():
     # Create temporary manifest file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_manifest:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w') as temp_manifest:
         manifest_data = {
             'audio_filepath': '/path/to/audio_file',
             'offset': 0,

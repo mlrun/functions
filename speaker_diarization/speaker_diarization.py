@@ -281,6 +281,7 @@ def _get_clustering_diarizer(manifest_filepath: str,
     )
 
     diarization_config_dict = asdict(diarization_config)
+    print(diarization_config_dict)
     omega_config = OmegaConf.create(diarization_config_dict)
 
     return ClusteringDiarizer(omega_config)

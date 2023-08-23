@@ -43,7 +43,6 @@ def test_get_clustering_diarizer():
         vad_model_path="vad_multilingual_marblenet",
         speaker_embeddings_model_path="titanet_large",
         msdd_model_path="diar_msdd_telephonic",
-        asr_model_path="stt_en_conformer_ctc_large",
         audio_filepath="/path/to/audio_file",
         rttm_filepath="/path/to/rttm/file"
     )

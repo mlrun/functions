@@ -936,7 +936,7 @@ def recognize_pii(
             # Store the anonymized text in the output path
             output_file = (
                 output_directory
-                / f"{str(txt_file.relative_to(txt_files_directory)).split('.')[0]}_{output_suffix}.txt"
+                / f"{str(txt_file.relative_to(txt_files_directory)).split('.')[0]}.txt"
             )
             output_file.parent.mkdir(parents=True, exist_ok=True)
             with open(output_file, "w") as f:

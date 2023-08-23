@@ -13,20 +13,21 @@
 # limitations under the License.
 #
 
-import warnings
-import os
 import logging
-import mlrun
+import os
 import pathlib
 import tempfile
-import nltk
-from tqdm.auto import tqdm
-from typing import List, Tuple, Set, Optional, Dict, Any, Union
+import warnings
 from collections.abc import Iterable
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
+
+import annotated_text.util as at_util
+import mlrun
+import nltk
 import presidio_analyzer as pa
 import presidio_anonymizer as pre_anoymizer
 from presidio_anonymizer.entities import OperatorConfig
-import annotated_text.util as at_util
+from tqdm.auto import tqdm
 
 try:
     import flair as fl
@@ -846,7 +847,7 @@ def _get_all_rpt(res_dict: dict, is_full_report: bool = True):
 
 def recognize_pii(
     context: mlrun.MLClientCtx,
-    input_path: Union[str,pathlib.Path],
+    input_path: Union[str, pathlib.Path],
     output_path: str,
     output_suffix: str,
     html_key: str,

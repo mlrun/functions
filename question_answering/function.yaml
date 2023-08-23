@@ -2,8 +2,8 @@ kind: job
 metadata:
   name: question-answering
   tag: ''
-  hash: a8f4e03c4f85b93d142e1df6fadf88c7aa052756
-  project: ''
+  hash: 67c50f89149e650e15afc3e13a0815855bf6bb5a
+  project: llm-workflow-gilads
   labels:
     author: yonish
   categories:
@@ -90,9 +90,32 @@ spec:
   disable_auto_mount: false
   clone_target_dir: ''
   env: []
+  resources:
+    requests:
+      memory: 1Mi
+      cpu: 25m
+    limits:
+      memory: 20Gi
+      cpu: '2'
   priority_class_name: ''
   preemption_mode: prevent
-  affinity: null
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: app.iguazio.com/lifecycle
+            operator: NotIn
+            values:
+            - preemptible
+          - key: eks.amazonaws.com/capacityType
+            operator: NotIn
+            values:
+            - SPOT
+          - key: node-lifecycle
+            operator: NotIn
+            values:
+            - spot
   tolerations: null
   security_context: {}
 verbose: false

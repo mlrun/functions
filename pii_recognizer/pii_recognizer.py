@@ -505,7 +505,6 @@ def _get_analyzer_engine(
     """
     # recognizer registry that can store multiple recognizers
     registry = pa.RecognizerRegistry()
-
     if model == Models.SPACY:
         # custom spacy recognizer
         spacy_recognizer = CustomSpacyRecognizer()
@@ -546,7 +545,6 @@ def _get_analyzer_engine(
         raise ValueError(
             f"argument of model and entities can not be None at the same time"
         )
-
     analyzer = pa.AnalyzerEngine(
         registry=registry,
         supported_languages=["en"],
@@ -562,7 +560,6 @@ def _get_analyzer_engine(
             f"The current model {model} doesn't support the following entities: {not_supported_entities}. "
             f"Supported entities are: {supported_entities}"
         )
-
     return analyzer
 
 
@@ -849,7 +846,7 @@ def _get_all_rpt(res_dict: dict, is_full_report: bool = True):
 
 def recognize_pii(
     context: mlrun.MLClientCtx,
-    input_path: str,
+    input_path: Union[str,pathlib.Path],
     output_path: str,
     output_suffix: str,
     html_key: str,
@@ -927,12 +924,12 @@ def recognize_pii(
             txt_content[str(txt_file)] = text
             # Process the text to recoginze the pii entities in it
             anonymized_text, results = _process(
-                text,
-                analyzer,
-                entities,
-                entity_operator_map,
-                score_threshold,
-                is_full_text,
+                text=text,
+                model=analyzer,
+                entities=entities,
+                entities_operator_map=entity_operator_map,
+                score_threshold=score_threshold,
+                is_full_text=is_full_text,
             )
             res_dict[str(txt_file)] = results
             # Store the anonymized text in the output path

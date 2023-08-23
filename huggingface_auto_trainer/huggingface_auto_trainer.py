@@ -17,21 +17,14 @@ from mlrun.artifacts.manager import Artifact, PlotlyArtifact
 from mlrun.datastore import is_store_uri
 from mlrun.frameworks._common import CommonTypes, MLRunInterface
 from mlrun.utils import logger
-from peft import LoraConfig, PeftModel, get_peft_model, prepare_model_for_kbit_training
+from peft import (LoraConfig, PeftModel, get_peft_model,
+                  prepare_model_for_kbit_training)
 from plotly import graph_objects as go
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    BitsAndBytesConfig,
-    DataCollatorForLanguageModeling,
-    PreTrainedModel,
-    PreTrainedTokenizer,
-    Trainer,
-    TrainerCallback,
-    TrainerControl,
-    TrainerState,
-    TrainingArguments,
-)
+from transformers import (AutoModelForCausalLM, AutoTokenizer,
+                          BitsAndBytesConfig, DataCollatorForLanguageModeling,
+                          PreTrainedModel, PreTrainedTokenizer, Trainer,
+                          TrainerCallback, TrainerControl, TrainerState,
+                          TrainingArguments)
 
 supported_tasks = [
     "question-answering",
@@ -74,18 +67,18 @@ class HFTrainerMLRunInterface(MLRunInterface, ABC):
     ]
 
     @classmethod
-    def _add_interface(
+    def add_interface(
         cls,
         obj: Trainer,
         restoration: CommonTypes.MLRunInterfaceRestorationType = None,
     ):
-        super(HFTrainerMLRunInterface, cls)._add_interface(
+        super(HFTrainerMLRunInterface, cls).add_interface(
             obj=obj, restoration=restoration
         )
 
     @classmethod
-    def _mlrun_train(cls):
-        def _wrapper(self: Trainer, *args, **kwargs):
+    def mlrun_train(cls):
+        def wrapper(self: Trainer, *args, **kwargs):
             # Restore the evaluation method as `train` will use it:
             # cls._restore_attribute(obj=self, attribute_name="evaluate")
 
@@ -97,7 +90,7 @@ class HFTrainerMLRunInterface(MLRunInterface, ABC):
 
             return result
 
-        return _wrapper
+        return wrapper
 
 
 class MLRunCallback(TrainerCallback):
@@ -133,7 +126,7 @@ class MLRunCallback(TrainerCallback):
         self._metric_scores: Dict[str, List[float]] = {}
         self._artifacts: Dict[str, Artifact] = {}
 
-    def _on_epoch_begin(
+    def on_epoch_begin(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -144,7 +137,7 @@ class MLRunCallback(TrainerCallback):
             return
         self._steps.append([])
 
-    def _on_epoch_end(
+    def on_epoch_end(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -153,9 +146,9 @@ class MLRunCallback(TrainerCallback):
     ):
         if not state.is_world_process_zero:
             return
-        self._log_metrics()
+        self.log_metrics()
 
-    def _on_log(
+    def on_log(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -181,7 +174,7 @@ class MLRunCallback(TrainerCallback):
                 self._metric_scores[metric_name] = []
             self._metric_scores[metric_name].append(metric_score)
 
-    def _on_train_begin(
+    def on_train_begin(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -192,7 +185,7 @@ class MLRunCallback(TrainerCallback):
             return
         self._is_training = True
 
-    def _on_train_end(
+    def on_train_end(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -203,9 +196,9 @@ class MLRunCallback(TrainerCallback):
     ):
         if not state.is_world_process_zero:
             return
-        self._log_metrics()
+        self.log_metrics()
 
-    def _on_evaluate(
+    def on_evaluate(
         self,
         args: TrainingArguments,
         state: TrainerState,
@@ -214,19 +207,19 @@ class MLRunCallback(TrainerCallback):
     ):
         if not state.is_world_process_zero:
             return
-        self._log_metrics()
+        self.log_metrics()
 
         if self._is_training:
             return
 
-    def _log_metrics(self):
+    def log_metrics(self):
         for metric_name, metric_scores in self._metric_scores.items():
             self._context.log_result(key=metric_name, value=metric_scores[-1])
             if len(metric_scores) > 1:
-                self._log_metric_plot(name=metric_name, scores=metric_scores)
+                self.log_metric_plot(name=metric_name, scores=metric_scores)
         self._context.commit(completed=False)
 
-    def _log_metric_plot(self, name: str, scores: List[float]):
+    def log_metric_plot(self, name: str, scores: List[float]):
         # Initialize a plotly figure:
         metric_figure = go.Figure()
 
@@ -248,7 +241,7 @@ class MLRunCallback(TrainerCallback):
         self._artifacts[artifact_name] = self._context.log_artifact(artifact)
 
 
-def _apply_mlrun(
+def apply_mlrun(
     trainer: transformers.Trainer,
     model_name: str = None,
     tag: str = "",
@@ -265,7 +258,7 @@ def _apply_mlrun(
     if context is None:
         context = mlrun.get_or_create_ctx(HFTrainerMLRunInterface.DEFAULT_CONTEXT_NAME)
 
-    HFTrainerMLRunInterface._add_interface(obj=trainer)
+    HFTrainerMLRunInterface.add_interface(obj=trainer)
 
     if auto_log:
         trainer.add_callback(
@@ -388,8 +381,8 @@ def _get_class_object(class_path: str) -> type:
 
 
 def _set_model_and_tokenizer(
-    model: Union[str, Tuple[str, str]],
-    tokenizer: Union[str, Tuple[str, str]],
+    model: Union[str, List[str]],
+    tokenizer: Union[str, List[str]],
     task: str,
     framework: str,
     lora_config: dict,
@@ -413,7 +406,7 @@ def _set_model_and_tokenizer(
     :param model_pretrained_config: config to load the pretrained model
     :param device_map: a device map for model training if using number of gpu's
 
-    :return model and tokenizer
+    :returns: model and tokenizer
     """
     # if task is not supported and no model was given we can't choose one
     if task and task not in supported_tasks and not model:
@@ -426,7 +419,7 @@ def _set_model_and_tokenizer(
         # TODO: load both model and tokenizer and return, need guy's help
 
     # if it's a tuple them we assume it contains of both name and class
-    if isinstance(model, tuple):
+    if isinstance(model, list):
         model_name, model_class = model
         model_class = _get_class_object(model_class)
 
@@ -498,8 +491,7 @@ def _set_model_and_tokenizer(
         tokenizer_name, **tokenizer_pretrained_config
     )
 
-    if not tokenizer.pad_token:
-        tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token = tokenizer.eos_token
 
     return model_name, model, tokenizer
 
@@ -512,7 +504,7 @@ def _dataset_loader(dataset: str, is_train: bool = True, **kwargs) -> Dataset:
     :param is_train: bool that indicates the purpose of the dataset
     :param kwargs: other kwargs for loading the dataset
 
-    :return loaded dataset
+    :returns: loaded dataset
     """
     # if split in kwargs then the user decides how to split the dataset
     if "split" in kwargs:
@@ -552,11 +544,28 @@ def _prepare_dataset(
     :param eval_load_dataset_kwargs: kwargs for dataset loading
     :param tokenizer: the tokenizer to pass the data through
 
-    :return tokenized datasets
+    :returns: tokenized datasets
     """
+    if not tokenizer.pad_token:
+        tokenizer.pad_token = tokenizer.eos_token
+
     # we take col name/s in a list for easy generalization
     if isinstance(dataset_columns_to_train, str):
         dataset_columns_to_train = [dataset_columns_to_train]
+
+    if isinstance(train_dataset, mlrun.datastore.DataItem):
+        train_dataset = Dataset.from_pandas(train_dataset.as_df())
+        return (
+            train_dataset.map(
+                lambda examples: tokenizer(
+                    *[examples[col] for col in dataset_columns_to_train],
+                    truncation=True,
+                    padding=True,
+                ),
+                batched=True,
+            ),
+            None,
+        )
 
     # Load datasets
     # if provided two paths/names we load each separately using designated func
@@ -620,13 +629,13 @@ def _prepare_dataset(
 
 def finetune_llm(
     context: mlrun.MLClientCtx,
-    train_dataset: str,
+    train_dataset: Union[str, mlrun.datastore.DataItem],
     eval_dataset: str = None,
     train_load_dataset_kwargs: dict = {},
     eval_load_dataset_kwargs: dict = {},
     dataset_columns_to_train: Union[str, list] = "text",
-    model: Union[str, Tuple[str, str]] = "huggingface-model",
-    tokenizer: Union[str, Tuple[str, str]] = None,
+    model: Union[str, List[str]] = "huggingface-model",
+    tokenizer: Union[str, List[str]] = None,
     deepspeed_config: Union[dict, bool] = False,
     quantization_config: Union[dict, bool] = False,
     lora_config: Union[dict, bool] = False,
@@ -743,7 +752,7 @@ def finetune_llm(
         args=training_args,
     )
 
-    _apply_mlrun(trainer, model_name=model_name)
+    apply_mlrun(trainer, model_name=model_name.split("/")[-1])
     model.config.use_cache = (
         False  # silence the warnings. Please re-enable for inference!
     )
@@ -765,7 +774,7 @@ def finetune_llm(
     # Log the model:
     context.log_model(
         key="model",
-        db_key=model_name,
+        db_key=model_name.split("/")[-1],
         model_file="model.zip",
         tag="",
         framework="Hugging Face",

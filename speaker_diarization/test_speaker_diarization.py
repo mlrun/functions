@@ -66,7 +66,7 @@ def test_diarize_single_audio():
         output_dir = temp_dir
 
         # Run the function to be tested
-        output_dir = _diarize_single_audio(audio_file_path, output_dir)
+        output_dir, _ = _diarize_single_audio(audio_file_path, output_dir)
         list_of_files = os.listdir(output_dir)
 
         # Check if the output directory contains the expected files

@@ -279,6 +279,8 @@ def _get_clustering_diarizer(manifest_filepath: str,
         clustering=clustering_config,
         msdd_model=msdd_config,
     )
+
+    #need the device config for the clustering diarizer
     import pdb
     pdb.set_trace()
 

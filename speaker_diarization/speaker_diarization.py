@@ -25,7 +25,6 @@ from typing import List, Dict, Any, Optional, Literal, Tuple
 from nemo.collections.asr.models import ClusteringDiarizer
 
 
-
 # Using Nemo to do speaker diarization we need the following steps:
 # 1. Voice Activity Detection, which part of the audio is speech and which part is not
 # 2. Speaker Embedding is used to extract the features of the speech
@@ -39,7 +38,9 @@ class GeneralConfig:
     num_workers: int = 1
     sample_rate: int = 16000
     batch_size: int = 64
-    device: Optional[str] = None  # Set to 'cuda:1', 'cuda:2', etc., for specific devices
+    device: Optional[
+        str
+    ] = None  # Set to 'cuda:1', 'cuda:2', etc., for specific devices
     verbose: bool = True
 
 
@@ -173,22 +174,25 @@ class DiarizationConfig:
 
 
 def _get_clustering_diarizer(
-                            num_workers: int = 1
-                            sample_rate: int = 16000
-                            batch_size: int = 64
-                            device: Optional[str] = None  # Set to 'cuda:1', (default cuda if cuda available, else cpu)
-                            verbose: bool = True
-                            manifest_filepath: str, 
-                             audio_filepath: str, 
-                             rttm_filepath: str,
-                             offset: int = 0, 
-                             duration: Optional[float] = None, 
-                             label: str = 'infer', 
-                             text: str = '-', 
-                             num_speakers: int = 2, 
-                             uem_filepath: Optional[str] = None,
-                             out_dir: str = "output_directory",
-                             **kwargs) -> ClusteringDiarizer:
+    manifest_filepath: str,
+    audio_filepath: str,
+    rttm_filepath: str,
+    offset: int = 0,
+    duration: Optional[float] = None,
+    label: str = "infer",
+    text: str = "-",
+    num_speakers: int = 2,
+    uem_filepath: Optional[str] = None,
+    out_dir: str = "output_directory",
+    num_workers: int = 1,
+    sample_rate: int = 16000,
+    batch_size: int = 64,
+    device: Optional[
+        str
+    ] = None,  # Set to 'cuda:1', (default cuda if cuda available, else cpu)
+    verbose: bool = True,
+    **kwargs
+) -> ClusteringDiarizer:
     """
     Helper function to form the configs to get a diarizer object.
     To override a parameter nested inside a configuration, the pattern is <config_name>__<parameter_name>__<attribute_name>.
@@ -223,20 +227,19 @@ def _get_clustering_diarizer(
 
     # Create the manifest file
     meta = {
-        'audio_filepath': audio_filepath, 
-        'offset': offset, 
-        'duration': duration, 
-        'label': label, 
-        'text': text, 
-        'num_speakers': num_speakers, 
-        'rttm_filepath': rttm_filepath, 
-        'uem_filepath': uem_filepath
+        "audio_filepath": audio_filepath,
+        "offset": offset,
+        "duration": duration,
+        "label": label,
+        "text": text,
+        "num_speakers": num_speakers,
+        "rttm_filepath": rttm_filepath,
+        "uem_filepath": uem_filepath,
     }
-    
-    with open(manifest_filepath, 'w') as fp:
-        json.dump(meta, fp)
-        fp.write('\n')
 
+    with open(manifest_filepath, "w") as fp:
+        json.dump(meta, fp)
+        fp.write("\n")
 
     # Extracting specific kwargs for each config and updating them
     vad_kwargs = {

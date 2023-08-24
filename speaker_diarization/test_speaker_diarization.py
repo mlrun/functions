@@ -16,7 +16,7 @@
 import os
 import tempfile
 import json
-from speaker_diarization import _get_clustering_diarizer, DiarizationConfig, OmegaConf
+from speaker_diarization import _get_clustering_diarizer, DiarizationConfig, _diarize_single_audio
 from nemo.collections.asr.models import ClusteringDiarizer
 
 def test_get_clustering_diarizer():
@@ -47,3 +47,12 @@ def test_get_clustering_diarizer():
         )
         # Check if the returned object is of type DiarizationConfig
         assert isinstance(diarizer, ClusteringDiarizer), f"Expected ClusteringDiarizer, but got {type(diarizer)}"
+
+def test_diarize_single_audio():
+    # Create temporary directory for output
+    with tempfile.TemporaryDirectory() as temp_dir:
+        audio_file_path = "./data/real_state.mp3"  # Replace with the path to your mp3 file
+        output_dir = temp_dir
+        
+        # Run the function to be tested
+        _diarize_single_audio(audio_file_path, output_dir)

@@ -176,7 +176,7 @@ class DiarizationConfig:
 def _get_clustering_diarizer(
     manifest_filepath: str,
     audio_filepath: str,
-    rttm_filepath: str,
+    rttm_filepath: str = None,
     offset: int = 0,
     duration: Optional[float] = None,
     label: str = "infer",

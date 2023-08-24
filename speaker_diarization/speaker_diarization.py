@@ -358,7 +358,7 @@ def _convert_to_support_format(audio_file_path: str) -> str:
             raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
 
 
-def _diarize_single_audio(audio_file_path: str, output_dir: str, num_speakers: int = 2) -> None
+def _diarize_single_audio(audio_file_path: str, output_dir: str, num_speakers: int = 2) -> None:
     """
     Diarizes a single audio file and returns the diarization results.
 

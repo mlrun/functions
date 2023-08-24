@@ -336,7 +336,7 @@ def _convert_to_support_format(audio_file_path: str) -> str:
         if audio_file_obj.suffix == ".wav":
             audio = AudioSegment.from_wav(audio_file_path, format="wav")
             if audio.channels != 1:
-                audio = audio.set_channels(1)a
+                audio = audio.set_channels(1)
             if audio.frame_rate != 16000:
                 audio = audio.set_frame_rate(16000)
             audio.export(audio_file_path, format="wav")

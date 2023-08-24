@@ -20,6 +20,7 @@ import pandas as pd
 from tqdm.auto import tqdm
 import json
 import pydub
+from functools import partial
 from omegaconf import OmegaConf
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Any, Optional, Literal, Tuple

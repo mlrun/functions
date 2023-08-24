@@ -33,6 +33,16 @@ from nemo.collections.asr.models import ClusteringDiarizer
 # 4. Multiscale Diarization decoder is used to obtain the speaker profile and estimated number of speakers
 
 
+@dataclass
+class GeneralConfig:
+    name: str = "ClusterDiarizer"
+    num_workers: int = 1
+    sample_rate: int = 16000
+    batch_size: int = 64
+    device: Optional[str] = None  # Set to 'cuda:1', 'cuda:2', etc., for specific devices
+    verbose: bool = True
+
+
 # Parameters for VAD (Voice Activity Detection)
 @dataclass
 class VADParameters:
@@ -162,7 +172,13 @@ class DiarizationConfig:
 # helper function to form the configs to get a diarizer object
 
 
-def _get_clustering_diarizer(manifest_filepath: str, 
+def _get_clustering_diarizer(
+                            num_workers: int = 1
+                            sample_rate: int = 16000
+                            batch_size: int = 64
+                            device: Optional[str] = None  # Set to 'cuda:1', (default cuda if cuda available, else cpu)
+                            verbose: bool = True
+                            manifest_filepath: str, 
                              audio_filepath: str, 
                              rttm_filepath: str,
                              offset: int = 0, 
@@ -177,6 +193,11 @@ def _get_clustering_diarizer(manifest_filepath: str,
     Helper function to form the configs to get a diarizer object.
     To override a parameter nested inside a configuration, the pattern is <config_name>__<parameter_name>__<attribute_name>.
 
+    :param num_workers: Number of workers for computing
+    :param sample_rate: Sample rate of the audio
+    :param batch_size: Batch size for computing
+    :param device: Device to use for computing
+    :param verbose: Whether to print intermediate outputs
     :param manifest_filepath: Path to the manifest file
     :param audio_filepath: Path to the audio file
     :param rttm_filepath: Path to the RTTM file
@@ -191,6 +212,15 @@ def _get_clustering_diarizer(manifest_filepath: str,
 
     :return: DiarizationConfig object
     """
+    # Create the general config
+    general_config = GeneralConfig(
+        num_workers=num_workers,
+        sample_rate=sample_rate,
+        batch_size=batch_size,
+        device=device,
+        verbose=verbose,
+    )
+
     # Create the manifest file
     meta = {
         'audio_filepath': audio_filepath, 
@@ -280,11 +310,8 @@ def _get_clustering_diarizer(manifest_filepath: str,
         msdd_model=msdd_config,
     )
 
-    #need the device config for the clustering diarizer
-    import pdb
-    pdb.set_trace()
-
     diarization_config_dict = {"diarizer": asdict(diarization_config)}
+    diarization_config_dict = diariazation_config_dict.update(asdict(general_config))
     print(diarization_config_dict)
     omega_config = OmegaConf.create(diarization_config_dict)
 

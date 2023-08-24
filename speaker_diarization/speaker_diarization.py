@@ -347,7 +347,7 @@ def _convert_to_support_format(audio_file_path: str) -> str:
     else:
         wav_file = tempfile.mkstemp(prefix="converted_audio_", suffix=".wav")
         if audio_file_obj.suffix in convert_func_dict.keys():
-            audio = convert_func_dict[audio_file_obj.suffix](audio_file_path)
+            audio = read_func_dict[audio_file_obj.suffix](audio_file_path)
             if audio.channels != 1:
                 audio = audio.set_channels(1)
             if audio.frame_rate != 16000:

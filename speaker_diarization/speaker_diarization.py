@@ -189,7 +189,7 @@ def _get_clustering_diarizer(
         str
     ] = None,  # Set to 'cuda:1', (default cuda if cuda available, else cpu)
     verbose: bool = True,
-    **kwargs
+    **kwargs,
 ) -> ClusteringDiarizer:
     """
     Helper function to form the configs to get a diarizer object.
@@ -317,46 +317,46 @@ def _get_clustering_diarizer(
 
     return ClusteringDiarizer(omega_config)
 
+
 # Helper function to convert the audio file to 16k single channel wav file
 def _convert_to_support_format(audio_file_path: str) -> str:
-        """
-        Converts the audio file to wav format. ClusteringDiarizer expects signle channel 16k wav file.
+    """
+    Converts the audio file to wav format. ClusteringDiarizer expects signle channel 16k wav file.
 
-        :param audio_file_path:   Path to the audio file
-        :returns audio_file_path: Path to the converted audio file
-        """
-        audio_file_obj = pathlib.Path(audio_file_path)
-        read_func_dict = {
-            ".mp3": pydub.AudioSegment.from_mp3,
-            ".flv": pydub.AudioSegment.from_flv,
-            ".mp4": partial(pydub.AudioSegment.from_file, format="mp4"),
-            ".wma": partial(pydub.AudioSegment.from_file, format="wma"),
-        }
-        # Check if the file is already in supported format
-        if audio_file_obj.suffix == ".wav":
-            audio = AudioSegment.from_wav(audio_file_path, format="wav")
+    :param audio_file_path:   Path to the audio file
+    :returns audio_file_path: Path to the converted audio file
+    """
+    audio_file_obj = pathlib.Path(audio_file_path)
+    read_func_dict = {
+        ".mp3": pydub.AudioSegment.from_mp3,
+        ".flv": pydub.AudioSegment.from_flv,
+        ".mp4": partial(pydub.AudioSegment.from_file, format="mp4"),
+        ".wma": partial(pydub.AudioSegment.from_file, format="wma"),
+    }
+    # Check if the file is already in supported format
+    if audio_file_obj.suffix == ".wav":
+        audio = AudioSegment.from_wav(audio_file_path, format="wav")
+        if audio.channels != 1:
+            audio = audio.set_channels(1)
+        if audio.frame_rate != 16000:
+            audio = audio.set_frame_rate(16000)
+        audio.export(audio_file_path, format="wav")
+        return audio_file_path
+    else:
+        wav_file = tempfile.mkstemp(prefix="converted_audio_", suffix=".wav")
+        if audio_file_obj.suffix in convert_func_dict.keys():
+            audio = convert_func_dict[audio_file_obj.suffix](audio_file_path)
             if audio.channels != 1:
                 audio = audio.set_channels(1)
             if audio.frame_rate != 16000:
                 audio = audio.set_frame_rate(16000)
-            audio.export(audio_file_path, format="wav")
-            return audio_file_path
+            audio.export(wav_file[1], format="wav")
+            return wav_file[1]
         else:
-            wav_file = tempfile.mkstemp(prefix="converted_audio_", suffix=".wav")
-            if audio_file_obj.suffix in convert_func_dict.keys():
-                audio = convert_func_dict[audio_file_obj.suffix](
-                    audio_file_path
-                )
-                if audio.channels != 1:
-                    audio = audio.set_channels(1)a
-                if audio.frame_rate != 16000:
-                    audio = audio.set_frame_rate(16000)
-                audio.export(wav_file[1], format="wav")
-                return wav_file[1]
-            else:
-                raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
+            raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
 
-def _diarize_single_audio(audio_file_path: str, output_dir: str): -> List[Dict]:
+
+def _diarize_single_audio(audio_file_path: str, output_dir: str):
     """
     Diarizes a single audio file and returns the diarization results.
 
@@ -367,15 +367,15 @@ def _diarize_single_audio(audio_file_path: str, output_dir: str): -> List[Dict]:
     audio_file_path = _convert_to_support_format(audio_file_path)
 
     # Create temporary manifest file
-    with tempfile.NamedTemporaryFile(suffix=".json", mode='w') as temp_manifest:
+    with tempfile.NamedTemporaryFile(suffix=".json", mode="w") as temp_manifest:
         manifest_data = {
-            'audio_filepath': audio_file_path,
-            'offset': 0,
-            'duration': None,
-            'label': 'infer',
-            'text': '-',
-            'num_speakers': 2,
-            'uem_filepath': None
+            "audio_filepath": audio_file_path,
+            "offset": 0,
+            "duration": None,
+            "label": "infer",
+            "text": "-",
+            "num_speakers": 2,
+            "uem_filepath": None,
         }
         json.dump(manifest_data, temp_manifest)
         temp_manifest_path = temp_manifest.name

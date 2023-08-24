@@ -16,21 +16,26 @@
 import os
 import tempfile
 import json
-from speaker_diarization import _get_clustering_diarizer, DiarizationConfig, _diarize_single_audio
+from speaker_diarization import (
+    _get_clustering_diarizer,
+    DiarizationConfig,
+    _diarize_single_audio,
+)
 from nemo.collections.asr.models import ClusteringDiarizer
+
 
 def test_get_clustering_diarizer():
     # Create temporary manifest file
-    with tempfile.NamedTemporaryFile(suffix=".json", mode='w') as temp_manifest:
+    with tempfile.NamedTemporaryFile(suffix=".json", mode="w") as temp_manifest:
         manifest_data = {
-            'audio_filepath': '/path/to/audio_file',
-            'offset': 0,
-            'duration': None,
-            'label': 'infer',
-            'text': '-',
-            'num_speakers': 2,
-            'rttm_filepath': '/path/to/rttm/file',
-            'uem_filepath': None
+            "audio_filepath": "/path/to/audio_file",
+            "offset": 0,
+            "duration": None,
+            "label": "infer",
+            "text": "-",
+            "num_speakers": 2,
+            "rttm_filepath": "/path/to/rttm/file",
+            "uem_filepath": None,
         }
         json.dump(manifest_data, temp_manifest)
         temp_manifest_path = temp_manifest.name
@@ -43,16 +48,21 @@ def test_get_clustering_diarizer():
             speaker_embeddings_model_path="titanet_large",
             msdd_model_path="diar_msdd_telephonic",
             audio_filepath="/path/to/audio_file",
-            rttm_filepath="/path/to/rttm/file"
+            rttm_filepath="/path/to/rttm/file",
         )
         # Check if the returned object is of type DiarizationConfig
-        assert isinstance(diarizer, ClusteringDiarizer), f"Expected ClusteringDiarizer, but got {type(diarizer)}"
+        assert isinstance(
+            diarizer, ClusteringDiarizer
+        ), f"Expected ClusteringDiarizer, but got {type(diarizer)}"
+
 
 def test_diarize_single_audio():
     # Create temporary directory for output
     with tempfile.TemporaryDirectory() as temp_dir:
-        audio_file_path = "./data/real_state.mp3"  # Replace with the path to your mp3 file
+        audio_file_path = (
+            "./data/real_state.mp3"  # Replace with the path to your mp3 file
+        )
         output_dir = temp_dir
-        
+
         # Run the function to be tested
         _diarize_single_audio(audio_file_path, output_dir)

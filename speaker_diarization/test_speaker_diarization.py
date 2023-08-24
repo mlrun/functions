@@ -46,9 +46,7 @@ def test_get_clustering_diarizer():
         audio_filepath="/path/to/audio_file",
         rttm_filepath="/path/to/rttm/file"
     )
-    
-    # Cleanup temporary manifest file
-    os.remove(temp_manifest_path)
-
     # Check if the returned object is of type DiarizationConfig
     assert isinstance(diarizer, ClusteringDiarizer), f"Expected ClusteringDiarizer, but got {type(diarizer)}"
+    # Cleanup temporary manifest file
+    os.remove(temp_manifest_path)

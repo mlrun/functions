@@ -280,7 +280,7 @@ def _get_clustering_diarizer(manifest_filepath: str,
         msdd_model=msdd_config,
     )
 
-    diarization_config_dict = asdict(diarization_config)
+    diarization_config_dict = {"diarizer": asdict(diarization_config)}
     print(diarization_config_dict)
     omega_config = OmegaConf.create(diarization_config_dict)
 

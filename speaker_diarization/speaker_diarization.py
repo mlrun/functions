@@ -214,7 +214,7 @@ def _get_clustering_diarizer(
     :param out_dir: Directory to store intermediate files and prediction outputs
     :param kwargs: Additional arguments to override default config values
 
-    :return: DiarizationConfig object
+    :returns: ClusteringDiarizer object
     """
     # Create the general config
     general_config = GeneralConfig(
@@ -315,7 +315,6 @@ def _get_clustering_diarizer(
 
     diarization_config_dict = {"diarizer": asdict(diarization_config)}
     diarization_config_dict.update(asdict(general_config))
-    print(diarization_config_dict)
     omega_config = OmegaConf.create(diarization_config_dict)
 
     return ClusteringDiarizer(omega_config)

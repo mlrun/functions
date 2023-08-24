@@ -21,7 +21,7 @@ from nemo.collections.asr.models import ClusteringDiarizer
 
 def test_get_clustering_diarizer():
     # Create temporary manifest file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode='w') as temp_manifest:
+    with tempfile.NamedTemporaryFile(suffix=".json", mode='w') as temp_manifest:
         manifest_data = {
             'audio_filepath': '/path/to/audio_file',
             'offset': 0,
@@ -35,18 +35,16 @@ def test_get_clustering_diarizer():
         json.dump(manifest_data, temp_manifest)
         temp_manifest_path = temp_manifest.name
 
-    # Call the _get_clustering_diarizer function
-    diarizer = _get_clustering_diarizer(
-        manifest_filepath=temp_manifest_path,
-        model_path="vad_multilingual_marblenet",
-        out_dir="/path/to/out_dir",
-        vad_model_path="vad_multilingual_marblenet",
-        speaker_embeddings_model_path="titanet_large",
-        msdd_model_path="diar_msdd_telephonic",
-        audio_filepath="/path/to/audio_file",
-        rttm_filepath="/path/to/rttm/file"
-    )
-    # Check if the returned object is of type DiarizationConfig
-    assert isinstance(diarizer, ClusteringDiarizer), f"Expected ClusteringDiarizer, but got {type(diarizer)}"
-    # Cleanup temporary manifest file
-    os.remove(temp_manifest_path)
+        # Call the _get_clustering_diarizer function
+        diarizer = _get_clustering_diarizer(
+            manifest_filepath=temp_manifest_path,
+            model_path="vad_multilingual_marblenet",
+            out_dir="/path/to/out_dir",
+            vad_model_path="vad_multilingual_marblenet",
+            speaker_embeddings_model_path="titanet_large",
+            msdd_model_path="diar_msdd_telephonic",
+            audio_filepath="/path/to/audio_file",
+            rttm_filepath="/path/to/rttm/file"
+        )
+        # Check if the returned object is of type DiarizationConfig
+        assert isinstance(diarizer, ClusteringDiarizer), f"Expected ClusteringDiarizer, but got {type(diarizer)}"

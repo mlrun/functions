@@ -66,6 +66,5 @@ def test_diarize_single_audio():
 
         # Run the function to be tested
         _diarize_single_audio(audio_file_path, output_dir)
-        import pdb
-        pdb.set_trace()
         list_of_files = os.listdir(output_dir)
+        print(list_of_files)

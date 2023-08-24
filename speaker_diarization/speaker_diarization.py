@@ -20,6 +20,7 @@ import pandas as pd
 from tqdm.auto import tqdm
 import json
 import pydub
+from pyannote.core import notebook, Segment, Annotation
 from functools import partial
 from omegaconf import OmegaConf
 from dataclasses import dataclass, field, asdict

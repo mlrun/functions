@@ -279,6 +279,8 @@ def _get_clustering_diarizer(manifest_filepath: str,
         clustering=clustering_config,
         msdd_model=msdd_config,
     )
+    import pdb
+    pdb.set_trace()
 
     diarization_config_dict = {"diarizer": asdict(diarization_config)}
     print(diarization_config_dict)

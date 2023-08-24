@@ -65,6 +65,11 @@ def test_diarize_single_audio():
         output_dir = temp_dir
 
         # Run the function to be tested
-        _diarize_single_audio(audio_file_path, output_dir)
+        output_dir = _diarize_single_audio(audio_file_path, output_dir)
         list_of_files = os.listdir(output_dir)
-        print(list_of_files)
+
+        # Check if the output directory contains the expected files
+        assert "speaker_outputs" in list_of_files
+        assert "pred_rttms" in list_of_files
+        assert "manifest_vad_input.json" in list_of_files
+        assert "vad_outputs" in list_of_files

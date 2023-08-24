@@ -20,6 +20,7 @@ from speaker_diarization import (
     _get_clustering_diarizer,
     DiarizationConfig,
     _diarize_single_audio,
+    _convert_rttm_to_annotation_df,
 )
 from nemo.collections.asr.models import ClusteringDiarizer
 
@@ -73,3 +74,23 @@ def test_diarize_single_audio():
         assert "pred_rttms" in list_of_files
         assert "manifest_vad_input.json" in list_of_files
         assert "vad_outputs" in list_of_files
+
+
+def test_convert_rttm_to_annotation_df():
+    # Prepare sample RTTM content
+    sample_rttm_content = """\
+    SPEAKER sample_audio 1 0.0 2.0 <NA> <NA> speaker_1 <NA> <NA>
+    SPEAKER sample_audio 1 3.0 2.0 <NA> <NA> speaker_2 <NA> <NA>
+    """
+
+    # Call the function
+    annotation_df = _convert_rttm_to_annotation_df(sample_rttm_content)
+
+    # Validate the resulting DataFrame
+    assert len(annotation_df) == 2
+    assert "start_time" in annotation_df.columns
+    assert "end_time" in annotation_df.columns
+    assert "speaker_label" in annotation_df.columns
+    assert annotation_df.loc[0, "start_time"] == 0.0
+    assert annotation_df.loc[0, "end_time"] == 2.0
+    assert annotation_df.loc[0, "speaker_label"] == "speaker_1"

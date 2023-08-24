@@ -25,6 +25,10 @@ from omegaconf import OmegaConf
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Any, Optional, Literal, Tuple
 from nemo.collections.asr.models import ClusteringDiarizer
+from nemo.collections.asr.parts.utils.speaker_utils import (
+    rttm_to_labels,
+    labels_to_pyannote_object,
+)
 
 
 # Using Nemo to do speaker diarization we need the following steps:
@@ -358,7 +362,9 @@ def _convert_to_support_format(audio_file_path: str) -> str:
             raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
 
 
-def _diarize_single_audio(audio_file_path: str, output_dir: str, num_speakers: int = 2) -> str:
+def _diarize_single_audio(
+    audio_file_path: str, output_dir: str, num_speakers: int = 2
+) -> Tuple[str, str]:
     """
     Diarizes a single audio file and returns the diarization results.
 
@@ -394,5 +400,25 @@ def _diarize_single_audio(audio_file_path: str, output_dir: str, num_speakers: i
 
         # Diarize the audio file
         diarizer.diarize()
-    return output_dir
+    return output_dir, audio_file_path
 
+
+def _convert_rttm_to_annotation_df(output_dir: str) -> Tuple[pd.DataFrame, Annotation]:
+    """
+    Converts the rttm file to a pyannote.Annotation and a pandas dataframe.
+
+    :param output_dir: Path to the output directory
+    :returns df:       Pandas dataframe containing the diarization results
+    :returns annotation: pyannote.Annotation containing the diarization results
+    """
+    for root, _, files in os.walk(output_dir + "/pred_rttms/"):
+        for file in files:
+            if file.endswith(".rttm"):
+                rttm_file = os.path.join(root, file)
+                break
+    pred_labels = rttm_to_labels(rttm_file)
+    annotation = labels_to_annotation(pred_labels)
+    lst = [item.split(" ") for item in pred_labels.split("\n")]
+    lst = [item for item in lst if item]
+    df = pd.DataFrame(lst, columns=["start", "end", "speaker"])
+    return df, annotation

@@ -315,7 +315,9 @@ def _get_clustering_diarizer(
 
     diarization_config_dict = {"diarizer": asdict(diarization_config)}
     diarization_config_dict = diarization_config_dict.update(asdict(general_config))
+    import pdb
+    pdb.set_trace()
     print(diarization_config_dict)
-    omega_config = OmegaConf.create(diarization_config_dict)
+    omega_config = OmegaConf.load(diarization_config_dict)
 
     return ClusteringDiarizer(omega_config)

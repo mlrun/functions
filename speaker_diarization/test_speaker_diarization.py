@@ -38,7 +38,6 @@ def test_get_clustering_diarizer():
         # Call the _get_clustering_diarizer function
         diarizer = _get_clustering_diarizer(
             manifest_filepath=temp_manifest_path,
-            model_path="vad_multilingual_marblenet",
             out_dir="/path/to/out_dir",
             vad_model_path="vad_multilingual_marblenet",
             speaker_embeddings_model_path="titanet_large",

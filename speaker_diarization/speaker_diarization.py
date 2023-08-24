@@ -171,8 +171,6 @@ class DiarizationConfig:
 
 
 # helper function to form the configs to get a diarizer object
-
-
 def _get_clustering_diarizer(
     manifest_filepath: str,
     audio_filepath: str,
@@ -197,22 +195,22 @@ def _get_clustering_diarizer(
     Helper function to form the configs to get a diarizer object.
     To override a parameter nested inside a configuration, the pattern is <config_name>__<parameter_name>__<attribute_name>.
 
-    :param num_workers: Number of workers for computing
-    :param sample_rate: Sample rate of the audio
-    :param batch_size: Batch size for computing
-    :param device: Device to use for computing
-    :param verbose: Whether to print intermediate outputs
+    :param num_workers:       Number of workers for computing
+    :param sample_rate:       Sample rate of the audio
+    :param batch_size:        Batch size for computing
+    :param device:            Device to use for computing
+    :param verbose:           Whether to print intermediate outputs
     :param manifest_filepath: Path to the manifest file
-    :param audio_filepath: Path to the audio file
-    :param rttm_filepath: Path to the RTTM file
-    :param offset: Offset value
-    :param duration: Duration of the audio
-    :param label: Label for the audio
-    :param text: Text representation of the audio
-    :param num_speakers: Number of speakers in the audio
-    :param uem_filepath: Path to the UEM file
-    :param out_dir: Directory to store intermediate files and prediction outputs
-    :param kwargs: Additional arguments to override default config values
+    :param audio_filepath:    Path to the audio file
+    :param rttm_filepath:     Path to the RTTM file if it's a groud truth inference
+    :param offset:            Offset value
+    :param duration:          Duration of the audio
+    :param label:             Label for the audio
+    :param text:              Text representation of the audio
+    :param num_speakers:      Number of speakers in the audio
+    :param uem_filepath:      Path to the UEM file
+    :param out_dir:           Directory to store intermediate files and prediction outputs
+    :param kwargs:            Additional arguments to override default config values
 
     :returns: ClusteringDiarizer object
     """
@@ -318,3 +316,79 @@ def _get_clustering_diarizer(
     omega_config = OmegaConf.create(diarization_config_dict)
 
     return ClusteringDiarizer(omega_config)
+
+# Helper function to convert the audio file to 16k single channel wav file
+def _convert_to_support_format(audio_file_path: str) -> str:
+        """
+        Converts the audio file to wav format. ClusteringDiarizer expects signle channel 16k wav file.
+
+        :param audio_file_path:   Path to the audio file
+        :returns audio_file_path: Path to the converted audio file
+        """
+        audio_file_obj = pathlib.Path(audio_file_path)
+        read_func_dict = {
+            ".mp3": pydub.AudioSegment.from_mp3,
+            ".flv": pydub.AudioSegment.from_flv,
+            ".mp4": partial(pydub.AudioSegment.from_file, format="mp4"),
+            ".wma": partial(pydub.AudioSegment.from_file, format="wma"),
+        }
+        # Check if the file is already in supported format
+        if audio_file_obj.suffix == ".wav":
+            audio = AudioSegment.from_wav(audio_file_path, format="wav")
+            if audio.channels != 1:
+                audio = audio.set_channels(1)a
+            if audio.frame_rate != 16000:
+                audio = audio.set_frame_rate(16000)
+            audio.export(audio_file_path, format="wav")
+            return audio_file_path
+        else:
+            wav_file = tempfile.mkstemp(prefix="converted_audio_", suffix=".wav")
+            if audio_file_obj.suffix in convert_func_dict.keys():
+                audio = convert_func_dict[audio_file_obj.suffix](
+                    audio_file_path
+                )
+                if audio.channels != 1:
+                    audio = audio.set_channels(1)a
+                if audio.frame_rate != 16000:
+                    audio = audio.set_frame_rate(16000)
+                audio.export(wav_file[1], format="wav")
+                return wav_file[1]
+            else:
+                raise ValueError(f"Unsupported audio format {audio_file_obj.suffix}")
+
+def _diarize_single_audio(audio_file_path: str, output_dir: str): -> List[Dict]:
+    """
+    Diarizes a single audio file and returns the diarization results.
+
+    :param audio_file_path: Path to the audio file
+    :param output_dir:      Path to the output directory
+    """
+    # Convert the audio file to supported format
+    audio_file_path = _convert_to_support_format(audio_file_path)
+
+    # Create temporary manifest file
+    with tempfile.NamedTemporaryFile(suffix=".json", mode='w') as temp_manifest:
+        manifest_data = {
+            'audio_filepath': audio_file_path,
+            'offset': 0,
+            'duration': None,
+            'label': 'infer',
+            'text': '-',
+            'num_speakers': 2,
+            'uem_filepath': None
+        }
+        json.dump(manifest_data, temp_manifest)
+        temp_manifest_path = temp_manifest.name
+
+        # Call the _get_clustering_diarizer function
+        diarizer = _get_clustering_diarizer(
+            manifest_filepath=temp_manifest_path,
+            out_dir=output_dir,
+            vad_model_path="vad_multilingual_marblenet",
+            speaker_embeddings_model_path="nvidia/speakerverification_en_titanet_large",
+            msdd_model_path="diar_msdd_telephonic",
+            audio_filepath=audio_file_path,
+        )
+
+        # Diarize the audio file
+        diarizer.diarize()

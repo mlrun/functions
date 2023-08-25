@@ -416,6 +416,8 @@ def _convert_rttm_to_annotation_df(output_dir: str) -> Tuple[pd.DataFrame, Annot
         for file in files:
             if file.endswith(".rttm"):
                 rttm_file = os.path.join(root, file)
+                import pdb
+                pdb.set_trace()
                 break
     pred_labels = rttm_to_labels(rttm_file)
     annotation = labels_to_annotation(pred_labels)

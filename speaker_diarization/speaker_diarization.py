@@ -99,7 +99,7 @@ class SpeakerEmbeddingsParameters:
 # Main Speaker Embeddings Configuration
 @dataclass
 class SpeakerEmbeddingsConfig:
-    model_path: str = "nvidia/speakerverification_en_titanet_large"  # Path to the speaker embeddings model
+    model_path: str = "titanet_large"  # Path to the speaker embeddings model
     parameters: SpeakerEmbeddingsParameters = field(
         default_factory=SpeakerEmbeddingsParameters
     )  # Nested speaker embeddings parameters
@@ -394,7 +394,7 @@ def _diarize_single_audio(
             manifest_filepath=temp_manifest_path,
             out_dir=output_dir,
             vad_model_path="vad_multilingual_marblenet",
-            speaker_embeddings_model_path="nvidia/speakerverification_en_titanet_large",
+            speaker_embeddings_model_path="titanet_large",
             msdd_model_path="diar_msdd_telephonic",
             audio_filepath=audio_file_path,
         )

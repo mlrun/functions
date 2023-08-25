@@ -78,17 +78,17 @@ def test_diarize_single_audio():
 
 def test_convert_rttm_to_annotation_df():
     # Sample RTTM content
-    sample_rttm_content = """
+    sample_rttm_content = """\
     SPEAKER sample_audio 1 2.08 1.12 <NA> <NA> speaker_1 <NA>
     SPEAKER sample_audio 1 4.25 0.95 <NA> <NA> speaker_2 <NA>
-    SPEAKER sample_audio 1 5.20 1.73 <NA> <NA> speaker_1 <NA>
+    SPEAKER sample_audio 1 5.20 1.73 <NA> <NA> speaker_1 <NA>\
     """
 
     # Create a temporary file and write the sample RTTM content to it
     with tempfile.NamedTemporaryFile(
         suffix=".rttm", mode="w+", delete=False
     ) as temp_rttm_file:
-        temp_rttm_file.write(sample_rttm_content)
+        temp_rttm_file.write(sample_rttm_content.strip())
         temp_rttm_file_path = os.path.dirname(temp_rttm_file.name)
     # Call the function to convert RTTM to annotation DataFrame
     annotation_df, _ = _convert_rttm_to_annotation_df(temp_rttm_file_path)

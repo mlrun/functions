@@ -78,7 +78,7 @@ def test_diarize_single_audio():
 
 def test_convert_rttm_to_annotation_df():
     # Sample RTTM content
-    sample_rttm_content = """SPEAKER sample_audio 1 2.08 1.12 <NA> <NA> speaker_1 <NA>"""
+    sample_rttm_content = """SPEAKER an4_diarize_test 1   0.299   2.471 <NA> <NA> speaker_1 <NA> <NA>"""
     print(sample_rttm_content.strip())
 
     # Create a temporary file and write the sample RTTM content to it

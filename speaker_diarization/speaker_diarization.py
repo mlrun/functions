@@ -416,12 +416,10 @@ def _convert_rttm_to_annotation_df(output_dir: str) -> Tuple[pd.DataFrame, Annot
         for file in files:
             if file.endswith(".rttm"):
                 rttm_file = os.path.join(root, file)
-                import pdb
-                pdb.set_trace()
                 break
     pred_labels = rttm_to_labels(rttm_file)
-    annotation = labels_to_annotation(pred_labels)
-    lst = [item.split(" ") for item in pred_labels.split("\n")]
+    annotation = labels_to_pyannote_object(pred_labels)
+    lst = [item.split(" ") for item in pred_labels]
     lst = [item for item in lst if item]
     df = pd.DataFrame(lst, columns=["start", "end", "speaker"])
     return df, annotation

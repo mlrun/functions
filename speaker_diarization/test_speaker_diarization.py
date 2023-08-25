@@ -86,12 +86,12 @@ def test_convert_rttm_to_annotation_df():
 
     # Create a temporary file and write the sample RTTM content to it
     with tempfile.NamedTemporaryFile(
-        suffix=".rttm", mode="w+", delete=False
+        suffix=".rttm", mode="w+", delete=True
     ) as temp_rttm_file:
         temp_rttm_file.write(sample_rttm_content.strip())
         temp_rttm_file_path = os.path.dirname(temp_rttm_file.name)
-    # Call the function to convert RTTM to annotation DataFrame
-    annotation_df, _ = _convert_rttm_to_annotation_df(temp_rttm_file_path)
+        # Call the function to convert RTTM to annotation DataFrame
+        annotation_df, _ = _convert_rttm_to_annotation_df(temp_rttm_file_path)
 
     # Assertions to check if the DataFrame is formed correctly
     assert annotation_df.shape == (3, 3)

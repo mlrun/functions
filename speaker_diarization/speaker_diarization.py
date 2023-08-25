@@ -412,6 +412,7 @@ def _convert_rttm_to_annotation_df(output_dir: str) -> Tuple[pd.DataFrame, Annot
     :returns df:       Pandas dataframe containing the diarization results
     :returns annotation: pyannote.Annotation containing the diarization results
     """
+    rttm_file = None
     for root, _, files in os.walk(output_dir + "/pred_rttms/"):
         for file in files:
             if file.endswith(".rttm"):

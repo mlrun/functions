@@ -83,6 +83,7 @@ def test_convert_rttm_to_annotation_df():
     SPEAKER sample_audio 1 4.25 0.95 <NA> <NA> speaker_2 <NA>
     SPEAKER sample_audio 1 5.20 1.73 <NA> <NA> speaker_1 <NA>\
     """
+    print(sample_rttm_content.strip())
 
     # Create a temporary file and write the sample RTTM content to it
     with tempfile.NamedTemporaryFile(

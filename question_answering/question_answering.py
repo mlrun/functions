@@ -67,7 +67,7 @@ def _get_prompt_template(
 
 def answer_questions(
     context: mlrun.MLClientCtx,
-    input_path: Union[str.pathlib.Path],
+    input_path: Union[str, pathlib.Path],
     model: str,
     questions: List[str],
     tokenizer: str = None,

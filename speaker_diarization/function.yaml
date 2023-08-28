@@ -60,7 +60,7 @@ spec:
         type: str
         doc: A directory of the audio files or a single file to diarize
         default: ''
-      - name: output_dir
+      - name: output_directory
         type: str
         doc: Path to the output directory this is where nemo will store the diarization
           results

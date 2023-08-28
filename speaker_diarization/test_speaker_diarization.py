@@ -120,6 +120,7 @@ def test_all_diarize(input_path: str):
         handler="diarize",
         params={
             "input_path": input_path,
+            "output_directory": temp_dir,
             "num_speakers": 2,
             "device": "cpu",
             "output_dir": temp_dir,

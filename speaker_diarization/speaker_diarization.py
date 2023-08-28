@@ -451,7 +451,7 @@ def _convert_rttm_to_annotation_df(output_dir: str) -> Tuple[pd.DataFrame, Annot
 def diarize(
     context: mlrun.MLClientCtx,
     input_path: str,
-    output_dir: str,
+    output_directory: str,
     condition_show_plot: bool = False,
     num_speakers: int = 2,
     vad_model: str = "vad_multilingual_marblenet",

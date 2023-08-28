@@ -160,5 +160,5 @@ def test_all_diarize(input_path: str):
     assert actual_errored_files == error_files
 
     # Check output_dir:
-    output_dir = mlrun.get_dataitem(artifact_path + "output_dir")
-    assert output_dir.kind == "file"
+    output_directory = mlrun.get_dataitem(artifact_path + "output_directory")
+    assert output_directory.kind == "file"

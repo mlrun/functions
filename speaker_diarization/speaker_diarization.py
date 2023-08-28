@@ -16,6 +16,7 @@ import os
 import pathlib
 import tempfile
 import librosa
+import mlrun
 import pandas as pd
 from tqdm.auto import tqdm
 import json
@@ -181,6 +182,7 @@ class DiarizationConfig:
 def _get_clustering_diarizer(
     manifest_filepath: str,
     audio_filepath: str,
+    out_dir: str,
     rttm_filepath: str = None,
     offset: int = 0,
     duration: Optional[float] = None,
@@ -188,7 +190,6 @@ def _get_clustering_diarizer(
     text: str = "-",
     num_speakers: int = 2,
     uem_filepath: Optional[str] = None,
-    out_dir: str = "output_directory",
     num_workers: int = 1,
     sample_rate: int = 16000,
     batch_size: int = 64,
@@ -364,13 +365,33 @@ def _convert_to_support_format(audio_file_path: str) -> str:
 
 
 def _diarize_single_audio(
-    audio_file_path: str, output_dir: str, num_speakers: int = 2
+    audio_file_path: str,
+    output_dir: str,
+    num_speakers: int = 2,
+    vad_model: str = "vad_multilingual_marblenet",
+    speaker_embeddings_model: str = "titanet_large",
+    msdd_model: str = "diar_msdd_telephonic",
+    device: Optional[
+        str
+    ] = None,  # Set to 'cuda:1', (default cuda if cuda available, else cpu)
+    **kwargs,
 ) -> Tuple[str, str]:
     """
     Diarizes a single audio file and returns the diarization results.
 
     :param audio_file_path: Path to the audio file
     :param output_dir:      Path to the output directory
+    :param num_speakers:    Number of speakers in the audio file
+    :param vad_model:       Name of the VAD model to use
+    :param speaker_embeddings_model: Name of the speaker embeddings model to use
+    :param msdd_model:      Name of the msdd model to use
+    :param device:          Device to use for diarization
+    :param kwargs:          Additional arguments to pass to the diarizer following the format <config_name>__<parameter_name>__<attribute_name>.
+
+    :returns: Tuple of two paths:
+             * path of the result of the pipeline
+             * path of the converted audio file
+
     """
     # Convert the audio file to supported format
     audio_file_path = _convert_to_support_format(audio_file_path)
@@ -393,10 +414,12 @@ def _diarize_single_audio(
         diarizer = _get_clustering_diarizer(
             manifest_filepath=temp_manifest_path,
             out_dir=output_dir,
-            vad_model_path="vad_multilingual_marblenet",
-            speaker_embeddings_model_path="titanet_large",
-            msdd_model_path="diar_msdd_telephonic",
+            vad_model_path=vad_model,
+            speaker_embeddings_model_path=speaker_embeddings_model,
+            msdd_model_path=msdd_model,
             audio_filepath=audio_file_path,
+            device=device,
+            **kwargs,
         )
 
         # Diarize the audio file
@@ -408,8 +431,8 @@ def _convert_rttm_to_annotation_df(output_dir: str) -> Tuple[pd.DataFrame, Annot
     """
     Converts the rttm file to a pyannote.Annotation and a pandas dataframe.
 
-    :param output_dir: Path to the output directory
-    :returns df:       Pandas dataframe containing the diarization results
+    :param output_dir:   Path to the output directory
+    :returns df:         Pandas dataframe containing the diarization results
     :returns annotation: pyannote.Annotation containing the diarization results
     """
     for root, _, files in os.walk(output_dir):
@@ -423,3 +446,125 @@ def _convert_rttm_to_annotation_df(output_dir: str) -> Tuple[pd.DataFrame, Annot
     lst = [item for item in lst if item]
     df = pd.DataFrame(lst, columns=["start", "end", "speaker"])
     return df, annotation
+
+
+def diarize(
+    context: mlrun.MLClientCtx,
+    input_path: str,
+    output_dir: str,
+    condition_show_plot: bool = False,
+    num_speakers: int = 2,
+    vad_model: str = "vad_multilingual_marblenet",
+    speaker_embeddings_model: str = "titanet_large",
+    msdd_model: str = "diar_msdd_telephonic",
+    device: Optional[
+        str
+    ] = None,  # Set to 'cuda:1', (default cuda if cuda available, else cpu)
+    **kwargs,
+):
+    """
+    Diarize audio files into speaker segments
+    The final result is a directory containing the diarization results in the form csv files, a dataframe that has the mapping with the audio file to the csv files
+    and a plot of the diarization results if condition_show_plot is set to True. The dataframe (csv) will have the following columns:
+
+    * start: Start time of the speaker segment
+    * end: End time of the speaker segment
+    * speaker: Speaker label
+
+    The pandas dataframe will have the following format:
+
+    * original_audio_file: Path to the original audio file
+    * result of model: directory of the diarization results
+    * converted_audio_file: Path to the converted audio file
+    * speaker_segments: Path to the dataitem that has the speaker labels, start, end
+
+    :param context:                  MLRun context
+    :param input_path:               A directory of the audio files or a single file to diarize
+    :param output_dir:               Path to the output directory this is where nemo will store the diarization results
+    :param condition_show_plot:      If set to True, the diarization results will be plotted
+    :param num_speakers:             Number of speakers in the audio file
+    :param vad_model:                Name of the VAD model to use
+    :param speaker_embeddings_model: Name of the speaker embeddings model to use
+    :param msdd_model:               Name of the msdd model to use
+    :param device:                   Device to use for diarization (default cuda if cuda available, else cpu)
+    :param kwargs:                   Additional arguments to pass to the diarizer following the format <config_name>__<parameter_name>__<attribute_name>.
+
+    :returns: A tuple of:
+              * Path to the diarization results (pandas dataframe)
+              * A dictionary of errored files that were not diarized
+    """
+    # Set output directory:
+    if output_directory is None:
+        output_directory = tempfile.mkdtemp()
+
+    # Prepare the dataframe and errors to be returned:
+    df = pd.DataFrame(
+        columns=[
+            "audio_file",
+            "diarization_results",
+            "converted_audio_file",
+            "speaker_segments",
+        ]
+    )
+
+    errors = {}
+
+    # Create the output directory:
+    output_directory = pathlib.Path(output_directory)
+    if not output_directory.exists():
+        output_directory.mkdir()
+
+    # Go over the audio files and transcribe:
+    audio_files_path = pathlib.Path(input_path).absolute()
+    is_dir = True
+    if audio_files_path.is_dir():
+        audio_files = list(audio_files_path.rglob("*.*"))
+    elif audio_files_path.is_file():
+        is_dir = False
+        audio_files = [audio_files_path]
+    else:
+        raise ValueError(
+            f"audio_files {str(audio_files_path)} must be either a directory path or a file path"
+        )
+
+    for i, audio_file in enumerate(tqdm(audio_files, desc="Diarizing", unit="file")):
+        try:
+            output_dir = output_directory / f"{audio_file.stem}_{i}"
+            output_dir, converted_audio_file_path = _diarize_single_file(
+                audio_file=audio_file,
+                output_dir=output_dir,
+                num_speakers=num_speakers,
+                vad_model=vad_model,
+                speaker_embeddings_model=speaker_embeddings_model,
+                msdd_model=msdd_model,
+                device=device,
+                **kwargs,
+            )
+        except Exception as exception:
+            # Collect the exception:
+            context.logger.warn(f"Error in file: '{audio_file}'")
+            errors[str(audio_file)] = str(exception)
+        else:
+            # Convert the rttm file to a pandas dataframe and a pyannote.Annotation:
+            df, annotation = _convert_rttm_to_annotation_df(output_dir)
+            locals()[f"{audio_file.stem}_segments_df"] = df
+
+            context.log_dataset(
+                f"{audio_file.stem}_segments_df",
+                df=locals()[f"{audio_file.stem}_segments_df"],
+                index=False,
+                format="csv",
+            )
+
+            # Note in the dataframe:
+            df.loc[i - len(errors)] = [
+                str(audio_file.relative_to(audio_files_path)),
+                str(output_dir.relative_to(output_directory)),
+                converted_audio_file_path,
+                context.get_dataitem(f"{audio_file.stem}_segments_df").artifact_url,
+            ]
+
+    # Return the dataframe:
+    context.logger.info(f"Done:\n{df.head()}")
+
+    return output_directory, df, errors

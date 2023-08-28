@@ -123,10 +123,9 @@ def test_all_diarize(input_path: str):
             "output_directory": temp_dir,
             "num_speakers": 2,
             "device": "cpu",
-            "output_dir": temp_dir,
         },
         local=True,
-        returns=["output_dir: path", "dataset: dataset", "errored_files"],
+        returns=["output_directory: path", "dataset: dataset", "errored_files"],
         artifact_path=artifact_path,
     )
 

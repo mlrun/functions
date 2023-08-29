@@ -39,7 +39,7 @@ def transcribe(
     decoding_options: dict = None,
     output_directory: str = None,
     condition_enhancement: bool = False,
-    csv_path: str = None, # path to the csv file that contains the result of speaker diarization
+    url_path: str = None, # path to the csv file that contains the result of speaker diarization
 ) -> Tuple[pathlib.Path, pd.DataFrame, dict, list]:
     """
     Transcribe audio files into text files and collect additional data.

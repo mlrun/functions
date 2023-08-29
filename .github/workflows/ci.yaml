@@ -130,7 +130,7 @@ jobs:
          pip install -r functions/requirements.txt
 
      - name: Run py tests
-       run: cd ${{ matrix.package }} && pip install -r requirements.txt && pytest -vs
+       run: cd functions/${{ matrix.package }} && pip install -r requirements.txt && pytest -vs
 
 #     - name: Run ipynb tests
 #       run: python functions/functions.py  run-tests -r functions -s ipynb -fn ${{ matrix.package }}

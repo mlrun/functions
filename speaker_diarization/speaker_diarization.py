@@ -560,8 +560,8 @@ def diarize(
 
             # Note in the dataframe:
             df.loc[i - len(errors)] = [
-                str(audio_file.relative_to(audio_files_path)),
-                str(output_dir.relative_to(output_directory)),
+                str(audio_file),
+                str(output_dir),
                 converted_audio_file_path,
                 context.get_dataitem(f"{audio_file.stem}").url,
             ]

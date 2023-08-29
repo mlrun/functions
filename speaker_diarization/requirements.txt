@@ -1,0 +1,8 @@
+tqdm
+Cython
+Cmake
+pyannote.core[notebook]
+torch
+torchaudio
+pydub
+nemo_toolkit[all]

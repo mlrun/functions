@@ -1,6 +1,8 @@
 openai-whisper
 tqdm
 librosa
+ffmpeg
+ffprobe
 pyannote.core
 torch
 torchaudio

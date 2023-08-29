@@ -23,5 +23,12 @@ spec:
   requirements:
     - openai-whisper
     - tqdm
+    - ffmpeg
+    - ffprobe
+    - librosa
+    - pyannote.core
+    - torch
+    - torchaudio
+    - pydub
 url: ''
 version: 0.0.1

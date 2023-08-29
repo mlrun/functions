@@ -1,10 +1,7 @@
-Cython
-Cmake
 openai-whisper
 tqdm
 librosa
-pyannote.core[notebook]
+pyannote.core
 torch
 torchaudio
 pydub
-nemo_toolkit[all]

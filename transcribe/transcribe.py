@@ -17,7 +17,6 @@ from collections import Counter
 import pathlib
 import tempfile
 from typing import Literal, Tuple, List
-from functools import partial
 
 import librosa
 import mlrun
@@ -25,9 +24,7 @@ import pandas as pd
 import whisper
 from tqdm.auto import tqdm
 
-from pyannote.audio import Pipeline
-from pyannote.core import notebook, Segment, Annotation
-import torch
+from pyannote.core import Segment, Annotation
 import pydub
 
 
@@ -38,8 +35,7 @@ def transcribe(
     device: Literal["cuda", "cpu"] = None,
     decoding_options: dict = None,
     output_directory: str = None,
-    condition_enhancement: bool = False,
-    url_path: str = None, # path to the csv file that contains the result of speaker diarization
+    url_path: str = None,  # path to the dataframe that contains the result of the speaker diarization
 ) -> Tuple[pathlib.Path, pd.DataFrame, dict, list]:
     """
     Transcribe audio files into text files and collect additional data.
@@ -59,8 +55,8 @@ def transcribe(
     :param device:                Device to load the model. Can be one of {"cuda", "cpu"}.
                                   Default will prefer "cuda" if available.
     :param decoding_options:      A dictionary of options to construct a `whisper.DecodingOptions`.
-    :param condition_enhancement: Whether to add the speaker diarization result to add on the transcription.
-    
+    :param url_path:              Path to the dataframe that contains the result of the speaker diarization.
+
 
     :returns: A tuple of:
 
@@ -107,24 +103,48 @@ def transcribe(
         raise ValueError(
             f"audio_files {str(audio_files_path)} must be either a directory path or a file path"
         )
-
+    # check if the user wants to add the speaker diarization result to the transcription
+    if url_path is not None:
+        try:
+            diarization_res = mlrun.get_dataitem(url_path).as_df()
+            diarization_res = diarization_res.set_index("audio_file")
+        except Exception as e:
+            raise ValueError(
+                f"Could not load speaker diarization result from {url_path}, {e}"
+            )
 
     for i, audio_file in enumerate(tqdm(audio_files, desc="Transcribing", unit="file")):
         try:
             # Get the results of speaker diarization
-            res, audio_file_path = diarizator._run(audio_file, num_speakers=2)
-            locals()[f"{audio_file}_segments_df"] = diarizator._to_df(res)
-            segments = diarizator._split_audio(audio_file_path, res)
+            if url_path is not None:
+                directory = pathlib.Path(url_path).parent
+                _, _, converted_wav, speaker_segments = diarization_res.loc[
+                    str(audio_file)
+                ].to_list()
+                res = mlrun.get_dataitem(
+                    str(directory / f"{speaker_segments}.csv")
+                ).as_df()
+                annotation = Annotation()
+                for i, row in res.iterrows():
+                    annotation[Segment(row["start"], row["end"])] = row["speaker"]
 
-            transcription, length, rate_of_speech, language = _single_transcribe(
-                audio_file=audio_file_path,
-                segments=segments,
-                model=model,
-                decoding_options=decoding_options,
-            )
+                segments = _split_audio(converted_wav, annotation)
 
-            # clean up the temporary files
-            os.remove(audio_file_path)
+                transcription, length, rate_of_speech, language = _single_transcribe(
+                    audio_file=converted_wav,
+                    segments=segments,
+                    model=model,
+                    decoding_options=decoding_options,
+                )
+
+                # clean up the temporary files
+                os.remove(converted_wav)
+            else:
+                transcription, length, rate_of_speech, language = _single_transcribe(
+                    audio_file=audio_file,
+                    model=model,
+                    decoding_options=decoding_options,
+                )
 
         except Exception as exception:
             # Collect the exception:
@@ -150,13 +170,6 @@ def transcribe(
                 length,
                 rate_of_speech,
             ]
-            file_name = str(audio_file).split("/")[-1].split(".")[0]
-            context.log_dataset(
-                f"{file_name}_segments_df",
-                df=locals()[f"{audio_file}_segments_df"],
-                index=False,
-                format="csv",
-            )
 
     # Return the dataframe:
     context.logger.info(f"Done:\n{df.head()}")
@@ -166,9 +179,9 @@ def transcribe(
 
 def _single_transcribe(
     audio_file: pathlib.Path,
-    segments: Tuple[int, str, float, float, pathlib.Path],
     model: whisper.Whisper,
     decoding_options: dict = None,
+    segments: Tuple[int, str, float, float, str] = None,
 ) -> Tuple[str, int, float, str]:
     """
     Transcribe a single audio file with the speaker segmentation
@@ -187,9 +200,25 @@ def _single_transcribe(
     """
     decoding_options = decoding_options or dict()
 
+    # if don't have the speaker segmentation, transcribe the whole audio file
+    if not segments:
+        # Load the audio:
+        audio = whisper.audio.load_audio(file=str(audio_file))
+        # Get audio length:
+        length = librosa.get_duration(path=audio_file)
+        # Transcribe:
+        result = model.transcribe(audio=audio, **decoding_options)
+        # Unpack the model's result:
+        transcription = result["text"]
+        language = result.get("language") or decoding_options.get("language", "")
+
+        # Calculate rate of speech (number of words / audio length):
+        rate_of_speech = len(transcription.split()) / length
+        return transcription, length, rate_of_speech, language
+
+    # if have the speaker segmentation, transcribe each segment separately
     res = []
     langs = []
-
     for idx, label, start_time, end_time, file in sorted(segments, key=lambda x: x[0]):
         # Load the audio:
         audio = whisper.audio.load_audio(file=str(file))
@@ -213,7 +242,6 @@ def _single_transcribe(
     language = Counter(langs).most_common(1)[0][0]
 
     return transcription, length, rate_of_speech, language
-
 
 
 def _split_audio(

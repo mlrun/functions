@@ -99,9 +99,6 @@ jobs:
 #         echo "MLRUN_STORAGE__AUTO_MOUNT_PARAMS='aws_access_key=minio,aws_secret_key=minio123,endpoint_url=http://minio.mlrun.svc.cluster.local:9000'" >> /tmp/examples_ci.env
 #         echo "MLRUN_STORAGE__AUTO_MOUNT_TYPE=s3" >> /tmp/examples_ci.env
 #         cat /tmp/examples_ci.env
-     - name: install ffmpeg
-       run: |
-         sudo apt-get update && sudo apt-get install -y libsndfile1 ffmpeg
      - name: Checkout current repo
        uses: actions/checkout@v2
        with:
@@ -130,7 +127,7 @@ jobs:
          pip install -r functions/requirements.txt
 
      - name: Run py tests
-       run: cd functions/${{ matrix.package }} && pip install -r requirements.txt && pytest -vs
+       run: python functions/functions.py  run-tests -r functions -s py -fn ${{ matrix.package }}
 
 #     - name: Run ipynb tests
 #       run: python functions/functions.py  run-tests -r functions -s ipynb -fn ${{ matrix.package }}

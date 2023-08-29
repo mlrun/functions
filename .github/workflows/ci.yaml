@@ -101,7 +101,7 @@ jobs:
 #         cat /tmp/examples_ci.env
      - name: install ffmpeg
        run: |
-         apt-get install ffmpeg
+         sudo apt-get update -y && sudo apt-get install ffmpeg
      - name: Checkout current repo
        uses: actions/checkout@v2
        with:

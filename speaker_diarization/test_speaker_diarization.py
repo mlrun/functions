@@ -31,13 +31,12 @@ def test_get_clustering_diarizer():
     # Create temporary manifest file
     with tempfile.NamedTemporaryFile(suffix=".json", mode="w") as temp_manifest:
         manifest_data = {
-            "audio_filepath": "/path/to/audio_file",
+            "audio_filepath": "./data/real_state.mp3",
             "offset": 0,
             "duration": None,
             "label": "infer",
             "text": "-",
             "num_speakers": 2,
-            "rttm_filepath": "/path/to/rttm/file",
             "uem_filepath": None,
         }
         json.dump(manifest_data, temp_manifest)
@@ -46,12 +45,11 @@ def test_get_clustering_diarizer():
         # Call the _get_clustering_diarizer function
         diarizer = _get_clustering_diarizer(
             manifest_filepath=temp_manifest_path,
-            out_dir="/path/to/out_dir",
+            out_dir="./output",
             vad_model_path="vad_multilingual_marblenet",
             speaker_embeddings_model_path="titanet_large",
             msdd_model_path="diar_msdd_telephonic",
-            audio_filepath="/path/to/audio_file",
-            rttm_filepath="/path/to/rttm/file",
+            audio_filepath="./data/real_state.mp3",
         )
         # Check if the returned object is of type DiarizationConfig
         assert isinstance(

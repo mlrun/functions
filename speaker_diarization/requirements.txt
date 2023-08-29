@@ -1,4 +1,5 @@
 tqdm
+ffmpeg
 Cython
 Cmake
 pyannote.core[notebook]

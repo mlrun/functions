@@ -466,7 +466,7 @@ def diarize(
 ) -> Tuple[pathlib.Path, pd.DataFrame, dict]:
     """
     Diarize audio files into speaker segments
-    The final result is a directory containing the diarization results in the form csv files, a dataframe that has the mapping with the audio file to the csv files
+    The final result is a directory containing the Nemo diarization results, a dataframe that has the mapping with the audio file to the result
     and a plot of the diarization results if condition_show_plot is set to True. The dataframe (csv) will have the following columns:
 
     * start: Start time of the speaker segment

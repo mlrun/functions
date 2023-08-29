@@ -128,8 +128,6 @@ def test_all_diarize(input_path: str):
         returns=["output_directory: path", "dataset: dataset", "errored_files"],
         artifact_path=artifact_path,
     )
-    import pdb
-    pdb.set_trace()
 
     artifact_path += f"/{diarize_run.metadata.name}/{diarize_run.metadata.iteration}/"
 
@@ -142,13 +140,13 @@ def test_all_diarize(input_path: str):
     expected_csv_files = sorted([f for f in input_files if f.endswith("mp3")])
     error_files = list(set(input_files) - set(expected_csv_files))
     expected_csv_files = [f.replace("mp3", "csv") for f in expected_csv_files]
-    csv_files = sorted(os.listdir(temp_dir))
+    csv_files = sorted([item for item in os.listdir(artifact_path) if item.endswith("csv")])
 
     # Check that the csv files are saved in output_directory:
     assert csv_files == expected_csv_files
 
     # Check that the dataframe is in the correct size:
-    df = mlrun.get_dataitem(artifact_path + "dataset.csv").as_df()
+    df = mlrun.get_dataitem(artifact_path + "dataset.parquet").as_df()
     assert len(df) == len(expected_csv_files)
 
     # Check errored files:

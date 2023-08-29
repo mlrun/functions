@@ -529,7 +529,7 @@ def diarize(
 
     for i, audio_file in enumerate(tqdm(audio_files, desc="Diarizing", unit="file")):
         try:
-            output_dir = output_directory / f"{audio_file.stem}_{i}"
+            output_dir = output_directory / f"{audio_file.stem}"
             output_dir, converted_audio_file_path = _diarize_single_audio(
                 audio_file_path=audio_file,
                 output_dir=output_dir,
@@ -546,12 +546,11 @@ def diarize(
             errors[str(audio_file)] = str(exception)
         else:
             # Convert the rttm file to a pandas dataframe and a pyannote.Annotation:
-            df, annotation = _convert_rttm_to_annotation_df(output_dir)
-            locals()[f"{audio_file.stem}_segments_df"] = df
+            single_df, annotation = _convert_rttm_to_annotation_df(output_dir)
 
             context.log_dataset(
-                f"{audio_file.stem}_segments_df",
-                df=locals()[f"{audio_file.stem}_segments_df"],
+                f"{audio_file.stem}",
+                df=single_df,
                 index=False,
                 format="csv",
             )
@@ -561,7 +560,7 @@ def diarize(
                 str(audio_file.relative_to(audio_files_path)),
                 str(output_dir.relative_to(output_directory)),
                 converted_audio_file_path,
-                context.get_dataitem(f"{audio_file.stem}_segments_df").artifact_url,
+                context.get_dataitem(f"{audio_file.stem}").url,
             ]
 
     # Return the dataframe:

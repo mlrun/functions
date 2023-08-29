@@ -101,7 +101,7 @@ jobs:
 #         cat /tmp/examples_ci.env
      - name: install ffmpeg
        run: |
-         sudo apt-get update -y && sudo apt-get install ffmpeg
+         sudo apt-get update -y && sudo apt-get install ffmpeg libavcodec-extra
      - name: Checkout current repo
        uses: actions/checkout@v2
        with:

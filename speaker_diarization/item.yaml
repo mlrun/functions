@@ -22,7 +22,6 @@ spec:
   kind: job
   requirements:
     - tqdm
-    - librora
     - Cython
     - Cmake
     - pyannote.core[notebook]

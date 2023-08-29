@@ -492,7 +492,8 @@ def diarize(
     :param kwargs:                   Additional arguments to pass to the diarizer following the format <config_name>__<parameter_name>__<attribute_name>.
 
     :returns: A tuple of:
-              * Path to the diarization results (pandas dataframe)
+              * Path to the diarization results
+              * Pandas dataframe that have the mapping between audio_file, converted_audio_file, dirarization_result.
               * A dictionary of errored files that were not diarized
     """
     # Set output directory:

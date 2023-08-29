@@ -530,8 +530,8 @@ def diarize(
     for i, audio_file in enumerate(tqdm(audio_files, desc="Diarizing", unit="file")):
         try:
             output_dir = output_directory / f"{audio_file.stem}_{i}"
-            output_dir, converted_audio_file_path = _diarize_single_file(
-                audio_file=audio_file,
+            output_dir, converted_audio_file_path = _diarize_single_audio(
+                audio_file_path=audio_file,
                 output_dir=output_dir,
                 num_speakers=num_speakers,
                 vad_model=vad_model,

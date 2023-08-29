@@ -128,6 +128,8 @@ def test_all_diarize(input_path: str):
         returns=["output_directory: path", "dataset: dataset", "errored_files"],
         artifact_path=artifact_path,
     )
+    import pdb
+    pdb.set_trace()
 
     artifact_path += f"/{diarize_run.metadata.name}/{diarize_run.metadata.iteration}/"
 

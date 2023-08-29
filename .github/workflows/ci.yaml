@@ -99,6 +99,9 @@ jobs:
 #         echo "MLRUN_STORAGE__AUTO_MOUNT_PARAMS='aws_access_key=minio,aws_secret_key=minio123,endpoint_url=http://minio.mlrun.svc.cluster.local:9000'" >> /tmp/examples_ci.env
 #         echo "MLRUN_STORAGE__AUTO_MOUNT_TYPE=s3" >> /tmp/examples_ci.env
 #         cat /tmp/examples_ci.env
+     - name: install ffmpeg
+       run: |
+         apt-get install ffmpeg
      - name: Checkout current repo
        uses: actions/checkout@v2
        with:

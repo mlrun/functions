@@ -23,8 +23,8 @@ spec:
       with_mlrun: false
   filename: batch_inference.py
   handler: infer
-  image: mlrun/mlrun
+  image: mlrun/ml-models
   kind: job
   requirements:
 url: ''
-version: 1.4.0
+version: 1.3.0

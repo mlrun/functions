@@ -1,5 +1,6 @@
 tqdm
 ffmpeg
+ffmpeg-python 
 Cython
 Cmake
 pyannote.core

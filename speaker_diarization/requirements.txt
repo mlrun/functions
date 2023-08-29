@@ -2,7 +2,7 @@ tqdm
 ffmpeg
 Cython
 Cmake
-pyannote.core[notebook]
+pyannote.core
 torch
 torchaudio
 pydub

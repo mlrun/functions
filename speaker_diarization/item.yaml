@@ -21,10 +21,11 @@ spec:
   image: mlrun/mlrun
   kind: job
   requirements:
+    - ffmpeg
     - tqdm
     - Cython
     - Cmake
-    - pyannote.core[notebook]
+    - pyannote.core
     - torch
     - torchaudio
     - pydub

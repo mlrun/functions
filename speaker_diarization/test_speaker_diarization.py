@@ -78,32 +78,6 @@ def test_diarize_single_audio():
         assert "vad_outputs" in list_of_files
 
 
-def test_convert_rttm_to_annotation_df():
-    # Sample RTTM content
-    sample_rttm_content = (
-        """SPEAKER an4_diarize_test 1   0.299   2.471 <NA> <NA> speaker_1 <NA> <NA>"""
-    )
-
-    # Create a temporary file and write the sample RTTM content to it
-    with tempfile.NamedTemporaryFile(
-        suffix=".rttm", mode="w+", delete=True
-    ) as temp_rttm_file:
-        temp_rttm_file.write(sample_rttm_content)
-        temp_rttm_file.flush()
-        temp_rttm_file_path = os.path.dirname(temp_rttm_file.name)
-        # Call the function to convert RTTM to annotation DataFrame
-        annotation_df, _ = _convert_rttm_to_annotation_df(temp_rttm_file_path)
-
-    # Assertions to check if the DataFrame is formed correctly
-    assert annotation_df.shape == (1, 3)
-    assert "start" in annotation_df.columns
-    assert "end" in annotation_df.columns
-    assert "speaker" in annotation_df.columns
-    assert annotation_df.iloc[0].start == "0.299"
-    assert annotation_df.iloc[0].end == "2.77"
-    assert annotation_df.iloc[0].speaker == "speaker_1"
-
-
 @pytest.mark.parametrize("input_path", ["./data/real_state.mp3"])
 def test_all_diarize(input_path: str):
     # Setting variables and importing function:

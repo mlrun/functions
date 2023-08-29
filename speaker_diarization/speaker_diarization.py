@@ -331,6 +331,7 @@ def _convert_to_support_format(audio_file_path: str) -> str:
     Converts the audio file to wav format. ClusteringDiarizer expects signle channel 16k wav file.
 
     :param audio_file_path:   Path to the audio file
+
     :returns audio_file_path: Path to the converted audio file
     """
     audio_file_obj = pathlib.Path(audio_file_path)
@@ -378,14 +379,14 @@ def _diarize_single_audio(
     """
     Diarizes a single audio file and returns the diarization results.
 
-    :param audio_file_path: Path to the audio file
-    :param output_dir:      Path to the output directory
-    :param num_speakers:    Number of speakers in the audio file
-    :param vad_model:       Name of the VAD model to use
+    :param audio_file_path:          Path to the audio file
+    :param output_dir:               Path to the output directory
+    :param num_speakers:             Number of speakers in the audio file
+    :param vad_model:                Name of the VAD model to use
     :param speaker_embeddings_model: Name of the speaker embeddings model to use
-    :param msdd_model:      Name of the msdd model to use
-    :param device:          Device to use for diarization
-    :param kwargs:          Additional arguments to pass to the diarizer following the format <config_name>__<parameter_name>__<attribute_name>.
+    :param msdd_model:               Name of the msdd model to use
+    :param device:                   Device to use for diarization
+    :param kwargs:                   Additional arguments to pass to the diarizer following the format <config_name>__<parameter_name>__<attribute_name>.
 
     :returns: Tuple of two paths:
              * path of the result of the pipeline
@@ -431,8 +432,10 @@ def _convert_rttm_to_annotation_df(output_dir: str) -> Tuple[pd.DataFrame, Annot
     Converts the rttm file to a pyannote.Annotation and a pandas dataframe.
 
     :param output_dir:   Path to the output directory
-    :returns df:         Pandas dataframe containing the diarization results
-    :returns annotation: pyannote.Annotation containing the diarization results
+
+    :returns: Tuple of pands dataframe and pyannote.Annotation object:
+              * pandas dataframe containing the diarization results
+              * pyannote.Annotation containing the diarization results
     """
     for root, _, files in os.walk(output_dir):
         for file in files:
@@ -460,7 +463,7 @@ def diarize(
         str
     ] = None,  # Set to 'cuda:1', (default cuda if cuda available, else cpu)
     **kwargs,
-):
+) -> Tuple[pathlib.Path, pd.DataFrame, dict]:
     """
     Diarize audio files into speaker segments
     The final result is a directory containing the diarization results in the form csv files, a dataframe that has the mapping with the audio file to the csv files

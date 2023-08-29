@@ -83,74 +83,86 @@ def _prepare_result_set(
         [x, pd.DataFrame(y_pred, columns=label_columns, index=x.index)], axis=1
     )
 
-
 def infer(
     context: mlrun.MLClientCtx,
-    model_path: str,
     dataset: DatasetType,
-    model_endpoint_name: str = "batch-infer",
+    model_path: str,
     drop_columns: Union[str, List[str], int, List[int]] = None,
     label_columns: Union[str, List[str]] = None,
     log_result_set: bool = True,
     result_set_name: str = "prediction",
     batch_id: str = None,
-    perform_drift_analysis: bool = None,
-    sample_set: DatasetType = None,
-    drift_threshold: float = 0.7,
-    possible_drift_threshold: float = 0.5,
-    inf_capping: float = 10.0,
     artifacts_tag: str = "",
-    endpoint_id: str = "",
+
+    # Drift analysis parameters
+    perform_drift_analysis: bool = None,
     trigger_monitoring_job: bool = False,
     batch_image_job: str = "mlrun/mlrun",
+    endpoint_id: str = "",
+
+    # The following model endpoint parameters are relevant only if:
+        # perform drift analysis is not disabled
+        # a new model endpoint record is going to be generated
+    model_endpoint_name: str = "batch-infer",
+    model_endpoint_drift_threshold: float = 0.7,
+    model_endpoint_possible_drift_threshold: float = 0.5,
+    model_endpoint_sample_set: DatasetType = None,
+
     **predict_kwargs: Dict[str, Any],
 ):
     """
-    Perform a prediction on a given dataset with the given model. Can perform drift analysis between the sample set
-    statistics stored in the model to the current input data. The drift rule is the value per-feature mean of the TVD
-    and Hellinger scores according to the thresholds configures here. When performing drift analysis, this function
-    either creates or update an existing model endpoint record (depends on the provided `endpoint_id`).
+    Perform a prediction on a given dataset with the given model.
+    Can perform drift analysis between the sample set statistics stored in the model to the current input data. The
+    drift rule is the value per-feature mean of the TVD and Hellinger scores according to the thresholds configures
+    here. When performing drift analysis, this function either uses an existing model endpoint record or creates
+    a new one.
     At the moment, this function is supported for `mlrun>=1.5.0` versions.
 
-    :param context:                  MLRun context.
-    :param model_path:               The model Store path.
-    :param dataset:                  The dataset to infer through the model. Can be passed in `inputs` as either a
-                                     Dataset artifact / Feature vector URI. Or, in `parameters` as a list, dictionary or
-                                     numpy array.
-    :param model_endpoint_name:      If a new model endpoint is generated, the model name will be presented under this
-                                     endpoint.
-    :param drop_columns:             A string / integer or a list of strings / integers that represent the column names
-                                     / indices to drop. When the dataset is a list or a numpy array this parameter must
-                                     be represented by integers.
-    :param label_columns:            The target label(s) of the column(s) in the dataset for Regression or
-                                     Classification tasks. The label column can be accessed from the model object, or
-                                     the feature vector provided if available.
-    :param log_result_set:           Whether to log the result set - a DataFrame of the given inputs concatenated with
-                                     the predictions. Defaulted to True.
-    :param result_set_name:          The db key to set name of the prediction result and the filename. Defaulted to
-                                     'prediction'.
-    :param batch_id:                 The ID of the given batch (inference dataset). If `None`, it will be generated.
-                                     Will be logged as a result of the run.
-    :param perform_drift_analysis:   Whether to perform drift analysis between the sample set of the model object to the
-                                     dataset given. By default, None, which means it will perform drift analysis if the
-                                     model has a sample set statistics. Performing drift analysis is equal to enable
-                                     monitoring on the provided model endpoint. Please note that in order to trigger
-                                     the drift analysis job, you need to set `trigger_monitoring_job=True`. Otherwise,
-                                     the drift analysis will be triggered only as part the scheduled monitoring job
-                                     (if exist in the current project) or if triggered manually by the user.
-    :param sample_set:               A sample dataset to give to compare the inputs in the drift analysis. The default
-                                     chosen sample set will always be the one who is set in the model artifact itself.
-    :param drift_threshold:          The threshold of which to mark drifts. Defaulted to 0.7.
-    :param possible_drift_threshold: The threshold of which to mark possible drifts. Defaulted to 0.5.
-    :param inf_capping:              The value to set for when it reached infinity. Defaulted to 10.0.
-    :param artifacts_tag:            Tag to use for all the artifacts resulted from the function.
-    :param endpoint_id:              Model endpoint unique ID. If perform_drift_analysis was set, the endpoint_id
-                                     will be used either to update an existing model endpoint or generate a new
-                                     model endpoint record.
-    :param trigger_monitoring_job:   Whether to trigger the batch drift analysis after the infer job.
-    :param batch_image_job:          The image that will be used for the monitoring batch job analysis. By default,
-                                     the image is mlrun/mlrun.
+    :param context:                                 MLRun context.
+    :param dataset:                                 The dataset to infer through the model. Can be passed in `inputs` as either a
+                                                    Dataset artifact / Feature vector URI. Or, in `parameters` as a list, dictionary or
+                                                    numpy array.
+    :param model_path:                              The model Store path. If `endpoint_id` of existing model endpoint is provided,
+                                                    make sure that it has a similar model store path, otherwise the drift analysis
+                                                    won't be triggered.
+    :param drop_columns:                            A string / integer or a list of strings / integers that represent the column names
+                                                    / indices to drop. When the dataset is a list or a numpy array this parameter must
+                                                    be represented by integers.
+    :param label_columns:                           The target label(s) of the column(s) in the dataset for Regression or
+                                                    Classification tasks. The label column can be accessed from the model object, or
+                                                    the feature vector provided if available.
+    :param log_result_set:                          Whether to log the result set - a DataFrame of the given inputs concatenated with
+                                                    the predictions. Defaulted to True.
+    :param result_set_name:                         The db key to set name of the prediction result and the filename. Defaulted to
+                                                    'prediction'.
+    :param batch_id:                                The ID of the given batch (inference dataset). If `None`, it will be generated.
+                                                    Will be logged as a result of the run.
+    :param artifacts_tag:                           Tag to use for all the artifacts resulted from the function (result set and
+                                                    model monitoring artifacts)
+    :param perform_drift_analysis:                  Whether to perform drift analysis between the sample set of the model object to the
+                                                    dataset given. By default, None, which means it will perform drift analysis if the
+                                                    model already has feature stats that are considered as a reference sample set.
+                                                    Performing drift analysis on a new endpoint id will generate a new model endpoint
+                                                    record. Please note that in order to trigger the drift analysis job, you need to
+                                                    set `trigger_monitoring_job=True`. Otherwise, the drift analysis will be triggered
+                                                    only as part the scheduled monitoring job (if exist in the current project) or
+                                                    if triggered manually by the user.
+    :param trigger_monitoring_job:                  Whether to trigger the batch drift analysis after the infer job.
+    :param batch_image_job:                         The image that will be used to register the monitoring batch job if not exist.
+                                                    By default, the image is mlrun/mlrun.
+    :param endpoint_id:                             Model endpoint unique ID. If `perform_drift_analysis` was set, the endpoint_id
+                                                    will be used either to perform the analysis on existing model endpoint or to
+                                                    generate a new model endpoint record.
+    :param model_endpoint_name:                     If a new model endpoint is generated, the model name will be presented under this
+                                                    endpoint.
+    :param model_endpoint_drift_threshold:          The threshold of which to mark drifts. Defaulted to 0.7.
+    :param model_endpoint_possible_drift_threshold: The threshold of which to mark possible drifts. Defaulted to 0.5.
+    :param model_endpoint_sample_set:               A sample dataset to give to compare the inputs in the drift analysis. The default
+                                                    chosen sample set will always be the one who is set in the model artifact itself.
+
+    raises MLRunInvalidArgumentError: if both `model_path` and `endpoint_id` are not provided
     """
+
     # Loading the model:
     context.logger.info(f"Loading model...")
     model_handler = AutoMLRun.load_model(model_path=model_path, context=context)
@@ -194,7 +206,7 @@ def infer(
         context.logger.info("Performing drift analysis...")
         # Get the sample set statistics (either from the sample set or from the statistics logged with the model)
         sample_set_statistics = mlrun.model_monitoring.api.get_sample_set_statistics(
-            sample_set=sample_set,
+            sample_set=model_endpoint_sample_set,
             model_artifact_feature_stats=model_handler._model_artifact.spec.feature_stats,
         )
         mlrun.model_monitoring.api.record_results(
@@ -203,11 +215,10 @@ def infer(
             endpoint_id=endpoint_id,
             model_path=model_path,
             model_endpoint_name=model_endpoint_name,
-            df_to_target=result_set.copy(),
+            infer_results_df=result_set.copy(),
             sample_set_statistics=sample_set_statistics,
-            drift_threshold=drift_threshold,
-            possible_drift_threshold=possible_drift_threshold,
-            inf_capping=inf_capping,
+            drift_threshold=model_endpoint_drift_threshold,
+            possible_drift_threshold=model_endpoint_possible_drift_threshold,
             artifacts_tag=artifacts_tag,
             trigger_monitoring_job=trigger_monitoring_job,
             default_batch_image=batch_image_job,

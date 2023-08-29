@@ -85,7 +85,7 @@ def train(training_set: pd.DataFrame):
 )
 def test_batch_predict():
     project = mlrun.get_or_create_project(
-        "batch-infer-test-v3", context="./", user_project=True
+        "batch-infer-test", context="./", user_project=True
     )
 
     # Configure test:
@@ -115,8 +115,9 @@ def test_batch_predict():
             "label_columns": "label",
             "trigger_monitoring_job": True,
             "perform_drift_analysis": True,
-            "drift_threshold": 0.2,
-            "possible_drift_threshold": 0.1,
+            "model_endpoint_drift_threshold": 0.2,
+            "model_endpoint_possible_drift_threshold": 0.1,
+            "batch_image_job": "eyaligu/mlrun-api:image-test",
         },
     )
 

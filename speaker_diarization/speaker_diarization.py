@@ -15,17 +15,16 @@
 import os
 import pathlib
 import tempfile
-import librosa
 import mlrun
 import pandas as pd
 from tqdm.auto import tqdm
 import json
 import pydub
-from pyannote.core import notebook, Segment, Annotation
+from pyannote.core import notebook, Annotation
 from functools import partial
 from omegaconf import OmegaConf
 from dataclasses import dataclass, field, asdict
-from typing import List, Dict, Any, Optional, Literal, Tuple
+from typing import List, Optional, Tuple
 from nemo.collections.asr.models import ClusteringDiarizer
 from nemo.collections.asr.parts.utils.speaker_utils import (
     rttm_to_labels,
@@ -343,7 +342,7 @@ def _convert_to_support_format(audio_file_path: str) -> str:
     }
     # Check if the file is already in supported format
     if audio_file_obj.suffix == ".wav":
-        audio = AudioSegment.from_wav(audio_file_path, format="wav")
+        audio = pydub.AudioSegment.from_wav(audio_file_path, format="wav")
         if audio.channels != 1:
             audio = audio.set_channels(1)
         if audio.frame_rate != 16000:
@@ -516,11 +515,9 @@ def diarize(
 
     # Go over the audio files and transcribe:
     audio_files_path = pathlib.Path(input_path).absolute()
-    is_dir = True
     if audio_files_path.is_dir():
         audio_files = list(audio_files_path.rglob("*.*"))
     elif audio_files_path.is_file():
-        is_dir = False
         audio_files = [audio_files_path]
     else:
         raise ValueError(

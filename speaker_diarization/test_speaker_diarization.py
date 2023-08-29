@@ -16,15 +16,11 @@
 import os
 import tempfile
 import mlrun
-from difflib import SequenceMatcher
-import pandas as pd
-import os
 import pathlib
 import pytest
 import json
 from speaker_diarization import (
     _get_clustering_diarizer,
-    DiarizationConfig,
     _diarize_single_audio,
     _convert_rttm_to_annotation_df,
 )
@@ -140,7 +136,9 @@ def test_all_diarize(input_path: str):
     expected_csv_files = sorted([f for f in input_files if f.endswith("mp3")])
     error_files = list(set(input_files) - set(expected_csv_files))
     expected_csv_files = [f.replace("mp3", "csv") for f in expected_csv_files]
-    csv_files = sorted([item for item in os.listdir(artifact_path) if item.endswith("csv")])
+    csv_files = sorted(
+        [item for item in os.listdir(artifact_path) if item.endswith("csv")]
+    )
 
     # Check that the csv files are saved in output_directory:
     assert csv_files == expected_csv_files

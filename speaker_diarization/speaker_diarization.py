@@ -480,7 +480,7 @@ def diarize(
 
     :param context:                  MLRun context
     :param input_path:               A directory of the audio files or a single file to diarize
-    :param output_directory:               Path to the output directory this is where nemo will store the diarization results
+    :param output_directory:         Path to the output directory this is where nemo will store the diarization results
     :param condition_show_plot:      If set to True, the diarization results will be plotted
     :param num_speakers:             Number of speakers in the audio file
     :param vad_model:                Name of the VAD model to use
@@ -554,6 +554,8 @@ def diarize(
                 index=False,
                 format="csv",
             )
+            if condition_show_plot:
+                notebook.plot_annotation(annotation)
 
             # Note in the dataframe:
             df.loc[i - len(errors)] = [

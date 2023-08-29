@@ -83,6 +83,7 @@ def _prepare_result_set(
         [x, pd.DataFrame(y_pred, columns=label_columns, index=x.index)], axis=1
     )
 
+
 def infer(
     context: mlrun.MLClientCtx,
     dataset: DatasetType,
@@ -93,21 +94,18 @@ def infer(
     result_set_name: str = "prediction",
     batch_id: str = None,
     artifacts_tag: str = "",
-
     # Drift analysis parameters
     perform_drift_analysis: bool = None,
     trigger_monitoring_job: bool = False,
     batch_image_job: str = "mlrun/mlrun",
     endpoint_id: str = "",
-
     # The following model endpoint parameters are relevant only if:
-        # perform drift analysis is not disabled
-        # a new model endpoint record is going to be generated
+    # perform drift analysis is not disabled
+    # a new model endpoint record is going to be generated
     model_endpoint_name: str = "batch-infer",
     model_endpoint_drift_threshold: float = 0.7,
     model_endpoint_possible_drift_threshold: float = 0.5,
     model_endpoint_sample_set: DatasetType = None,
-
     **predict_kwargs: Dict[str, Any],
 ):
     """

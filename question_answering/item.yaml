@@ -19,6 +19,9 @@ spec:
   handler: answer_questions
   image: mlrun/mlrun
   kind: job
-  requirements: []
+  requirements:
+    transformers
+    torch
+    tqdm
 url: ''
-version: 0.1.0
+version: 0.2.0

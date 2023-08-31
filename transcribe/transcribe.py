@@ -130,14 +130,21 @@ def transcribe(
 
                 segments = _split_audio(converted_wav, annotation)
 
-                transcription, length, rate_of_speech, language, single_df= _single_transcribe(
+                (
+                    transcription,
+                    length,
+                    rate_of_speech,
+                    language,
+                    single_df,
+                ) = _single_transcribe(
                     audio_file=converted_wav,
                     segments=segments,
                     model=model,
                     decoding_options=decoding_options,
                 )
-                context.log_dataset(f'{speaker_segments}', df=single_df, index=False, format='csv') 
-
+                context.log_dataset(
+                    f"{speaker_segments}", df=single_df, index=False, format="csv"
+                )
             else:
                 transcription, length, rate_of_speech, language = _single_transcribe(
                     audio_file=audio_file,
@@ -217,7 +224,7 @@ def _single_transcribe(
         return transcription, length, rate_of_speech, language
 
     # if have the speaker segmentation, transcribe each segment separately
-    
+
     # Prepare the dataframe:
     df = pd.DataFrame(
         columns=[
@@ -236,7 +243,7 @@ def _single_transcribe(
         result = model.transcribe(
             audio=audio, **decoding_options, initial_prompt="\n".join(res[: idx + 1])
         )
-        df.loc[idx] = [label, start_time, end_time, result["text"]] 
+        df.loc[idx] = [label, start_time, end_time, result["text"]]
         transcription = f"{label}  {start_time}  {end_time}: \n {result['text']}"
         langs.append(result.get("language") or decoding_options.get("language", ""))
         res.append(transcription)

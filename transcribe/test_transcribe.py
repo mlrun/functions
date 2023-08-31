@@ -20,7 +20,6 @@ from difflib import SequenceMatcher
 import mlrun
 import pytest
 import whisper
-from transcribe import transcribe
 
 
 expected_outputs = [

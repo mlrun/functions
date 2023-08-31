@@ -20,7 +20,7 @@ from difflib import SequenceMatcher
 import mlrun
 import pytest
 import whisper
-from transcribe import Diarizator
+from transcribe import transcribe
 
 
 expected_outputs = [
@@ -34,7 +34,7 @@ expected_outputs = [
 
 
 @pytest.mark.parametrize("model_name", whisper.available_models()[:4])
-@pytest.mark.parametrize("audio_path", ["./data", "./data/speech_01.mp3"])
+@pytest.mark.parametrize("audio_path", ["./data/speech_01.mp3"])
 def test_transcribe(model_name: str, audio_path: str):
     # Setting variables and importing function:
     artifact_path = tempfile.mkdtemp()

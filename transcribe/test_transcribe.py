@@ -99,3 +99,62 @@ def test_transcribe(model_name: str, audio_path: str):
     assert zip_dir.kind == "file"
 
 
+@pytest.mark.parametrize("model_name", whisper.available_models()[:1])
+@pytest.mark.parametrize("url_path", ["./input/dataset.parquet"])
+@pytest.mark.parametrize("audio_path", ["./data/real_state.mp3"])
+def test_transcribe_with_speaker(model_name: str, audio_path: str, url_path: str):
+    # Setting variables and importing function:
+    artifact_path = tempfile.mkdtemp()
+    transcribe_function = mlrun.import_function("function.yaml")
+    temp_dir = tempfile.mkdtemp()
+
+    # Running transcribe function:
+    transcribe_run = transcribe_function.run(
+        handler="transcribe",
+        params={
+            "input_path": audio_path,
+            "model_name": model_name,
+            "device": "cpu",
+            "output_directory": temp_dir,
+            "url_path": url_path,
+        },
+        local=True,
+        returns=["output_dir: path", "dataset: dataset", "errored_files"],
+        artifact_path=artifact_path,
+    )
+
+    artifact_path += (
+        f"/{transcribe_run.metadata.name}/{transcribe_run.metadata.iteration}/"
+    )
+
+    # Getting actual files from run (text and errored):
+    input_files = (
+        os.listdir(audio_path)
+        if pathlib.Path(audio_path).is_dir()
+        else [pathlib.Path(audio_path).name]
+    )
+    expected_text_files = sorted([f for f in input_files if f.endswith("mp3")])
+    error_files = list(set(input_files) - set(expected_text_files))
+    expected_text_files = [f.replace("mp3", "txt") for f in expected_text_files]
+    text_files = sorted(os.listdir(temp_dir))
+
+    # Check that the text files are saved in output_directory:
+    assert text_files == expected_text_files
+
+    # Check that the dataframe is in the correct size:
+    df = mlrun.get_dataitem(artifact_path + "dataset.parquet").as_df()
+    assert len(df) == len(expected_text_files)
+
+    # Check errored files:
+    if isinstance(transcribe_run.outputs["errored_files"], str):
+        actual_errored_files = []
+    else:
+        actual_errored_files = [
+            os.path.basename(errored)
+            for errored in transcribe_run.outputs["errored_files"].keys()
+        ]
+    assert actual_errored_files == error_files
+
+    # Check output_dir:
+    zip_dir = mlrun.get_dataitem(artifact_path + "output_dir.zip")
+    assert zip_dir.kind == "file"

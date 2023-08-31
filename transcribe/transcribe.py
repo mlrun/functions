@@ -1,4 +1,4 @@
-# Copyright 2019 Iguazio
+# Copyright 2023 Iguazio
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ def transcribe(
             # Get the results of speaker diarization
             if url_path is not None:
                 directory = pathlib.Path(url_path).parent
-                _, _, converted_wav, speaker_segments = diarization_res.loc[
+                _, converted_wav, speaker_segments = diarization_res.loc[
                     str(audio_file)
                 ].to_list()
                 res = mlrun.get_dataitem(

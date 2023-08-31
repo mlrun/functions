@@ -34,7 +34,7 @@ expected_outputs = [
 
 @pytest.mark.parametrize("model_name", whisper.available_models()[:4])
 @pytest.mark.parametrize("audio_path", ["./data/speech_01.mp3"])
-def test_transcribe(model_name: str, audio_path: str):
+def test_transcribe_no_speaker(model_name: str, audio_path: str):
     # Setting variables and importing function:
     artifact_path = tempfile.mkdtemp()
     transcribe_function = mlrun.import_function("function.yaml")
@@ -98,7 +98,7 @@ def test_transcribe(model_name: str, audio_path: str):
     assert zip_dir.kind == "file"
 
 
-@pytest.mark.parametrize("model_name", whisper.available_models()[:1])
+@pytest.mark.parametrize("model_name", whisper.available_models()[:4])
 @pytest.mark.parametrize("url_path", ["./input/dataset.parquet"])
 @pytest.mark.parametrize("audio_path", ["./data/real_state.mp3"])
 def test_transcribe_with_speaker(model_name: str, audio_path: str, url_path: str):

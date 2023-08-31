@@ -107,7 +107,8 @@ def test_transcribe_with_speaker(model_name: str, audio_path: str, url_path: str
     artifact_path = tempfile.mkdtemp()
     transcribe_function = mlrun.import_function("function.yaml")
     temp_dir = tempfile.mkdtemp()
-
+    import pdb
+    pdb.set_trace()
     # Running transcribe function:
     transcribe_run = transcribe_function.run(
         handler="transcribe",

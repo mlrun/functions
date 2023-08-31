@@ -137,8 +137,6 @@ def transcribe(
                     decoding_options=decoding_options,
                 )
 
-                # clean up the temporary files
-                os.remove(converted_wav)
             else:
                 transcription, length, rate_of_speech, language = _single_transcribe(
                     audio_file=audio_file,

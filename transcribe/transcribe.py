@@ -130,12 +130,13 @@ def transcribe(
 
                 segments = _split_audio(converted_wav, annotation)
 
-                transcription, length, rate_of_speech, language = _single_transcribe(
+                transcription, length, rate_of_speech, language, single_df= _single_transcribe(
                     audio_file=converted_wav,
                     segments=segments,
                     model=model,
                     decoding_options=decoding_options,
                 )
+                context.log_dataset(f'{speaker_segments}', df=single_df, index=False, format='csv') 
 
             else:
                 transcription, length, rate_of_speech, language = _single_transcribe(
@@ -195,6 +196,7 @@ def _single_transcribe(
             * The length of the audio file.
             * The rate of speech.
             * The detected language.
+            * Dataframe of the speaker segmentation and the transcription.
     """
     decoding_options = decoding_options or dict()
 
@@ -215,6 +217,16 @@ def _single_transcribe(
         return transcription, length, rate_of_speech, language
 
     # if have the speaker segmentation, transcribe each segment separately
+    
+    # Prepare the dataframe:
+    df = pd.DataFrame(
+        columns=[
+            "speaker",
+            "start_time",
+            "end_time",
+            "transcription",
+        ]
+    )
     res = []
     langs = []
     for idx, label, start_time, end_time, file in sorted(segments, key=lambda x: x[0]):
@@ -224,9 +236,7 @@ def _single_transcribe(
         result = model.transcribe(
             audio=audio, **decoding_options, initial_prompt="\n".join(res[: idx + 1])
         )
-        # Unpack the model's result:
-        if not result["text"]:
-            continue
+        df.loc[idx] = [label, start_time, end_time, result["text"]] 
         transcription = f"{label}  {start_time}  {end_time}: \n {result['text']}"
         langs.append(result.get("language") or decoding_options.get("language", ""))
         res.append(transcription)
@@ -241,7 +251,7 @@ def _single_transcribe(
     # Get the language:
     language = Counter(langs).most_common(1)[0][0]
 
-    return transcription, length, rate_of_speech, language
+    return transcription, length, rate_of_speech, language, df
 
 
 def _split_audio(

@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 import pathlib
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import mlrun
 import pandas as pd

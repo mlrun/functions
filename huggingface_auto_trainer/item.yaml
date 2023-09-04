@@ -2,6 +2,7 @@ apiVersion: v1
 categories:
 - machine-learning
 - model-training
+- GenAI
 description: fine-tune llm model with ease
 doc: ''
 example: huggingface_auto_trainer.ipynb
@@ -22,4 +23,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 1.0.0
+version: 1.1.0

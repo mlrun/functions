@@ -94,6 +94,7 @@ def test_train(model: Tuple[str, str]):
 
     train_run = None
     model_name = model[0].split(".")[-1]
+    labels = {"label1": "my-value"}
     try:
         train_run = fn.run(
             inputs={"dataset": dataset},
@@ -103,6 +104,7 @@ def test_train(model: Tuple[str, str]):
                 "model_name": f"model_{model_name}",
                 "label_columns": label_columns,
                 "train_test_split_size": 0.2,
+                "labels": labels,
             },
             handler="train",
             local=True,
@@ -112,6 +114,7 @@ def test_train(model: Tuple[str, str]):
     assert train_run and all(
         key in train_run.outputs for key in ["model", "test_set"]
     ), "outputs should include more data"
+    assert labels.items() <= train_run.artifact("model").meta.labels.items()
 
 
 @pytest.mark.parametrize("model", MODELS)

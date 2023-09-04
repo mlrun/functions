@@ -93,7 +93,6 @@ def test_batch_predict():
         inputs={"dataset": generate_data_run.outputs["prediction_set"]},
         params={
             "model": train_run.outputs["model"],
-            # "label_columns": "label",
             "result_set_name": "result_set",
         },
         local=True,

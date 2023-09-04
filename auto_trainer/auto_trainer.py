@@ -16,6 +16,8 @@ from typing import List, Dict, Optional, Union, Tuple, Any
 from pathlib import Path
 
 import mlrun
+import mlrun.datastore
+import mlrun.utils
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -23,7 +25,6 @@ from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.frameworks.auto_mlrun import AutoMLRun
 from mlrun import feature_store as fs
-from mlrun.api.schemas import ObjectKind
 from mlrun.utils.helpers import create_class, create_function
 
 PathType = Union[str, Path]
@@ -84,7 +85,8 @@ def _get_dataframe(
 
         return dataset, label_columns
 
-    if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
+    store_uri_prefix, _ = mlrun.datastore.parse_store_uri(dataset.artifact_url)
+    if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
         # feature-vector case:
         label_columns = label_columns or dataset.meta.status.label_column
         dataset = fs.get_offline_features(
@@ -117,6 +119,7 @@ def train(
     test_set: DataItem = None,
     train_test_split_size: float = None,
     random_state: int = None,
+    labels: dict = None,
 ):
     """
     Training the given model on the given dataset.
@@ -136,6 +139,7 @@ def train(
                                     in the test split. The size of the Training set is set to the complement of this
                                     value. Default = 0.2
     :param random_state:            Random state for `train_test_split`
+    :param labels:                  Labels to log with the model
     """
     # Validate inputs:
     # Check if exactly one of them is supplied:
@@ -221,6 +225,7 @@ def train(
         x_test=x_test,
         y_test=y_test,
         artifacts=context.artifacts,
+        labels=labels,
     )
     context.logger.info(f"training '{model_name}'")
     model.fit(x_train, y_train, **fit_kwargs)

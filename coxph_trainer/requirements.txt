@@ -1,6 +1,6 @@
 scikit-learn
 seaborn
 scikit-plot
-mlrun
 pandas
 lifelines
+matplotlib

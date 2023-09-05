@@ -14,14 +14,30 @@
 #
 import json
 import os
-import tempfile
 
 import mlrun
+import mlrun.common.schemas
 import numpy as np
 import pandas as pd
+import pytest
 from mlrun.frameworks.sklearn import apply_mlrun
 from sklearn.datasets import make_classification
 from sklearn.tree import DecisionTreeClassifier
+
+REQUIRED_ENV_VARS = [
+    "MLRUN_DBPATH",
+    "V3IO_USERNAME",
+    "V3IO_API",
+    "V3IO_ACCESS_KEY",
+]
+
+
+def _validate_environment_variables() -> bool:
+    """
+    Checks that all required Environment variables are set.
+    """
+    environment_keys = os.environ.keys()
+    return all(key in environment_keys for key in REQUIRED_ENV_VARS)
 
 
 @mlrun.handler(outputs=["training_set", "prediction_set"])
@@ -65,23 +81,29 @@ def train(training_set: pd.DataFrame):
     model.fit(training_set, labels)
 
 
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
 def test_batch_predict():
+
+    project = mlrun.get_or_create_project(
+        "batch-infer-v9-test", context="./", user_project=True
+    )
+
     # Configure test:
     n_samples = 5000
     n_features = 20
 
     # Create the function and run:
     test_function = mlrun.code_to_function(filename=__file__, kind="job")
-    artifact_path = tempfile.TemporaryDirectory()
     generate_data_run = test_function.run(
         handler="generate_data",
-        artifact_path=artifact_path.name,
         params={"n_samples": n_samples, "n_features": n_features},
         local=True,
     )
     train_run = test_function.run(
         handler="train",
-        artifact_path=artifact_path.name,
         inputs={"training_set": generate_data_run.outputs["training_set"]},
         local=True,
     )
@@ -89,13 +111,11 @@ def test_batch_predict():
     batch_predict_function = mlrun.import_function("function.yaml")
     batch_predict_run = batch_predict_function.run(
         handler="infer",
-        artifact_path=artifact_path.name,
         inputs={"dataset": generate_data_run.outputs["prediction_set"]},
         params={
             "model": train_run.outputs["model"],
             "result_set_name": "result_set",
         },
-        local=True,
     )
 
     # Check the result set:
@@ -104,10 +124,10 @@ def test_batch_predict():
     assert "target_label" in result_set.columns
     assert "batch_id" in batch_predict_run.status.results
 
-    # Check the drift table plot:
+    # Check drift table artifact url
     assert (
-        os.path.basename(batch_predict_run.artifact("drift_table_plot").local())
-        == "drift_table_plot.html"
+        batch_predict_run.artifact("drift_table_plot").artifact_url
+        == batch_predict_run.outputs["drift_table_plot"]
     )
 
     # Check the features drift results json:
@@ -119,6 +139,3 @@ def test_batch_predict():
     # Check the final analysis logged results:
     assert "drift_status" in batch_predict_run.status.results
     assert "drift_metric" in batch_predict_run.status.results
-
-    # Clear outputs:
-    artifact_path.cleanup()

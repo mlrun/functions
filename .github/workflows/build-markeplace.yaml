@@ -3,7 +3,7 @@ name: Test all functions, build marketplace
 on:
   push:
     branches:
-      - ci
+      - development
 
 jobs:
 

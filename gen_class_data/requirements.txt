@@ -1,3 +1,2 @@
 pandas
-mlrun
 scikit-learn~=1.0

@@ -90,6 +90,7 @@ def infer(
     model_path: str,
     drop_columns: Union[str, List[str], int, List[int]] = None,
     label_columns: Union[str, List[str]] = None,
+    feature_columns: Union[str, List[str]] = None,
     log_result_set: bool = True,
     result_set_name: str = "prediction",
     batch_id: str = None,
@@ -129,6 +130,8 @@ def infer(
     :param label_columns:                           The target label(s) of the column(s) in the dataset for Regression or
                                                     Classification tasks. The label column can be accessed from the model object, or
                                                     the feature vector provided if available.
+    :param feature_columns:                         List of feature columns that will be used to build the dataframe when dataset is
+                                                    from type list or numpy array.
     :param log_result_set:                          Whether to log the result set - a DataFrame of the given inputs concatenated with
                                                     the predictions. Defaulted to True.
     :param result_set_name:                         The db key to set name of the prediction result and the filename. Defaulted to
@@ -169,10 +172,16 @@ def infer(
             output.name for output in model_handler._model_artifact.spec.outputs
         ]
 
+    if feature_columns is None:
+        feature_columns = [
+            input.name for input in model_handler._model_artifact.spec.inputs
+        ]
+
     # Get dataset by object, URL or by FeatureVector:
     context.logger.info(f"Loading data...")
     x, label_columns = mlrun.model_monitoring.api.read_dataset_as_dataframe(
         dataset=dataset,
+        feature_columns=feature_columns,
         label_columns=label_columns,
         drop_columns=drop_columns,
     )

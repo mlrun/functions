@@ -1,2 +1,1 @@
 transformers
-PyYaml==5.3.1

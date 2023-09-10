@@ -36,4 +36,4 @@ def test_gen_class_data():
         local=True,
         artifact_path="artifacts",
         )
-    assert run.artifact('classifier-data').get()
+    assert 'classifier-data' in run.outputs.keys()

@@ -44,7 +44,7 @@ def test_xgb_trainer_code_to_function():
                          'FIT_verbose': 0,
                          'label_column': 'labels'},
                  local=False,
-                 inputs={'dataset': gen_data_run.artifact('classifier-data').url})
+                 inputs={'dataset': gen_data_run.outputs['classifier-data']})
 
     assert (run.artifact('model'))
 
@@ -60,6 +60,6 @@ def test_local_xgb_trainer_import_function():
                          'CLASS_booster': 'gbtree',
                          'FIT_verbose': 0,
                          'label_column': 'labels'},
-                 local=True, inputs={'dataset': gen_data_run.artifact('classifier-data').url})
+                 local=True, inputs={'dataset': gen_data_run.outputs['classifier-data']})
 
     assert (run.artifact('model'))

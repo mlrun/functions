@@ -31,6 +31,7 @@ def get_class_data():
 
 
 def test_xgb_trainer_code_to_function():
+    project = mlrun.get_or_create_project('test-xgb-trainer')
     gen_data_run = get_class_data()
     fn = code_to_function(name='test_xgb_trainer',
                           filename='xgb_trainer.py',
@@ -50,6 +51,7 @@ def test_xgb_trainer_code_to_function():
 
 
 def test_local_xgb_trainer_import_function():
+    project = mlrun.get_or_create_project('test-xgb-trainer')
     # importing data preparation function locally
     gen_data_run = get_class_data()
 

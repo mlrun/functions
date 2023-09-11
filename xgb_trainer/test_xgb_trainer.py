@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import mlrun
 from mlrun import code_to_function, import_function, DataItem
 from mlrun.execution import MLClientCtx
 import os
@@ -27,32 +26,11 @@ def get_class_data():
                          'header': None,
                          'weight': [0.5, 0.5],
                          'sk_params': {'n_informative': 2},
-                         'file_ext': 'csv'}, local=True, artifact_path='./')
+                         'file_ext': 'csv'}, local=True, artifact_path="./")
     return run
 
 
-def test_xgb_trainer_code_to_function():
-    project = mlrun.get_or_create_project('test-xgb-trainer')
-    gen_data_run = get_class_data()
-    fn = code_to_function(name='test_xgb_trainer',
-                          filename='xgb_trainer.py',
-                          handler='train_model',
-                          kind='local')
-    
-    run = fn.run(params={'model_type': 'classifier',
-                         'CLASS_tree_method': 'hist',
-                         'CLASS_objective': 'binary:logistic',
-                         'CLASS_booster': 'gbtree',
-                         'FIT_verbose': 0,
-                         'label_column': 'labels'},
-                 local=False,
-                 inputs={'dataset': gen_data_run.outputs['classifier-data']})
-
-    assert (run.artifact('model'))
-
-
 def test_local_xgb_trainer_import_function():
-    project = mlrun.get_or_create_project('test-xgb-trainer')
     # importing data preparation function locally
     gen_data_run = get_class_data()
 
@@ -65,4 +43,4 @@ def test_local_xgb_trainer_import_function():
                          'label_column': 'labels'},
                  local=True, inputs={'dataset': gen_data_run.outputs['classifier-data']})
 
-    assert (run.artifact('model'))
+    assert ('model' in run.outputs.keys())

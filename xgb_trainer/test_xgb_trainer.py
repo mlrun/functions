@@ -26,6 +26,7 @@ def get_class_data():
                          'weight': [0.5, 0.5],
                          'sk_params': {'n_informative': 2},
                          'file_ext': 'csv'}, local=True, artifact_path="./artifacts")
+
     return run
 
 
@@ -42,6 +43,7 @@ def test_local_xgb_trainer_import_function():
                          'label_column': 'labels'},
                  local=True, inputs={'dataset': gen_data_run.status.artifacts[0]['spec']['target_path']})  # only one dataset artifact created
 
+    print(run.to_dict())
     for artifact in run.status.artifacts:
         if artifact['kind'] == 'model':
             assert os.path.exists(artifact['spec']['target_path'])  # validating model exists

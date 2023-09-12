@@ -11,9 +11,9 @@ labels:
   author: Daniel
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.4.1
 name: xgb_trainer
-platformVersion: 3.5.0
+platformVersion: 3.5.4
 spec:
   filename: xgb_trainer.py
   handler: train_model

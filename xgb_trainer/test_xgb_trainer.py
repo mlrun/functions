@@ -43,7 +43,6 @@ def test_local_xgb_trainer_import_function():
                          'label_column': 'labels'},
                  local=True, inputs={'dataset': gen_data_run.status.artifacts[0]['spec']['target_path']})  # only one dataset artifact created
 
-    print(run.to_dict())
     for artifact in run.status.artifacts:
         if artifact['kind'] == 'model':
             assert os.path.exists(artifact['spec']['target_path'])  # validating model exists

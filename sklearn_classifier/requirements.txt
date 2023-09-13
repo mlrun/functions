@@ -3,4 +3,4 @@ pandas
 scikit-learn
 matplotlib
 seaborn
-scikit-plot
+scikit-plot==1.0.2

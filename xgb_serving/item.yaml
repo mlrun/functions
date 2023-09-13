@@ -12,14 +12,18 @@ labels:
   author: Daniel
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.4.1
 name: xgb_serving
-platformVersion: 3.5.0
+platformVersion: 3.5.3
 spec:
+  customFields:
+    default_class: ClassifierModel
   filename: xgb_serving.py
   handler: handler
-  image: mlrun/ml-models
-  kind: remote
+  image: mlrun/mlrun
+  kind: serving
   requirements: []
 url: ''
-version: 1.1.0
+version: 1.1.2
+
+

@@ -1,6 +1,6 @@
 mlrun
 pandas
-scikit-learn
+scikit-learn==1.0.2
 matplotlib
 seaborn
-scikit-plot==1.0.2
+scikit-plot

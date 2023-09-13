@@ -54,7 +54,6 @@ def xgb_trainer():
 def test_local_xgb_serving():
     model_path, dataset_path = xgb_trainer()
     fn = mlrun.import_function('function.yaml')
-    fn = mlrun.code_to_function(name='serv', kind='serving', image='mlrun/mlrun', filename='xgb_serving.py')
 
     fn.add_model(key='my_model', model_path=model_path, class_name='XGBoostModel')
     server = fn.to_mock_server()

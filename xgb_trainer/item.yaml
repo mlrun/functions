@@ -17,7 +17,7 @@ platformVersion: 3.5.4
 spec:
   filename: xgb_trainer.py
   handler: train_model
-  image: mlrun/ml-models
+  image: mlrun/mlrun
   kind: job
   requirements: []
 url: ''

@@ -12,41 +12,56 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from mlrun import import_function
+import mlrun
 import os
 import pandas as pd
 from xgb_serving import XGBoostModel
 
+
+def get_class_data():
+    fn = mlrun.import_function('../gen_class_data/function.yaml')
+    run = fn.run(params={'key': 'classifier-data',
+                         'n_samples': 10_000,
+                         'm_features': 5,
+                         'k_classes': 2,
+                         'header': None,
+                         'weight': [0.5, 0.5],
+                         'sk_params': {'n_informative': 2},
+                         'file_ext': 'csv'}, local=True, artifact_path="./artifacts")
+    return run
+
+
+def xgb_trainer():
+    # running data preparation function locally
+    gen_data_run = get_class_data()
+
+    fn = mlrun.import_function('../xgb_trainer/function.yaml')
+    run = fn.run(params={'model_type': 'classifier',
+                         'CLASS_tree_method': 'hist',
+                         'CLASS_objective': 'binary:logistic',
+                         'CLASS_booster': 'gbtree',
+                         'FIT_verbose': 0,
+                         'label_column': 'labels'},
+                 local=True, inputs={'dataset': gen_data_run.status.artifacts[0]['spec']['target_path']})
+
+    for artifact in run.status.artifacts:
+        if artifact['kind'] == 'model':
+            assert os.path.exists(artifact['spec']['target_path']), "Failed locating model file"  # validating model exists
+            return artifact['spec']['target_path'] + artifact['spec']['model_file'], gen_data_run.status.artifacts[0]['spec']['target_path']
+    assert False, "Failed creating model"
+
+
 def test_local_xgb_serving():
-    # importing data preparation function (gen_class_data) locally
-    fn = import_function("hub://gen_class_data")
-    gen_data_run = fn.run(params={"n_samples": 10_000,
-                                  "m_features": 5,
-                                  "k_classes": 2,
-                                  "header": None,
-                                  "weight": [0.5, 0.5],
-                                  "sk_params": {"n_informative": 2},
-                                  "file_ext": "csv"},
-                          local=True,
-                          artifact_path="./")
+    model_path, dataset_path = xgb_trainer()
+    fn = mlrun.import_function('function.yaml')
 
-    # importing model training function (xgb_trainer) locally
-    fn = import_function("../xgb_trainer/function.yaml")
-    xgb_trainer_run = fn.run(params={"model_type": "classifier",
-                                     "CLASS_tree_method": "hist",
-                                     "CLASS_objective": "binary:logistic",
-                                     "CLASS_booster": "gbtree",
-                                     "FIT_verbose": 0,
-                                     "label_column": "labels"},
-                             local=True,
-                             inputs={"dataset": gen_data_run.artifact('classifier-data').url},
-                             artifact_path='./')
+    fn.add_model(key='my_model', model_path=model_path, class_name='XGBoostModel')
+    server = fn.to_mock_server()
 
-    # because this class is implemented with MLModelServer, creating a class instance and not to_mock_server(V2_Model_Server).
-    model = xgb_trainer_run.artifact('model').url
-    my_server = XGBoostModel("my-model", model_dir=model)
-    my_server.load()
     # Testing the model
-    xtest = pd.read_csv(gen_data_run.artifact('classifier-data').url)
-    preds = my_server.predict({"instances": xtest.values[:10, :-1].tolist()})
-    assert (True if preds == [1, 0, 0, 0, 0, 0, 1, 1, 0, 1] else False) is True
+    df = pd.read_csv(dataset_path)
+    x = df.drop(['labels'], axis=1).iloc[0].tolist()
+    y_true = df['labels'][0]
+
+    y_pred = server.test(path='/v2/models/my_model/predict', body={"inputs": x})['outputs'][0]
+    assert y_true == y_pred

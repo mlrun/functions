@@ -34,6 +34,6 @@ def test_gen_class_data():
             "sk_params": {"n_informative": 2},
             "file_ext": "csv"},
         local=True,
-        artifact_path="artifacts",
+        artifact_path="./artifacts",
         )
-    assert 'classifier-data' in run.outputs.keys()
+    assert os.path.isfile(run.status.artifacts[0]['spec']['target_path']), 'dataset is not available'

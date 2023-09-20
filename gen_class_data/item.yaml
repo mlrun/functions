@@ -11,9 +11,9 @@ labels:
   author: Daniel
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.4.1
 name: gen_class_data
-platformVersion: 3.5.0
+platformVersion: 3.5.3
 spec:
   filename: gen_class_data.py
   handler: gen_class_data
@@ -21,4 +21,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 1.1.0
+version: 1.2.0

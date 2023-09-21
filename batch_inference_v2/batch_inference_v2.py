@@ -31,9 +31,6 @@ import numpy as np
 import pandas as pd
 from mlrun.frameworks.auto_mlrun import AutoMLRun
 
-# A union of all supported dataset types:
-DatasetType = Union[list, dict, pd.DataFrame, pd.Series, np.ndarray, Any]
-
 
 def _prepare_result_set(
     x: pd.DataFrame, label_columns: List[str], y_pred: np.ndarray
@@ -84,7 +81,7 @@ def _prepare_result_set(
 
 def infer(
     context: mlrun.MLClientCtx,
-    dataset: Union[mlrun.DataItem, DatasetType],
+    dataset: Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
     model_path: Union[str, mlrun.DataItem],
     drop_columns: Union[str, List[str], int, List[int]] = None,
     label_columns: Union[str, List[str]] = None,
@@ -104,7 +101,9 @@ def infer(
     model_endpoint_name: str = "batch-infer",
     model_endpoint_drift_threshold: float = 0.7,
     model_endpoint_possible_drift_threshold: float = 0.5,
-    model_endpoint_sample_set: Union[mlrun.DataItem, DatasetType] = None,
+    model_endpoint_sample_set: Union[
+        mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray
+    ] = None,
     **predict_kwargs: Dict[str, Any],
 ):
     """
@@ -119,7 +118,7 @@ def infer(
     :param dataset:                                 The dataset to infer through the model. Can be passed in `inputs` as either a
                                                     Dataset artifact / Feature vector URI. Or, in `parameters` as a list, dictionary or
                                                     numpy array.
-    :param model_path:                              The model Store path. Can be provided as an input or as a parameter.
+    :param model_path:                              The model Store path. Can be provided as an input (DataItem) or as a parameter (string).
                                                     If `endpoint_id` of existing model endpoint is provided, make sure
                                                     that it has a similar model store path, otherwise the drift analysis
                                                     won't be triggered.
@@ -158,8 +157,8 @@ def infer(
     :param model_endpoint_drift_threshold:          The threshold of which to mark drifts. Defaulted to 0.7.
     :param model_endpoint_possible_drift_threshold: The threshold of which to mark possible drifts. Defaulted to 0.5.
     :param model_endpoint_sample_set:               A sample dataset to give to compare the inputs in the drift analysis.
-                                                    Can be provided as an input or as a parameter. The default chosen sample
-                                                    set will always be the one who is set in the model artifact itself.
+                                                    Can be provided as an input (DataItem) or as a parameter (e.g. string, list, DataFrame).
+                                                    The default chosen sample set will always be the one who is set in the model artifact itself.
 
     raises MLRunInvalidArgumentError: if both `model_path` and `endpoint_id` are not provided
     """

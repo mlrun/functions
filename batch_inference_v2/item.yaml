@@ -14,7 +14,7 @@ labels:
   author: eyald
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.5.0-rc9
+mlrunVersion: 1.5.0-rc13
 name: batch_inference_v2
 platformVersion: 3.5.3
 spec:
@@ -29,4 +29,4 @@ spec:
   kind: job
   requirements:
 url: ''
-version: 1.6.0
+version: 1.7.0

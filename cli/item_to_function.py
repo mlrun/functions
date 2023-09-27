@@ -115,7 +115,7 @@ def _get_item_yaml(item_path: Path) -> dict:
         raise FileNotFoundError(f"{item_path} not found")
 
     item_yaml = full_load(open(item_path, "r"))
-    return item_yaml
+    return item_path, item_yaml
 
 
 def create_function_yaml(
@@ -129,7 +129,7 @@ def create_function_yaml(
     if bump_version:
         bump_function_yaml_version(item_path)
 
-    item_yaml = _get_item_yaml(item_path)
+    item_path, item_yaml = _get_item_yaml(item_path)
 
     filename = item_yaml.get("spec", {}).get("filename")
     filename = filename or item_yaml.get("example")
@@ -197,7 +197,7 @@ def create_function_yaml(
 
 
 def bump_function_yaml_version(item_path: Path):
-    item_yaml = _get_item_yaml(item_path)
+    item_path, item_yaml = _get_item_yaml(item_path)
     item_ver = item_yaml.get("version", "0.0.0")
     new_ver = semver.Version.parse(item_ver).bump_minor()
     item_yaml["version"] = str(new_ver)

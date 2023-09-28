@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import os.path
 import subprocess
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -186,7 +185,7 @@ class TestSuite(ABC):
 
 
 class TestPY(TestSuite):
-    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True, multi_process: bool = False):
+    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True):
         super().__init__(stop_on_failure)
         self.clean_env_artifacts = clean_env_artifacts
         self.results = []
@@ -222,6 +221,7 @@ class TestPY(TestSuite):
             )
             sys.exit(0)
         testable.sort()
+        print(testable)
         return testable
 
     def before_run(self):

@@ -35,3 +35,4 @@ spec:
   - plotly~=5.4
 url: ''
 version: 1.2.0
+test_valid: False

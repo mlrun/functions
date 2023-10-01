@@ -31,11 +31,6 @@ import numpy as np
 import pandas as pd
 from mlrun.frameworks.auto_mlrun import AutoMLRun
 
-# A union of all supported dataset types:
-DatasetType = Union[
-    mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray, Any
-]
-
 
 def _prepare_result_set(
     x: pd.DataFrame, label_columns: List[str], y_pred: np.ndarray
@@ -86,10 +81,11 @@ def _prepare_result_set(
 
 def infer(
     context: mlrun.MLClientCtx,
-    dataset: DatasetType,
-    model_path: str,
+    dataset: Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
+    model_path: Union[str, mlrun.DataItem],
     drop_columns: Union[str, List[str], int, List[int]] = None,
     label_columns: Union[str, List[str]] = None,
+    feature_columns: Union[str, List[str]] = None,
     log_result_set: bool = True,
     result_set_name: str = "prediction",
     batch_id: str = None,
@@ -105,7 +101,9 @@ def infer(
     model_endpoint_name: str = "batch-infer",
     model_endpoint_drift_threshold: float = 0.7,
     model_endpoint_possible_drift_threshold: float = 0.5,
-    model_endpoint_sample_set: DatasetType = None,
+    model_endpoint_sample_set: Union[
+        mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray
+    ] = None,
     **predict_kwargs: Dict[str, Any],
 ):
     """
@@ -120,8 +118,9 @@ def infer(
     :param dataset:                                 The dataset to infer through the model. Can be passed in `inputs` as either a
                                                     Dataset artifact / Feature vector URI. Or, in `parameters` as a list, dictionary or
                                                     numpy array.
-    :param model_path:                              The model Store path. If `endpoint_id` of existing model endpoint is provided,
-                                                    make sure that it has a similar model store path, otherwise the drift analysis
+    :param model_path:                              The model Store path. Can be provided as an input (DataItem) or as a parameter (string).
+                                                    If `endpoint_id` of existing model endpoint is provided, make sure
+                                                    that it has a similar model store path, otherwise the drift analysis
                                                     won't be triggered.
     :param drop_columns:                            A string / integer or a list of strings / integers that represent the column names
                                                     / indices to drop. When the dataset is a list or a numpy array this parameter must
@@ -129,6 +128,8 @@ def infer(
     :param label_columns:                           The target label(s) of the column(s) in the dataset for Regression or
                                                     Classification tasks. The label column can be accessed from the model object, or
                                                     the feature vector provided if available.
+    :param feature_columns:                         List of feature columns that will be used to build the dataframe when dataset is
+                                                    from type list or numpy array.
     :param log_result_set:                          Whether to log the result set - a DataFrame of the given inputs concatenated with
                                                     the predictions. Defaulted to True.
     :param result_set_name:                         The db key to set name of the prediction result and the filename. Defaulted to
@@ -155,24 +156,34 @@ def infer(
                                                     endpoint.
     :param model_endpoint_drift_threshold:          The threshold of which to mark drifts. Defaulted to 0.7.
     :param model_endpoint_possible_drift_threshold: The threshold of which to mark possible drifts. Defaulted to 0.5.
-    :param model_endpoint_sample_set:               A sample dataset to give to compare the inputs in the drift analysis. The default
-                                                    chosen sample set will always be the one who is set in the model artifact itself.
+    :param model_endpoint_sample_set:               A sample dataset to give to compare the inputs in the drift analysis.
+                                                    Can be provided as an input (DataItem) or as a parameter (e.g. string, list, DataFrame).
+                                                    The default chosen sample set will always be the one who is set in the model artifact itself.
 
     raises MLRunInvalidArgumentError: if both `model_path` and `endpoint_id` are not provided
     """
 
     # Loading the model:
     context.logger.info(f"Loading model...")
+    if isinstance(model_path, mlrun.DataItem):
+        model_path = model_path.artifact_url
     model_handler = AutoMLRun.load_model(model_path=model_path, context=context)
+
     if label_columns is None:
         label_columns = [
             output.name for output in model_handler._model_artifact.spec.outputs
+        ]
+
+    if feature_columns is None:
+        feature_columns = [
+            input.name for input in model_handler._model_artifact.spec.inputs
         ]
 
     # Get dataset by object, URL or by FeatureVector:
     context.logger.info(f"Loading data...")
     x, label_columns = mlrun.model_monitoring.api.read_dataset_as_dataframe(
         dataset=dataset,
+        feature_columns=feature_columns,
         label_columns=label_columns,
         drop_columns=drop_columns,
     )

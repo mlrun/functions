@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import os.path
 import subprocess
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -107,19 +106,19 @@ class TestResult:
 
     @classmethod
     def passed(
-        cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
+            cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
     ):
         return cls(status="Passed", status_code=status_code, meta_data=meta_data)
 
     @classmethod
     def failed(
-        cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
+            cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
     ):
         return cls(status="Failed", status_code=status_code, meta_data=meta_data)
 
     @classmethod
     def ignored(
-        cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
+            cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
     ):
         return cls(status="Ignored", status_code=status_code, meta_data=meta_data)
 
@@ -157,7 +156,7 @@ class TestSuite(ABC):
         import multiprocessing as mp
         process_count = 1
         if multiprocess:
-            process_count = mp.cpu_count()-1
+            process_count = mp.cpu_count() - 1
         print("running tests with {} process".format(process_count))
         discovered = self.discover(path)
         if function_name is not None:
@@ -175,7 +174,7 @@ class TestSuite(ABC):
             self.directory_process(directory)
         self.after_run()
 
-        #pool.close()
+        # pool.close()
         sys.exit(0)
 
     def directory_process(self, directory):
@@ -186,22 +185,23 @@ class TestSuite(ABC):
 
 
 class TestPY(TestSuite):
-    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True, multi_process: bool= False):
+    def __init__(self, stop_on_failure: bool = True, clean_env_artifacts: bool = True):
         super().__init__(stop_on_failure)
         self.clean_env_artifacts = clean_env_artifacts
         self.results = []
 
     def discover(self, path: Union[str, Path]) -> List[str]:
         path = Path(path)
-        testables = []
-
+        testable = []
+        item_yaml_path = path / "item.yaml"
         # Handle single test file
-        if (path / "item.yaml").exists():
+        if item_yaml_path.exists():
             for inner_file in path.iterdir():
                 if self.is_test_py(inner_file):
-                    testables.append(str(path.resolve()))
-                    break
-            if testables:
+                    if is_test_valid_by_item(item_yaml_path):
+                        testable.append(str(path.resolve()))
+                        break
+            if testable:
                 click.echo("Found testable directory...")
         # Handle multiple directories
         else:
@@ -210,17 +210,19 @@ class TestPY(TestSuite):
                 # Iterate individual files in each directory
                 for inner_file in inner_dir.iterdir():
                     if self.is_test_py(inner_file):
-                        testables.append(str(inner_dir.resolve()))
-                        break
-            click.echo(f"Found {len(testables)} testable items...")
+                        if is_test_valid_by_item(inner_dir):
+                            testable.append(str(inner_dir.resolve()))
+                            break
+            click.echo(f"Found {len(testable)} testable items...")
 
-        if not testables:
+        if not testable:
             click.echo(
                 "No tests found, make sure your test file names are structures as 'test_*.py')"
             )
             sys.exit(0)
-        testables.sort()
-        return testables
+        testable.sort()
+        print(testable)
+        return testable
 
     def before_run(self):
         install_pipenv()
@@ -312,9 +314,9 @@ class TestPY(TestSuite):
     @staticmethod
     def is_test_py(path: Union[str, Path]) -> bool:
         return (
-            path.is_file()
-            and path.name.startswith("test_")
-            and path.name.endswith(".py")
+                path.is_file()
+                and path.name.startswith("test_")
+                and path.name.endswith(".py")
         )
 
 
@@ -341,9 +343,9 @@ class TestIPYNB(TestSuite):
             for inner_dir in item_iterator:
                 # Iterate individual files in each directory
                 for inner_file in inner_dir.iterdir():
-                    #click.echo("test inner file"+str(inner_file))
+                    # click.echo("test inner file"+str(inner_file))
                     if self.is_test_ipynb(inner_file):
-                        #click.echo("adding "+str(inner_file))
+                        # click.echo("adding "+str(inner_file))
                         testables.append(str(inner_dir.resolve()))
             click.echo(f"Found {len(testables)} testable items...")
 
@@ -354,7 +356,7 @@ class TestIPYNB(TestSuite):
             exit(0)
         testables.sort()
         click.echo(
-            "tests list "+str(testables)
+            "tests list " + str(testables)
         )
         return testables
 
@@ -364,7 +366,7 @@ class TestIPYNB(TestSuite):
     def before_each(self, path: Union[str, Path]):
         pass
 
-#    def run(self, path: Union[str, Path]) -> TestResult:
+    #    def run(self, path: Union[str, Path]) -> TestResult:
     def run(self, path: Union[str, Path]) -> TestResult:
         print("IPYNB run path {}".format(path))
         install_python(path)
@@ -372,7 +374,7 @@ class TestIPYNB(TestSuite):
         install_requirements(path, ["papermill"] + item_requirements)
 
         click.echo(f"Running tests for {path}...")
-        running_ipynb = Path(path).name+".ipynb"
+        running_ipynb = Path(path).name + ".ipynb"
         click.echo(f"Running notebook {running_ipynb}")
         command = f'pipenv run papermill {running_ipynb} out.ipynb --log-output'
         completed_process: CompletedProcess = subprocess.run(
@@ -451,13 +453,13 @@ class TestIPYNB(TestSuite):
                 exit(test_result.status_code)
 
     def _run(self, path: Union[str, Path], multi_processing, function_name):
-        super()._run(path, multi_processing, function_name )
+        super()._run(path, multi_processing, function_name)
 
     @staticmethod
     def is_test_ipynb(path: Path):
         return (
-            path.is_file()
-            and path.name.endswith(".ipynb")
+                path.is_file()
+                and path.name.endswith(".ipynb")
         )
 
 
@@ -591,6 +593,27 @@ def clean_pipenv(directory: str):
         pip_file.unlink()
     if pip_lock.exists():
         pip_lock.unlink()
+
+
+# load item yaml
+def load_item(path):
+    with open(path, 'r') as stream:
+        data = yaml.load(stream)
+    return data
+
+
+def is_test_valid_by_item(item_posix_path):
+    full_path = str(item_posix_path.absolute())+'/item.yaml'
+    data = load_item(full_path)
+    if data.get("test_valid") is not None:
+        test_valid = data.get("test_valid")
+        test_name = data.get("name")
+        if not test_valid:
+            click.echo("==================== Test {} Not valid ====================".format(test_name))
+            click.echo("==================== enable tet_valid in item yaml ====================")
+        return test_valid
+    else:
+        return True
 
 
 if __name__ == "__main__":

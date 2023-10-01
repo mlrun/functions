@@ -16,6 +16,8 @@ from pathlib import Path
 from typing import Optional, Union
 
 import click
+import semver
+import yaml
 from black import format_str, FileMode
 from mlrun import code_to_function
 from yaml import full_load
@@ -45,10 +47,17 @@ from cli.path_iterator import PathIterator
     default=False,
     help="If -c/--code_output is enabled, and -fmt/--format is enabled, the code output will be formatted",
 )
+@click.option(
+    "-b",
+    "--bump_version",
+    is_flag=True,
+    default=False,
+    help="If -b/--bump_version is enabled, increase the minor version in the item.yaml file",
+)
 def item_to_function_cli(
-    item_path: str, output_path: Optional[str], code_output: bool, format_code: bool
+    item_path: str, output_path: Optional[str], code_output: bool, format_code: bool, bump_version: bool
 ):
-    item_to_function(item_path, output_path, code_output, format_code)
+    item_to_function(item_path, output_path, code_output, format_code, bump_version)
 
 
 def item_to_function(
@@ -56,6 +65,7 @@ def item_to_function(
     output_path: Optional[str] = None,
     code_output: bool = False,
     format_code: bool = True,
+    bump_version: bool = False,
 ):
     item_path = Path(item_path)
     if item_path.is_dir():
@@ -64,7 +74,7 @@ def item_to_function(
     # That means we are in a specific item directory
     if item_path.exists():
         _output_path = output_path or item_path.parent / "function.yaml"
-        create_function_yaml(item_path, _output_path, code_output, format_code)
+        create_function_yaml(item_path, _output_path, code_output, format_code, bump_version)
     # That means we need to search for items inside this direcotry
     else:
         for inner_dir in PathIterator(
@@ -74,7 +84,7 @@ def item_to_function(
         ):
             try:
                 _output_path = output_path or (inner_dir / "function.yaml")
-                create_function_yaml(inner_dir, _output_path, code_output, format_code)
+                create_function_yaml(inner_dir, _output_path, code_output, format_code, bump_version)
             except Exception as e:
                 print(e)
                 click.echo(f"{inner_dir.name}: Failed to generate function.yaml")
@@ -95,14 +105,7 @@ def set_nested(parent, key, value):
         setattr(parent, key, value)
 
 
-def create_function_yaml(
-    item_path: Union[str, Path],
-    output_path: Optional[str] = None,
-    code_output: bool = False,
-    format_code: bool = True,
-):
-    item_path = Path(item_path)
-
+def _get_item_yaml(item_path: Path) -> dict:
     if item_path.is_dir():
         if (item_path / "item.yaml").exists():
             item_path = item_path / "item.yaml"
@@ -112,6 +115,21 @@ def create_function_yaml(
         raise FileNotFoundError(f"{item_path} not found")
 
     item_yaml = full_load(open(item_path, "r"))
+    return item_path, item_yaml
+
+
+def create_function_yaml(
+    item_path: Union[str, Path],
+    output_path: Optional[str] = None,
+    code_output: bool = False,
+    format_code: bool = True,
+    bump_version: bool = False,
+):
+    item_path = Path(item_path)
+    if bump_version:
+        bump_function_yaml_version(item_path)
+
+    item_path, item_yaml = _get_item_yaml(item_path)
 
     filename = item_yaml.get("spec", {}).get("filename")
     filename = filename or item_yaml.get("example")
@@ -176,6 +194,15 @@ def create_function_yaml(
         code = format_str(code, mode=FileMode())
         with open(_code_output, "w") as file:
             file.write(code)
+
+
+def bump_function_yaml_version(item_path: Path):
+    item_path, item_yaml = _get_item_yaml(item_path)
+    item_ver = item_yaml.get("version", "0.0.0")
+    new_ver = semver.Version.parse(item_ver).bump_minor()
+    item_yaml["version"] = str(new_ver)
+    with open(item_path, 'w') as file:
+        yaml.safe_dump(item_yaml, file, default_flow_style=False)
 
 
 if __name__ == "__main__":

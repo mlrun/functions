@@ -13,9 +13,9 @@ labels:
   framework: sklearn
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.4.1
 name: sklearn-classifier
-platformVersion: 3.5.0
+platformVersion: 3.5.3
 spec:
   filename: sklearn_classifier.py
   handler: train_model
@@ -23,4 +23,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 1.1.0
+version: 1.1.1

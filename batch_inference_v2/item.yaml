@@ -1,12 +1,12 @@
 apiVersion: v1
 categories:
-- Utils
-- Data Analysis
-- Monitoring
+- utils
+- data-analysis
+- monitoring
 description: Batch inference (also knows as prediction) for the common ML frameworks
   (SciKit-Learn, XGBoost and LightGBM) while performing data drift analysis.
 doc: ''
-example: batch_inference.ipynb
+example: batch_inference_v2.ipynb
 generationDate: 2023-08-07:12-25
 hidden: false
 icon: ''
@@ -14,7 +14,7 @@ labels:
   author: eyald
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.5.0
+mlrunVersion: 1.5.0-rc13
 name: batch_inference_v2
 platformVersion: 3.5.3
 spec:
@@ -27,6 +27,6 @@ spec:
   handler: infer
   image: mlrun/mlrun
   kind: job
-  requirements:
+  requirements: null
 url: ''
-version: 1.4.0
+version: 1.8.0

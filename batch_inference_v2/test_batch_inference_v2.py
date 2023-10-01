@@ -117,7 +117,6 @@ def test_batch_predict():
             "perform_drift_analysis": True,
             "model_endpoint_drift_threshold": 0.2,
             "model_endpoint_possible_drift_threshold": 0.1,
-            "batch_image_job": "eyaligu/mlrun-api:image-test",
         },
     )
 

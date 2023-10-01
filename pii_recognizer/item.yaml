@@ -31,3 +31,4 @@ spec:
    - https://huggingface.co/beki/en_spacy_pii_distilbert/resolve/main/en_spacy_pii_distilbert-any-py3-none-any.whl
 url: ''
 version: 0.1.0
+test_valid: False

@@ -69,7 +69,7 @@ jobs:
          path: functions
      # Install python 3.9
      - name: Install python 3.9
-       uses: actions/setup-python@v2
+       uses: actions/setup-python@v3
        with:
          python-version: 3.9
      # Install dependencies

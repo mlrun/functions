@@ -606,7 +606,11 @@ def is_test_valid_by_item(item_posix_path):
     full_path = str(item_posix_path.absolute())+'/item.yaml'
     data = load_item(full_path)
     if data.get("test_valid") is not None:
-        return data.get("test_valid")
+        test_valid = data.get("test_valid")
+        if not test_valid:
+            click.echo("==================== Test Not valid ====================")
+            click.echo("==================== enable tet_valid in item yaml ====================")
+        return test_valid
     else:
         return True
 

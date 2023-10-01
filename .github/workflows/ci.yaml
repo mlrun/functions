@@ -44,7 +44,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
   check_matrix:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: build_strategy_matrix
     steps:
       - name: Install json2yaml
@@ -58,7 +58,7 @@ jobs:
           echo $matrix | json2yaml
   run_monorepo_tests:
     needs: build_strategy_matrix
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       # matrix: [{"package": some package that changed}, {...}, ...]
       matrix: ${{fromJson(needs.build_strategy_matrix.outputs.matrix)}}
@@ -69,11 +69,11 @@ jobs:
          path: functions
      # Install python 3.9
      - name: Install python 3.9
-       uses: actions/setup-python@v2
+       uses: actions/setup-python@v3
        with:
          python-version: 3.9
      # Install dependencies
-     - uses: actions/cache@v1
+     - uses: actions/cache@v3
        id: cache
        with:
          path: ~/.cache/pip

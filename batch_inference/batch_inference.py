@@ -18,10 +18,11 @@ from datetime import datetime
 from typing import Any, Dict, List, Tuple, Union
 
 import mlrun
+import mlrun.datastore
+import mlrun.utils
 import numpy as np
 import pandas as pd
 from mlrun import feature_store as fs
-from mlrun.api.schemas import ObjectKind
 from mlrun.artifacts import Artifact
 from mlrun.data_types.infer import InferOptions, get_df_stats
 from mlrun.frameworks.auto_mlrun import AutoMLRun
@@ -37,6 +38,7 @@ DatasetType = Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndar
 
 def _read_dataset_as_dataframe(
     dataset: DatasetType,
+    feature_columns: Union[str, List[str]] = None,
     label_columns: Union[str, List[str]] = None,
     drop_columns: Union[str, List[str], int, List[int]] = None,
 ) -> Tuple[pd.DataFrame, List[str]]:
@@ -44,12 +46,14 @@ def _read_dataset_as_dataframe(
     Parse the given dataset into a DataFrame and drop the columns accordingly. In addition, the label columns will be
     parsed and validated as well.
 
-    :param dataset:       The dataset to train the model on.
-                          Can be either a list of lists, dict, URI or a FeatureVector.
-    :param label_columns: The target label(s) of the column(s) in the dataset. for Regression or
-                          Classification tasks.
-    :param drop_columns:  ``str`` / ``int`` or a list of ``str`` / ``int`` that represent the column names / indices to
-                          drop.
+    :param dataset:         A dataset that will be converted into a DataFrame.
+                            Can be either a list of lists, dict, URI or a FeatureVector.
+    :param feature_columns: List of feature columns that will be used to build the dataframe when dataset is from
+                            type list or numpy array.
+    :param label_columns:   The target label(s) of the column(s) in the dataset. for Regression or
+                            Classification tasks.
+    :param drop_columns:    ``str`` / ``int`` or a list of ``str`` / ``int`` that represent the column names / indices
+                            to drop.
 
     :returns: A tuple of:
               [0] = The parsed dataset as a DataFrame
@@ -63,46 +67,48 @@ def _read_dataset_as_dataframe(
             drop_columns = [drop_columns]
 
     # Check if the dataset is in fact a Feature Vector:
-    if dataset.meta and dataset.meta.kind == ObjectKind.feature_vector:
+    if isinstance(dataset, fs.FeatureVector):
         # Try to get the label columns if not provided:
         if label_columns is None:
-            label_columns = dataset.meta.status.label_column
+            label_columns = dataset.status.label_column
         # Get the features and parse to DataFrame:
         dataset = fs.get_offline_features(
-            dataset.meta.uri, drop_columns=drop_columns
+            dataset.uri, drop_columns=drop_columns
         ).to_dataframe()
+
+    elif isinstance(dataset, (list, np.ndarray)):
+        if not feature_columns:
+            raise mlrun.errors.MLRunInvalidArgumentError(
+                "Feature columns list must be provided when dataset input as from type list or numpy array"
+            )
+        # Parse the list / numpy array into a DataFrame:
+        dataset = pd.DataFrame(dataset, columns=feature_columns)
+        # Validate the `drop_columns` is given as integers:
+        if drop_columns and not all(isinstance(col, int) for col in drop_columns):
+            raise mlrun.errors.MLRunInvalidArgumentError(
+                "`drop_columns` must be an integer / list of integers if provided as a list."
+            )
+    elif isinstance(dataset, mlrun.DataItem):
+        # Turn the DataITem to DataFrame:
+        dataset = dataset.as_df()
     else:
-        # Parse to DataFrame according to the dataset's type:
-        if isinstance(dataset, (list, np.ndarray)):
-            # Parse the list / numpy array into a DataFrame:
+        # Parse the object (should be a pd.DataFrame / pd.Series, dictionary) into a DataFrame:
+        try:
             dataset = pd.DataFrame(dataset)
-            # Validate the `drop_columns` is given as integers:
-            if drop_columns and not all(isinstance(col, int) for col in drop_columns):
-                raise mlrun.errors.MLRunInvalidArgumentError(
-                    "`drop_columns` must be an integer / list of integers if provided as a list."
-                )
-        elif isinstance(dataset, mlrun.DataItem):
-            # Turn the DataITem to DataFrame:
-            dataset = dataset.as_df()
-        else:
-            # Parse the object (should be a pd.DataFrame / pd.Series, dictionary) into a DataFrame:
-            try:
-                dataset = pd.DataFrame(dataset)
-            except ValueError as e:
-                raise mlrun.errors.MLRunInvalidArgumentError(
-                    f"Could not parse the given dataset of type {type(dataset)} into a pandas DataFrame. "
-                    f"Received the following error: {e}"
-                )
-        # Drop columns if needed:
-        if drop_columns:
-            dataset.drop(drop_columns, axis=1, inplace=True)
+        except ValueError as e:
+            raise mlrun.errors.MLRunInvalidArgumentError(
+                f"Could not parse the given dataset of type {type(dataset)} into a pandas DataFrame. "
+                f"Received the following error: {e}"
+            )
+    # Drop columns if needed:
+    if drop_columns:
+        dataset.drop(drop_columns, axis=1, inplace=True)
 
     # Turn the `label_columns` into a list by default:
     if label_columns is None:
         label_columns = []
     elif isinstance(label_columns, (str, int)):
         label_columns = [label_columns]
-
     return dataset, label_columns
 
 
@@ -307,6 +313,7 @@ def infer(
     dataset: DatasetType,
     drop_columns: Union[str, List[str], int, List[int]] = None,
     label_columns: Union[str, List[str]] = None,
+    feature_columns: Union[str, List[str]] = None,
     log_result_set: bool = True,
     result_set_name: str = "prediction",
     batch_id: str = None,
@@ -334,6 +341,8 @@ def infer(
     :param label_columns:            The target label(s) of the column(s) in the dataset for Regression or
                                      Classification tasks. The label column can be accessed from the model object, or
                                      the feature vector provided if available.
+    :param feature_columns:          List of feature columns that will be used to build the dataframe when dataset is
+                                     from type list or numpy array.
     :param log_result_set:           Whether to log the result set - a DataFrame of the given inputs concatenated with
                                      the predictions. Defaulted to True.
     :param result_set_name:          The db key to set name of the prediction result and the filename. Defaulted to
@@ -359,10 +368,16 @@ def infer(
             output.name for output in model_handler._model_artifact.spec.outputs
         ]
 
+    if feature_columns is None:
+        feature_columns = [
+            input.name for input in model_handler._model_artifact.spec.inputs
+        ]
+
     # Get dataset by object, URL or by FeatureVector:
     context.logger.info(f"Loading data...")
     x, label_columns = _read_dataset_as_dataframe(
         dataset=dataset,
+        feature_columns=feature_columns,
         label_columns=label_columns,
         drop_columns=drop_columns,
     )

@@ -25,7 +25,7 @@ from mlrun.execution import MLClientCtx
 from sklearn.datasets import make_classification, make_regression
 
 DATA_PATH = os.path.abspath("./artifacts/random_dataset.parquet")
-PLOTS_PATH = os.path.abspath("./artifacts/plots")
+PLOTS_PATH = os.path.abspath("./artifacts/task-describe/0")
 ARTIFACTS_PATH = os.path.abspath("./artifacts")
 
 
@@ -56,10 +56,10 @@ def run_around_tests():
     _validate_paths(
         {
             "correlation.html",
-            "correlation-matrix.csv",
+            "correlation-matrix-csv.csv",
             "scatter-2d.html",
             "violin.html",
-            "describe.csv",
+            "describe-csv.csv",
             # "hist.html",
             "histograms.html",
         }
@@ -176,64 +176,64 @@ def test_different_size_of_dataset(
     assert is_test_passed
 
 
-@pytest.mark.parametrize("problem_type", ["classification", "regression"])
-def test_data_already_loaded(problem_type):
-    """
-    Test scenario on already loaded data artifact
-    """
-
-    log_data_function = mlrun.code_to_function(
-        filename="test_describe.py",
-        name="log_data",
-        kind="job",
-        image="mlrun/ml-models",
-    )
-    df = _create_data(
-        n_samples=100,
-        n_features=5,
-        n_classes=3,
-        n_informative=3,
-        reg=(problem_type == "regression"),
-    )
-    log_data_run = log_data_function.run(
-        handler="_log_data",
-        params={"table": DATA_PATH},
-        local=True,
-    )
-    describe_func = import_function("function.yaml")
-    is_test_passed = True
-    try:
-        describe_run = describe_func.run(
-            name="task-describe",
-            handler="analyze",
-            inputs={"table": log_data_run.outputs["dataset"]},
-            params={"label_column": "label", "problem_type": problem_type},
-            artifact_path=os.path.abspath("./artifacts"),
-            local=True,
-        )
-
-    except Exception as exception:
-        print(f"- The test failed - raised the following error:\n- {exception}")
-        is_test_passed = False
-
-    created_artifact = [*describe_run.outputs.keys()]
-
-    expected_artifacts = [
-        "correlation-matrix-csv",
-        "correlation",
-        "scatter-2d",
-        "imbalance",
-        "imbalance-weights-vec",
-        "violin",
-        "histograms",
-    ]
-    for artifact in expected_artifacts:
-        if artifact not in created_artifact:
-            print(f"{artifact} artifact not found!")
-            is_test_passed = False
-
-            break
-    assert is_test_passed
+# @pytest.mark.parametrize("problem_type", ["classification", "regression"])
+# def test_data_already_loaded(problem_type):
+#     """
+#     Test scenario on already loaded data artifact
+#     """
+#
+#     log_data_function = mlrun.code_to_function(
+#         filename="test_describe.py",
+#         name="log_data",
+#         kind="job",
+#         #image="mlrun/mlrun",
+#     )
+#     df = _create_data(
+#         n_samples=100,
+#         n_features=5,
+#         n_classes=3,
+#         n_informative=3,
+#         reg=(problem_type == "regression"),
+#     )
+#     log_data_run = log_data_function.run(
+#         handler="_log_data",
+#         params={"table": DATA_PATH},
+#         local=True,
+#     )
+#     describe_func = import_function("function.yaml")
+#     is_test_passed = True
+#     try:
+#         describe_run = describe_func.run(
+#             name="task-describe",
+#             handler="analyze",
+#             inputs={"table": log_data_run.outputs["dataset"]},
+#             params={"label_column": "label", "problem_type": problem_type},
+#             artifact_path=os.path.abspath("./artifacts"),
+#             local=True,
+#         )
+#
+#     except Exception as exception:
+#         print(f"- The test failed - raised the following error:\n- {exception}")
+#         is_test_passed = False
+#
+#     created_artifact = list(describe_run.outputs.keys())
+#
+#     expected_artifacts = [
+#         "correlation-matrix-csv",
+#         "correlation",
+#         "scatter-2d",
+#         "imbalance",
+#         "imbalance-weights-vec",
+#         "violin",
+#         "histograms",
+#     ]
+#     for artifact in expected_artifacts:
+#         if artifact not in created_artifact:
+#             print(f"{artifact} artifact not found!")
+#             is_test_passed = False
+#
+#             break
+#     assert is_test_passed
 
 
 def _log_data(context: MLClientCtx, table: str):

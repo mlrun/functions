@@ -63,9 +63,13 @@ def install_pipenv():
 
 
 def install_python(directory: Union[str, Path]):
-    print(f"Installing python for {directory}...")
+    print(f"Installing python for {directory} ...")
+    install_command = f"pipenv --rm;pipenv --python 3.9"
+    if (os.environ.get('CONDA_DEFAULT_ENV') is not None) and (os.environ.get('CONDA_PREFIX') is not None):
+        print("conda env detected using conda to get pipenv python version")
+        install_command = f"pipenv --rm;pipenv --python=$(conda run which python) --site-packages"
     python_install: subprocess.CompletedProcess = subprocess.run(
-        f"pipenv --rm;pipenv --python 3.7",
+        install_command,
         stdout=sys.stdout,
         stderr=subprocess.PIPE,
         cwd=directory,
@@ -117,6 +121,11 @@ def install_requirements(
         _run_subprocess(
             f"pipenv install --skip-lock -r {requirements_file}", directory
         )
+        with open(requirements_file, "r") as f:
+            mlrun_version = [l.replace("\n", "") for l in f.readlines() if "mlrun" in l]
+            # remove mlrun from requirements if installed with version limits:
+            if mlrun_version and any([c in mlrun_version[0] for c in "<>=~"]):
+                requirements = [r for r in requirements if "mlrun" not in r]
 
     if requirements:
         print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
@@ -161,6 +170,7 @@ def get_item_yaml_values(
             else:
                 values_set.add(values)
         values_dict[key] = values_set
+
     return values_dict
 
 

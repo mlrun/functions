@@ -15,7 +15,7 @@ jobs:
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
         id: myref
  
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - id: set-matrix
         # This is very hacky, but it goes like that:
         # 1) Associate base_ref with origin/base_ref since actions/checkout doesn't do it, if we don't do that we won't be able to check the actual diff
@@ -63,7 +63,7 @@ jobs:
     steps:
       # Source
       - name: Checkout current repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: functions
       # Install python 3.9
@@ -98,7 +98,7 @@ jobs:
     if: github.repository == 'mlrun/functions' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     needs: run_monorepo_tests
-    continue-on-error: true
+    continue-on-error: false
     
     steps:
       - name: Get the current branch name
@@ -106,11 +106,11 @@ jobs:
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
         id: branch
       - name: Checkout current repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: functions
       - name: Checkout Marketplace
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: mlrun/marketplace
           path: marketplace

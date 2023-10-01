@@ -29,7 +29,7 @@ expected_outputs = [
     "The crowd roars, a symphony of passion, "
     "as the game writes its unpredictable story on the field of destiny.",
 ]
-whisper_models = ["tiny_en", "tiny", "base_en", "base_en"]
+whisper_models = ["tiny.en", "tiny", "base.en", "base"]
 
 @pytest.mark.skipif(
     condition=sys.version_info[:2] < (3, 8),

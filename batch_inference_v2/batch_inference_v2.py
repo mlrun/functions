@@ -107,7 +107,8 @@ def infer(
     **predict_kwargs: Dict[str, Any],
 ):
     """
-    Perform a prediction on a given dataset with the given model.
+    Perform a prediction on a given dataset with the given model. Please make sure that you already logged the model
+    under the current project.
     Can perform drift analysis between the sample set statistics stored in the model to the current input data. The
     drift rule is the value per-feature mean of the TVD and Hellinger scores according to the thresholds configures
     here. When performing drift analysis, this function either uses an existing model endpoint record or creates
@@ -115,10 +116,13 @@ def infer(
     At the moment, this function is supported for `mlrun>=1.5.0` versions.
 
     :param context:                                 MLRun context.
-    :param dataset:                                 The dataset to infer through the model. Can be passed in `inputs` as either a
-                                                    Dataset artifact / Feature vector URI. Or, in `parameters` as a list, dictionary or
+    :param dataset:                                 The dataset to infer through the model. Provided as an input (DataItem)
+                                                    that represents Dataset artifact / Feature vector URI.
+                                                    If using MLRun SDK, `dataset` can also be provided as a list, dictionary or
                                                     numpy array.
-    :param model_path:                              The model Store path. Can be provided as an input (DataItem) or as a parameter (string).
+    :param model_path:                              Model store uri (should start with store://). Provided as an input (DataItem).
+                                                    If using MLRun SDK, `model_path` also can be provided as a parameter (string).
+                                                    To generate a valid model store URI, please log the model before running this function.
                                                     If `endpoint_id` of existing model endpoint is provided, make sure
                                                     that it has a similar model store path, otherwise the drift analysis
                                                     won't be triggered.
@@ -168,7 +172,11 @@ def infer(
     if isinstance(model_path, mlrun.DataItem):
         model_path = model_path.artifact_url
     if not mlrun.datastore.is_store_uri(model_path):
-        raise mlrun.errors.MLRunInvalidArgumentError(f"The provided model path is an invalid store uri: {model_path}, `should start with store://`")
+        raise mlrun.errors.MLRunInvalidArgumentError(
+            f"The provided model path is an invalid store uri: {model_path}, should start with store://. "
+            f"Please make sure that you have logged the model using `project.log_model()` "
+            f"which generates a unique store uri for the logged model."
+        )
     model_handler = AutoMLRun.load_model(model_path=model_path, context=context)
 
     if label_columns is None:

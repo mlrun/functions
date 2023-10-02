@@ -167,6 +167,8 @@ def infer(
     context.logger.info(f"Loading model...")
     if isinstance(model_path, mlrun.DataItem):
         model_path = model_path.artifact_url
+    if not mlrun.datastore.is_store_uri(model_path):
+        raise mlrun.errors.MLRunInvalidArgumentError(f"The provided model path is an invalid store uri: {model_path}, `should start with store://`")
     model_handler = AutoMLRun.load_model(model_path=model_path, context=context)
 
     if label_columns is None:

@@ -107,7 +107,7 @@ def infer(
     **predict_kwargs: Dict[str, Any],
 ):
     """
-    Perform a prediction on a given dataset with the given model. Please make sure that you already logged the model
+    Perform a prediction on a given dataset with the given model. Please make sure that you have already logged the model
     under the current project.
     Can perform drift analysis between the sample set statistics stored in the model to the current input data. The
     drift rule is the value per-feature mean of the TVD and Hellinger scores according to the thresholds configures
@@ -121,7 +121,7 @@ def infer(
                                                     If using MLRun SDK, `dataset` can also be provided as a list, dictionary or
                                                     numpy array.
     :param model_path:                              Model store uri (should start with store://). Provided as an input (DataItem).
-                                                    If using MLRun SDK, `model_path` also can be provided as a parameter (string).
+                                                    If using MLRun SDK, `model_path` can also be provided as a parameter (string).
                                                     To generate a valid model store URI, please log the model before running this function.
                                                     If `endpoint_id` of existing model endpoint is provided, make sure
                                                     that it has a similar model store path, otherwise the drift analysis
@@ -173,7 +173,7 @@ def infer(
         model_path = model_path.artifact_url
     if not mlrun.datastore.is_store_uri(model_path):
         raise mlrun.errors.MLRunInvalidArgumentError(
-            f"The provided model path is an invalid store uri: {model_path}, should start with store://. "
+            f"The provided model path is an invalid store uri: {model_path}, it should start with store://. "
             f"Please make sure that you have logged the model using `project.log_model()` "
             f"which generates a unique store uri for the logged model."
         )

@@ -1,3 +1,2 @@
-mlrun
 pyhive
 pymysql

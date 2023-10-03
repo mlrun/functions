@@ -12,7 +12,7 @@ labels:
   framework: dask
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.4.0
 name: snowflake_dask
 platformVersion: 3.5.0
 spec:

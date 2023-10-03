@@ -173,7 +173,7 @@ def infer(
         model_path = model_path.artifact_url
     if not mlrun.datastore.is_store_uri(model_path):
         raise mlrun.errors.MLRunInvalidArgumentError(
-            f"The provided model path is an invalid store uri: {model_path}, it should start with store://. "
+            f"The provided model path is an invalid store uri: ({model_path}), it should start with `store://`. "
             f"Please make sure that you have logged the model using `project.log_model()` "
             f"which generates a unique store uri for the logged model."
         )

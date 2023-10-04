@@ -19,6 +19,7 @@ import pathlib
 import tempfile
 import warnings
 from collections.abc import Iterable
+from multiprocessing import Pool, cpu_count
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import annotated_text.util as at_util
@@ -849,7 +850,6 @@ def recognize_pii(
     context: mlrun.MLClientCtx,
     input_path: Union[str, pathlib.Path],
     output_path: str,
-    output_suffix: str,
     html_key: str,
     score_threshold: float,
     entities: List[
@@ -869,7 +869,6 @@ def recognize_pii(
     :param context:              The MLRun context. this is needed for log the artifacts.
     :param input_path:           The input path of the text files needs to be analyzied.
     :param output_path:          The output path to store the anonymized text.
-    :param output_suffix:        The surfix of output key for the anonymized text. for example if the input file is pii.txt, the output key is anoymized, the output file name will be pii_anonymized.txt.
     :param html_key:             The html key for the artifact.
     :param score_threshold:      The score threshold to mark the recognition as trusted.
     :param entities:             The list of entities to recognize.
@@ -922,6 +921,8 @@ def recognize_pii(
         try:
             # Load the str from the text file
             text = txt_file.read_text()
+            # TODO maybe the encoding issue if from this function call of tqdm.read_text()
+            # Need to fix it later
             txt_content[str(txt_file)] = text
             # Process the text to recoginze the pii entities in it
             anonymized_text, results = _process(
@@ -956,3 +957,80 @@ def recognize_pii(
         json_res = _get_all_rpt(res_dict, is_full_report)
         return output_path, json_res, errors
     return output_path, errors
+
+
+def recognize_pii_one_file(
+        input_file: str,
+        output_file: str,
+        score_threshold: float,
+        entities: List[
+            str
+        ] = None,  # List of entities to recognize, default is recognizing all
+        entity_operator_map: dict = None,
+        model: str = None,
+        ) -> None:
+
+    """
+    :param context:              The MLRun context. this is needed
+    :param input_config:         The input config of the text files needs to be analyzied.It's a csv file that contain the location of all the text files that need to be process
+    :param output_path:          The output path to store the anonymized text.
+    """
+
+    errors = {}
+    # Load the model:
+    try:
+        analyzer = _get_analyzer_engine(model, entities)
+    except Exception as e:
+        errors["model"] = str(e)
+        logger.error(f"Error when get the model: {e}")
+
+    logger.info("Model loaded")
+    try:
+        # Load the str from the text file
+        with open(input_file, 'r', encoding='utf-8') as file:
+            text = file.read()
+        # Process the text to recoginze the pii entities in it
+        anonymized_text, results = _process(
+            text=text,
+            model=analyzer,
+            entities=entities,
+            entities_operator_map=entity_operator_map,
+            score_threshold=score_threshold,
+        )
+        with open(output_file, "w", encoding='utf-8') as f:
+            f.write(anonymized_text)
+
+    except Exception as e:
+        errors[str(txt_file)] = str(e)
+        logger.error(f"Error processing {txt_file}: {e}")
+
+def recognize_pii_parallel(
+        config_input_output: str, 
+        score_threshold: float,
+        entities: List[str] = None,
+        entity_operator_map: Dict = None,
+        model: str = None,
+        num_processes: int = None
+        ) -> None:
+    """Doing a fan-in and fan-out pattern using mutiple processes for cpu node, Since our model is mixed with rule_based and NLP model based. Both Spacy and Flair do not support the cuda GPU natively. For now, we can use all the cores that a CPU offers.
+    :param config_input_output  csv file which have the input file path and output file path
+    :param score_threshold:     The threshold of the score to recognize the entities
+    :entities                   List of entities to recognize, default is recognizing all
+    :model                      The model to use. Can be "spacy", "flair", "pattern" or "whole".
+    :num_process                The number of process to run in parallel
+    """
+    if num_processes is None:
+        num_processes = cpu_count()
+
+    # Read the CSV into a DataFrame
+    config_df = pd.read_csv(config_input_output)
+
+    # Convert DataFrame rows into a list of tuples, each tuple is arguments for `recognize_pii_one_file`
+    tasks = [(row['input_file'], row['output_file'], score_threshold, entities, entity_operator_map, model) 
+             for _, row in config_df.iterrows()]
+    
+    # Create a pool of processes and distribute the tasks
+    with Pool(processes=num_processes) as pool:
+        pool.starmap(recognize_pii_one_file, tasks)
+    
+

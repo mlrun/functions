@@ -1,11 +1,19 @@
-tqdm~=4.62.3
-tensorflow~=2.7.0
-torch~=1.10.0
-torchvision~=0.11.1
-onnx~=1.10.1
-onnxruntime~=1.8.1
-onnxoptimizer~=0.2.0
-onnxmltools~=1.9.0
-tf2onnx~=1.9.0
-plotly~=5.4.0
-wrapt<1.15.0 # wrapt==1.15.0 fails tensorflow 2.7 Todo: please remove when updating tensorflow
+onnx~=1.13.0
+onnxruntime~=1.14.0
+onnxoptimizer~=0.3.0
+onnxmltools~=1.11.0
+tf2onnx~=1.13.0
+tensorflow~=2.9.0
+
+
+# tqdm~=4.62.3
+# tensorflow~=2.7.0
+# torch~=1.10.0
+# torchvision~=0.11.1
+# onnx~=1.10.1
+# onnxruntime~=1.8.1
+# onnxoptimizer~=0.2.0
+# onnxmltools~=1.9.0
+# tf2onnx~=1.9.0
+# plotly~=5.4.0
+# wrapt<1.15.0 # wrapt==1.15.0 fails tensorflow 2.7 Todo: please remove when updating tensorflow

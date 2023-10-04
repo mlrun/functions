@@ -11,7 +11,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/ml-models
+  image: mlrun/mlrun
   env: []
   default_handler: train_model
   entry_points:

@@ -12,7 +12,7 @@ metadata:
 spec:
   command: ''
   args: []
-  image: mlrun/ml-models
+  image: mlrun/mlrun
   env: []
   default_handler: xgb_test
   entry_points:

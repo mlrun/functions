@@ -28,7 +28,7 @@ def test_run_arc_to_parquet():
                  artifact_path='artifacts',
                  local=False)
     
-    assert(run.artifact('higgs-sample'))
+    assert(run.outputs['higgs-sample'])
 
 def test_run_local_arc_to_parquet():
     import os
@@ -40,4 +40,4 @@ def test_run_local_arc_to_parquet():
                  artifact_path=os.getcwd()+'/artifacts',
                  local=True)
     
-    assert(run.artifact('higgs-sample'))
+    assert(run.outputs['higgs-sample'])

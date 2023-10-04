@@ -1,3 +1,2 @@
-mlrun
 tensorflow==2.8.2
 wget

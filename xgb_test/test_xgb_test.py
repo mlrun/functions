@@ -32,14 +32,14 @@ def get_class_data():
         local=True,
         artifact_path="./artifacts/inputs",
     )
-    return run.artifact('classifier-data').url
+    return run.status.artifacts[0]['spec']['target_path']
 
 
 def xgb_trainer():
     data = get_class_data()
     fn = code_to_function(
         name='xgb_trainer',
-        filename=os.path.dirname(os.path.dirname(__file__)) + "/xgb_trainer/xgb_trainer.py",
+        filename="../xgb_trainer/xgb_trainer.py",
         handler="train_model",
         kind="job",
     )
@@ -56,14 +56,18 @@ def xgb_trainer():
         inputs={"dataset": data},
     )
 
-    return data, run.artifact('model').url
+    for artifact in run.status.artifacts:
+        if artifact['kind'] == 'model':
+            assert os.path.exists(artifact['spec']['target_path']), "Failed locating model file"  # validating model exists
+            break
+    return data, artifact['spec']['target_path'] + artifact['spec']['model_file']
 
 
 def test_xgb_test_code_to_function():
     data, model = xgb_trainer()
     fn = code_to_function(
         name='test_xgb_test',
-        filename=os.path.dirname(os.path.dirname(__file__)) + "/xgb_test/xgb_test.py",
+        filename="../xgb_test/xgb_test.py",
         handler="xgb_test",
         kind="job",
     )
@@ -84,7 +88,7 @@ def test_xgb_test_code_to_function():
 
 def test_local_xgb_test_import_local_function():
     # importing data preparation function (gen_class_data) locally
-    fn = import_function("hub://gen_class_data")
+    fn = import_function("../gen_class_data/function.yaml")
     run = fn.run(
         params={
             "n_samples": 10_000,
@@ -98,7 +102,7 @@ def test_local_xgb_test_import_local_function():
         local=True,
         artifact_path="./artifacts/inputs",
     )
-    data = run.artifact('classifier-data').url
+    data = run.status.artifacts[0]['spec']['target_path']
 
     # importing model training function (xgb_trainer) locally
     fn = import_function("../xgb_trainer/function.yaml")
@@ -114,7 +118,12 @@ def test_local_xgb_test_import_local_function():
         local=True,
         inputs={"dataset": data},
     )
-    model = run.artifact('model').url
+    for artifact in run.status.artifacts:
+        if artifact['kind'] == 'model':
+            assert os.path.exists(artifact['spec']['target_path']), "Failed locating model file"  # validating model exists
+            break
+
+    model = artifact['spec']['target_path'] + artifact['spec']['model_file']
 
     # importing xgb_test function.yaml and running tests
     fn = import_function("function.yaml")

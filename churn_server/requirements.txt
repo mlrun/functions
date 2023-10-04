@@ -1,3 +1,2 @@
-mlrun
 wget
 pygit2

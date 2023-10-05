@@ -12,7 +12,7 @@ labels:
   author: yonatans
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.4.0
+mlrunVersion: 1.4.1
 name: transcribe
 platformVersion: 3.5.3
 spec:
@@ -25,4 +25,3 @@ spec:
     - tqdm
 url: ''
 version: 0.0.1
-test_valid: False

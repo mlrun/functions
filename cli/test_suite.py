@@ -303,7 +303,8 @@ class TestPY(TestSuite):
             process = failed_test.meta_data["completed_process"]
             click.echo(f"{test_path} [Failed]")
             click.echo("==================== stdout ====================")
-            click.echo(process.stdout.decode("utf-8"))
+            if process.stdout:
+                click.echo(process.stdout.decode("utf-8"))
             click.echo("==================== stderr ====================")
             click.echo(process.stderr.decode("utf-8"))
             click.echo("\n")

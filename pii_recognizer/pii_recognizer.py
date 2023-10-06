@@ -960,7 +960,7 @@ def recognize_pii(
     return output_path, errors
 
 
-def recognize_pii_one_file(
+def _recognize_pii_one_file(
     input_file: str,
     output_file: str,
     score_threshold: float,
@@ -1064,7 +1064,7 @@ def recognize_pii_parallel(
     # Read the CSV into a DataFrame
     config_df = pd.read_csv(config_input_output)
 
-    # Convert DataFrame rows into a list of tuples, each tuple is arguments for `recognize_pii_one_file`
+    # Convert DataFrame rows into a list of tuples, each tuple is arguments for `_recognize_pii_one_file`
     tasks = [
         (
             row["input_file"],
@@ -1079,7 +1079,7 @@ def recognize_pii_parallel(
     ]
     # Create a pool of processes and distribute the tasks
     with Pool(processes=num_processes) as pool:
-        res = pool.starmap(recognize_pii_one_file, tasks)
+        res = pool.starmap(_recognize_pii_one_file, tasks)
     # Get the results
     res_dict = {}
     txt_content = {}

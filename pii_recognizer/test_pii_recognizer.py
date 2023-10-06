@@ -17,12 +17,13 @@ import os
 import pytest
 import random
 from faker import Faker
+import mlrun
 from pii_recognizer import (
     _process,
     _get_analyzer_engine,
     _anonymize,
     _annotate,
-    recognize_pii_parallel
+    recognize_pii_parallel,
 )
 
 
@@ -214,8 +215,8 @@ def test_only_entities(fake_data):
     assert any(entity in res for entity in ENTITIES.keys())
 
 
-
 def test_parallel():
+    context = mlrun.get_or_create_ctx("test_parallel")
     ENTITIES = {
         "LOCATION": "location",
         "PERSON": "name",
@@ -238,5 +239,11 @@ def test_parallel():
         "PASSWORD": "password",
         "SWIFT_CODE": "swift_code",
     }
-    recognize_pii_parallel(config_input_output = "data/config.csv", score_threshold = 0.5, entities = list(ENTITIES.keys()), model = "whole")
-
+    recognize_pii_parallel(
+        context=context,
+        config_input_output="data/config.csv",
+        score_threshold=0.5,
+        html_key="test_parallel",
+        entities=list(ENTITIES.keys()),
+        model="whole",
+    )

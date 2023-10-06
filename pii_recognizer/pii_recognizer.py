@@ -969,7 +969,8 @@ def recognize_pii_one_file(
     ] = None,  # List of entities to recognize, default is recognizing all
     entity_operator_map: dict = None,
     model: str = None,
-) -> None:
+    is_full_text: bool = True,
+) -> Tuple[dict, dict, dict]:
     """
     :param context:              The MLRun context. this is needed
     :param input_config:         The input config of the text files needs to be analyzied.It's a csv file that contain the location of all the text files that need to be process
@@ -977,6 +978,8 @@ def recognize_pii_one_file(
     """
 
     errors = {}
+    res_dict = {}
+    txt_content = {}
     # Load the model:
     try:
         analyzer = _get_analyzer_engine(model, entities)
@@ -989,6 +992,7 @@ def recognize_pii_one_file(
         # Load the str from the text file
         with open(input_file, "r", encoding="utf-8") as file:
             text = file.read()
+        txt_content[str(input_file)] = text
         # Process the text to recoginze the pii entities in it
         anonymized_text, results = _process(
             text=text,
@@ -996,7 +1000,9 @@ def recognize_pii_one_file(
             entities=entities,
             entities_operator_map=entity_operator_map,
             score_threshold=score_threshold,
+            is_full_text=is_full_text,
         )
+        res_dict[str(input_file)] = results
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(anonymized_text)
 
@@ -1004,13 +1010,22 @@ def recognize_pii_one_file(
         errors[str(txt_file)] = str(e)
         logger.error(f"Error processing {txt_file}: {e}")
 
+    return res_dict, txt_content, errors
+
 
 def recognize_pii_parallel(
+    context: mlrun.MLClientCtx,
     config_input_output: str,
     score_threshold: float,
+    html_key: str,
     entities: List[str] = None,
     entity_operator_map: Dict = None,
     model: str = None,
+    generate_html: bool = True,
+    generate_json: bool = True,
+    is_full_html: bool = True,
+    is_full_text: bool = True,
+    is_full_report: bool = True,
     num_processes: int = None,
 ) -> None:
     """Doing a fan-in and fan-out pattern using mutiple processes for cpu node, Since our model is mixed with rule_based and NLP model based. Both Spacy and Flair do not support the cuda GPU natively. For now, we can use all the cores that a CPU offers.
@@ -1035,12 +1050,30 @@ def recognize_pii_parallel(
             entities,
             entity_operator_map,
             model,
+            is_full_text,
         )
         for _, row in config_df.iterrows()
     ]
     # Create a pool of processes and distribute the tasks
     with Pool(processes=num_processes) as pool:
-        pool.starmap(recognize_pii_one_file, tasks)
+        res = pool.starmap(recognize_pii_one_file, tasks)
+    # Get the results
+    res_dict = {}
+    txt_content = {}
+    errors = {}
+    for r in res:
+        res_dict.update(r[0])
+        txt_content.update(r[1])
+        errors.update(r[2])
 
-
-
+    if generate_html:
+        # Generate the html report
+        html_res = _get_all_html(txt_content, res_dict, is_full_html)
+        # Store the html report in the context
+        arti_html = mlrun.artifacts.Artifact(body=html_res, format="html", key=html_key)
+        context.log_artifact(arti_html)
+    if generate_json:
+        # Generate the json report
+        json_res = _get_all_rpt(res_dict, is_full_report)
+        return json_res, errors
+    return errors

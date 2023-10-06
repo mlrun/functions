@@ -972,9 +972,19 @@ def recognize_pii_one_file(
     is_full_text: bool = True,
 ) -> Tuple[dict, dict, dict]:
     """
-    :param context:              The MLRun context. this is needed
-    :param input_config:         The input config of the text files needs to be analyzied.It's a csv file that contain the location of all the text files that need to be process
-    :param output_path:          The output path to store the anonymized text.
+    Recognize PII in text and store the anonymized text in the output path. Generate the html with different colors for each entity, json report of the explaination.
+    :param input_file:           The input path of the text files needs to be analyzied.
+    :param output_file:          The output path to store the anonymized text.
+    :param score_threshold:      The score threshold to mark the recognition as trusted.
+    :param entities:             The list of entities to recognize.
+    :param entity_operator_map:  The map of entity to operator (mask, redact, replace, keep, hash, and its params)
+    :param model:                The model to use. Can be "spacy", "flair", "pattern" or "whole".
+    :param is_full_text:         Whether to return the full text or only the masked text.
+
+    :returns: A tuple of:
+        * A dictionary of the text content of the input file
+        * A dictionary of the results of the explaination
+        * A dictionary of errors files that were not processed
     """
 
     errors = {}
@@ -1027,13 +1037,26 @@ def recognize_pii_parallel(
     is_full_text: bool = True,
     is_full_report: bool = True,
     num_processes: int = None,
-) -> None:
+) -> Tuple[dict, dict]:
     """Doing a fan-in and fan-out pattern using mutiple processes for cpu node, Since our model is mixed with rule_based and NLP model based. Both Spacy and Flair do not support the cuda GPU natively. For now, we can use all the cores that a CPU offers.
+    :param context:             The MLRun context. this is needed
     :param config_input_output  csv file which have the input file path and output file path
     :param score_threshold:     The threshold of the score to recognize the entities
+    :param html_key:            The key of the html report in the context
     :entities                   List of entities to recognize, default is recognizing all
-    :model                      The model to use. Can be "spacy", "flair", "pattern" or "whole".
-    :num_process                The number of process to run in parallel
+    :entity_operator_map        The map of the entities and the operator to use. For example, {"PERSON": "replace", "LOCATION": "mask"}
+    :param model                The model to use. Can be "spacy", "flair", "pattern" or "whole".
+    :param generate_html:       Whether to generate the html report
+    :param generate_json:       Whether to generate the json report
+    :param is_full_html:        Whether to generate the full html report
+    :param is_full_text:        Whether to generate the full text in the html report
+    :param is_full_report:      Whether to generate the full json report
+    :param num_process          The number of process to run in parallel
+
+    :returns: A tuple of:
+        * A json report of the result explaination
+        * A dictionary of errors files that were not processed
+
     """
     if num_processes is None:
         num_processes = cpu_count()

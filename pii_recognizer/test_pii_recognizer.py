@@ -239,7 +239,7 @@ def test_parallel():
         "PASSWORD": "password",
         "SWIFT_CODE": "swift_code",
     }
-    recognize_pii_parallel(
+    json_res, erros = recognize_pii_parallel(
         context=context,
         config_input_output="data/config.csv",
         score_threshold=0.5,
@@ -247,3 +247,5 @@ def test_parallel():
         entities=list(ENTITIES.keys()),
         model="whole",
     )
+
+    assert len(json_res) == 2

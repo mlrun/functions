@@ -22,6 +22,7 @@ from pii_recognizer import (
     _get_analyzer_engine,
     _anonymize,
     _annotate,
+    recognize_pii_parallel
 )
 
 
@@ -211,3 +212,31 @@ def test_only_entities(fake_data):
     analyzer = _get_analyzer_engine(entities=list(ENTITIES.keys())[:5])
     res, results = _process(text, analyzer, score_threshold=0.5)
     assert any(entity in res for entity in ENTITIES.keys())
+
+
+
+def test_parallel():
+    ENTITIES = {
+        "LOCATION": "location",
+        "PERSON": "name",
+        "ORGANIZATION": "organization",
+        "MAC_ADDRESS": "mac_address",
+        "US_BANK_NUMBER": "us_bank_number",
+        "IMEI": "imei",
+        "TITLE": "title",
+        "LICENSE_PLATE": "license_plate",
+        "US_PASSPORT": "us_passport",
+        "CURRENCY": "currency",
+        "ROUTING_NUMBER": "routing_number",
+        "US_ITIN": "us_itin",
+        "US_BANK_NUMBER": "us_bank_number",
+        "AGE": "age",
+        "CREDIT_CARD": "credit_card",
+        "SSN": "ssn",
+        "PHONE": "phone",
+        "EMAIL": "email",
+        "PASSWORD": "password",
+        "SWIFT_CODE": "swift_code",
+    }
+    recognize_pii_parallel(config_input_output = "data/config.csv", score_threshold = 0.5, entities = list(ENTITIES.keys()), model = "whole")
+

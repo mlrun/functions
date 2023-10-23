@@ -117,18 +117,6 @@ def _get_item_yaml(item_path: Path) -> dict:
     item_yaml = full_load(open(item_path, "r"))
     return item_path, item_yaml
 
-def _get_function_yaml(function_path: Path) -> dict:
-    if function_path.is_dir():
-        if (function_path / "function.yaml").exists():
-            function_path = function_path / "function.yaml"
-        else:
-            raise FileNotFoundError(f"{function_path} does not contain a item.yaml file")
-    elif not function_path.exists():
-        raise FileNotFoundError(f"{function_path} not found")
-
-    item_yaml = full_load(open(function_path, "r"))
-    return function_path, item_yaml
-
 
 def create_function_yaml(
     item_path: Union[str, Path],
@@ -225,15 +213,3 @@ def remove_build_info_from_yaml(function_path: Path):
     function_yaml['spec']['build']['origin_filename'] = ''
     with open(str(function_path), 'w') as file:
         yaml.safe_dump(function_yaml, file, default_flow_style=False)
-
-
-
-
-
-
-
-# if __name__ == "__main__":
-#     # item_to_function_cli()
-#     item_to_function(
-#         "/home/michaell/projects/functions/tf1_serving"
-#     )

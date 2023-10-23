@@ -158,6 +158,9 @@ def create_function_yaml(
         with_doc=True,
     )
     function_object.metadata.project = ""
+    # remove build info from object
+    function_object.spec.build.code_origin = ''
+    function_object.spec.build.origin_filename = ''
 
     custom_fields = spec.get("customFields", {})
     for key, value in custom_fields.items():
@@ -188,8 +191,6 @@ def create_function_yaml(
 
     function_object.export(target=str(output_path.resolve()))
 
-    remove_build_info_from_yaml(function_path=output_path)
-
     if code_output and format_code:
         with open(_code_output, "r") as file:
             code = file.read()
@@ -205,11 +206,3 @@ def bump_function_yaml_version(item_path: Path):
     item_yaml["version"] = str(new_ver)
     with open(item_path, 'w') as file:
         yaml.safe_dump(item_yaml, file, default_flow_style=False)
-
-
-def remove_build_info_from_yaml(function_path: Path):
-    function_path, function_yaml = _get_item_yaml(function_path)
-    function_yaml['spec']['build']['code_origin'] = ''
-    function_yaml['spec']['build']['origin_filename'] = ''
-    with open(str(function_path), 'w') as file:
-        yaml.safe_dump(function_yaml, file, default_flow_style=False)

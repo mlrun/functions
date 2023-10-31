@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: batch-inference-v2
   tag: ''
-  hash: cde622360faa797902544a2178e97c152f69aacd
+  hash: 3206a38ca42ac3ec02b052ef9f5b218156ab65b0
   project: ''
   labels:
     author: eyald
@@ -46,13 +46,11 @@ spec:
       - name: context
         type: MLClientCtx
         doc: MLRun context.
-        default: ''
       - name: dataset
         type: Union[DataItem, list, dict, DataFrame, Series, ndarray]
         doc: The dataset to infer through the model. Provided as an input (DataItem)
           that represents Dataset artifact / Feature vector URI. If using MLRun SDK,
           `dataset` can also be provided as a list, dictionary or numpy array.
-        default: ''
       - name: model_path
         type: Union[str, DataItem]
         doc: Model store uri (should start with store://). Provided as an input (DataItem).
@@ -61,7 +59,6 @@ spec:
           this function. If `endpoint_id` of existing model endpoint is provided,
           make sure that it has a similar model store path, otherwise the drift analysis
           won't be triggered.
-        default: ''
       - name: drop_columns
         type: Union[str, List[str], int, List[int]]
         doc: A string / integer or a list of strings / integers that represent the

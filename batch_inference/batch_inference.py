@@ -16,8 +16,15 @@ import hashlib
 import json
 from datetime import datetime
 from typing import Any, Dict, List, Tuple, Union
+import semver
 
 import mlrun
+if semver.compare(mlrun.__version__, "1.5.0") >= 0:
+    raise mlrun.errors.MLRunNotFoundError(
+        f"When using `mlrun` version >=1.5.0, please use "
+        f"batch inference `v2` function ('hub://batch_inference_v2')."
+    )
+
 import mlrun.datastore
 import mlrun.utils
 import numpy as np

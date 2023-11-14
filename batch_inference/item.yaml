@@ -27,5 +27,5 @@ spec:
   kind: job
   requirements:
 url: ''
-version: 1.6.0
+version: 1.7.0
 

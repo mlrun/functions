@@ -158,6 +158,9 @@ def create_function_yaml(
         with_doc=True,
     )
     function_object.metadata.project = ""
+    # remove build info from object
+    function_object.spec.build.code_origin = ''
+    function_object.spec.build.origin_filename = ''
 
     custom_fields = spec.get("customFields", {})
     for key, value in custom_fields.items():
@@ -203,10 +206,3 @@ def bump_function_yaml_version(item_path: Path):
     item_yaml["version"] = str(new_ver)
     with open(item_path, 'w') as file:
         yaml.safe_dump(item_yaml, file, default_flow_style=False)
-
-
-if __name__ == "__main__":
-    # item_to_function_cli()
-    item_to_function(
-        "/home/michaell/projects/functions/tf1_serving"
-    )

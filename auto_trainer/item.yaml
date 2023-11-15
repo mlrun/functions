@@ -13,7 +13,7 @@ labels:
   author: yonish
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.3.0
+mlrunVersion: 1.5.1
 name: auto_trainer
 platformVersion: 3.5.0
 spec:

@@ -12,7 +12,7 @@ labels:
   author: yonatans
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.5.2
+mlrunVersion: 1.5.1
 name: text_to_audio_generator
 platformVersion: 3.5.3
 spec:

@@ -29,7 +29,13 @@ expected_outputs = [
     "The crowd roars, a symphony of passion, "
     "as the game writes its unpredictable story on the field of destiny.",
 ]
-whisper_models = ["tiny.en", "tiny", "base.en", "base"]
+whisper_models = [
+    "tiny.en",
+    "tiny",
+    "base.en",
+    "base",
+]
+
 
 @pytest.mark.skipif(
     condition=sys.version_info[:2] < (3, 8),
@@ -47,9 +53,10 @@ def test_transcribe(model_name: str, audio_path: str):
     transcribe_run = transcribe_function.run(
         handler="transcribe",
         params={
-            "input_path": audio_path,
+            "data_path": audio_path,
             "model_name": model_name,
             "device": "cpu",
+            "compute_type": "int8",
             "output_directory": temp_dir,
         },
         local=True,

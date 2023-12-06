@@ -1,3 +1,4 @@
 transformers
 tqdm
 torch
+sentencepiece

@@ -20,6 +20,10 @@ spec:
   handler: transcribe
   image: mlrun/mlrun
   kind: job
+  build:
+    - sudo add-apt-repository universe
+    - sudo apt update
+    - sudo apt install ffmpeg
   requirements:
     - openai-whisper
     - tqdm

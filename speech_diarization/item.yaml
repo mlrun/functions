@@ -1,7 +1,8 @@
 apiVersion: v1
 categories:
-- Utilities
-- Machine Learning
+  - Deep Learning
+  - Huggingface
+  - Audio
 description: speech diarization of audio files
 doc: ''
 example: speech_diarization.ipynb
@@ -18,8 +19,12 @@ platformVersion: 3.5.3
 spec:
   filename: speech_diarization.py
   handler: diarize
-  image: mlrun/mlrun
+  image: mlrun/mlrun-gpu
   kind: job
-  requirements: []
+  requirements:
+    -pyannote.audio
+    -pyannote.core
+    -torchaudio
+    -tqdm
 url: ''
 version: 1.0.0

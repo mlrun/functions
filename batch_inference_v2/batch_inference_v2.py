@@ -11,10 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-
-from typing import Any, Dict, List, Union
+from inspect import signature
+from typing import Any, Dict, List, Optional, Union
 
 import mlrun
 
@@ -79,6 +78,28 @@ def _prepare_result_set(
     )
 
 
+def _parse_record_results_kwarg(
+    mark_monitoring_window_completed: Optional[bool],
+) -> dict[str, bool]:
+    """
+    Check if `mark_monitoring_window_completed` is provided and expected as a parameter.
+    Return it as a dictionary.
+    """
+    kwarg = "mark_monitoring_window_completed"
+    if mark_monitoring_window_completed is None:
+        return {}
+    if (
+        signature(mlrun.model_monitoring.api.record_results).parameters.get(kwarg)
+        is None
+    ):
+        raise mlrun.errors.MLRunInvalidArgumentError(
+            f"Unexpected parameter `{kwarg}` for function: "
+            "`mlrun.model_monitoring.api.record_results`. "
+            "Please make sure that you are using `mlrun>=1.6.0` version."
+        )
+    return {kwarg: mark_monitoring_window_completed}
+
+
 def infer(
     context: mlrun.MLClientCtx,
     dataset: Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
@@ -104,6 +125,7 @@ def infer(
     model_endpoint_sample_set: Union[
         mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray
     ] = None,
+    mark_monitoring_window_completed: Optional[bool] = None,
     **predict_kwargs: Dict[str, Any],
 ):
     """
@@ -163,8 +185,11 @@ def infer(
     :param model_endpoint_sample_set:               A sample dataset to give to compare the inputs in the drift analysis.
                                                     Can be provided as an input (DataItem) or as a parameter (e.g. string, list, DataFrame).
                                                     The default chosen sample set will always be the one who is set in the model artifact itself.
-
-    raises MLRunInvalidArgumentError: if both `model_path` and `endpoint_id` are not provided
+    :param mark_monitoring_window_completed:        Relevant only when `trigger_monitoring_job` and `perform_drift_analysis` are both `True`.
+                                                    Whether to mark the monitoring window as completed and allow monitoring without extra inferences.
+                                                    Defaults to None, which means use the `mlrun` default if the parameter exists.
+    raises MLRunInvalidArgumentError: if both `model_path` and `endpoint_id` are not provided, or if `mark_monitoring_window_completed` is
+                                      provided for an unsupported `mlrun` version.
     """
 
     # Loading the model:
@@ -241,4 +266,7 @@ def infer(
             artifacts_tag=artifacts_tag,
             trigger_monitoring_job=trigger_monitoring_job,
             default_batch_image=batch_image_job,
+            **_parse_record_results_kwarg(
+                mark_monitoring_window_completed=mark_monitoring_window_completed
+            ),
         )

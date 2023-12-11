@@ -22,9 +22,9 @@ spec:
   image: mlrun/mlrun-gpu
   kind: job
   requirements:
-    -pyannote.audio
-    -pyannote.core
-    -torchaudio
-    -tqdm
+    - pyannote.audio
+    - pyannote.core
+    - torchaudio
+    - tqdm
 url: ''
 version: 1.0.0

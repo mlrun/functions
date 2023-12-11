@@ -20,7 +20,11 @@ spec:
   handler: translate
   image: mlrun/mlrun
   kind: job
-  requirements: []
+  requirements:
+    - transformers
+    - sentencepiece
+    - torch
+    - tqdm
 url: ''
 version: 0.0.1
 test_valid: True

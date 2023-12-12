@@ -79,14 +79,14 @@ def _prepare_result_set(
 
 
 def _parse_record_results_kwarg(
-    mark_monitoring_window_completed: Optional[bool],
+    last_in_batch_set: Optional[bool],
 ) -> dict[str, bool]:
     """
-    Check if `mark_monitoring_window_completed` is provided and expected as a parameter.
+    Check if `last_in_batch_set` is provided and expected as a parameter.
     Return it as a dictionary.
     """
-    kwarg = "mark_monitoring_window_completed"
-    if mark_monitoring_window_completed is None:
+    kwarg = "last_in_batch_set"
+    if last_in_batch_set is None:
         return {}
     if (
         signature(mlrun.model_monitoring.api.record_results).parameters.get(kwarg)
@@ -97,7 +97,7 @@ def _parse_record_results_kwarg(
             "`mlrun.model_monitoring.api.record_results`. "
             "Please make sure that you are using `mlrun>=1.6.0` version."
         )
-    return {kwarg: mark_monitoring_window_completed}
+    return {kwarg: last_in_batch_set}
 
 
 def infer(
@@ -125,7 +125,7 @@ def infer(
     model_endpoint_sample_set: Union[
         mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray
     ] = None,
-    mark_monitoring_window_completed: Optional[bool] = None,
+    last_in_batch_set: Optional[bool] = None,
     **predict_kwargs: Dict[str, Any],
 ):
     """
@@ -185,10 +185,10 @@ def infer(
     :param model_endpoint_sample_set:               A sample dataset to give to compare the inputs in the drift analysis.
                                                     Can be provided as an input (DataItem) or as a parameter (e.g. string, list, DataFrame).
                                                     The default chosen sample set will always be the one who is set in the model artifact itself.
-    :param mark_monitoring_window_completed:        Relevant only when `trigger_monitoring_job` and `perform_drift_analysis` are both `True`.
+    :param last_in_batch_set:                       Relevant only when `perform_drift_analysis` is `True`.
                                                     Whether to mark the monitoring window as completed and allow monitoring without extra inferences.
-                                                    Defaults to None, which means use the `mlrun` default if the parameter exists.
-    raises MLRunInvalidArgumentError: if both `model_path` and `endpoint_id` are not provided, or if `mark_monitoring_window_completed` is
+                                                    Defaults to `None`, which means use the `mlrun`'s default if the parameter exists.
+    raises MLRunInvalidArgumentError: if both `model_path` and `endpoint_id` are not provided, or if `last_in_batch_set` is
                                       provided for an unsupported `mlrun` version.
     """
 
@@ -266,7 +266,5 @@ def infer(
             artifacts_tag=artifacts_tag,
             trigger_monitoring_job=trigger_monitoring_job,
             default_batch_image=batch_image_job,
-            **_parse_record_results_kwarg(
-                mark_monitoring_window_completed=mark_monitoring_window_completed
-            ),
+            **_parse_record_results_kwarg(last_in_batch_set=last_in_batch_set),
         )

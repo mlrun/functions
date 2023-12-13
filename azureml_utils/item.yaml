@@ -13,26 +13,26 @@ labels:
   author: yonish
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.5.2
 name: azureml_utils
-platformVersion: 3.5.0
+platformVersion: 3.5.3
 spec:
   extra_spec:
     allow_empty_resources: true
     build:
       auto_build: true
       commands:
-      - python -m pip install pip==22.1.2
       - apt-get update && apt-get install -y --no-install-recommends git
+      - apt install -y liblttng-ust0
       with_mlrun: true
   filename: azureml_utils.py
   handler: train
-  image: python:3.7.9-slim
+  image: python:3.9-bullseye
   kind: job
   requirements:
-  - azureml-core==1.40.0
-  - azureml-train-automl-client==1.40.0
+  - azureml-core==1.54.0.post1
+  - azureml-train-automl-client==1.54.0.post1
   - plotly~=5.4
 url: ''
-version: 1.2.0
-test_valid: False
+version: 1.3.0
+test_valid: True

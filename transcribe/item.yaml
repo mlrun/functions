@@ -12,7 +12,7 @@ labels:
   author: yonatans
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.5.2
+mlrunVersion: 1.5.1
 name: transcribe
 platformVersion: 3.5.3
 spec:
@@ -20,13 +20,9 @@ spec:
   handler: transcribe
   image: mlrun/mlrun
   kind: job
-  build:
-    - sudo add-apt-repository universe
-    - sudo apt update
-    - sudo apt install ffmpeg
   requirements:
     - openai-whisper
     - tqdm
 url: ''
-version: 0.0.1
+version: 0.0.2
 test_valid: True

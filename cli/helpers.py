@@ -21,6 +21,7 @@ import sys
 from glob import iglob
 import yaml
 from jinja2 import Template
+from sys import platform
 
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 
@@ -134,6 +135,46 @@ def install_requirements(
         )
 
 
+def execute_build_commands(
+    directory: str,
+    commands: Union[List[str], Set[str]],
+):
+    """
+    Installing requirements from a requirements list/set and from a requirements.txt file if found in directory
+    :param directory:       The relevant directory were the requirements are installed and collected
+    :param commands:    Requirement list/set with or without bounds
+    """
+    build_file = str(Path(directory) / 'item.yaml')
+
+    with open(build_file, 'r') as file:
+        item_yaml = yaml.safe_load(file)
+
+    spec = item_yaml['spec']
+    item_commands = None
+    if 'build' in spec:
+        build = spec['build']
+        if 'commands' in build:
+            item_commands = build['commands']
+
+    if not item_commands and not commands.exists():
+        print(f"No build commands found for {directory}...")
+        return
+
+    if item_commands is not None:
+        if platform == "linux" or platform == "linux2":
+            print(f"running commands from {build_file}...")
+            for command in item_commands:
+                _run_subprocess(f"{command}"
+                                , directory)
+        else:
+            print(f"cannot install commands on {platform}...")
+
+    if commands:
+        print(f"Installing commands [{' '.join(commands)}] for {directory}...")
+        _run_subprocess(
+            f"{commands}", directory
+        )
+
 def get_item_yaml_values(
     item_path: pathlib.Path, keys: Union[str, Set[str]]
 ) -> Dict[str, Set[str]]:
@@ -167,6 +208,8 @@ def get_item_yaml_values(
         if values:
             if isinstance(values, list):
                 values_set = set(values)
+            elif isinstance(values, dict):
+                values_set = values
             else:
                 values_set.add(values)
         values_dict[key] = values_set

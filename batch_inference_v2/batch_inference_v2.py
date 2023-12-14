@@ -186,8 +186,14 @@ def infer(
                                                     Can be provided as an input (DataItem) or as a parameter (e.g. string, list, DataFrame).
                                                     The default chosen sample set will always be the one who is set in the model artifact itself.
     :param last_in_batch_set:                       Relevant only when `perform_drift_analysis` is `True`.
-                                                    Whether to mark the monitoring window as completed and allow monitoring without extra inferences.
-                                                    Defaults to `None`, which means use the `mlrun`'s default if the parameter exists.
+                                                    This flag can (and should only) be used when the model endpoint does not have
+                                                    model-monitoring set.
+                                                    If set to `True` (the default), this flag marks the current monitoring window
+                                                    (on this monitoring endpoint) as completed - the data inferred so far is assumed
+                                                    to be the complete data for this monitoring window.
+                                                    You may want to set this flag to `False` if you want to record multiple results in
+                                                    close time proximity ("batch set"). In this case, set this flag to `False` on all
+                                                    but the last batch in the set.
     raises MLRunInvalidArgumentError: if both `model_path` and `endpoint_id` are not provided, or if `last_in_batch_set` is
                                       provided for an unsupported `mlrun` version.
     """

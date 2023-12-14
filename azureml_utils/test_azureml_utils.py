@@ -117,9 +117,8 @@ def test_train():
             local=True,
         )
         # Get trained models:
-        model_paths = [azureml_run.outputs[key] for key in azureml_run.outputs.keys() if "model" in key]
-        print(model_paths)
-        test_pass = len(model_paths) == save_n_models
+        num_saved_models = len(azureml_run.status.iterations) - 1  # The first one in the list is the 'columns'
+        test_pass = num_saved_models == save_n_models
 
     except Exception as exception:
         print(f"- The test failed - raised the following error:\n- {exception}")

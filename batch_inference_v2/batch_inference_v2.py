@@ -11,10 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-
-from typing import Any, Dict, List, Union
+from inspect import signature
+from typing import Any, Dict, List, Optional, Union
 
 import mlrun
 
@@ -79,6 +78,28 @@ def _prepare_result_set(
     )
 
 
+def _parse_record_results_kwarg(
+    last_in_batch_set: Optional[bool],
+) -> dict[str, bool]:
+    """
+    Check if `last_in_batch_set` is provided and expected as a parameter.
+    Return it as a dictionary.
+    """
+    kwarg = "last_in_batch_set"
+    if last_in_batch_set is None:
+        return {}
+    if (
+        signature(mlrun.model_monitoring.api.record_results).parameters.get(kwarg)
+        is None
+    ):
+        raise mlrun.errors.MLRunInvalidArgumentError(
+            f"Unexpected parameter `{kwarg}` for function: "
+            "`mlrun.model_monitoring.api.record_results`. "
+            "Please make sure that you are using `mlrun>=1.6.0` version."
+        )
+    return {kwarg: last_in_batch_set}
+
+
 def infer(
     context: mlrun.MLClientCtx,
     dataset: Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
@@ -104,6 +125,7 @@ def infer(
     model_endpoint_sample_set: Union[
         mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray
     ] = None,
+    last_in_batch_set: Optional[bool] = None,
     **predict_kwargs: Dict[str, Any],
 ):
     """
@@ -163,8 +185,17 @@ def infer(
     :param model_endpoint_sample_set:               A sample dataset to give to compare the inputs in the drift analysis.
                                                     Can be provided as an input (DataItem) or as a parameter (e.g. string, list, DataFrame).
                                                     The default chosen sample set will always be the one who is set in the model artifact itself.
-
-    raises MLRunInvalidArgumentError: if both `model_path` and `endpoint_id` are not provided
+    :param last_in_batch_set:                       Relevant only when `perform_drift_analysis` is `True`.
+                                                    This flag can (and should only) be used when the model endpoint does not have
+                                                    model-monitoring set.
+                                                    If set to `True` (the default), this flag marks the current monitoring window
+                                                    (on this monitoring endpoint) as completed - the data inferred so far is assumed
+                                                    to be the complete data for this monitoring window.
+                                                    You may want to set this flag to `False` if you want to record multiple results in
+                                                    close time proximity ("batch set"). In this case, set this flag to `False` on all
+                                                    but the last batch in the set.
+    raises MLRunInvalidArgumentError: if both `model_path` and `endpoint_id` are not provided, or if `last_in_batch_set` is
+                                      provided for an unsupported `mlrun` version.
     """
 
     # Loading the model:
@@ -241,4 +272,5 @@ def infer(
             artifacts_tag=artifacts_tag,
             trigger_monitoring_job=trigger_monitoring_job,
             default_batch_image=batch_image_job,
+            **_parse_record_results_kwarg(last_in_batch_set=last_in_batch_set),
         )

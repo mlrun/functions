@@ -39,8 +39,8 @@ def test_question_answering(monkeypatch):
     qa_run = qa_function.run(
         handler="answer_questions",
         params={
-            "model": "distilgpt2",
-            "input_path": input_path,
+            "model_name": "distilgpt2",
+            "data_path": input_path,
             "text_wrapper": (
                 "Given the following sentence:\n"
                 "-----\n"

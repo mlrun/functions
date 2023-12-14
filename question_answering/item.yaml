@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 categories:
 - machine-learning
 description: GenAI approach of question answering on a given data

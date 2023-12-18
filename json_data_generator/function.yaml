@@ -1,0 +1,71 @@
+kind: job
+metadata:
+  name: json-data-generator
+  tag: ''
+  hash: 1d12e2f61c526d24b384d2c80315839f26a82c0a
+  project: ''
+  labels:
+    author: zeevr
+  categories:
+  - machine-learning
+  - Data Preparation
+  - GenAI
+spec:
+  command: ''
+  args: []
+  image: ''
+  build:
+    functionSourceCode: IyBDb3B5cmlnaHQgMjAyMyBJZ3VhemlvCiMKIyBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIyB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiMgWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CiMKIyAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAojCiMgVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQojIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiMgV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiMgU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAojIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgppbXBvcnQgbWxydW4KaW1wb3J0IG9zCmltcG9ydCB0cWRtCmZyb20gbGFuZ2NoYWluLmNoYXRfbW9kZWxzIGltcG9ydCBDaGF0T3BlbkFJCmltcG9ydCBhc3QKZnJvbSBzcmMuY29tbW9uIGltcG9ydCBQcm9qZWN0U2VjcmV0cwoKCmRlZiBnZW5lcmF0ZV9kYXRhKAogICAgICAgIGNvbnRleHQ6IG1scnVuLk1MQ2xpZW50Q3R4LAogICAgICAgIGZpZWxkczogbGlzdCwKICAgICAgICBhbW91bnQ6IGludCA9IDEwLAogICAgICAgIG1vZGVsX25hbWU6IHN0ciA9ICJncHQtMy41LXR1cmJvIiwKICAgICAgICBsYW5ndWFnZTogc3RyID0gImVuIiwKICAgICAgICBjaHVua19zaXplOiBpbnQgPSA1MCwKKSAtPiBsaXN0OgogICAgIiIiCiAgICBHZW5lcmF0ZXMgYSBKc29uIGZpbGUgd2l0aCBkYXRhIHJhbmRvbWx5IG1hZGUgZnJvbSBnaXZlbiB1c2VyIGZpZWxkcy4KCiAgICA6cGFyYW0gY29udGV4dDogbWxydW4gY29udGV4dC4KICAgIDpwYXJhbSBmaWVsZHM6IEEgbGlzdCBvZiBmaWVsZHMgdG8gcmFuZG9tbHkgZ2VuZXJhdGUuCiAgICA6cGFyYW0gYW1vdW50OiBUaGUgbnVtYmVyIG9mIHZhcmlhbnRzIHRvIGdlbmVyYXRlLgogICAgOnBhcmFtIG1vZGVsX25hbWU6IFRoZSBuYW1lIG9mIHRoZSBtb2RlbCB0byB1c2UgZm9yIGNvbnZlcnNhdGlvbiBnZW5lcmF0aW9uLgogICAgICAgICAgICAgICAgICAgICAgIFlvdSBzaG91bGQgY2hvb3NlIG9uZSBvZiBHUFQtNCBvciBHUFQtMy41IGZyb20gdGhlIGxpc3QgaGVyZTogaHR0cHM6Ly9wbGF0Zm9ybS5vcGVuYWkuY29tL2RvY3MvbW9kZWxzLgogICAgICAgICAgICAgICAgICAgICAgIERlZmF1bHQ6ICdncHQtMy41LXR1cmJvJy4KICAgIDpwYXJhbSBsYW5ndWFnZTogVGhlIGxhbmd1YWdlIHRvIHVzZSBmb3IgdGhlIGdlbmVyYXRlZCBjb252ZXJzYXRpb24gdGV4dC4KICAgIDpwYXJhbSBjaHVua19zaXplOiBOdW1iZXIgb2Ygc2FtcGxlcyBnZW5lcmF0ZWQgYXQgZWFjaCBHUFQgcXVlcnkuCiAgICAiIiIKICAgIGluc3RydWN0aW9ucyA9ICIiCiAgICBmb3IgZmllbGQgaW4gZmllbGRzOgogICAgICAgIGlmICI6IiBpbiBmaWVsZDoKICAgICAgICAgICAga2V5LCBpbnN0cnVjdGlvbiA9IGZpZWxkLnNwbGl0KCI6IiwgMSkKICAgICAgICBlbHNlOgogICAgICAgICAgICBrZXksIGluc3RydWN0aW9uID0gZmllbGQsICJubyBzcGVjaWFsIGluc3RydWN0aW9uIgogICAgICAgIGtleSA9IGtleS5yZXBsYWNlKCIgIiwgIl8iKQogICAgICAgIGluc3RydWN0aW9ucyArPSBmIioge2tleX06IHtpbnN0cnVjdGlvbn1cbiIKCiAgICAjIENyZWF0ZSB0aGUgcHJvbXB0IHN0cnVjdHVyZToKICAgIHByb21wdF9zdHJ1Y3R1cmUgPSAoCiAgICAgICAgZiJVc2UgdGhlIGZvbGxvd2luZyBrZXlzIGFuZCBpbnN0cnVjdGlvbnMgKGV4YW1wbGU6ICdrZXk6IGluc3RydWN0aW9uIG9yIG5vIHNwZWNpYWwgaW5zdHJ1Y3Rpb24nKToge2luc3RydWN0aW9uc30uXG4iCiAgICAgICAgZiJQbGVhc2UgZ2VuZXJhdGUgdGhlIHZhbHVlcyBpbiB7bGFuZ3VhZ2V9IGxhbmd1YWdlLiBcbiIKICAgICAgICBmIk1ha2Ugc3VyZSB0aGUgbmFtZXMgb2YgdGhlIGtleXMgYXJlIHRoZSBzYW1lIGFzIHRoZSBnaXZlbiBmaWVsZCBuYW1lLlxuIgogICAgICAgIGYiUGxlYXNlIHJldHVybiBvbmx5IHRoZSBqc29uIGZvcm1hdCB3aXRob3V0IGFueSBpbnRyb2R1Y3Rpb24gYW5kIGVuZGluZyIKICAgICkKCiAgICBwcm9tcHRfc3RydWN0dXJlID0gImdlbmVyYXRlIHRoZSBmb2xsb3dpbmcgdmFsdWVzIHthbW91bnR9IHRpbWVzIHJhbmRvbWx5LCBpbiBhbiBvcmRlciB0aGF0IGNyZWF0ZXMgYSBqc29uIHRhYmxlLlxuIiArIHByb21wdF9zdHJ1Y3R1cmUKCiAgICAjIExvYWQgdGhlIE9wZW5BSSBtb2RlbCB1c2luZyBsYW5nY2hhaW46CiAgICBvcy5lbnZpcm9uWyJPUEVOQUlfQVBJX0tFWSJdID0gY29udGV4dC5nZXRfc2VjcmV0KGtleT1Qcm9qZWN0U2VjcmV0cy5PUEVOQUlfQVBJX0tFWSkKICAgIG9zLmVudmlyb25bIk9QRU5BSV9BUElfQkFTRSJdID0gY29udGV4dC5nZXRfc2VjcmV0KAogICAgICAgIGtleT1Qcm9qZWN0U2VjcmV0cy5PUEVOQUlfQVBJX0JBU0UKICAgICkKICAgIGxsbSA9IENoYXRPcGVuQUkobW9kZWw9bW9kZWxfbmFtZSkKCiAgICAjIFN0YXJ0IGdlbmVyYXRpbmcgZGF0YToKICAgIGRhdGEgPSBbXQogICAgZm9yIF8gaW4gdHFkbS50cWRtKHJhbmdlKGludChhbW91bnQgLyBjaHVua19zaXplKSArIDEpLCBkZXNjPSJHZW5lcmF0aW5nIik6CiAgICAgICAgZm9yIHRyeW91dCBpbiByYW5nZSgzKToKICAgICAgICAgICAgaWYgYW1vdW50ID4gY2h1bmtfc2l6ZToKICAgICAgICAgICAgICAgIGN1cnJlbnRfY2h1bmtfc2l6ZSA9IGNodW5rX3NpemUKICAgICAgICAgICAgICAgIGFtb3VudCAtPSBjaHVua19zaXplCiAgICAgICAgICAgIGVsc2U6CiAgICAgICAgICAgICAgICBjdXJyZW50X2NodW5rX3NpemUgPSBhbW91bnQKCiAgICAgICAgICAgICMgQ3JlYXRlIHRoZSBwcm9tcHQ6CiAgICAgICAgICAgIHByb21wdCA9IHByb21wdF9zdHJ1Y3R1cmUuZm9ybWF0KAogICAgICAgICAgICAgICAgYW1vdW50PWN1cnJlbnRfY2h1bmtfc2l6ZSwKICAgICAgICAgICAgKQogICAgICAgICAgICAjIEdlbmVyYXRlIHRoZSBjb252ZXJzYXRpb246CiAgICAgICAgICAgIGNodW5rX2RhdGEgPSBsbG0ucHJlZGljdCh0ZXh0PXByb21wdCkKICAgICAgICAgICAgY2h1bmtfZGF0YSA9IGNodW5rX2RhdGFbY2h1bmtfZGF0YS5maW5kKCJbIik6Y2h1bmtfZGF0YS5yZmluZCgiXSIpICsgMV0KICAgICAgICAgICAgaWYgY2h1bmtfZGF0YS5jb3VudCgiWyIpICE9IGNodW5rX2RhdGEuY291bnQoIl0iKToKICAgICAgICAgICAgICAgIHByaW50KCJGYWlsZWQgdG8gZ2V0IHByb3BlciBqc29uIGZvcm1hdCBmcm9tIG1vZGVsLCBudW1iZXIgb2YgJ1snIGRvZXNuJ3QgbWF0Y2ggbnVtYmVyIG9mICddJy4iKQogICAgICAgICAgICAgICAgY29udGludWUKICAgICAgICAgICAgY2h1bmtfZGF0YSA9IGFzdC5saXRlcmFsX2V2YWwoY2h1bmtfZGF0YSkKICAgICAgICAgICAgZGF0YSArPSBjaHVua19kYXRhCiAgICAgICAgICAgIGJyZWFrCiAgICAgICAgaWYgdHJ5b3V0ID09IDM6CiAgICAgICAgICAgIHJhaXNlIFZhbHVlRXJyb3IoCiAgICAgICAgICAgICAgICBmIkNvdWxkIG5vdCBnZW5lcmF0ZSBhIHByb3BlciBqc29uIGZvcm1hdCBmb3IgdGhlIGdpdmVuIGZpZWxkcywgdXNpbmcgZ2l2ZW4gbW9kZWw6IHttb2RlbF9uYW1lfS4gSGludDogR3B0LTQgd29ya3MgZm9yIG91ciBwdXJwb3NlLiIpCiAgICByZXR1cm4gZGF0YQo=
+    base_image: mlrun/mlrun
+    commands: []
+    code_origin: ''
+    origin_filename: ''
+    requirements:
+    - langchain.chat_models
+    - tqdm
+  entry_points:
+    generate_data:
+      name: generate_data
+      doc: Generates a Json file with data randomly made from given user fields.
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: mlrun context.
+        default: ''
+      - name: fields
+        type: list
+        doc: A list of fields to randomly generate.
+        default: ''
+      - name: amount
+        type: int
+        doc: The number of variants to generate.
+        default: 10
+      - name: model_name
+        type: str
+        doc: 'The name of the model to use for conversation generation. You should
+          choose one of GPT-4 or GPT-3.5 from the list here: https://platform.openai.com/docs/models.
+          Default: ''gpt-3.5-turbo''.'
+        default: gpt-3.5-turbo
+      - name: language
+        type: str
+        doc: The language to use for the generated conversation text.
+        default: en
+      - name: chunk_size
+        type: int
+        doc: Number of samples generated at each GPT query.
+        default: 50
+      outputs:
+      - default: ''
+        type: list
+      lineno: 22
+  description: GenAI approach of generating json data according to a given schema
+  default_handler: generate_data
+  disable_auto_mount: false
+  clone_target_dir: ''
+  env: []
+  priority_class_name: ''
+  preemption_mode: prevent
+  affinity: null
+  tolerations: null
+  security_context: {}
+verbose: false

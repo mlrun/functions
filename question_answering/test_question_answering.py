@@ -41,12 +41,12 @@ def test_question_answering(monkeypatch):
         params={
             "model_name": "distilgpt2",
             "data_path": input_path,
-            "text_wrapper": (
+            "text_wrapper": [(
                 "Given the following sentence:\n"
                 "-----\n"
                 "{}\n"
                 "-----"
-            ),
+            )],
             "questions": [
                 "What is the color of the apple?",
             ],

@@ -11,7 +11,7 @@ labels:
   author: yonish
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.4.0
+mlrunVersion: 1.5.2
 name: question_answering
 platformVersion: 3.5.0
 spec:

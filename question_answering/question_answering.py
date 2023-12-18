@@ -320,7 +320,7 @@ def answer_questions(
     # Create a list of question handlers according to given configs
     handlers = []
     for cfg in questions_config:
-        question_type = cfg.get("type", "default")
+        question_type = cfg.pop("type", "default")
         handlers.append(QUESTION_MAPPING.get(question_type)(**cfg))
 
     # Go over the batches of text files and question them:
@@ -529,7 +529,7 @@ class QuestionHandler:
         pass
 
     def __init__(self, **kwargs):
-        self.type = kwargs.get("type", "default")
+        pass
 
     @staticmethod
     def _get_answers(generated_text: str, questions_amount: int) -> List[str]:
@@ -666,9 +666,8 @@ class PollQuestionHandler(QuestionHandler):
             return getattr(self, self.value)(answers)
 
     def __init__(
-        self, poll_count: int = 5, poll_strategy: str = "most_common", type="poll"
-    ):
-        super().__init__(type=type)
+        self, poll_count: int = 5, poll_strategy: str = "most_common"):
+        super().__init__()
         self.poll_count = poll_count
         self.poll_strategy = self.Strategy(poll_strategy)
 

@@ -3,10 +3,8 @@ import mlrun
 import pytest
 
 # OpenAI tokens:
-OPENAI_API_KEY = ""
-OPENAI_API_BASE = ""
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
-os.environ["OPENAI_API_BASE"] = OPENAI_API_BASE
+# os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+# os.environ["OPENAI_API_BASE"] = OPENAI_API_BASE
 
 
 @pytest.mark.skipif("OPENAI_API_KEY" not in os.environ, reason="no token")

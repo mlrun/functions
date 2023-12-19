@@ -20,7 +20,7 @@ APPLE_COLOR = "red"
 
 
 def mock_pipeline_call(*args, **kwargs):
-    return [{"generated_text": args[1] + APPLE_COLOR}]
+    return [[{"generated_text": "1. " + APPLE_COLOR}]]
 
 
 def _make_data_dir_for_test():
@@ -35,8 +35,9 @@ def test_question_answering(monkeypatch):
     monkeypatch.setattr(transformers.Pipeline, "__call__", mock_pipeline_call)
     input_path = "./data"
     artifact_path = tempfile.mkdtemp()
-    qa_function = mlrun.import_function("function.yaml")
-    qa_run = qa_function.run(
+    project = mlrun.new_project("qa", context="./")
+    fn = project.set_function("question_answering.py", "answer_questions", kind="job", image="mlrun/mlrun")
+    qa_run = fn.run(
         handler="answer_questions",
         params={
             "model_name": "distilgpt2",
@@ -69,7 +70,7 @@ def test_question_answering(monkeypatch):
         artifact_path=artifact_path
     )
     qa_df = mlrun.get_dataitem(
-        f"{artifact_path}/question-answering-answer-questions/0/question_answering_df.parquet"
+        qa_run.status.artifacts[0]["spec"]["target_path"]
     ).as_df()
     assert qa_df["color"][0] == APPLE_COLOR
     assert qa_run.outputs["question_answering_errors"] == {}

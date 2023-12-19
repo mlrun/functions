@@ -22,7 +22,7 @@ spec:
   image: mlrun/mlrun
   kind: job
   requirements:
-    - langchain.chat_models
+    - langchain
     - tqdm
 url: ''
 version: 1.0

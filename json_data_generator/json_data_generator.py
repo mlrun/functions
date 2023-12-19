@@ -16,7 +16,12 @@ import os
 import tqdm
 from langchain.chat_models import ChatOpenAI
 import ast
-from src.common import ProjectSecrets
+
+
+def _env_or_secret(context, key):
+    if key in os.environ:
+        return os.environ[key]
+    return context.get_secret(key)
 
 
 def generate_data(
@@ -59,10 +64,8 @@ def generate_data(
     prompt_structure = "generate the following values {amount} times randomly, in an order that creates a json table.\n" + prompt_structure
 
     # Load the OpenAI model using langchain:
-    os.environ["OPENAI_API_KEY"] = context.get_secret(key=ProjectSecrets.OPENAI_API_KEY)
-    os.environ["OPENAI_API_BASE"] = context.get_secret(
-        key=ProjectSecrets.OPENAI_API_BASE
-    )
+    os.environ["OPENAI_API_KEY"] = _env_or_secret(context, key="OPENAI_API_KEY")
+    os.environ["OPENAI_API_BASE"] = _env_or_secret(context, key="OPENAI_API_BASE")
     llm = ChatOpenAI(model=model_name)
 
     # Start generating data:

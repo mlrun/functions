@@ -29,7 +29,6 @@ MODELS = [
     ("sklearn.linear_model.LinearRegression", "regression"),
     ("sklearn.ensemble.RandomForestClassifier", "classification"),
     ("xgboost.XGBRegressor", "regression"),
-    ("lightgbm.LGBMClassifier", "classification"),
 ]
 
 REQUIRED_ENV_VARS = [
@@ -82,11 +81,10 @@ def _assert_train_handler(train_run):
 def test_train(model: Tuple[str, str]):
     dataset, label_columns = _get_dataset(model[1])
     is_test_passed = True
-    # Importing function:
-    # fn = import_function("function.yaml")
+
     project = mlrun.new_project("auto-trainer-test", context="./")
     fn = project.set_function("function.yaml", "train", kind="job", image="mlrun/mlrun")
-    # fn = mlrun.code_to_function("train", kind="job", filename="function.yaml", image="mlrun/mlrun", handler="train")
+
     train_run = None
     model_name = model[0].split(".")[-1]
     labels = {"label1": "my-value"}

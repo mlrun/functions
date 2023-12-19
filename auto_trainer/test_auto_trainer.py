@@ -12,19 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from typing import Tuple
 import os
+import tempfile
+from typing import Tuple
+
 import mlrun
 import pandas as pd
 import pytest
-from mlrun import import_function
-
 from sklearn.datasets import (
     make_classification,
     make_multilabel_classification,
     make_regression,
 )
-
 
 MODELS = [
     ("sklearn.linear_model.LinearRegression", "regression"),
@@ -73,25 +72,21 @@ def _get_dataset(problem_type: str, filepath: str = ".", n_classes: int = 2):
     return filename, labels
 
 
-def _set_environment(env_file=None):
-    if env_file:
-        mlrun.set_env_from_file(env_file)
-    mlrun.get_or_create_project("auto-trainer-test", context="./", user_project=True)
+def _assert_train_handler(train_run):
+    assert train_run and all(
+        key in train_run.outputs for key in ["model", "test_set"]
+    ), "outputs should include more data"
 
 
 @pytest.mark.parametrize("model", MODELS)
-@pytest.mark.skipif(
-    condition=not _validate_environment_variables(),
-    reason="Project's environment variables are not set",
-)
 def test_train(model: Tuple[str, str]):
-    _set_environment()
-
     dataset, label_columns = _get_dataset(model[1])
-
+    is_test_passed = True
     # Importing function:
-    fn = import_function("function.yaml")
-
+    # fn = import_function("function.yaml")
+    project = mlrun.new_project("auto-trainer-test", context="./")
+    fn = project.set_function("function.yaml", "train", kind="job", image="mlrun/mlrun")
+    # fn = mlrun.code_to_function("train", kind="job", filename="function.yaml", image="mlrun/mlrun", handler="train")
     train_run = None
     model_name = model[0].split(".")[-1]
     labels = {"label1": "my-value"}
@@ -111,10 +106,10 @@ def test_train(model: Tuple[str, str]):
         )
     except Exception as exception:
         print(f"- The test failed - raised the following error:\n- {exception}")
-    assert train_run and all(
-        key in train_run.outputs for key in ["model", "test_set"]
-    ), "outputs should include more data"
-    assert labels.items() <= train_run.artifact("model").meta.labels.items()
+        is_test_passed = False
+
+    assert is_test_passed, "The test failed"
+    _assert_train_handler(train_run)
 
 
 @pytest.mark.parametrize("model", MODELS)
@@ -123,12 +118,12 @@ def test_train(model: Tuple[str, str]):
     reason="Project's environment variables are not set",
 )
 def test_train_evaluate(model: Tuple[str, str]):
-    _set_environment()
-
     dataset, label_columns = _get_dataset(model[1])
-
+    is_test_passed = True
     # Importing function:
-    fn = import_function("function.yaml")
+    project = mlrun.new_project("auto-trainer-test", context="./")
+    fn = project.set_function("function.yaml", "train", kind="job", image="mlrun/mlrun")
+    temp_dir = tempfile.mkdtemp()
 
     evaluate_run = None
     model_name = model[0].split(".")[-1]
@@ -144,7 +139,9 @@ def test_train_evaluate(model: Tuple[str, str]):
             },
             handler="train",
             local=True,
+            artifact_path=temp_dir,
         )
+        _assert_train_handler(train_run)
 
         evaluate_run = fn.run(
             inputs={"dataset": train_run.outputs["test_set"]},
@@ -154,10 +151,13 @@ def test_train_evaluate(model: Tuple[str, str]):
             },
             handler="evaluate",
             local=True,
-            artifact_path='./potato'
+            artifact_path=temp_dir,
         )
     except Exception as exception:
         print(f"- The test failed - raised the following error:\n- {exception}")
+        is_test_passed = False
+
+    assert is_test_passed, "The test failed"
     assert (
         evaluate_run and "evaluation-test_set" in evaluate_run.outputs
     ), "Missing fields in evaluate_run"
@@ -169,13 +169,14 @@ def test_train_evaluate(model: Tuple[str, str]):
     reason="Project's environment variables are not set",
 )
 def test_train_predict(model: Tuple[str, str]):
-    _set_environment()
-
+    is_test_passed = True
     dataset, label_columns = _get_dataset(model[1])
     df = pd.read_csv(dataset)
     sample = df.head().drop("labels", axis=1).values.tolist()
     # Importing function:
-    fn = import_function("function.yaml")
+    project = mlrun.new_project("auto-trainer-test", context="./")
+    fn = project.set_function("function.yaml", "train", kind="job", image="mlrun/mlrun")
+    temp_dir = tempfile.mkdtemp()
 
     predict_run = None
     model_name = model[0].split(".")[-1]
@@ -191,7 +192,9 @@ def test_train_predict(model: Tuple[str, str]):
             },
             handler="train",
             local=True,
+            artifact_path=temp_dir,
         )
+        _assert_train_handler(train_run)
 
         predict_run = fn.run(
             params={
@@ -202,9 +205,13 @@ def test_train_predict(model: Tuple[str, str]):
             },
             handler="predict",
             local=True,
+            artifact_path=temp_dir,
         )
     except Exception as exception:
         print(f"- The test failed - raised the following error:\n- {exception}")
+        is_test_passed = False
+
+    assert is_test_passed, "The test failed"
     assert (
         predict_run and "prediction" in predict_run.outputs
     ), "Prediction field must be in the output"

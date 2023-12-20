@@ -158,19 +158,19 @@ class TestSuite(ABC):
         if multiprocess:
             process_count = mp.cpu_count() - 1
         print("running tests with {} process".format(process_count))
-        discovered = self.discover(path)
+        discovered_functions = self.discover(path)
         if function_name is not None:
-            discovered = [string for string in discovered if function_name in string]
-        for path in discovered:
+            discovered_functions = [fn for fn in discovered_functions if function_name == Path(fn).stem]
+        for path in discovered_functions:
             if re.match(".+/test_*", path):
-                discovered.remove(path)
+                discovered_functions.remove(path)
                 print("a function name cannot start with test, please rename {} ".format(path))
 
         self.before_run()
 
         # pool = mp.Pool(process_count)
         # pool.map(self.directory_process, [directory for directory in discovered])
-        for directory in discovered:
+        for directory in discovered_functions:
             self.directory_process(directory)
         self.after_run()
 
@@ -198,7 +198,7 @@ class TestPY(TestSuite):
         if item_yaml_path.exists():
             for inner_file in path.iterdir():
                 if self.is_test_py(inner_file):
-                    if is_test_valid_by_item(item_yaml_path):
+                    if is_test_valid_by_item(path):
                         testable.append(str(path.resolve()))
                         break
             if testable:

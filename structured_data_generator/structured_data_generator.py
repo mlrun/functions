@@ -47,32 +47,39 @@ def generate_data(
     """
     instructions = ""
     for field in fields:
+        # Split the field to key and instruction:
         if ":" in field:
             key, instruction = field.split(":", 1)
         else:
             key, instruction = field, "no special instruction"
+        # Replace spaces with underscores for the key to be used as a json key:
         key = key.replace(" ", "_")
         instructions += f"* {key}: {instruction}\n"
 
     # Create the prompt structure:
     prompt_structure = (
-        f"Use the following keys and instructions (example: 'key: instruction or no special instruction'): {instructions}.\n"
+        f"generate the following values {amount} times randomly, in an order that creates a json table.\n"
+        f"Use the following keys and instructions (example: 'key: instruction or no special instruction'): "
+        f"{instructions}.\n"
         f"Please generate the values in {language} language. \n"
         f"Make sure the names of the keys are the same as the given field name.\n"
         f"Please return only the json format without any introduction and ending"
     )
 
-    prompt_structure = "generate the following values {amount} times randomly, in an order that creates a json table.\n" + prompt_structure
-
-    # Load the OpenAI model using langchain:
+    # Take the OpenAI API key and base from the secrets or environment variables:
     os.environ["OPENAI_API_KEY"] = _env_or_secret(context, key="OPENAI_API_KEY")
     os.environ["OPENAI_API_BASE"] = _env_or_secret(context, key="OPENAI_API_BASE")
+    # Load the OpenAI model using langchain:
     llm = ChatOpenAI(model=model_name)
 
     # Start generating data:
     data = []
     for _ in tqdm.tqdm(range(int(amount / chunk_size) + 1), desc="Generating"):
+        # We try to generate the data 3 times, if we fail we raise an error:
         for tryout in range(3):
+            # If the amount wanted is bigger than the chunk size, we generate a chunk of data in the size of the chunk
+            # and decrease the amount by the chunk size.
+            # otherwise we generate a chunk of data in the size of the amount:
             if amount > chunk_size:
                 current_chunk_size = chunk_size
                 amount -= chunk_size

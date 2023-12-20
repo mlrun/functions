@@ -33,7 +33,8 @@ def generate_data(
         chunk_size: int = 50,
 ) -> list:
     """
-    Generates a Json file with data randomly made from given user fields.
+     structured data of elements according to the given parameters.
+      The data can be later logged as a structured file with MLRun's `returns` parameter.
 
     :param context: mlrun context.
     :param fields: A list of fields to randomly generate.
@@ -82,8 +83,11 @@ def generate_data(
             prompt = prompt_structure.format(
                 amount=current_chunk_size,
             )
-            # Generate the conversation:
+
+            # Generate a chunk of data:
             chunk_data = llm.predict(text=prompt)
+
+            # Validate the response for correct python `list` structure
             chunk_data = chunk_data[chunk_data.find("["):chunk_data.rfind("]") + 1]
             if chunk_data.count("[") != chunk_data.count("]"):
                 print("Failed to get proper json format from model, number of '[' doesn't match number of ']'.")
@@ -93,5 +97,6 @@ def generate_data(
             break
         if tryout == 3:
             raise ValueError(
-                f"Could not generate a proper json format for the given fields, using given model: {model_name}. Hint: Gpt-4 works for our purpose.")
+                f"Could not generate a proper json format for the given fields, using given model: {model_name}."
+                f" Hint: Gpt-4 works best for most scenarios.")
     return data

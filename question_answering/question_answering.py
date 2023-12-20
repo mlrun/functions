@@ -528,7 +528,7 @@ class QuestionHandler:
     class ConfigKeys:
         pass
 
-    def __init__(self, **kwargs):
+    def __init__(self):
         pass
 
     @staticmethod

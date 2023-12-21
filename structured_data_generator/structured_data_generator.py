@@ -11,21 +11,44 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import mlrun
 import os
 import tqdm
 from langchain.chat_models import ChatOpenAI
 import ast
 
 
-def _env_or_secret(context, key):
-    if key in os.environ:
-        return os.environ[key]
-    return context.get_secret(key)
+def _set_openai_secrets() -> bool:
+    key = "OPENAI_API_KEY"
+    base = "OPENAI_API_BASE"
+    # Check if the key is already in the environment variables:
+    if key in os.environ and base in os.environ:
+        return True
+    # Check if mlrun is installed:
+    try:
+        import mlrun
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError(f"Please install mlrun or set {key} and {base} as os variables "
+                                  f"in order to use this function.")
+
+    # Check if the key is in the secrets:
+    context = mlrun.get_or_create_context(name="context")
+    openai_key = context.get_secret(key, None)
+    openai_base = context.get_secret(base, None)
+
+    # If the key is not in the secrets, return False:
+    if not openai_key:
+        raise ValueError(f"Could not find OpenAI API key in the environment variables or secrets,"
+                         f" please set it as: {key}.")
+    if not openai_base:
+        raise ValueError(f"Could not find OpenAI API base in the environment variables or secrets,"
+                         f" please set it as: {base}.")
+    # If the key is in the secrets, set it in the environment variables and return True:
+    os.environ[key] = openai_key
+    os.environ[base] = openai_base
+    return True
 
 
 def generate_data(
-        context: mlrun.MLClientCtx,
         fields: list,
         amount: int = 10,
         model_name: str = "gpt-3.5-turbo",
@@ -36,7 +59,6 @@ def generate_data(
      structured data of elements according to the given parameters.
       The data can be later logged as a structured file with MLRun's `returns` parameter.
 
-    :param context: mlrun context.
     :param fields: A list of fields to randomly generate.
     :param amount: The number of variants to generate.
     :param model_name: The name of the model to use for conversation generation.
@@ -66,9 +88,9 @@ def generate_data(
         f"Please return only the json format without any introduction and ending"
     )
 
-    # Take the OpenAI API key and base from the secrets or environment variables:
-    os.environ["OPENAI_API_KEY"] = _env_or_secret(context, key="OPENAI_API_KEY")
-    os.environ["OPENAI_API_BASE"] = _env_or_secret(context, key="OPENAI_API_BASE")
+    # Set the OpenAI secrets:
+    _set_openai_secrets()
+
     # Load the OpenAI model using langchain:
     llm = ChatOpenAI(model=model_name)
 

@@ -56,8 +56,8 @@ def generate_data(
         chunk_size: int = 50,
 ) -> list:
     """
-     structured data of elements according to the given parameters.
-      The data can be later logged as a structured file with MLRun's `returns` parameter.
+    Structured data of elements according to the given parameters.
+    The data can be later logged as a structured file with MLRun's `returns` parameter.
 
     :param fields: A list of fields to randomly generate.
     :param amount: The number of variants to generate.

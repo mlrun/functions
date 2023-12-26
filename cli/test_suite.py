@@ -238,7 +238,7 @@ class TestPY(TestSuite):
         install_requirements(path, ["pytest", f"mlrun=={mlrun_version}"] + item_requirements)
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
-            f"cd {path} ; pipenv run python -m pytest",
+            f"cd {path} ; pipenv run python -m pytest --full-trace",
             stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,

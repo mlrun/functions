@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import ast
 import os
+
 import tqdm
 from langchain.chat_models import ChatOpenAI
-import ast
 
 
 def _set_openai_secrets() -> bool:
@@ -27,8 +28,11 @@ def _set_openai_secrets() -> bool:
     try:
         import mlrun
     except ModuleNotFoundError:
-        raise ModuleNotFoundError(f"Please install mlrun or set {key} and {base} as os variables "
-                                  f"in order to use this function.")
+        raise EnvironmentError(
+            f"One or more of the OpenAI required environment variables ('{key}', '{base}') are missing."
+            f"Please set them as environment variables or install mlrun (`pip install mlrun`)"
+            f"and set them as project secrets using `projecy.set_secrets`."
+        )
 
     # Check if the key is in the secrets:
     context = mlrun.get_or_create_context(name="context")
@@ -37,11 +41,15 @@ def _set_openai_secrets() -> bool:
 
     # If the key is not in the secrets, return False:
     if not openai_key:
-        raise ValueError(f"Could not find OpenAI API key in the environment variables or secrets,"
-                         f" please set it as: {key}.")
+        raise EnvironmentError(
+            f"Could not find OpenAI API key in the environment variables or secrets,"
+            f" please set it as: {key}."
+        )
     if not openai_base:
-        raise ValueError(f"Could not find OpenAI API base in the environment variables or secrets,"
-                         f" please set it as: {base}.")
+        raise EnvironmentError(
+            f"Could not find OpenAI API base in the environment variables or secrets,"
+            f" please set it as: {base}."
+        )
     # If the key is in the secrets, set it in the environment variables and return True:
     os.environ[key] = openai_key
     os.environ[base] = openai_base
@@ -49,11 +57,11 @@ def _set_openai_secrets() -> bool:
 
 
 def generate_data(
-        fields: list,
-        amount: int = 10,
-        model_name: str = "gpt-3.5-turbo",
-        language: str = "en",
-        chunk_size: int = 50,
+    fields: list,
+    amount: int = 10,
+    model_name: str = "gpt-3.5-turbo",
+    language: str = "en",
+    chunk_size: int = 50,
 ) -> list:
     """
     Structured data of elements according to the given parameters.
@@ -96,7 +104,7 @@ def generate_data(
 
     # Start generating data:
     data = []
-    for _ in tqdm.tqdm(range(int(amount / chunk_size) + 1), desc="Generating"):
+    for _ in tqdm.tqdm(range((amount // chunk_size) + 1), desc="Generating"):
         # We try to generate the data 3 times, if we fail we raise an error:
         for tryout in range(3):
             # If the amount wanted is bigger than the chunk size, we generate a chunk of data in the size of the chunk
@@ -117,15 +125,18 @@ def generate_data(
             chunk_data = llm.predict(text=prompt)
 
             # Validate the response for correct python `list` structure
-            chunk_data = chunk_data[chunk_data.find("["):chunk_data.rfind("]") + 1]
+            chunk_data = chunk_data[chunk_data.find("[") : chunk_data.rfind("]") + 1]
             if chunk_data.count("[") != chunk_data.count("]"):
-                print("Failed to get proper json format from model, number of '[' doesn't match number of ']'.")
+                print(
+                    "Failed to get proper json format from model, number of '[' doesn't match number of ']'."
+                )
                 continue
             chunk_data = ast.literal_eval(chunk_data)
             data += chunk_data
             break
         if tryout == 3:
-            raise ValueError(
+            raise RuntimeError(
                 f"Could not generate a proper json format for the given fields, using given model: {model_name}."
-                f" Hint: Gpt-4 works best for most scenarios.")
+                f" Hint: Gpt-4 works best for most scenarios."
+            )
     return data

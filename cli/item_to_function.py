@@ -161,6 +161,7 @@ def create_function_yaml(
     # remove build info from object
     function_object.spec.build.code_origin = ''
     function_object.spec.build.origin_filename = ''
+    function_object.spec.state_thresholds=None
 
     custom_fields = spec.get("customFields", {})
     for key, value in custom_fields.items():

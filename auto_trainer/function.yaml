@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: auto-trainer
   tag: ''
-  hash: 86a2510a414a10512a9b25607fa0e7895d8fc47d
+  hash: 95201dacf05c181e0257b5dd145cb79a503b6fbe
   project: ''
   labels:
     author: yonish
@@ -158,11 +158,6 @@ spec:
   env: []
   priority_class_name: ''
   preemption_mode: prevent
-  state_thresholds:
-    pending_scheduled: 1h
-    pending_not_scheduled: '-1'
-    image_pull_backoff: 1h
-    running: 24h
   affinity: null
   tolerations: null
   security_context: {}

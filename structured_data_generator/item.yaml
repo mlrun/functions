@@ -4,9 +4,9 @@ categories:
 - Data Preparation
 - Data Generation
 - GenAI
-description: GenAI approach of generating json data according to a given schema
+description: GenAI approach of generating structured data according to a given schema
 doc: ''
-example: json_data_generator.ipynb
+example: structured_data_generator.ipynb
 generationDate: 2023-12-14:10-50
 hidden: false
 icon: ''
@@ -15,10 +15,10 @@ labels:
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 1.5.2
-name: json_data_generator
+name: structured_data_generator
 platformVersion: 3.5.0
 spec:
-  filename: json_data_generator.py
+  filename: structured_data_generator.py
   handler: generate_data
   image: mlrun/mlrun
   kind: job
@@ -26,4 +26,4 @@ spec:
     - langchain
     - tqdm
 url: ''
-version: 1.0
+version: 1.0.0

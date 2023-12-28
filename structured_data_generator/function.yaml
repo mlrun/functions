@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: structured-data-generator
   tag: ''
-  hash: 1ccebb4975b8e5078b22ade4ac145058a890a30a
+  hash: 775c1a59adea52f5a1a4d26c96925c88474015f3
   project: ''
   labels:
     author: zeevr
@@ -65,11 +65,6 @@ spec:
   env: []
   priority_class_name: ''
   preemption_mode: prevent
-  state_thresholds:
-    pending_scheduled: 1h
-    pending_not_scheduled: '-1'
-    image_pull_backoff: 1h
-    running: 24h
   affinity: null
   tolerations: null
   security_context: {}

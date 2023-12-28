@@ -1,5 +1,0 @@
-mlrun
-torch
-wget
-pygit2
-transformers==3.0.2

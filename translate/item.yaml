@@ -2,6 +2,8 @@ apiVersion: v1
 categories:
 - data-preparation
 - machine-learning
+- deep-learning
+- NLP
 description: Translate text files from one language to another
 doc: ''
 example: translate.ipynb
@@ -26,5 +28,5 @@ spec:
     - torch
     - tqdm
 url: ''
-version: 0.0.1
+version: 0.0.2
 test_valid: True

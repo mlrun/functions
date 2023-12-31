@@ -21,7 +21,6 @@ import sys
 from glob import iglob
 import yaml
 from jinja2 import Template
-from sys import platform
 
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 

@@ -28,7 +28,6 @@ from cli.helpers import (
     install_pipenv,
     install_python,
     install_requirements,
-    execute_build_commands,
     get_item_yaml_values,
 )
 from cli.path_iterator import PathIterator
@@ -237,7 +236,6 @@ class TestPY(TestSuite):
         item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
         mlrun_version = list(get_item_yaml_values(path, "mlrunVersion")["mlrunVersion"])[0]
         install_requirements(path, ["pytest", f"mlrun=={mlrun_version}"] + item_requirements)
-        execute_build_commands(path,[])
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ; pipenv run python -m pytest",

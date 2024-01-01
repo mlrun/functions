@@ -167,6 +167,8 @@ def get_item_yaml_values(
         if values:
             if isinstance(values, list):
                 values_set = set(values)
+            elif isinstance(values, dict):
+                values_set = values
             else:
                 values_set.add(values)
         values_dict[key] = values_set

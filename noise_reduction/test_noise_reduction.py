@@ -13,7 +13,12 @@ def test_reduce_noise(audio_source, expected_num_audio_files):
     # set up the project and function
     artifact_path = tempfile.TemporaryDirectory().name
     project = mlrun.new_project("noise-reduction")
-    noise_reduction_function = project.set_function("function.yaml")
+    noise_reduction_function = project.set_function(
+        func="function.yaml",
+        name="reduce_noise",
+        kind="job",
+        image="mlrun/mlrun",
+    )
 
     # run the function
     noise_reduction_run = noise_reduction_function.run(

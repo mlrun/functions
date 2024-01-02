@@ -1,0 +1,101 @@
+kind: job
+metadata:
+  name: noise-reduction
+  tag: ''
+  hash: a111ece345524b92aca1be3280e2c925fe8460f2
+  project: ''
+  labels:
+    author: yonatans
+  categories: []
+spec:
+  command: ''
+  args: []
+  image: ''
+  build:
+    functionSourceCode: ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmZyb20gdHFkbSBpbXBvcnQgdHFkbQppbXBvcnQgbnVtcHkgYXMgbnAKZnJvbSBzY2lweS5pbyBpbXBvcnQgd2F2ZmlsZQoKCmRlZiByZWR1Y2Vfbm9pc2VfZGZuKAogICAgYXVkaW9fc291cmNlOiBzdHIsCiAgICB0YXJnZXRfZGlyZWN0b3J5OiBzdHIsCiAgICBwYWQ6IGJvb2wgPSBUcnVlLAogICAgYXR0ZW5fbGltX2RiOiBpbnQgPSBOb25lLAogICAgKiprd2FyZ3MKKToKICAgICIiIgogICAgUmVkdWNlIG5vaXNlIGZyb20gYXVkaW8gZmlsZXMgdXNpbmcgRGVlcEZpbHRlck5ldC4KICAgIE5vdGljZSB0aGF0IHRoZSBzYXZlZCBmaWxlcyBhcmUgaW4gd2F2IGZvcm1hdCwgZXZlbiBpZiB0aGUgb3JpZ2luYWwgZmlsZXMgYXJlIGluIG90aGVyIGZvcm1hdC4KCiAgICA6cGFyYW0gYXVkaW9fc291cmNlOiAgICAgICBwYXRoIHRvIGF1ZGlvIGZpbGUgb3IgZGlyZWN0b3J5IG9mIGF1ZGlvIGZpbGVzCiAgICA6cGFyYW0gdGFyZ2V0X2RpcmVjdG9yeTogICAgICBwYXRoIHRvIHRhcmdldCBkaXJlY3RvcnkgdG8gc2F2ZSBjbGVhbmVkIGF1ZGlvIGZpbGVzCiAgICA6cGFyYW0gcGFkOiAgICAgICAgICAgICB3aGV0aGVyIHRvIHBhZCB0aGUgYXVkaW8gZmlsZSB3aXRoIHplcm9zIGJlZm9yZSBjbGVhbmluZwogICAgOnBhcmFtIGF0dGVuX2xpbV9kYjogICAgbWF4aW11bSBhdHRlbnVhdGlvbiBpbiBkQgogICAgOnBhcmFtIGt3YXJnczogICAgICAgICAgYWRkaXRpb25hbCBhcmd1bWVudHMgdG8gcGFzcyB0byB0b3JjaGF1ZGlvLmxvYWQoKS4gRm9yIG1vcmUgaW5mb3JtYXRpb24gc2VlOgogICAgICAgICAgICAgICAgICAgICAgICAgICAgaHR0cHM6Ly9weXRvcmNoLm9yZy9hdWRpby9zdGFibGUvZ2VuZXJhdGVkL3RvcmNoYXVkaW8ubG9hZC5odG1sCiAgICAiIiIKICAgICMgaW1wb3J0IHJlcXVpcmVkIHBhY2thZ2VzCiAgICB0cnk6CiAgICAgICAgZnJvbSBkZi5lbmhhbmNlIGltcG9ydCBlbmhhbmNlLCBpbml0X2RmLCBsb2FkX2F1ZGlvLCBzYXZlX2F1ZGlvCiAgICBleGNlcHQgSW1wb3J0RXJyb3IgYXMgZToKICAgICAgICByYWlzZSBJbXBvcnRFcnJvcigiUGxlYXNlIGluc3RhbGwgZGVlcGZpbHRlcm5ldCBwYWNrYWdlcyIpIGZyb20gZQoKICAgICMgY3JlYXRlIHRhcmdldCBkaXJlY3Rvcnk6CiAgICB0YXJnZXRfZGlyZWN0b3J5ID0gX2NyZWF0ZV90YXJnZXRfZGlyZWN0b3J5KHRhcmdldF9kaXJlY3RvcnkpCgogICAgIyBnZXQgYXVkaW8gZmlsZXM6CiAgICBhdWRpb19maWxlcyA9IF9nZXRfYXVkaW9fZmlsZXMoYXVkaW9fc291cmNlKQoKICAgICMgTG9hZCBkZWZhdWx0IG1vZGVsCiAgICBtb2RlbCwgZGZfc3RhdGUsIF8gPSBpbml0X2RmKCkKCiAgICBmb3IgZmlsZSBpbiB0cWRtKGF1ZGlvX2ZpbGVzLCBkZXNjPSJDbGVhbmluZyBhdWRpbyBmaWxlcyIpOgogICAgICAgICMgbG9hZCBkYXRhCiAgICAgICAgYXVkaW8sIF8gPSBsb2FkX2F1ZGlvKAogICAgICAgICAgICBmaWxlPXN0cihmaWxlKSwKICAgICAgICAgICAgc3I9ZGZfc3RhdGUuc3IoKSwKICAgICAgICAgICAgKiprd2FyZ3MKICAgICAgICApCgogICAgICAgICMgcGVyZm9ybSBub2lzZSByZWR1Y3Rpb24KICAgICAgICByZWR1Y2VkX25vaXNlID0gZW5oYW5jZSgKICAgICAgICAgICAgbW9kZWw9bW9kZWwsCiAgICAgICAgICAgIGRmX3N0YXRlPWRmX3N0YXRlLAogICAgICAgICAgICBhdWRpbz1hdWRpbywKICAgICAgICAgICAgcGFkPXBhZCwKICAgICAgICAgICAgYXR0ZW5fbGltX2RiPWF0dGVuX2xpbV9kYiwKICAgICAgICApCgogICAgICAgIHRhcmdldF9wYXRoID0gZmlsZQogICAgICAgIGlmIHRhcmdldF9wYXRoLnN1ZmZpeCAhPSAiLndhdiI6CiAgICAgICAgICAgIG9sZF9zdWZmaXggPSB0YXJnZXRfcGF0aC5zdWZmaXhbMTpdCiAgICAgICAgICAgIHRhcmdldF9wYXRoID0gdGFyZ2V0X3BhdGgud2l0aF9zdGVtKHRhcmdldF9wYXRoLnN0ZW0gKyBmIl97b2xkX3N1ZmZpeH0iKQogICAgICAgICAgICB0YXJnZXRfcGF0aCA9IHRhcmdldF9wYXRoLndpdGhfc3VmZml4KCIud2F2IikKCiAgICAgICAgIyBzYXZlIGZpbGUKICAgICAgICBzYXZlX2F1ZGlvKAogICAgICAgICAgICBmaWxlPXRhcmdldF9wYXRoLm5hbWUsCiAgICAgICAgICAgIGF1ZGlvPXJlZHVjZWRfbm9pc2UsCiAgICAgICAgICAgIHNyPWRmX3N0YXRlLnNyKCksCiAgICAgICAgICAgIG91dHB1dF9kaXI9c3RyKHRhcmdldF9kaXJlY3RvcnkpLAogICAgICAgICkKCiAgICByZXR1cm4gdGFyZ2V0X2RpcmVjdG9yeQoKCmRlZiByZWR1Y2Vfbm9pc2UoCiAgICBhdWRpb19zb3VyY2U6IHN0ciwKICAgIHRhcmdldF9kaXJlY3Rvcnk6IHN0ciwKICAgIHNhbXBsZV9yYXRlOiBpbnQgPSAxNjAwMCwKICAgIGR1cmF0aW9uOiBpbnQgPSBOb25lLAogICAgY2hhbm5lbDogaW50ID0gTm9uZSwKKToKICAgICIiIgogICAgUmVkdWNlIG5vaXNlIGZyb20gYXVkaW8gZmlsZSBvciBkaXJlY3RvcnkgY29udGFpbmluZyBhdWRpbyBmaWxlcy4KICAgIFRoZSBhdWRpbyBmaWxlcyBtdXN0IGJlIGluIC53YXYgZm9ybWF0LgogICAgVGhlIGNsZWFuZWQgYXVkaW8gZmlsZXMgd2lsbCBiZSBzYXZlZCBpbiB0aGUgdGFyZ2V0X2RpcmVjdG9yeS4KICAgIEZvciBpbmZvcm1hdGlvbiBhYm91dCB0aGUgbm9pc2UgcmVkdWN0aW9uIGFsZ29yaXRobSBzZWU6CiAgICBodHRwczovL2dpdGh1Yi5jb20vdGltc2FpbmIvbm9pc2VyZWR1Y2UKICAgIE5vdGljZSB0aGF0IHRoZSBzYXZlZCBmaWxlcyBhcmUgaW4gd2F2IGZvcm1hdCwgZXZlbiBpZiB0aGUgb3JpZ2luYWwgZmlsZXMgYXJlIGluIG90aGVyIGZvcm1hdC4KCiAgICA6cGFyYW0gYXVkaW9fc291cmNlOiAgIHBhdGggdG8gYXVkaW8gZmlsZSBvciBkaXJlY3RvcnkgY29udGFpbmluZyBhdWRpbyBmaWxlcwogICAgOnBhcmFtIHRhcmdldF9kaXJlY3Rvcnk6ICBwYXRoIHRvIGRpcmVjdG9yeSB0byBzYXZlIHRoZSBjbGVhbmVkIGF1ZGlvIGZpbGVzLgogICAgOnBhcmFtIHNhbXBsZV9yYXRlOiBOdW1iZXIgb2Ygc2FtcGxlcyBpbiBvbmUgc2Vjb25kIGluIHRoZSBhdWRpbyBmaWxlLgogICAgICAgICAgICAgICAgICAgICAgICBQYXNzIE5vbmUgdG8ga2VlcCB0aGUgb3JpZ2luYWwgc2FtcGxlIHJhdGUuCiAgICA6cGFyYW0gZHVyYXRpb246ICAgIER1cmF0aW9uIG9mIHRoZSBhdWRpbyBmaWxlIHRvIGNsZWFuIGluIHNlY29uZHMuCiAgICAgICAgICAgICAgICAgICAgICAgIFBhc3MgTm9uZSB0byBrZWVwIHRoZSBvcmlnaW5hbCBkdXJhdGlvbi4KICAgIDpwYXJhbSBjaGFubmVsOiAgICAgQ2hhbm5lbCB0byBjbGVhbi4gUGFzcyB0aGUgbnVtYmVyIG9mIHRoZSBjaGFubmVsIHRvIGNsZWFuLgogICAgICAgICAgICAgICAgICAgICAgICBUbyBjbGVhbiBhbGwgY2hhbm5lbHMgcGFzcyBOb25lLgogICAgIiIiCiAgICAjIGltcG9ydCByZXF1aXJlZCBwYWNrYWdlcwogICAgdHJ5OgogICAgICAgIGltcG9ydCBsaWJyb3NhCiAgICAgICAgaW1wb3J0IG5vaXNlcmVkdWNlCiAgICBleGNlcHQgSW1wb3J0RXJyb3IgYXMgZToKICAgICAgICByYWlzZSBJbXBvcnRFcnJvcigiUGxlYXNlIGluc3RhbGwgbGlicm9zYSBhbmQgbm9pc2VyZWR1Y2UgcGFja2FnZXMiKSBmcm9tIGUKCiAgICAjIGNyZWF0ZSB0YXJnZXQgZGlyZWN0b3J5OgogICAgdGFyZ2V0X2RpcmVjdG9yeSA9IF9jcmVhdGVfdGFyZ2V0X2RpcmVjdG9yeSh0YXJnZXRfZGlyZWN0b3J5KQoKICAgICMgZ2V0IGF1ZGlvIGZpbGVzOgogICAgYXVkaW9fZmlsZXMgPSBfZ2V0X2F1ZGlvX2ZpbGVzKGF1ZGlvX3NvdXJjZSkKCiAgICBmb3IgZmlsZSBpbiB0cWRtKGF1ZGlvX2ZpbGVzLCBkZXNjPSJDbGVhbmluZyBhdWRpbyBmaWxlcyIpOgogICAgICAgICMgbG9hZCBkYXRhCiAgICAgICAgZGF0YSwgc3IgPSBsaWJyb3NhLmxvYWQoCiAgICAgICAgICAgIHBhdGg9ZmlsZSwKICAgICAgICAgICAgc3I9c2FtcGxlX3JhdGUsCiAgICAgICAgICAgIG1vbm89RmFsc2UsICAjIGtlZXAgY2hhbm5lbHMgc2VwYXJhdGUKICAgICAgICAgICAgZHVyYXRpb249ZHVyYXRpb24sCiAgICAgICAgKQogICAgICAgIHNyID0gaW50KHNyKQoKICAgICAgICAjIGNvbnZlcnQgdG8gaW50IHdpdGggc2NhbGluZyBmb3IgMTYtYml0IGludGVnZXIKICAgICAgICBkYXRhICo9IDMyNzY3IC8gbnAubWF4KG5wLmFicyhkYXRhKSkgICMgcmUtc2NhbGluZwogICAgICAgIGRhdGEgPSBkYXRhLmFzdHlwZShucC5pbnQxNikgICMgY2hhbmdlIGRhdGEgdHlwZQoKICAgICAgICAjIHNlbGVjdCBjaGFubmVsCiAgICAgICAgZGF0YV90b19yZWR1Y2UgPSBkYXRhW2NoYW5uZWxdIGlmIGNoYW5uZWwgaXMgbm90IE5vbmUgZWxzZSBkYXRhCgogICAgICAgICMgcGVyZm9ybSBub2lzZSByZWR1Y3Rpb24KICAgICAgICByZWR1Y2VkX25vaXNlID0gbm9pc2VyZWR1Y2UucmVkdWNlX25vaXNlKHk9ZGF0YV90b19yZWR1Y2UsIHNyPXNyKQoKICAgICAgICAjIGFkZCBjaGFubmVsIGJhY2sgYWZ0ZXIgbm9pc2UgcmVkdWN0aW9uCiAgICAgICAgaWYgY2hhbm5lbCBpcyBub3QgTm9uZToKICAgICAgICAgICAgIyBwdXR0aW5nIHRoZSBjaGFubmVsIGJhY2sgaW4gdGhlIGRhdGEKICAgICAgICAgICAgZGF0YVtjaGFubmVsXSA9IHJlZHVjZWRfbm9pc2UKICAgICAgICAgICAgIyB1cGRhdGluZyB0aGUgZGF0YSB0byBzYXZlCiAgICAgICAgICAgIHJlZHVjZWRfbm9pc2UgPSBkYXRhCgogICAgICAgICMgVHJhbnNwb3NlIGlmIG5lY2Vzc2FyeSwgcmVxdWlyZWQgZm9yIHdyaXRpbmcgdG8gZmlsZQogICAgICAgIGlmIGxlbihyZWR1Y2VkX25vaXNlKSA+IDE6CiAgICAgICAgICAgIHJlZHVjZWRfbm9pc2UgPSByZWR1Y2VkX25vaXNlLlQKCiAgICAgICAgIyBNb2RpZnkgc3VmZml4IHRvIC53YXYKICAgICAgICB0YXJnZXRfcGF0aCA9IHRhcmdldF9kaXJlY3RvcnkgLyBmaWxlLm5hbWUKICAgICAgICBpZiB0YXJnZXRfcGF0aC5zdWZmaXggIT0gIi53YXYiOgogICAgICAgICAgICBvbGRfc3VmZml4ID0gdGFyZ2V0X3BhdGguc3VmZml4WzE6XQogICAgICAgICAgICB0YXJnZXRfcGF0aCA9IHRhcmdldF9wYXRoLndpdGhfc3RlbSh0YXJnZXRfcGF0aC5zdGVtICsgZiJfe29sZF9zdWZmaXh9IikKICAgICAgICAgICAgdGFyZ2V0X3BhdGggPSB0YXJnZXRfcGF0aC53aXRoX3N1ZmZpeCgiLndhdiIpCgogICAgICAgICMgc2F2ZSBmaWxlCiAgICAgICAgd2F2ZmlsZS53cml0ZSgKICAgICAgICAgICAgZmlsZW5hbWU9dGFyZ2V0X3BhdGgsCiAgICAgICAgICAgIHJhdGU9c3IsCiAgICAgICAgICAgIGRhdGE9cmVkdWNlZF9ub2lzZSwKICAgICAgICApCgogICAgcmV0dXJuIHRhcmdldF9kaXJlY3RvcnkKCgpkZWYgX2NyZWF0ZV90YXJnZXRfZGlyZWN0b3J5KHRhcmdldF9kaXJlY3Rvcnk6IHN0cik6CiAgICB0YXJnZXRfZGlyZWN0b3J5ID0gUGF0aCh0YXJnZXRfZGlyZWN0b3J5KQogICAgaWYgbm90IHRhcmdldF9kaXJlY3RvcnkuZXhpc3RzKCk6CiAgICAgICAgdGFyZ2V0X2RpcmVjdG9yeS5ta2RpcihwYXJlbnRzPVRydWUsIGV4aXN0X29rPVRydWUpCiAgICByZXR1cm4gdGFyZ2V0X2RpcmVjdG9yeQoKCmRlZiBfZ2V0X2F1ZGlvX2ZpbGVzKGF1ZGlvX3NvdXJjZTogc3RyKToKICAgIGF1ZGlvX3NvdXJjZSA9IFBhdGgoYXVkaW9fc291cmNlKQogICAgYXVkaW9fZmlsZXMgPSBbXQogICAgaWYgYXVkaW9fc291cmNlLmlzX2RpcigpOgogICAgICAgIGF1ZGlvX2ZpbGVzID0gbGlzdChhdWRpb19zb3VyY2UuZ2xvYigiKi4qIikpCiAgICBlbGlmIGF1ZGlvX3NvdXJjZS5pc19maWxlKCk6CiAgICAgICAgYXVkaW9fZmlsZXMuYXBwZW5kKGF1ZGlvX3NvdXJjZSkKICAgIGVsc2U6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcihmImF1ZGlvX3NvdXJjZSBtdXN0IGJlIGEgZmlsZSBvciBhIGRpcmVjdG9yeSwgZ290IHthdWRpb19zb3VyY2V9IikKICAgIHJldHVybiBhdWRpb19maWxlcwo=
+    base_image: mlrun/mlrun
+    commands: []
+    code_origin: ''
+    origin_filename: ''
+    requirements:
+    - librosa
+    - noisereduce
+    - deepfilternet
+    - torchaudio>=2.1.2
+  entry_points:
+    reduce_noise_dfn:
+      name: reduce_noise_dfn
+      doc: 'Reduce noise from audio files using DeepFilterNet.
+
+        Notice that the saved files are in wav format, even if the original files
+        are in other format.'
+      parameters:
+      - name: audio_source
+        type: str
+        doc: path to audio file or directory of audio files
+      - name: target_directory
+        type: str
+        doc: path to target directory to save cleaned audio files
+      - name: pad
+        type: bool
+        doc: whether to pad the audio file with zeros before cleaning
+        default: true
+      - name: atten_lim_db
+        type: int
+        doc: maximum attenuation in dB
+        default: null
+      outputs: []
+      lineno: 7
+      has_varargs: false
+      has_kwargs: true
+    reduce_noise:
+      name: reduce_noise
+      doc: 'Reduce noise from audio file or directory containing audio files.
+
+        The audio files must be in .wav format.
+
+        The cleaned audio files will be saved in the target_directory.
+
+        For information about the noise reduction algorithm see:
+
+        https://github.com/timsainb/noisereduce
+
+        Notice that the saved files are in wav format, even if the original files
+        are in other format.'
+      parameters:
+      - name: audio_source
+        type: str
+        doc: path to audio file or directory containing audio files
+      - name: target_directory
+        type: str
+        doc: path to directory to save the cleaned audio files.
+      - name: sample_rate
+        type: int
+        doc: Number of samples in one second in the audio file. Pass None to keep
+          the original sample rate.
+        default: 16000
+      - name: duration
+        type: int
+        doc: Duration of the audio file to clean in seconds. Pass None to keep the
+          original duration.
+        default: null
+      - name: channel
+        type: int
+        doc: Channel to clean. Pass the number of the channel to clean. To clean all
+          channels pass None.
+        default: null
+      outputs: []
+      lineno: 74
+      has_varargs: false
+      has_kwargs: false
+  description: Reduce noise from audio files
+  default_handler: reduce_noise
+  disable_auto_mount: false
+  clone_target_dir: ''
+  env: []
+  priority_class_name: ''
+  preemption_mode: prevent
+  affinity: null
+  tolerations: null
+  security_context: {}
+verbose: false

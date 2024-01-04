@@ -35,7 +35,7 @@ def _set_openai_secrets() -> bool:
         )
 
     # Check if the key is in the secrets:
-    context = mlrun.get_or_create_context(name="context")
+    context = mlrun.get_or_create_ctx(name="context")
     openai_key = context.get_secret(key, None)
     openai_base = context.get_secret(base, None)
 

@@ -6,7 +6,7 @@ import pytest
 @pytest.mark.skipif("HUGGING_FACE_HUB_TOKEN" not in os.environ, reason="no token")
 def test_speech_diarization():
     project = mlrun.new_project("diarization-test2")
-    speech_diarization = project.set_function(func="speech_diarization.py", name="speech_diarization",
+    speech_diarization = project.set_function(func="pyannote_speech_diarization.py", name="speech_diarization",
                                               image="mlrun/mlrun")
 
     diarize_run = speech_diarization.run(

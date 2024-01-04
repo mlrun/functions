@@ -3,9 +3,9 @@ categories:
   - Deep Learning
   - Huggingface
   - Audio
-description: speech diarization of audio files
+description: pyannote's speech diarization of audio files
 doc: ''
-example: speech_diarization.ipynb
+example: pyannote_speech_diarization.ipynb
 generationDate: 2023-12-03:14-30
 hidden: false
 icon: ''
@@ -14,10 +14,10 @@ labels:
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 1.5.2
-name: speech_diarization
+name: pyannote_speech_diarization
 platformVersion: 3.5.3
 spec:
-  filename: speech_diarization.py
+  filename: pyannote_speech_diarization.py
   handler: diarize
   image: mlrun/mlrun-gpu
   kind: job

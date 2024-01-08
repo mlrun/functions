@@ -1,8 +1,8 @@
 kind: job
 metadata:
-  name: pyannote-speech-diarization
+  name: pyannote-audio
   tag: ''
-  hash: 755b0314aa39748174d7155f6aa20e2a755fe3ca
+  hash: 335752327ddd14b62222bd45faa3a88704505b66
   project: ''
   labels:
     author: guyl

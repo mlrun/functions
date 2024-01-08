@@ -5,7 +5,7 @@ categories:
   - Audio
 description: pyannote's speech diarization of audio files
 doc: ''
-example: pyannote_speech_diarization.ipynb
+example: pyannote_audio.ipynb
 generationDate: 2023-12-03:14-30
 hidden: false
 icon: ''
@@ -14,10 +14,10 @@ labels:
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 1.5.2
-name: pyannote_speech_diarization
+name: pyannote-audio
 platformVersion: 3.5.3
 spec:
-  filename: pyannote_speech_diarization.py
+  filename: pyannote_audio.py
   handler: diarize
   image: mlrun/mlrun-gpu
   kind: job
@@ -27,4 +27,4 @@ spec:
     - torchaudio
     - tqdm
 url: ''
-version: 2.0.0
+version: 1.0.0

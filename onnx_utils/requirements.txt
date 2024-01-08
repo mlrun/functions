@@ -7,6 +7,5 @@ onnxruntime~=1.8.1
 onnxoptimizer~=0.2.0
 onnxmltools~=1.9.0
 tf2onnx~=1.9.0
-mlrun
 plotly~=5.4.0
 wrapt<1.15.0 # wrapt==1.15.0 fails tensorflow 2.7 Todo: please remove when updating tensorflow

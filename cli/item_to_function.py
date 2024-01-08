@@ -55,17 +55,17 @@ from cli.path_iterator import PathIterator
     help="If -b/--bump_version is enabled, increase the minor version in the item.yaml file",
 )
 def item_to_function_cli(
-    item_path: str, output_path: Optional[str], code_output: bool, format_code: bool, bump_version: bool
+        item_path: str, output_path: Optional[str], code_output: bool, format_code: bool, bump_version: bool
 ):
     item_to_function(item_path, output_path, code_output, format_code, bump_version)
 
 
 def item_to_function(
-    item_path: str,
-    output_path: Optional[str] = None,
-    code_output: bool = False,
-    format_code: bool = True,
-    bump_version: bool = False,
+        item_path: str,
+        output_path: Optional[str] = None,
+        code_output: bool = False,
+        format_code: bool = True,
+        bump_version: bool = False,
 ):
     item_path = Path(item_path)
     if item_path.is_dir():
@@ -78,9 +78,9 @@ def item_to_function(
     # That means we need to search for items inside this direcotry
     else:
         for inner_dir in PathIterator(
-            root=item_path.parent,
-            rule=is_item_dir,
-            as_path=True,
+                root=item_path.parent,
+                rule=is_item_dir,
+                as_path=True,
         ):
             try:
                 _output_path = output_path or (inner_dir / "function.yaml")
@@ -119,11 +119,11 @@ def _get_item_yaml(item_path: Path) -> dict:
 
 
 def create_function_yaml(
-    item_path: Union[str, Path],
-    output_path: Optional[str] = None,
-    code_output: bool = False,
-    format_code: bool = True,
-    bump_version: bool = False,
+        item_path: Union[str, Path],
+        output_path: Optional[str] = None,
+        code_output: bool = False,
+        format_code: bool = True,
+        bump_version: bool = False,
 ):
     item_path = Path(item_path)
     if bump_version:
@@ -158,6 +158,11 @@ def create_function_yaml(
         with_doc=True,
     )
     function_object.metadata.project = ""
+    # remove build info from object
+    function_object.spec.build.code_origin = ''
+    function_object.spec.build.origin_filename = ''
+    if 'state_thresholds' not in spec:
+        function_object.spec.state_thresholds = None
 
     custom_fields = spec.get("customFields", {})
     for key, value in custom_fields.items():
@@ -203,10 +208,3 @@ def bump_function_yaml_version(item_path: Path):
     item_yaml["version"] = str(new_ver)
     with open(item_path, 'w') as file:
         yaml.safe_dump(item_yaml, file, default_flow_style=False)
-
-
-if __name__ == "__main__":
-    # item_to_function_cli()
-    item_to_function(
-        "/home/michaell/projects/functions/tf1_serving"
-    )

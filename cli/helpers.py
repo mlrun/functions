@@ -54,7 +54,7 @@ def render_jinja(
 def install_pipenv():
     print("Installing pipenv...")
     pipenv_install: subprocess.CompletedProcess = subprocess.run(
-        f"export PIP_NO_INPUT=1;pip install pipenv",
+        f"export PIP_NO_INPUT=1;pip install pipenv==2023.10.24",
         stdout=sys.stdout,
         stderr=subprocess.PIPE,
         shell=True,
@@ -167,6 +167,8 @@ def get_item_yaml_values(
         if values:
             if isinstance(values, list):
                 values_set = set(values)
+            elif isinstance(values, dict):
+                values_set = values
             else:
                 values_set.add(values)
         values_dict[key] = values_set

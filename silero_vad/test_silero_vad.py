@@ -1,8 +1,8 @@
 import os
 import tempfile
 
-import pytest
 import mlrun
+import pytest
 
 
 @pytest.fixture()
@@ -12,7 +12,7 @@ def setup_test():
         func = project.set_function(
             func=os.path.abspath("./function.yaml"),
             name="silero-vad",
-            image="mlrun/mlrun"
+            image="mlrun/mlrun",
         )
         yield func, artifact_path
 

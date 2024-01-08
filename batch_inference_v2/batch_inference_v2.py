@@ -258,6 +258,9 @@ def infer(
         sample_set_statistics = mlrun.model_monitoring.api.get_sample_set_statistics(
             sample_set=model_endpoint_sample_set,
             model_artifact_feature_stats=model_handler._model_artifact.spec.feature_stats,
+            sample_set_columns=feature_columns,
+            sample_set_drop_columns=drop_columns,
+            sample_set_label_columns=label_columns
         )
         mlrun.model_monitoring.api.record_results(
             project=context.project,

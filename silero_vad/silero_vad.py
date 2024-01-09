@@ -273,7 +273,7 @@ class VoiceActivityDetector:
 
     def _read_audio(
         self,
-        path: str,
+        path: Path,
     ) -> torch.Tensor:
         """
         Read the audio from the given path and return it as a tensor.
@@ -283,7 +283,7 @@ class VoiceActivityDetector:
         :returns: The audio as a tensor.
         """
         # Read the audio:
-        audio, sampling_rate = torchaudio.load(path)
+        audio, sampling_rate = torchaudio.load(str(path))
 
         # Check if the audio is stereo and if so, convert it to mono (only if not per channel):
         if audio.size(0) > 1 and not self._per_channel:

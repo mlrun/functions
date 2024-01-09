@@ -25,5 +25,6 @@ spec:
     - torch
     - torchaudio
     - tqdm
+    - onnxruntime
 url: ''
 version: 1.0.0

@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: silero-vad
   tag: ''
-  hash: c22afda5fad52bd735ccb766a30ff2df63d268b5
+  hash: 064d82f265f7a42c937584473e6092dbbfd8ffe8
   project: ''
   labels:
     author: guyl
@@ -24,6 +24,7 @@ spec:
     - torch
     - torchaudio
     - tqdm
+    - onnxruntime
   entry_points:
     audio_file:
       name: audio_file

@@ -765,7 +765,7 @@ def _parallel_run(
         n_workers = len(audio_files)
 
     # Initialize the multiprocessing queues:
-    tasks_queue = Queue(maxsize=n_workers * 2)
+    tasks_queue = Queue()
     results_queue = Queue()
 
     # Initialize the multiprocessing processes:
@@ -785,39 +785,38 @@ def _parallel_run(
     for p in task_completion_processes:
         p.start()
 
-    # Put the tasks in the queue (the progress bar is not accurate as it is updating by the queue which has a max size
-    # of 2*n_workers so the progress bar won't be too off - better than nothing):
-    for audio_file in tqdm(
-        audio_files,
-        desc=description,
-        unit="file",
-        total=len(audio_files),
-        disable=not verbose,
-    ):
-        # Put the task in the queue:
+    # Put the tasks in the queue:
+    for audio_file in audio_files:
         tasks_queue.put(task_creator.create_task(audio_file=audio_file).to_tuple())
 
     # Put the stop marks in the queue:
     for _ in range(n_workers):
         tasks_queue.put(_MULTIPROCESSING_STOP_MARK)
 
-    # Wait for the processes to finish:
-    for p in task_completion_processes:
-        p.join()
-
     # Collect the results:
     results = []
     stop_marks_counter = 0
-    while True:
-        # Get a result from the queue:
-        result: Tuple[bool, Tuple[str, list]] = results_queue.get()
-        if result == _MULTIPROCESSING_STOP_MARK:
-            stop_marks_counter += 1
-            if stop_marks_counter == n_workers:
-                break
-        else:
-            # Collect the result:
-            results.append(result)
+    with tqdm(
+        desc=description,
+        unit="file",
+        total=len(audio_files),
+        disable=not verbose,
+    ) as progressbar:
+        while True:
+            # Get a result from the queue:
+            result: Tuple[bool, Tuple[str, list]] = results_queue.get()
+            if result == _MULTIPROCESSING_STOP_MARK:
+                stop_marks_counter += 1
+                if stop_marks_counter == n_workers:
+                    break
+            else:
+                # Collect the result:
+                results.append(result)
+                progressbar.update(1)
+
+    # Wait for the processes to finish:
+    for p in task_completion_processes:
+        p.join()
 
     return results
 

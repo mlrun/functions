@@ -1,11 +1,11 @@
 apiVersion: v1
 categories:
   - Deep Learning
-  - Huggingface
+  - PyTorch
   - Audio
-description: speech diarization of audio files
+description: Silero VAD (Voice Activity Detection) functions.
 doc: ''
-example: speech_diarization.ipynb
+example: silero_vad.ipynb
 generationDate: 2023-12-03:14-30
 hidden: false
 icon: ''
@@ -14,17 +14,17 @@ labels:
 maintainers: []
 marketplaceType: ''
 mlrunVersion: 1.5.2
-name: speech_diarization
+name: silero_vad
 platformVersion: 3.5.3
 spec:
-  filename: speech_diarization.py
-  handler: diarize
-  image: mlrun/mlrun-gpu
+  filename: silero_vad.py
+  handler: detect_voice
+  image: mlrun/mlrun
   kind: job
   requirements:
-    - pyannote.audio
-    - pyannote.core
+    - torch
     - torchaudio
     - tqdm
+    - onnxruntime
 url: ''
-version: 2.0.0
+version: 1.0.0

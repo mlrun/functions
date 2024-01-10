@@ -66,6 +66,14 @@ class BaseTask:
         """
         return self._audio_file.name, self._result
 
+    def to_tuple(self) -> Tuple[str, dict]:
+        """
+        Convert the task to a tuple to reconstruct it later (used for multiprocessing to pass in queue).
+
+        :returns: The converted task.
+        """
+        return self.__class__.__name__, {"audio_file": self._audio_file}
+
 
 class SpeechDiarizationTask(BaseTask):
     """
@@ -105,11 +113,26 @@ class SpeechDiarizationTask(BaseTask):
         speech_diarization.sort()
         self._result = speech_diarization
 
+    def to_tuple(self) -> Tuple[str, dict]:
+        """
+        Convert the task to a tuple to reconstruct it later (used for multiprocessing to pass in queue).
+
+        :returns: The converted task.
+        """
+        task_class, task_kwargs = super().to_tuple()
+        return task_class, {**task_kwargs, "speaker_labels": self._speaker_labels}
+
 
 class TaskCreator:
     """
     A task creator to create different tasks to run after the VAD.
     """
+
+    #: A map from task class name to task class to use in `from_tuple`:
+    _MAP = {
+        BaseTask.__name__: BaseTask,
+        SpeechDiarizationTask.__name__: SpeechDiarizationTask,
+    }
 
     def __init__(self, task_type: Type[BaseTask], task_kwargs: dict = None):
         """
@@ -120,7 +143,7 @@ class TaskCreator:
         self._task_type = task_type
         self._task_kwargs = task_kwargs or {}
 
-    def create_task(self, audio_file: Path):
+    def create_task(self, audio_file: Path) -> BaseTask:
         """
         Create a task with the given audio file.
 
@@ -129,6 +152,18 @@ class TaskCreator:
         :returns: The created task.
         """
         return self._task_type(audio_file=audio_file, **self._task_kwargs)
+
+    @classmethod
+    def from_tuple(cls, task_tuple: Tuple[str, dict]) -> BaseTask:
+        """
+        Create a task from a tuple of the audio file name and the task kwargs.
+
+        :param task_tuple: The task tuple to create the task from.
+
+        :returns: The created task.
+        """
+        task_class, task_kwargs = task_tuple
+        return cls._MAP[task_class](**task_kwargs)
 
 
 class VoiceActivityDetector:
@@ -196,14 +231,16 @@ class VoiceActivityDetector:
         self._model: torch.Module = None
         self._get_speech_timestamps: FunctionType = None
 
-    def load(self):
+    def load(self, force_reload: bool = True):
         """
         Load the VAD model.
+
+        :param force_reload: Whether to force reload the model even if it was already loaded. Default is True.
         """
         model, utils = torch.hub.load(
             repo_or_dir="snakers4/silero-vad",
             model="silero_vad",
-            force_reload=True,
+            force_reload=force_reload,
             onnx=self._use_onnx,
             force_onnx_cpu=self._force_onnx_cpu,
         )
@@ -317,31 +354,40 @@ def _multiprocessing_complete_tasks(
     """
     # Initialize and load the VAD:
     vad = VoiceActivityDetector(**vad_init_kwargs)
-    vad.load()
+    vad.load(force_reload=False)
 
     # Start listening to the tasks queue:
     while True:
         # Get the task:
-        task: BaseTask = tasks_queue.get()
+        task: Tuple[str, dict] = tasks_queue.get()
         if task == _MULTIPROCESSING_STOP_MARK:
             break
         try:
+            # Create the task:
+            task = TaskCreator.from_tuple(task_tuple=task)
             # Run the file through the VAD:
             speech_timestamps = vad.detect_voice(audio_file=task.audio_file)
             # Complete the task:
             task.do_task(speech_timestamps=speech_timestamps)
-            # Collect the result:
-            results_queue.put((False, task.get_result()))
+            # Build the result:
+            result = (False, task.get_result())
         except Exception as exception:
-            # Collect the error:
-            results_queue.put((True, (task.audio_file.name, str(exception))))
+            # Build the error:
+            result = (True, (task.audio_file.name, str(exception)))
+        # Collect the result / error:
+        results_queue.put(result)
 
     # Mark the end of the tasks:
     results_queue.put(_MULTIPROCESSING_STOP_MARK)
 
 
 # Get the global logger:
-_LOGGER = logging.getLogger()
+try:
+    import mlrun
+
+    _LOGGER = mlrun.get_or_create_ctx("silero_vad").logger
+except ModuleNotFoundError:
+    _LOGGER = logging.getLogger()
 
 
 def detect_voice(
@@ -702,6 +748,14 @@ def _parallel_run(
 
     :returns: The collected results.
     """
+    # Load the VAD (download once, and it will be loaded then per process later on):
+    if verbose:
+        _LOGGER.info(f"Loading the VAD model.")
+    vad = VoiceActivityDetector(**vad_init_kwargs)
+    vad.load()
+    if verbose:
+        _LOGGER.info("VAD model loaded.")
+
     # Check the number of workers:
     if n_workers > len(audio_files):
         _LOGGER.warning(
@@ -728,12 +782,8 @@ def _parallel_run(
     ]
 
     # Start the multiprocessing processes:
-    if verbose:
-        _LOGGER.info(f"Loading the VAD model (per process).")
     for p in task_completion_processes:
         p.start()
-    if verbose:
-        _LOGGER.info("VAD model loaded.")
 
     # Put the tasks in the queue (the progress bar is not accurate as it is updating by the queue which has a max size
     # of 2*n_workers so the progress bar won't be too off - better than nothing):
@@ -745,7 +795,7 @@ def _parallel_run(
         disable=not verbose,
     ):
         # Put the task in the queue:
-        tasks_queue.put(task_creator.create_task(audio_file=audio_file))
+        tasks_queue.put(task_creator.create_task(audio_file=audio_file).to_tuple())
 
     # Put the stop marks in the queue:
     for _ in range(n_workers):

@@ -255,13 +255,20 @@ def infer(
     if perform_drift_analysis:
         context.logger.info("Performing drift analysis...")
         # Get the sample set statistics (either from the sample set or from the statistics logged with the model)
-        sample_set_statistics = mlrun.model_monitoring.api.get_sample_set_statistics(
-            sample_set=model_endpoint_sample_set,
-            model_artifact_feature_stats=model_handler._model_artifact.spec.feature_stats,
-            sample_set_columns=feature_columns,
-            sample_set_drop_columns=drop_columns,
-            sample_set_label_columns=label_columns
-        )
+        get_sample_statics_function = mlrun.model_monitoring.api.get_sample_set_statistics
+        statics_input_full_dict = dict(sample_set=model_endpoint_sample_set,
+                                       model_artifact_feature_stats=model_handler._model_artifact.spec.feature_stats,
+                                       sample_set_columns=feature_columns,
+                                       sample_set_drop_columns=drop_columns,
+                                       sample_set_label_columns=label_columns)
+        statics_function_input_dict = signature(get_sample_statics_function).parameters
+        #  As a result of changes to input parameters in the mlrun-get_sample_set_statistics function,
+        #  we will now send only the parameters it expects.
+        statics_input_filtered_dict = {key: statics_input_full_dict[key] for key in statics_function_input_dict}
+        if len(statics_input_filtered_dict) != len(statics_function_input_dict):
+            context.logger.warning("get_sample_set_statistics is in an older version; "
+                                   "some parameters will not be sent to the function.")
+        sample_set_statistics = get_sample_statics_function(**statics_input_filtered_dict)
         mlrun.model_monitoring.api.record_results(
             project=context.project,
             context=context,

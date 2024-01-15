@@ -14,12 +14,12 @@
 #
 import os
 import pathlib
-import sys
 import tempfile
 from difflib import SequenceMatcher
 
 import mlrun
 import pytest
+
 
 expected_outputs = [
     "This is a speech to text test.",
@@ -30,14 +30,12 @@ expected_outputs = [
     "as the game writes its unpredictable story on the field of destiny.",
 ]
 models = [
-    # "tiny.en",
-    # "tiny",
-    # "base.en",
-    # "base",
+
     "openai/whisper-tiny",
 ]
 
 
+@pytest.mark.skipif(os.system("which ffmpeg") != 0, reason="ffmpeg not installed")
 @pytest.mark.parametrize("model_name", models)
 @pytest.mark.parametrize("audio_path", ["./data", "./data/speech_01.mp3"])
 def test_transcribe(model_name: str, audio_path: str):
@@ -58,15 +56,13 @@ def test_transcribe(model_name: str, audio_path: str):
             "output_directory": temp_dir,
         },
         local=True,
-        # returns=["output_dir: path", "dataset: dataset", "errored_files"],
+        returns=["output_dir: path", "dataset: dataset", "errored_files"],
         artifact_path=artifact_path,
     )
 
-    # *** DEBUGGING ***
-    print(transcribe_run.outputs["return"])
-    # artifact_path += (
-    #     f"/{transcribe_run.metadata.name}/{transcribe_run.metadata.iteration}/"
-    # )
+    artifact_path += (
+        f"/{transcribe_run.metadata.name}/{transcribe_run.metadata.iteration}/"
+    )
 
     # Getting actual files from run (text and errored):
     input_files = (

@@ -21,8 +21,10 @@ spec:
   image: mlrun/mlrun
   kind: job
   requirements:
-    - openai-whisper
+    - transformers
     - tqdm
+    - torchaudio
+    - torch
+    - accelerate
 url: ''
-version: 0.0.2
-test_valid: True
+version: 1.0.0

@@ -29,24 +29,23 @@ expected_outputs = [
     "The crowd roars, a symphony of passion, "
     "as the game writes its unpredictable story on the field of destiny.",
 ]
-whisper_models = [
-    "tiny.en",
-    "tiny",
-    "base.en",
-    "base",
+models = [
+    # "tiny.en",
+    # "tiny",
+    # "base.en",
+    # "base",
+    "openai/whisper-tiny",
 ]
 
 
-@pytest.mark.skipif(
-    condition=sys.version_info[:2] < (3, 8),
-    reason="whisper requires python 3.8 and above"
-)
-@pytest.mark.parametrize("model_name", whisper_models)
+@pytest.mark.parametrize("model_name", models)
 @pytest.mark.parametrize("audio_path", ["./data", "./data/speech_01.mp3"])
 def test_transcribe(model_name: str, audio_path: str):
     # Setting variables and importing function:
     artifact_path = tempfile.mkdtemp()
-    transcribe_function = mlrun.import_function("function.yaml")
+    project = mlrun.get_or_create_project("test")
+    transcribe_function = project.set_function("transcribe.py", "transcribe", kind="job", image="mlrun/mlrun")
+    # transcribe_function = mlrun.import_function("function.yaml")
     temp_dir = tempfile.mkdtemp()
 
     # Running transcribe function:
@@ -56,7 +55,6 @@ def test_transcribe(model_name: str, audio_path: str):
             "data_path": audio_path,
             "model_name": model_name,
             "device": "cpu",
-            "compute_type": "int8",
             "output_directory": temp_dir,
         },
         local=True,

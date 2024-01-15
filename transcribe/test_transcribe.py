@@ -58,13 +58,15 @@ def test_transcribe(model_name: str, audio_path: str):
             "output_directory": temp_dir,
         },
         local=True,
-        returns=["output_dir: path", "dataset: dataset", "errored_files"],
+        # returns=["output_dir: path", "dataset: dataset", "errored_files"],
         artifact_path=artifact_path,
     )
 
-    artifact_path += (
-        f"/{transcribe_run.metadata.name}/{transcribe_run.metadata.iteration}/"
-    )
+    # *** DEBUGGING ***
+    print(transcribe_run.outputs["return"])
+    # artifact_path += (
+    #     f"/{transcribe_run.metadata.name}/{transcribe_run.metadata.iteration}/"
+    # )
 
     # Getting actual files from run (text and errored):
     input_files = (

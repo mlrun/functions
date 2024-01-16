@@ -35,9 +35,9 @@ def _set_openai_secrets() -> bool:
         )
 
     # Check if the key is in the secrets:
-    context = mlrun.get_or_create_context(name="context")
-    openai_key = context.get_secret(key, None)
-    openai_base = context.get_secret(base, None)
+    context = mlrun.get_or_create_ctx(name="context")
+    openai_key = context.get_secret(key)
+    openai_base = context.get_secret(base)
 
     # If the key is not in the secrets, return False:
     if not openai_key:
@@ -83,7 +83,7 @@ def generate_data(
         else:
             key, instruction = field, "no special instruction"
         # Replace spaces with underscores for the key to be used as a json key:
-        key = key.replace(" ", "_")
+        key = key.strip().replace(" ", "_")
         instructions += f"* {key}: {instruction}\n"
 
     # Create the prompt structure:

@@ -14,15 +14,22 @@
 #
 import json
 import os
-
-import mlrun
-import mlrun.common.schemas
+import pickle
+import uuid
 import numpy as np
 import pandas as pd
 import pytest
-from mlrun.frameworks.sklearn import apply_mlrun
 from sklearn.datasets import make_classification
 from sklearn.tree import DecisionTreeClassifier
+import datetime
+from sklearn.model_selection import train_test_split
+from xgboost import XGBClassifier
+from mlrun.frameworks.sklearn import apply_mlrun
+from mlrun.projects import get_or_create_project
+import mlrun
+import mlrun.common.schemas
+from batch_inference_v2 import infer
+import shutil
 
 REQUIRED_ENV_VARS = [
     "MLRUN_DBPATH",
@@ -84,7 +91,7 @@ def train(training_set: pd.DataFrame):
     reason="Project's environment variables are not set",
 )
 def test_batch_predict():
-    project = mlrun.get_or_create_project(
+    project = get_or_create_project(
         "batch-infer-test", context="./", user_project=True
     )
 
@@ -142,6 +149,64 @@ def test_batch_predict():
 
     # Clean resources
     _delete_project(project=project.metadata.name)
+
+
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
+class TestBatchInferUnitTests:
+    @classmethod
+    def setup_class(cls):
+        cls.project_name = "batch-infer-v2-unit-test"
+        cls.infer_artifact_path = "./infer_test_result/"
+
+    def setup_method(self):
+        self.project = get_or_create_project(self.project_name)
+        current_datetime = datetime.datetime.now()
+        datetime_str = current_datetime.strftime("%Y%m%d_%H%M%S")
+        self.context = mlrun.get_or_create_ctx(datetime_str, project=self.project.metadata.name)
+        self.context.artifact_path = self.infer_artifact_path
+
+    def teardown_method(self):
+        mlrun.get_run_db().delete_project(
+            self.project.metadata.name,
+            deletion_strategy=mlrun.common.schemas.DeletionStrategy.cascading,
+        )
+        if os.path.exists(self.infer_artifact_path):
+            shutil.rmtree(self.infer_artifact_path)
+
+    def test_infer(self):
+        n_features = 10
+        training_set, prediction_set = generate_data(n_features=n_features)
+        clf = XGBClassifier(n_estimators=2, max_depth=2, learning_rate=1, objective="binary:logistic")
+        x, y = prediction_set, training_set['target_label']
+        x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, test_size=0.2, random_state=0)
+        clf.fit(x_train, y_train)
+        train_set_to_log = x_train.join(y_train)
+        model = self.project.log_model(f"clf_udbi{uuid.uuid4()}", body=pickle.dumps(clf),
+                                       model_file=f"clf{uuid.uuid4()}.pkl", framework="xgboost",
+                                       training_set=train_set_to_log, label_column="target_label")
+
+        dataset = self.project.log_dataset(f"ds_lkr{uuid.uuid4()}", df=x_test)
+        z_test = train_set_to_log * 5
+        model_endpoint_sample_set = self.project.log_dataset(f"my_model_endpoint_sample_set{uuid.uuid4()}", df=z_test)
+
+
+        list_model_endpoint_sample_set = generate_data(n_samples=4,n_features=n_features)[0].values.tolist()
+        # model_endpoint_sample_set_value = model_endpoint_sample_set._df
+        #model_endpoint_sample_set_value = model_endpoint_sample_set.uri
+        model_endpoint_sample_set_value = list_model_endpoint_sample_set
+        infer(context=self.context,
+              batch_image_job="tomermamia855/mlrun-api:batch-infer-bug",
+              dataset=dataset.to_dataitem().as_df(), model_path=model.uri,
+              model_endpoint_sample_set= model_endpoint_sample_set_value,
+              feature_columns=list(model_endpoint_sample_set.to_dataitem().as_df().columns),
+              label_columns="target_label",
+              log_result_set = False,
+              model_endpoint_name=f"new-model-endpoint-sample_set{uuid.uuid4()}", artifacts_tag="tag1",
+              trigger_monitoring_job=True, perform_drift_analysis=True, model_endpoint_drift_threshold=0.7,
+              model_endpoint_possible_drift_threshold=0.5)
 
 
 def _delete_project(project: str):

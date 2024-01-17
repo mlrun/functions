@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: batch-inference-v2
   tag: ''
-  hash: 1bb938adfe2b006dad2c70d5fec32e88b22bde4e
+  hash: 6d03260f9186d7b27651d6d0b42074fec54eb0f9
   project: ''
   labels:
     author: eyald
@@ -157,6 +157,7 @@ spec:
       outputs:
       - default: ''
       lineno: 103
+      has_kwargs: true
   description: Batch inference (also knows as prediction) for the common ML frameworks
     (SciKit-Learn, XGBoost and LightGBM) while performing data drift analysis.
   default_handler: infer

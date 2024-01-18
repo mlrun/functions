@@ -110,11 +110,11 @@ def _get_get_sample_set_statistics_parameters(context, model_endpoint_sample_set
     statics_function_input_dict = signature(get_sample_statics_function).parameters
     #  As a result of changes to input parameters in the mlrun-get_sample_set_statistics function,
     #  we will now send only the parameters it expects.
-    statics_input_filtered_dict = {key: statics_input_full_dict[key] for key in statics_function_input_dict}
-    if len(statics_input_filtered_dict) != len(statics_function_input_dict):
+    statics_input_filtered = {key: statics_input_full_dict[key] for key in statics_function_input_dict}
+    if len(statics_input_filtered) != len(statics_function_input_dict):
         context.logger.warning("get_sample_set_statistics is in an older version; "
                                "some parameters will not be sent to the function.")
-    return statics_input_filtered_dict
+    return statics_input_filtered
 
 
 def infer(
@@ -278,8 +278,8 @@ def infer(
                                        feature_columns=feature_columns,
                                        drop_columns=drop_columns,
                                        label_columns=label_columns)
-        statics_input_filtered_dict = _get_get_sample_set_statistics_parameters(**statics_input_full_dict)
-        sample_set_statistics = mlrun.model_monitoring.api.get_sample_set_statistics(**statics_input_filtered_dict)
+        statics_input_filtered = _get_get_sample_set_statistics_parameters(**statics_input_full_dict)
+        sample_set_statistics = mlrun.model_monitoring.api.get_sample_set_statistics(**statics_input_filtered)
         mlrun.model_monitoring.api.record_results(
             project=context.project,
             context=context,

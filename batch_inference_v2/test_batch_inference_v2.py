@@ -52,7 +52,7 @@ def generate_data(n_samples: int = 5000, n_features: int = 20):
     x, y = make_classification(n_samples=n_samples, n_features=n_features, n_classes=2)
 
     # Split the data into a training set and a prediction set:
-    x_train, x_prediction = x[: n_samples // 2], x[n_samples // 2 :]
+    x_train, x_prediction = x[: n_samples // 2], x[n_samples // 2:]
     y_train = y[: n_samples // 2]
 
     # Randomly drift some features:
@@ -85,6 +85,7 @@ def train(training_set: pd.DataFrame):
     # Train:
     model.fit(training_set, labels)
 
+
 def assert_batch_predict(n_features, batch_inference_run):
     # Check the logged results:
     assert "batch_id" in batch_inference_run.status.results
@@ -96,8 +97,8 @@ def assert_batch_predict(n_features, batch_inference_run):
 
     # Check drift table artifact url
     assert (
-        batch_inference_run.artifact("drift_table_plot").artifact_url
-        == batch_inference_run.outputs["drift_table_plot"]
+            batch_inference_run.artifact("drift_table_plot").artifact_url
+            == batch_inference_run.outputs["drift_table_plot"]
     )
 
     # Check the features drift results json:
@@ -169,7 +170,7 @@ class TestBatchInferUnitTests:
         current_datetime = datetime.datetime.now()
         datetime_str = current_datetime.strftime("%Y%m%d_%H%M%S")
         mlrun.runtimes.utils.global_context.set(None)
-        self.context = mlrun.get_or_create_ctx(datetime_str, project=self.project.metadata.name,upload_artifacts=True)
+        self.context = mlrun.get_or_create_ctx(datetime_str, project=self.project.metadata.name, upload_artifacts=True)
         self.context.artifact_path = self.infer_artifact_path
 
     def teardown_method(self):

@@ -85,6 +85,27 @@ def train(training_set: pd.DataFrame):
     # Train:
     model.fit(training_set, labels)
 
+def assert_batch_predict(n_features, batch_inference_run):
+    # Check the logged results:
+    assert "batch_id" in batch_inference_run.status.results
+    assert "drift_metric" in batch_inference_run.status.results
+    assert batch_inference_run.status.results["drift_status"] is True
+
+    # Check that 3 artifacts were generated
+    assert len(batch_inference_run.status.artifacts) == 3
+
+    # Check drift table artifact url
+    assert (
+        batch_inference_run.artifact("drift_table_plot").artifact_url
+        == batch_inference_run.outputs["drift_table_plot"]
+    )
+
+    # Check the features drift results json:
+    drift_results_file = batch_inference_run.artifact("features_drift_results").local()
+    with open(drift_results_file, "r") as json_file:
+        drift_results = json.load(json_file)
+    assert len(drift_results) == n_features + 1
+
 
 @pytest.mark.skipif(
     condition=not _validate_environment_variables(),
@@ -94,7 +115,6 @@ def test_batch_predict():
     project = get_or_create_project(
         "batch-infer-test", context="./", user_project=True
     )
-
     # Configure test:
     n_samples = 5000
     n_features = 20
@@ -128,24 +148,7 @@ def test_batch_predict():
     )
 
     # Check the logged results:
-    assert "batch_id" in batch_inference_run.status.results
-    assert "drift_metric" in batch_inference_run.status.results
-    assert batch_inference_run.status.results["drift_status"] is True
-
-    # Check that 3 artifacts were generated
-    assert len(batch_inference_run.status.artifacts) == 3
-
-    # Check drift table artifact url
-    assert (
-        batch_inference_run.artifact("drift_table_plot").artifact_url
-        == batch_inference_run.outputs["drift_table_plot"]
-    )
-
-    # Check the features drift results json:
-    drift_results_file = batch_inference_run.artifact("features_drift_results").local()
-    with open(drift_results_file, "r") as json_file:
-        drift_results = json.load(json_file)
-    assert len(drift_results) == n_features + 1
+    assert_batch_predict(n_features=n_features, batch_inference_run=batch_inference_run)
 
     # Clean resources
     _delete_project(project=project.metadata.name)
@@ -165,18 +168,34 @@ class TestBatchInferUnitTests:
         self.project = get_or_create_project(self.project_name)
         current_datetime = datetime.datetime.now()
         datetime_str = current_datetime.strftime("%Y%m%d_%H%M%S")
-        self.context = mlrun.get_or_create_ctx(datetime_str, project=self.project.metadata.name)
+        mlrun.runtimes.utils.global_context.set(None)
+        self.context = mlrun.get_or_create_ctx(datetime_str, project=self.project.metadata.name,upload_artifacts=True)
         self.context.artifact_path = self.infer_artifact_path
 
     def teardown_method(self):
         mlrun.get_run_db().delete_project(
             self.project.metadata.name,
-            deletion_strategy=mlrun.common.schemas.DeletionStrategy.cascading,
+            deletion_strategy=mlrun.common.schemas.DeletionStrategy.cascade,
         )
         if os.path.exists(self.infer_artifact_path):
             shutil.rmtree(self.infer_artifact_path)
 
-    def test_infer(self):
+    def _get_model_endpoint_sample_set(self, sample_type, n_features: int = 20):
+        data = generate_data(n_samples=4, n_features=n_features)[0]
+        if sample_type == mlrun.DataItem:
+            artifact = self.project.log_dataset("infer_sample", df=data)
+            return artifact.to_dataitem()
+        elif sample_type == list:
+            return data.values.tolist()
+        elif sample_type == dict:
+            return data.to_dict(orient='list')
+        elif sample_type == pd.DataFrame:
+            return data
+        elif sample_type == np.ndarray:
+            return data.values
+
+    @pytest.mark.parametrize("sample_type", [mlrun.DataItem, list, dict, pd.DataFrame, np.ndarray])
+    def test_infer_sample_types(self, sample_type):
         n_features = 10
         training_set, prediction_set = generate_data(n_features=n_features)
         clf = XGBClassifier(n_estimators=2, max_depth=2, learning_rate=1, objective="binary:logistic")
@@ -184,29 +203,30 @@ class TestBatchInferUnitTests:
         x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, test_size=0.2, random_state=0)
         clf.fit(x_train, y_train)
         train_set_to_log = x_train.join(y_train)
-        model = self.project.log_model(f"clf_udbi{uuid.uuid4()}", body=pickle.dumps(clf),
-                                       model_file=f"clf{uuid.uuid4()}.pkl", framework="xgboost",
+        model = self.project.log_model(f"model-{uuid.uuid4()}", body=pickle.dumps(clf),
+                                       model_file=f"model-{uuid.uuid4()}.pkl", framework="xgboost",
                                        training_set=train_set_to_log, label_column="target_label")
 
-        dataset = self.project.log_dataset(f"ds_lkr{uuid.uuid4()}", df=x_test)
+        dataset = self.project.log_dataset(f"dataset-{uuid.uuid4()}", df=x_test)
         z_test = train_set_to_log * 5
-        model_endpoint_sample_set = self.project.log_dataset(f"my_model_endpoint_sample_set{uuid.uuid4()}", df=z_test)
+        model_endpoint_sample_set = self.project.log_dataset(f"model-endpoint-sample-set{uuid.uuid4()}", df=z_test)
 
-
-        list_model_endpoint_sample_set = generate_data(n_samples=4,n_features=n_features)[0].values.tolist()
-        # model_endpoint_sample_set_value = model_endpoint_sample_set._df
-        #model_endpoint_sample_set_value = model_endpoint_sample_set.uri
-        model_endpoint_sample_set_value = list_model_endpoint_sample_set
+        sample = self._get_model_endpoint_sample_set(
+            sample_type=sample_type, n_features=n_features)
         infer(context=self.context,
-              batch_image_job="tomermamia855/mlrun-api:batch-infer-bug",
               dataset=dataset.to_dataitem().as_df(), model_path=model.uri,
-              model_endpoint_sample_set= model_endpoint_sample_set_value,
+              model_endpoint_sample_set=sample,
               feature_columns=list(model_endpoint_sample_set.to_dataitem().as_df().columns),
               label_columns="target_label",
-              log_result_set = False,
-              model_endpoint_name=f"new-model-endpoint-sample_set{uuid.uuid4()}", artifacts_tag="tag1",
-              trigger_monitoring_job=True, perform_drift_analysis=True, model_endpoint_drift_threshold=0.7,
+              model_endpoint_name=f"model-endpoint-name-{uuid.uuid4()}",
+              trigger_monitoring_job=True,
+              perform_drift_analysis=True,
+              model_endpoint_drift_threshold=0.7,
               model_endpoint_possible_drift_threshold=0.5)
+        #  a workaround until ML-4636 will be solved.
+        batch_inference_run = self.project.list_runs(name=self.context.name).to_objects()[0]
+        mlrun.get_run_db().update_run(updates={"status.state": "completed"}, uid=batch_inference_run.uid())
+        assert_batch_predict(n_features=n_features, batch_inference_run=batch_inference_run)
 
 
 def _delete_project(project: str):

@@ -29,9 +29,7 @@ import pandas as pd
 from mlrun.frameworks.auto_mlrun import AutoMLRun
 
 
-def _prepare_result_set(
-        x: pd.DataFrame, label_columns: List[str], y_pred: np.ndarray
-) -> pd.DataFrame:
+def _prepare_result_set(x: pd.DataFrame, label_columns: List[str], y_pred: np.ndarray) -> pd.DataFrame:
     """
     Set default label column names and validate given names to prepare the result set - a concatenation of the inputs
     (x) and the model predictions (y_pred).
@@ -95,31 +93,31 @@ def _get_get_sample_set_statistics_parameters(context, model_endpoint_sample_set
 
 
 def infer(
-    context: mlrun.MLClientCtx,
-    dataset: Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
-    model_path: Union[str, mlrun.DataItem],
-    drop_columns: Union[str, List[str], int, List[int]] = None,
-    label_columns: Union[str, List[str]] = None,
-    feature_columns: Union[str, List[str]] = None,
-    log_result_set: bool = True,
-    result_set_name: str = "prediction",
-    batch_id: str = None,
-    artifacts_tag: str = "",
-    # Drift analysis parameters
-    perform_drift_analysis: bool = None,
-    trigger_monitoring_job: bool = False,
-    batch_image_job: str = "mlrun/mlrun",
-    endpoint_id: str = "",
-    # The following model endpoint parameters are relevant only if:
-    # perform drift analysis is not disabled
-    # a new model endpoint record is going to be generated
-    model_endpoint_name: str = "batch-infer",
-    model_endpoint_drift_threshold: float = 0.7,
-    model_endpoint_possible_drift_threshold: float = 0.5,
-    model_endpoint_sample_set: Union[
-        mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray
-    ] = None,
-    **predict_kwargs: Dict[str, Any],
+        context: mlrun.MLClientCtx,
+        dataset: Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
+        model_path: Union[str, mlrun.DataItem],
+        drop_columns: Union[str, List[str], int, List[int]] = None,
+        label_columns: Union[str, List[str]] = None,
+        feature_columns: Union[str, List[str]] = None,
+        log_result_set: bool = True,
+        result_set_name: str = "prediction",
+        batch_id: str = None,
+        artifacts_tag: str = "",
+        # Drift analysis parameters
+        perform_drift_analysis: bool = None,
+        trigger_monitoring_job: bool = False,
+        batch_image_job: str = "mlrun/mlrun",
+        endpoint_id: str = "",
+        # The following model endpoint parameters are relevant only if:
+        # perform drift analysis is not disabled
+        # a new model endpoint record is going to be generated
+        model_endpoint_name: str = "batch-infer",
+        model_endpoint_drift_threshold: float = 0.7,
+        model_endpoint_possible_drift_threshold: float = 0.5,
+        model_endpoint_sample_set: Union[
+            mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray
+        ] = None,
+        **predict_kwargs: Dict[str, Any],
 ):
     """
     Perform a prediction on a given dataset with the given model. Please make sure that you have already logged the model

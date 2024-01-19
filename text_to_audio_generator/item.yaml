@@ -24,5 +24,5 @@ spec:
     - bark
     - torchaudio
 url: ''
-version: 1.0.0
+version: 1.1.0
 test_valid: True

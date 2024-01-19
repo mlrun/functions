@@ -14,6 +14,7 @@
 import logging
 import pathlib
 import random
+import tempfile
 from typing import Dict, List, Optional, Tuple, Union
 
 import bark
@@ -29,9 +30,9 @@ _LOGGER = logging.getLogger()
 
 def generate_multi_speakers_audio(
     data_path: str,
-    output_directory: str,
     speakers: Union[List[str], Dict[str, int]],
     available_voices: List[str],
+    output_directory: str = None,
     use_gpu: bool = True,
     use_small_models: bool = False,
     offload_cpu: bool = False,
@@ -44,13 +45,13 @@ def generate_multi_speakers_audio(
     Generate audio files from text files.
 
     :param data_path:           Path to the text file or directory containing the text files to generate audio from.
-    :param output_directory:    Path to the directory to save the generated audio files to.
     :param speakers:            List / Dict of speakers to generate audio for.
                                 If a list is given, the speakers will be assigned to channels in the order given.
                                 If dictionary, the keys will be the speakers and the values will be the channels.
     :param available_voices:    List of available voices to use for the generation.
                         See here for the available voices:
                         https://suno-ai.notion.site/8b8e8749ed514b0cbf3f699013548683?v=bc67cff786b04b50b3ceb756fd05f68c
+    :param output_directory:    Path to the directory to save the generated audio files to.
     :param use_gpu:             Whether to use the GPU for the generation.
     :param use_small_models:    Whether to use the small models for the generation.
     :param offload_cpu:         To reduce the memory footprint, the models can be offloaded to the CPU after loading.
@@ -108,8 +109,11 @@ def generate_multi_speakers_audio(
     errors = {}
 
     # Create the output directory:
+    if output_directory is None:
+        output_directory = tempfile.mkdtemp()
     output_directory = pathlib.Path(output_directory)
-    output_directory.mkdir(exist_ok=True)
+    if not output_directory.exists():
+        output_directory.mkdir(exist_ok=True, parents=True)
 
     # Start generating audio:
     # Go over the audio files and transcribe:

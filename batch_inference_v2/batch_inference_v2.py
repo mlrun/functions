@@ -74,7 +74,7 @@ def _prepare_result_set(x: pd.DataFrame, label_columns: List[str], y_pred: np.nd
     )
 
 
-def _get_get_sample_set_statistics_parameters(context: mlrun.MLClientCtx,
+def _get_sample_set_statistics_parameters(context: mlrun.MLClientCtx,
                                               model_endpoint_sample_set: Union[
                                                   mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
                                               model_artifact_feature_stats: dict,
@@ -248,7 +248,7 @@ def infer(
                                        feature_columns=feature_columns,
                                        drop_columns=drop_columns,
                                        label_columns=label_columns)
-        statics_input_filtered = _get_get_sample_set_statistics_parameters(**statics_input_full_dict)
+        statics_input_filtered = _get_sample_set_statistics_parameters(**statics_input_full_dict)
         sample_set_statistics = mlrun.model_monitoring.api.get_sample_set_statistics(**statics_input_filtered)
         mlrun.model_monitoring.api.record_results(
             project=context.project,

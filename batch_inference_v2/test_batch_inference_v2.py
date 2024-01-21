@@ -140,12 +140,13 @@ def test_batch_predict():
         inputs={"dataset": generate_data_run.outputs["prediction_set"]},
         params={
             "model_path": train_run.outputs["model"],
-            "label_columns": "label",
+            "label_columns": "target_label",
             "trigger_monitoring_job": True,
             "perform_drift_analysis": True,
             "model_endpoint_drift_threshold": 0.2,
             "model_endpoint_possible_drift_threshold": 0.1,
         },
+        local=True,
     )
 
     # Check the logged results:

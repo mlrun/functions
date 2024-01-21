@@ -92,8 +92,10 @@ def _get_sample_set_statistics_parameters(context: mlrun.MLClientCtx,
     #  we will now send only the parameters it expects.
     statics_input_filtered = {key: statics_input_full_dict[key] for key in statics_function_input_dict}
     if len(statics_input_filtered) != len(statics_function_input_dict):
-        context.logger.warning("get_sample_set_statistics is in an older version; "
-                               "some parameters will not be sent to the function.")
+        context.logger.warning(f"get_sample_set_statistics is in an older version; "
+                               "some parameters will not be sent to the function."
+                               f" Expected input: {list(statics_function_input_dict.keys())},"
+                               f" actual input: {list(statics_input_filtered.keys())}")
     return statics_input_filtered
 
 

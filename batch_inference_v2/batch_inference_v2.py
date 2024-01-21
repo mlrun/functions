@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from inspect import signature
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 import mlrun
 
 try:
@@ -74,8 +74,13 @@ def _prepare_result_set(x: pd.DataFrame, label_columns: List[str], y_pred: np.nd
     )
 
 
-def _get_get_sample_set_statistics_parameters(context, model_endpoint_sample_set, model_artifact_feature_stats,
-                                              feature_columns, drop_columns, label_columns):
+def _get_get_sample_set_statistics_parameters(context: mlrun.MLClientCtx,
+                                              model_endpoint_sample_set: Union[
+                                                  mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
+                                              model_artifact_feature_stats: dict,
+                                              feature_columns: Optional[List],
+                                              drop_columns: Optional[List],
+                                              label_columns: Optional[List]):
     statics_input_full_dict = dict(sample_set=model_endpoint_sample_set,
                                    model_artifact_feature_stats=model_artifact_feature_stats,
                                    sample_set_columns=feature_columns,

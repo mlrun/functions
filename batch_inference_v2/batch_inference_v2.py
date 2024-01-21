@@ -75,12 +75,12 @@ def _prepare_result_set(x: pd.DataFrame, label_columns: List[str], y_pred: np.nd
 
 
 def _get_sample_set_statistics_parameters(context: mlrun.MLClientCtx,
-                                              model_endpoint_sample_set: Union[
-                                                  mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
-                                              model_artifact_feature_stats: dict,
-                                              feature_columns: Optional[List],
-                                              drop_columns: Optional[List],
-                                              label_columns: Optional[List]):
+                                          model_endpoint_sample_set: Union[
+                                              mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
+                                          model_artifact_feature_stats: dict,
+                                          feature_columns: Optional[List],
+                                          drop_columns: Optional[List],
+                                          label_columns: Optional[List]) -> Dict[str, Any]:
     statics_input_full_dict = dict(sample_set=model_endpoint_sample_set,
                                    model_artifact_feature_stats=model_artifact_feature_stats,
                                    sample_set_columns=feature_columns,

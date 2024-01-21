@@ -90,13 +90,13 @@ def _get_sample_set_statistics_parameters(context: mlrun.MLClientCtx,
     statics_function_input_dict = signature(get_sample_statics_function).parameters
     #  As a result of changes to input parameters in the mlrun-get_sample_set_statistics function,
     #  we will now send only the parameters it expects.
-    statics_input_filtered = {key: statics_input_full_dict[key] for key in statics_function_input_dict}
-    if len(statics_input_filtered) != len(statics_function_input_dict):
+    statistics_input_filtered = {key: statics_input_full_dict[key] for key in statics_function_input_dict}
+    if len(statistics_input_filtered) != len(statics_function_input_dict):
         context.logger.warning(f"get_sample_set_statistics is in an older version; "
                                "some parameters will not be sent to the function."
                                f" Expected input: {list(statics_function_input_dict.keys())},"
-                               f" actual input: {list(statics_input_filtered.keys())}")
-    return statics_input_filtered
+                               f" actual input: {list(statistics_input_filtered.keys())}")
+    return statistics_input_filtered
 
 
 def infer(
@@ -244,14 +244,14 @@ def infer(
     if perform_drift_analysis:
         context.logger.info("Performing drift analysis...")
         # Get the sample set statistics (either from the sample set or from the statistics logged with the model)
-        statics_input_filtered = _get_sample_set_statistics_parameters(
+        statistics_input_filtered = _get_sample_set_statistics_parameters(
             context=context,
             model_endpoint_sample_set=model_endpoint_sample_set,
             model_artifact_feature_stats=model_handler._model_artifact.spec.feature_stats,
             feature_columns=feature_columns,
             drop_columns=drop_columns,
             label_columns=label_columns)
-        sample_set_statistics = mlrun.model_monitoring.api.get_sample_set_statistics(**statics_input_filtered)
+        sample_set_statistics = mlrun.model_monitoring.api.get_sample_set_statistics(**statistics_input_filtered)
         mlrun.model_monitoring.api.record_results(
             project=context.project,
             context=context,

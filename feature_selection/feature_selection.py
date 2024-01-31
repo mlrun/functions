@@ -180,7 +180,7 @@ def feature_selection(
     y = df.pop(label_column)
     X = df
 
-    if np.object in list(X.dtypes) and ignore_type_errors is False:
+    if np.object_ in list(X.dtypes) and ignore_type_errors is False:
         raise ValueError(
             f"{df.select_dtypes(include=['object']).columns.tolist()} are neither float or int."
         )

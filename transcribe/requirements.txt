@@ -1,3 +1,5 @@
-faster-whisper
+transformers
+torch
+torchaudio
 tqdm
-librosa
+accelerate

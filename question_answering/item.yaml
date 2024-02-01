@@ -20,8 +20,8 @@ spec:
   image: mlrun/mlrun
   kind: job
   requirements:
-    transformers
-    torch
-    tqdm
+    - transformers
+    - torch
+    - tqdm
 url: ''
-version: 0.3.0
+version: 0.3.1

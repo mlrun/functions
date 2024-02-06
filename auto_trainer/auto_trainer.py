@@ -71,12 +71,17 @@ def _get_dataframe(
 
     # Getting the dataset:
     if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
-        # FeatureVector case:
-        fv = mlrun.datastore.get_store_resource(dataset.artifact_url)
         label_columns = label_columns or dataset.meta.status.label_column
-        dataset = fv.get_offline_features(drop_columns=drop_columns).to_dataframe()
-
         context.logger.info(f"label columns: {label_columns}")
+        # FeatureVector case:
+        try:
+            fv = mlrun.datastore.get_store_resource(dataset.artifact_url)
+            dataset = fv.get_offline_features(drop_columns=drop_columns).to_dataframe()
+        except AttributeError:
+            # Leave here for backwards compatibility
+            dataset = fs.get_offline_features(
+                dataset.meta.uri, drop_columns=drop_columns
+            ).to_dataframe()
 
     elif not label_columns:
         context.logger.info(

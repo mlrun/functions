@@ -17,12 +17,12 @@
 import pandas as pd
 import pytest
 
-from .llm_judge import (
+from llm_judge import (
     LLMJudgePairwiseGrading,
     LLMJudgeReferenceGrading,
     LLMJudgeSingleGrading,
 )
-from .llm_judge import (
+from llm_judge import (
     PAIR_GRADE_PROMPT,
     REF_GRADE_PROMPT,
     SINGLE_GRADE_PROMPT,

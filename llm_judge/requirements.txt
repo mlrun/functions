@@ -1,2 +1,12 @@
 pandas
 mpi4py
+transformers
+torch==2.0.0
+# torch 2.0.0 works with our current cuda driver 11.7, the newer versions will require a newer driver
+torchvision
+nltk
+rouge_score
+accelerate
+einops
+mpi4py
+openmpi

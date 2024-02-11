@@ -649,7 +649,7 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         response_after_output = response[output_marker_index + len("[Output]:") :]
 
         # Adjusted pattern to match the text format and separate lines
-        pattern = r"- score of assistant ([ab]): (\d)\s*- explanation of assistant \1: (.*?)\s*(?=- score of assistant|$)"
+        pattern = r"- score of assistant ([abAB]): (\d)\s*- explanation of assistant \1: (.*?)\s*(?=- score of assistant|$)"
 
         matches = re.findall(pattern, response_after_output, re.DOTALL)
 

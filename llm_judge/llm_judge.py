@@ -72,9 +72,9 @@ Examples could be included beblow for your reference. Make sure you understand t
 {examples}
 [User Question]:
 {question}
-[Response of assistant A]:
+[Response of assistant a]:
 {answerA}
-[Response of assistant B]:
+[Response of assistant b]:
 {answerB}
 [Definition of {name}]:
 {definition}
@@ -96,9 +96,9 @@ Examples could be included beblow for your reference. Make sure you understand t
 {examples}
 [User Question]:
 {question}
-[Response of assistant A]:
+[Response of assistant a]:
 {answerA}
-[Response of assistant B]:
+[Response of assistant b]:
 {answerB}
 [Ground truth of the response]:
 {reference}
@@ -591,7 +591,6 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         logger.info(f"Response of the judge model is {response}")
         res_dic = self.extract_score_explanation(response)
         res_dic["answerB"] = self.prompt_config["answerB"]
-        print(res_dic)
         return res_dic
 
     @open_mpi_handler(worker_inputs="sample_df")

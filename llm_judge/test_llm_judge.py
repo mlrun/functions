@@ -28,23 +28,24 @@ from llm_judge import (
     SINGLE_GRADE_PROMPT,
 )
 from mlrun.utils import logger
-
-JUDGE_MODEL = "TheBloke/Mistral-7B-OpenOrca-GPTQ"
+JUDGE_MODEL ="TheBloke/Mistral-7B-OpenOrca-GPTQ"
 JUDGE_CONFIG = {
     "device_map": "auto",
-    "revision": "main",
+    "revision": "gptq-8bit--1g-actorder_True",
     "trust_remote_code": False,
 }
-JUDGE_INFER_CONFIG = {"max_length": 1500}
+JUDGE_INFER_CONFIG = {
+        "max_length": 1500,
+        }
 TOKENIZER_JUDGE_CONFIG = {"use_fast": True}
 BENCHMARK_MODEL = "microsoft/phi-2"
 BENCHMARK_CONFIG = {
     "max_length": 1500,
-    "device_map": "auto",
+    "device_map": "cuda",
     "revision": "main",
     "trust_remote_code": True,
     "torch_dtype": "auto",
-    "flash_attn": True,
+    #"flash_attn": True,
 }
 TOKENIZER_BENCHMARK_CONFIG = {"trust_remote_code": True}
 BENCHMARK_INFER_CONFIG = {"max_length": 1500}

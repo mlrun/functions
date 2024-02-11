@@ -564,7 +564,6 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
             response_ids, skip_special_tokens=True
         )
         logger.info(f"Response of the bench mark model is {response}")
-        print(response)
 
         return response
 

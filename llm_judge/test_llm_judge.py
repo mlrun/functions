@@ -45,7 +45,7 @@ BENCHMARK_CONFIG = {
     "revision": "main",
     "trust_remote_code": True,
     "torch_dtype": "auto",
-    #"flash_attn": True,
+    "flash_attn": True,
 }
 TOKENIZER_BENCHMARK_CONFIG = {"trust_remote_code": True}
 BENCHMARK_INFER_CONFIG = {"max_length": 1500}

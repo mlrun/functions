@@ -785,5 +785,3 @@ class LLMJudgeReferenceGrading(LLMJudgePairwiseGrading):
             ]
 
         return res_df
-
-

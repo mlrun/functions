@@ -41,7 +41,7 @@ TOKENIZER_JUDGE_CONFIG = {"use_fast": True}
 BENCHMARK_MODEL = "microsoft/phi-2"
 BENCHMARK_CONFIG = {
     "max_length": 1500,
-    "device_map": "cuda",
+    "device_map": "auto",
     "revision": "main",
     "trust_remote_code": True,
     "torch_dtype": "auto",

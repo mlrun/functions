@@ -647,6 +647,7 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
 
         # Extract the part of the response after the "[Output]:" marker
         response_after_output = response[output_marker_index + len("[Output]:") :]
+        print(response)
 
         # Adjusted pattern to match the text format and separate lines
         pattern = r"- score of assistant ([ab]): (\d)\s*- explanation of assistant \1: (.*?)\s*(?=- score of assistant|$)"

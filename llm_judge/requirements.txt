@@ -1,13 +1,11 @@
 pandas
-mlrun
+mlrun==1.4.0
 auto-gptq
 openmpi
 mpi4py
 transformers
 torch==2.0.0 # torch 2.0.0 works with our current cuda driver 11.7, the newer versions will require a newer driver
-torchvision
 nltk
-rouge_score
 accelerate
 einops
 openmpi

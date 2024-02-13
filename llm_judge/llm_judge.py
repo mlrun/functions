@@ -117,8 +117,6 @@ You must return the following fields in your output:
 """
 
 
-
-
 def _check_mlrun_and_open_mpi() -> Tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intracomm"]:
     is_mpi = False
     try:
@@ -188,6 +186,7 @@ def open_mpi_handler(
 
     return decorator
 
+
 # The following class is used to compute the metrics of NLP. for example, BLEU, ROUGE, METEOR, etc.
 class LLMEvaluateMetric(ModelObj):
     """
@@ -231,6 +230,7 @@ class LLMEvaluateMetric(ModelObj):
         logger.info(f"Computing the metrics score of {self.name}")
         return self.metric.compute(predictions=predictions, references=references)
 
+
 class LLMJudgeBaseMetric(ModelObj, ABC):
     """
     Base class of the metrics that computed by LLM as a judge
@@ -254,11 +254,11 @@ class LLMJudgeBaseMetric(ModelObj, ABC):
         self,
         name: str,
         model_judge: str,
+        prompt_template: str,
+        prompt_config: Dict[str, Any],
         model_judge_config: Dict[str, Any] = None,
         tokenizer_judge_config: Dict[str, Any] = None,
         model_judge_infer_config: Dict[str, Any] = None,
-        prompt_template: str,
-        prompt_config: Dict[str, Any],
     ):
         """
         These metrics are used to evaluate the model performance on a given dataset
@@ -810,7 +810,7 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         model_judge_infer_config: Dict[str, Any],
         prompt_template: str,
         prompt_config: Dict[str, str],
-        ):
+    ):
         """
         init the grading with reference class
         :param name: the name of the metrics
@@ -834,9 +834,10 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         Prepare the judge model
         """
         logger.info("Prepare the openAI model as judge")
-        self.model = openai.OpenAI(api_key=self.model_judge_config["api_key"],
-                                   base_url=self.model_judge_config["base_url"]
-                                   )
+        self.model = openai.OpenAI(
+            api_key=self.model_judge_config["api_key"],
+            base_url=self.model_judge_config["base_url"],
+        )
 
     def compute_over_one_data(self, question, response) -> Dict[str, Any]:
         """
@@ -849,21 +850,17 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         self.prompt_config["question"] = question
         prompt = self.fill_prompt()
         res = self.model.chat.completions.create(
-            model=self.model_judge,
-            messages = [
-                {
-                    "role": "user",
-                    "content": prompt
-                    }
-                ]
-            )
+            model=self.model_judge, messages=[{"role": "user", "content": prompt}]
+        )
         res_dic = self.extract_score_explanation(res.choices[0].message.content)
         return res_dic
+
 
 class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
     """
     Using API to judge the response
     """
+
     _dict_fields = [
         "name",
         "model_judge",
@@ -890,7 +887,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         tokenizer_bench_mark_config: Dict[str, Any],
         prompt_template: str,
         prompt_config: Dict[str, str],
-        ):
+    ):
         """
         init the grading with reference class
         :param name: the name of the metrics
@@ -918,9 +915,10 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         Prepare the judge model
         """
         logger.info("Prepare the openAI model as judge")
-        self.model = openai.OpenAI(api_key=self.model_judge_config["api_key"],
-                                   base_url=self.model_judge_config["base_url"]
-                                   )
+        self.model = openai.OpenAI(
+            api_key=self.model_judge_config["api_key"],
+            base_url=self.model_judge_config["base_url"],
+        )
 
     def compute_over_one_data(self, question, response) -> Dict[str, Any]:
         """
@@ -934,17 +932,12 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         self.prompt_config["answerB"] = self.compute_bench_mark_response(question)
         prompt = self.fill_prompt()
         res = self.model.chat.completions.create(
-            model=self.model_judge,
-            messages = [
-                {
-                    "role": "user",
-                    "content": prompt
-                    }
-                ]
-            )
+            model=self.model_judge, messages=[{"role": "user", "content": prompt}]
+        )
         res_dic = self.extract_score_explanation(res.choices[0].message.content)
         res_dic["answerB"] = self.prompt_config["answerB"]
         return res_dic
+
 
 class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
     """
@@ -1059,4 +1052,3 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
             ]
 
         return res_df
-

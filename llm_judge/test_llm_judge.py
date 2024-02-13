@@ -109,9 +109,9 @@ def test_single_grading_score(prompt_fixture):
         model_judge=JUDGE_MODEL,
         model_judge_config=JUDGE_CONFIG,
         model_judge_infer_config=JUDGE_INFER_CONFIG,
-        tokenizer_judge_config=TOKENIZER_JUDGE_CONFIG,
         prompt_template=prompt_template,
         prompt_config=prompt_config,
+        tokenizer_judge_config=TOKENIZER_JUDGE_CONFIG,
     )
     result = single_grading.compute_over_data(sample_df)
 

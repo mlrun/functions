@@ -1,3 +1,4 @@
+pytest==5.2.0
 pandas
 langchain
 openai
@@ -11,4 +12,3 @@ torch==2.0.0 # torch 2.0.0 works with our current cuda driver 11.7, the newer ve
 nltk
 accelerate
 einops
-openmpi

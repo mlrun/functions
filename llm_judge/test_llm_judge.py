@@ -22,8 +22,8 @@ from llm_judge import (
     LLMJudgeReferenceGrading,
     LLMJudgeSingleGrading,
     OPENAIJudgeSingleGrading,
-    OPENAIPairwiseGrading,
-    OPENAIReferenceGrading,
+    OPENAIJudgePairwiseGrading,
+    OPENAIJudgeReferenceGrading,
 )
 from llm_judge import (
     PAIR_GRADE_PROMPT,

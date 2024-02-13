@@ -1,4 +1,7 @@
 pandas
+langchain
+openai
+anthropic
 mlrun==1.4.0
 auto-gptq
 openmpi

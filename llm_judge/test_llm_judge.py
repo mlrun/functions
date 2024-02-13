@@ -21,6 +21,9 @@ from llm_judge import (
     LLMJudgePairwiseGrading,
     LLMJudgeReferenceGrading,
     LLMJudgeSingleGrading,
+    OPENAIJudgeSingleGrading,
+    OPENAIPairwiseGrading,
+    OPENAIReferenceGrading,
 )
 from llm_judge import (
     PAIR_GRADE_PROMPT,
@@ -28,15 +31,16 @@ from llm_judge import (
     SINGLE_GRADE_PROMPT,
 )
 from mlrun.utils import logger
-JUDGE_MODEL ="TheBloke/Mistral-7B-OpenOrca-GPTQ"
+
+JUDGE_MODEL = "TheBloke/Mistral-7B-OpenOrca-GPTQ"
 JUDGE_CONFIG = {
     "device_map": "auto",
     "revision": "gptq-8bit--1g-actorder_True",
     "trust_remote_code": False,
 }
 JUDGE_INFER_CONFIG = {
-        "max_length": 1500,
-        }
+    "max_length": 1500,
+}
 TOKENIZER_JUDGE_CONFIG = {"use_fast": True}
 BENCHMARK_MODEL = "microsoft/phi-2"
 BENCHMARK_CONFIG = {
@@ -45,7 +49,7 @@ BENCHMARK_CONFIG = {
     "revision": "main",
     "trust_remote_code": True,
     "torch_dtype": "auto",
-    #"flash_attn": True,
+    # "flash_attn": True,
 }
 TOKENIZER_BENCHMARK_CONFIG = {"trust_remote_code": True}
 BENCHMARK_INFER_CONFIG = {"max_length": 1500}
@@ -154,6 +158,96 @@ def test_reference_grading_scores(prompt_fixture):
         name="accuracy_metrics",
         model_judge=JUDGE_MODEL,
         tokenizer_judge_config=TOKENIZER_JUDGE_CONFIG,
+        model_judge_config=JUDGE_CONFIG,
+        model_judge_infer_config=JUDGE_INFER_CONFIG,
+        model_bench_mark=BENCHMARK_MODEL,
+        model_bench_mark_config=BENCHMARK_CONFIG,
+        model_bench_mark_infer_config=BENCHMARK_INFER_CONFIG,
+        tokenizer_bench_mark_config=TOKENIZER_BENCHMARK_CONFIG,
+        prompt_template=prompt_template,
+        prompt_config=prompt_config,
+    )
+
+    q1 = "What is the capital of China?"
+    a1 = "The capital of China is Kongfu"
+    ref1 = "Beijing"
+
+    q2 = "What is the capital of France?"
+    a2 = "The capital of France is Seattle"
+    ref2 = "Paris"
+
+    sample_df = pd.DataFrame(
+        {"question": [q1, q2], "answer": [a1, a2], "reference": [ref1, ref2]}
+    )
+
+    result = metric.compute_over_data(sample_df)
+    logger.info(f"result: {result}")
+    assert all(0 <= score <= 5 for score in result["score_of_assistant_a"].to_list())
+    assert all(0 <= score <= 5 for score in result["score_of_assistant_b"].to_list())
+
+
+def test_openai_single_grading_score(prompt_fixture):
+    prompt_template = SINGLE_GRADE_PROMPT
+    prompt_config = prompt_fixture
+    q1 = "What is the capital of China?"
+    a1 = "The capital of China is Kongfu"
+
+    q2 = "What is the capital of France?"
+    a2 = "The capital of France is Paris"
+
+    sample_df = pd.DataFrame({"question": [q1, q2], "answer": [a1, a2]})
+
+    single_grading = OPENAIJudgeSingleGrading(
+        name="accuracy_metrics",
+        model_judge=JUDGE_MODEL,
+        model_judge_config=JUDGE_CONFIG,
+        model_judge_infer_config=JUDGE_INFER_CONFIG,
+        prompt_template=prompt_template,
+        prompt_config=prompt_config,
+    )
+    result = single_grading.compute_over_data(sample_df)
+
+    logger.info(f"result: {result}")
+    assert all(0 <= score <= 5 for score in result["score"])
+
+
+def test_openai_pairwise_grading_scores(prompt_fixture):
+    prompt_template = PAIR_GRADE_PROMPT
+    prompt_config = prompt_fixture
+
+    metric = OPENAIJudgePairwiseGrading(
+        name="accuracy_metrics",
+        model_judge=JUDGE_MODEL,
+        model_judge_config=JUDGE_CONFIG,
+        model_judge_infer_config=JUDGE_INFER_CONFIG,
+        model_bench_mark=BENCHMARK_MODEL,
+        model_bench_mark_config=BENCHMARK_CONFIG,
+        model_bench_mark_infer_config=BENCHMARK_INFER_CONFIG,
+        tokenizer_bench_mark_config=TOKENIZER_BENCHMARK_CONFIG,
+        prompt_template=prompt_template,
+        prompt_config=prompt_config,
+    )
+
+    q1 = "What is the capital of China?"
+    a1 = "The capital of China is Kongfu"
+
+    q2 = "What is the capital of France?"
+    a2 = "The capital of France is Paris"
+
+    sample_df = pd.DataFrame({"question": [q1, q2], "answer": [a1, a2]})
+    result = metric.compute_over_data(sample_df)
+    logger.info(f"result: {result}")
+    assert all(0 <= score <= 5 for score in result["score_of_assistant_a"].to_list())
+    assert all(0 <= score <= 5 for score in result["score_of_assistant_b"].to_list())
+
+
+def test_openai_reference_grading_scores(prompt_fixture):
+    prompt_template = REF_GRADE_PROMPT
+    prompt_config = prompt_fixture
+
+    metric = OPENAIJudgeReferenceGrading(
+        name="accuracy_metrics",
+        model_judge=JUDGE_MODEL,
         model_judge_config=JUDGE_CONFIG,
         model_judge_infer_config=JUDGE_INFER_CONFIG,
         model_bench_mark=BENCHMARK_MODEL,

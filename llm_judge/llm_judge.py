@@ -25,6 +25,7 @@ import transformers
 import mlrun
 from mlrun.model import ModelObj
 from mlrun.utils import logger
+from langchain.chat_models import ChatModel, ChatCohere, ChatAnthropic 
 
 # These prmopt are used to generate the grade for LLM-as a judge
 
@@ -186,7 +187,7 @@ def open_mpi_handler(
 
     return decorator
 
-
+# The following class is used to compute the metrics of NLP. for example, BLEU, ROUGE, METEOR, etc.
 class LLMEvaluateMetric(ModelObj):
     """
     Base class of the metrics that computed by evluate package
@@ -228,6 +229,55 @@ class LLMEvaluateMetric(ModelObj):
             )
         logger.info(f"Computing the metrics score of {self.name}")
         return self.metric.compute(predictions=predictions, references=references)
+
+
+
+# The following class is used to compute the metrics of a model that is deployed as an API backend. 
+# It should support openAI, anthropic, cohere
+class APIJudgeBaseMetric(ModelObj, ABC):
+    """
+    Base class of the metrics that computed by a API backend model
+    """
+    _dict_fields = [
+        "name",
+        "api_url",
+        ]
+    kind = "api_judge_metric"
+    default_name: ClassVar[str] = "api_judge_metric"
+
+    def __init__(
+        self,
+        name: str,
+        api_url: str,
+    ):
+        """
+        These metrics are used to evaluate the model performance on a given dataset
+        and the algorithm is implemented in the evaluate library
+        :param name: name of the metric
+        :param api_url: the url of the api backend
+        """
+        self.name = name or self.default_name
+        self.api_url = api_url
+
+
+class OpenAIAPIJudgeMetric(APIJudgeBaseMetric):
+    """
+    The metrics that computed by OpenAI API backend model
+    """
+    
+        def __init__(
+            self,
+            name: str,
+            api_url: str,
+        ):
+            """
+            These metrics are used to evaluate the model performance on a given dataset
+            and the algorithm is implemented in the evaluate library
+            :param name: name of the metric
+            :param api_url: the url of the api backend
+            """
+            super().__init__(name, api_url)
+
 
 
 class LLMJudgeBaseMetric(ModelObj, ABC):

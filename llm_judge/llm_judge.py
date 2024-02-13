@@ -241,11 +241,11 @@ class LLMJudgeBaseMetric(ModelObj, ABC):
     _dict_fields = [
         "name",
         "model_judge",
+        "prompt_template",
+        "prompt_config",
         "model_judge_config",
         "tokenizer_judge_config",
         "model_judge_infer_config",
-        "prompt_template",
-        "prompt_config",
     ]
     kind = "llm_judge_metric"
     default_name: ClassVar[str] = "llm_judge_metric"
@@ -337,10 +337,10 @@ class LLMJudgeSingleGrading(LLMJudgeBaseMetric):
         "name",
         "model_judge",
         "model_judge_config",
-        "tokenizer_judge_config",
         "model_judge_infer_config",
         "prompt_template",
         "prompt_config",
+        "tokenizer_judge_config",
     ]
     kind = "llm_judge_single_grading"
 
@@ -367,11 +367,11 @@ class LLMJudgeSingleGrading(LLMJudgeBaseMetric):
         super().__init__(
             name,
             model_judge,
+            prompt_template,
+            prompt_config,
             model_judge_config,
             tokenizer_judge_config,
             model_judge_infer_config,
-            prompt_template,
-            prompt_config,
         )
 
     def prepare_judge(self) -> None:

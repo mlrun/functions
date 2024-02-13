@@ -25,7 +25,8 @@ import transformers
 import mlrun
 from mlrun.model import ModelObj
 from mlrun.utils import logger
-from langchain.chat_models import ChatModel, ChatCohere, ChatAnthropic 
+from langchain_community.chat_models import ChatCohere, ChatAnthropic
+import openai
 
 # These prmopt are used to generate the grade for LLM-as a judge
 
@@ -230,56 +231,6 @@ class LLMEvaluateMetric(ModelObj):
         logger.info(f"Computing the metrics score of {self.name}")
         return self.metric.compute(predictions=predictions, references=references)
 
-
-
-# The following class is used to compute the metrics of a model that is deployed as an API backend. 
-# It should support openAI, anthropic, cohere
-class APIJudgeBaseMetric(ModelObj, ABC):
-    """
-    Base class of the metrics that computed by a API backend model
-    """
-    _dict_fields = [
-        "name",
-        "api_url",
-        ]
-    kind = "api_judge_metric"
-    default_name: ClassVar[str] = "api_judge_metric"
-
-    def __init__(
-        self,
-        name: str,
-        api_url: str,
-    ):
-        """
-        These metrics are used to evaluate the model performance on a given dataset
-        and the algorithm is implemented in the evaluate library
-        :param name: name of the metric
-        :param api_url: the url of the api backend
-        """
-        self.name = name or self.default_name
-        self.api_url = api_url
-
-
-class OpenAIAPIJudgeMetric(APIJudgeBaseMetric):
-    """
-    The metrics that computed by OpenAI API backend model
-    """
-    
-        def __init__(
-            self,
-            name: str,
-            api_url: str,
-        ):
-            """
-            These metrics are used to evaluate the model performance on a given dataset
-            and the algorithm is implemented in the evaluate library
-            :param name: name of the metric
-            :param api_url: the url of the api backend
-            """
-            super().__init__(name, api_url)
-
-
-
 class LLMJudgeBaseMetric(ModelObj, ABC):
     """
     Base class of the metrics that computed by LLM as a judge
@@ -303,9 +254,9 @@ class LLMJudgeBaseMetric(ModelObj, ABC):
         self,
         name: str,
         model_judge: str,
-        model_judge_config: Dict[str, Any],
-        tokenizer_judge_config: Dict[str, Any],
-        model_judge_infer_config: Dict[str, Any],
+        model_judge_config: Dict[str, Any] = None,
+        tokenizer_judge_config: Dict[str, Any] = None,
+        model_judge_infer_config: Dict[str, Any] = None,
         prompt_template: str,
         prompt_config: Dict[str, Any],
     ):
@@ -398,10 +349,10 @@ class LLMJudgeSingleGrading(LLMJudgeBaseMetric):
         name: str,
         model_judge: str,
         model_judge_config: Dict[str, Any],
-        tokenizer_judge_config: Dict[str, Any],
         model_judge_infer_config: Dict[str, Any],
         prompt_template: str,
         prompt_config: Dict[str, Any],
+        tokenizer_judge_config: Dict[str, Any] = None,
     ):
         """
         init the class
@@ -834,3 +785,278 @@ class LLMJudgeReferenceGrading(LLMJudgePairwiseGrading):
             ]
 
         return res_df
+
+
+class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
+    """
+    Using API to judge the response
+    """
+
+    _dict_fields = [
+        "name",
+        "model_judge",
+        "model_judge_config",
+        "model_judge_infer_config",
+        "prompt_template",
+        "prompt_config",
+    ]
+    kind = "OPENAI_judge_single_grading"
+
+    def __init__(
+        self,
+        name: str,
+        model_judge: str,
+        model_judge_config: Dict[str, Any],
+        model_judge_infer_config: Dict[str, Any],
+        prompt_template: str,
+        prompt_config: Dict[str, str],
+        ):
+        """
+        init the grading with reference class
+        :param name: the name of the metrics
+        :param model_judge: the model to use for grading
+        :param model_judge_config: the config of the model to use for grading
+        :param model_judge_infer_config: the config of the model to use for inference
+        :param prompt_template: the template of the prompt to use
+        :param prompt_config: the config of the prompt to use
+        """
+        super().__init__(
+            name,
+            model_judge,
+            model_judge_config,
+            model_judge_infer_config,
+            prompt_template,
+            prompt_config,
+        )
+
+    def prepare_judge(self) -> None:
+        """
+        Prepare the judge model
+        """
+        logger.info("Prepare the openAI model as judge")
+        self.model = openai.OpenAI(api_key=self.model_judge_config["api_key"],
+                                   base_url=self.model_judge_config["base_url"]
+                                   )
+
+    def compute_over_one_data(self, question, response) -> Dict[str, Any]:
+        """
+        Compute the metrics over one data point
+        :param kwargs: the data to compute the metrics over
+        :return: the metrics score and the explanation
+        """
+        logger.info(f"Compute the metrics over one data point using openAI's model")
+        self.prompt_config["response"] = response
+        self.prompt_config["question"] = question
+        prompt = self.fill_prompt()
+        res = self.model.chat.completions.create(
+            model=self.model_judge,
+            messages = [
+                {
+                    "role": "user",
+                    "content": prompt
+                    }
+                ]
+            )
+        res_dic = self.extract_score_explanation(res.choices[0].message.content)
+        return res_dic
+
+class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
+    """
+    Using API to judge the response
+    """
+    _dict_fields = [
+        "name",
+        "model_judge",
+        "model_judge_config",
+        "model_judge_infer_config",
+        "model_bench_mark",
+        "model_bench_mark_config",
+        "model_bench_mark_infer_config",
+        "tokenizer_bench_mark_config",
+        "prompt_template",
+        "prompt_config",
+    ]
+    kind = "OPENAI_judge_pair_grading"
+
+    def __init__(
+        self,
+        name: str,
+        model_judge: str,
+        model_judge_config: Dict[str, Any],
+        model_judge_infer_config: Dict[str, Any],
+        model_bench_mark: str,
+        model_bench_mark_config: Dict[str, Any],
+        model_bench_mark_infer_config: Dict[str, Any],
+        tokenizer_bench_mark_config: Dict[str, Any],
+        prompt_template: str,
+        prompt_config: Dict[str, str],
+        ):
+        """
+        init the grading with reference class
+        :param name: the name of the metrics
+        :param model_judge: the model to use for grading
+        :param model_judge_config: the config of the model to use for grading
+        :param model_judge_infer_config: the config of the model to use for inference
+        :param prompt_template: the template of the prompt to use
+        :param prompt_config: the config of the prompt to use
+        """
+        super().__init__(
+            name,
+            model_judge,
+            model_judge_config,
+            model_judge_infer_config,
+            model_bench_mark,
+            model_bench_mark_config,
+            model_bench_mark_infer_config,
+            tokenizer_bench_mark_config,
+            prompt_template,
+            prompt_config,
+        )
+
+    def prepare_judge(self) -> None:
+        """
+        Prepare the judge model
+        """
+        logger.info("Prepare the openAI model as judge")
+        self.model = openai.OpenAI(api_key=self.model_judge_config["api_key"],
+                                   base_url=self.model_judge_config["base_url"]
+                                   )
+
+    def compute_over_one_data(self, question, response) -> Dict[str, Any]:
+        """
+        Compute the metrics over one data point
+        :param kwargs: the data to compute the metrics over
+        :return: the metrics score and the explanation
+        """
+        logger.info(f"Computing the metrics over {question} and {response}")
+        self.prompt_config["question"] = question
+        self.prompt_config["answerA"] = response
+        self.prompt_config["answerB"] = self.compute_bench_mark_response(question)
+        prompt = self.fill_prompt()
+        res = self.model.chat.completions.create(
+            model=self.model_judge,
+            messages = [
+                {
+                    "role": "user",
+                    "content": prompt
+                    }
+                ]
+            )
+        res_dic = self.extract_score_explanation(res.choices[0].message.content)
+        res_dic["answerB"] = self.prompt_config["answerB"]
+        return res_dic
+
+class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
+    """
+    OPENAI Judge Reference Grading class
+    you need to give the name of the metrics, give the grading rubric and the bench mark model to use
+    This class requrie you know the y_true of the response
+    """
+
+    _dict_fields = [
+        "name",
+        "model_judge",
+        "model_judge_config",
+        "model_judge_infer_config",
+        "model_bench_mark",
+        "model_bench_mark_config",
+        "model_bench_mark_infer_config",
+        "tokenizer_bench_mark_config",
+        "prompt_template",
+        "prompt_config",
+    ]
+    kind = "OPENAI_judge_reference_grading"
+
+    def __init__(
+        self,
+        name: str,
+        model_judge: str,
+        model_judge_config: Dict[str, Any],
+        model_judge_infer_config: Dict[str, Any],
+        model_bench_mark: str,
+        model_bench_mark_config: Dict[str, Any],
+        tokenizer_bench_mark_config: Dict[str, Any],
+        model_bench_mark_infer_config: Dict[str, Any],
+        prompt_template: str,
+        prompt_config: Dict[str, str],
+    ):
+        """
+        init the grading with reference class
+        :param name: the name of the metrics
+        :param model_judge: the model to use for grading
+        :param model_judge_config: the config of the model to use for grading
+        :param model_judge_infer_config: the config of the model to use for inference
+        :param model_bench_mark: the model to use for bench marking
+        :param model_bench_mark_config: the config of the model to use for bench marking
+        :param tokenizer_bench_mark_config: the config of the tokenizer to use for bench marking
+        :param model_bench_mark_infer_config: the config of the model to use for inference
+        :param prompt_template: the template of the prompt to use
+        :param prompt_config: the config of the prompt to use
+        """
+        super().__init__(
+            name,
+            model_judge,
+            tokenizer_judge_config,
+            model_judge_config,
+            model_judge_infer_config,
+            model_bench_mark,
+            model_bench_mark_config,
+            model_bench_mark_infer_config,
+            tokenizer_bench_mark_config,
+            prompt_template,
+            prompt_config,
+        )
+
+    def compute_over_one_data(self, question, response, reference) -> Dict[str, Any]:
+        """
+        Compute the metrics over one data point
+        :param kwargs: the data to compute the metrics over
+        :return: the metrics score and the explanation
+        """
+        self.prompt_config["reference"] = reference
+        res_dic = super().compute_over_one_data(question, response)
+        return res_dic
+
+    @open_mpi_handler(worker_inputs="sample_df")
+    def compute_over_data(
+        self, sample_df: pd.DataFrame, train_df: pd.DataFrame = None
+    ) -> pd.DataFrame:
+        """
+        Compute the metrics over a dataset
+        :param sample_df: the data to compute the metrics over
+        :return: the metrics score and the explanation
+        """
+        self.prepare_judge()
+        self.prepare_bench_mark_model()
+        res_df = pd.DataFrame(
+            columns=[
+                "question",
+                "answerA",
+                "answerB",
+                "reference",
+                "score_of_assistant_a",
+                "explanation_of_assistant_a",
+                "score_of_assistant_b",
+                "explanation_of_assistant_b",
+            ]
+        )
+
+        for i in range(len(sample_df)):
+            res_dic = self.compute_over_one_data(
+                sample_df.loc[i, "question"],
+                sample_df.loc[i, "answer"],
+                sample_df.loc[i, "reference"],
+            )
+            res_df.loc[i] = [
+                sample_df.loc[i, "question"],
+                sample_df.loc[i, "answer"],
+                sample_df.loc[i, "reference"],
+                res_dic["answerB"],
+                res_dic["score_of_assistant_a"],
+                res_dic["explanation_of_assistant_a"],
+                res_dic["score_of_assistant_b"],
+                res_dic["explanation_of_assistant_b"],
+            ]
+
+        return res_df
+

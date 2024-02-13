@@ -989,7 +989,6 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         super().__init__(
             name,
             model_judge,
-            tokenizer_judge_config,
             model_judge_config,
             model_judge_infer_config,
             model_bench_mark,

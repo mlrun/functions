@@ -1036,6 +1036,7 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
             model_judge_config,
             model_bench_mark,
             model_bench_mark_config,
+            model_bench_mark_infer_config,
             tokenizer_bench_mark_config,
             prompt_template,
             prompt_config,

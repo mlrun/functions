@@ -883,13 +883,13 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         "name",
         "model_judge",
         "model_judge_config",
-        "model_judge_infer_config",
         "model_bench_mark",
         "model_bench_mark_config",
         "model_bench_mark_infer_config",
         "tokenizer_bench_mark_config",
         "prompt_template",
         "prompt_config",
+        "model_judge_infer_config",
     ]
     kind = "OPENAI_judge_pair_grading"
 
@@ -898,13 +898,13 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         name: str,
         model_judge: str,
         model_judge_config: Dict[str, Any],
-        model_judge_infer_config: Dict[str, Any],
         model_bench_mark: str,
         model_bench_mark_config: Dict[str, Any],
         model_bench_mark_infer_config: Dict[str, Any],
         tokenizer_bench_mark_config: Dict[str, Any],
         prompt_template: str,
         prompt_config: Dict[str, str],
+        model_judge_infer_config: Dict[str, Any] = None,
     ):
         """
         init the grading with reference class

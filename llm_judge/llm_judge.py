@@ -187,6 +187,7 @@ def open_mpi_handler(
 
     return decorator
 
+
 class LLMJudgeBaseMetric(ModelObj, ABC):
     """
     Base class of the metrics that computed by LLM as a judge
@@ -918,13 +919,37 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         :param response: the response to extract the score and the explanation from
         :return: the score and the explanation
         """
-        res = json.loads(response)
-        result_dict = {}
-        result_dict['score_of_assistant_a'] = res['score of assistant a']
-        result_dict['score_of_assistant_b'] = res['score of assistant b']
-        result_dict['explanation_of_assistant_a'] = res['explanation of assistant a']
-        result_dict['explanation_of_assistant_b'] = res['explanation of assistant b']
-        return result_dict
+        try:
+            res = json.loads(response)
+            result_dict = {}
+            result_dict["score_of_assistant_a"] = res["score of assistant a"]
+            result_dict["score_of_assistant_b"] = res["score of assistant b"]
+            result_dict["explanation_of_assistant_a"] = res[
+                "explanation of assistant a"
+            ]
+            result_dict["explanation_of_assistant_b"] = res[
+                "explanation of assistant b"
+            ]
+            return result_dict
+        except Exception as e:
+            # Adjusted pattern to match the text format and separate lines
+            pattern = r"- score of assistant ([abAB]): (\d)\s*- explanation of assistant \1: (.*?)\s*(?=- score of assistant|$)"
+            matches = re.findall(pattern, response, re.DOTALL)
+
+            if matches:
+                result_dict = {}
+                for match in matches:
+                    assistant, score, explanation = match
+                    result_dict[f"score_of_assistant_{assistant}".lower()] = int(score)
+                    result_dict[
+                        f"explanation_of_assistant_{assistant}".lower()
+                    ] = explanation.strip()
+                return result_dict
+            else:
+                raise ValueError(
+                    "No matches found after '[Output]:' marker. "
+                    "Please check the format of the response."
+                )
 
 
 class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
@@ -1045,19 +1070,15 @@ def _get_metrics(
     prompt_template: str,
     prompt_config: Dict[str, Any],
     **kwargs,
-    ) -> LLMJudgeBaseMetric:
-
+) -> LLMJudgeBaseMetric:
     pass
-
-
-
 
 
 def llm_judge(
     context: mlrun.MLClientCtx,
     input_path: Union[str, pathlib.Path],
     metric: LLMJudgeBaseMetric,
-    ) -> pd.DataFrame:
+) -> pd.DataFrame:
     """
     Compute the metrics over a dataset
     :param context: the mlrun context

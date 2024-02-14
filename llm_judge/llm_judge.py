@@ -839,6 +839,24 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
             base_url=self.model_judge_config["base_url"],
         )
 
+    def extract_score_explanation(self, result: str) -> Dict[str, Any]:
+        """
+        Abstract the store of the result
+        :param result: the result to store
+        :return: the stored result
+        """
+        logger.info(f"Extracting the score and explanation from {result}")
+        score_pattern = r'"score":\s*(\d+)'
+        explanation_pattern = r'"explanation":\s*"([^"]+)"'
+
+        score_match = re.search(score_pattern, result)
+        score = int(score_match.group(1)) if score_match else None
+
+        explanation_match = re.search(explanation_pattern, result, re.DOTALL)
+        explanation = explanation_match.group(1).strip() if explanation_match else None
+
+        return {"score": score, "explanation": explanation}
+
     def compute_over_one_data(self, question, response) -> Dict[str, Any]:
         """
         Compute the metrics over one data point
@@ -846,7 +864,7 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         :return: the metrics score and the explanation
         """
         logger.info(f"Compute the metrics over one data point using openAI's model")
-        self.prompt_config["response"] = response
+        self.prompt_config["answer"] = response
         self.prompt_config["question"] = question
         prompt = self.fill_prompt()
         res = self.model.chat.completions.create(

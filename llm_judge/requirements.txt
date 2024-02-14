@@ -8,7 +8,6 @@ openmpi
 mpi4py
 transformers
 torch==2.0.0 # torch 2.0.0 works with our current cuda driver 11.7, the newer versions will require a newer driver
-nltk
 accelerate
 einops
 optimum

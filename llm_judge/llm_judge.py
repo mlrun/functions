@@ -467,15 +467,15 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
     _dict_fields = [
         "name",
         "model_judge",
-        "tokenizer_judge_config",
         "model_judge_config",
-        "model_judge_infer_config",
         "model_bench_mark",
         "model_bench_mark_config",
         "model_bench_mark_infer_config",
         "tokenizer_bench_mark_config",
         "prompt_template",
         "prompt_config",
+        "tokenizer_judge_config",
+        "model_judge_infer_config",
     ]
     kind = "llm_judge_pairwise_grading"
 
@@ -483,15 +483,15 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         self,
         name: str,
         model_judge: str,
-        tokenizer_judge_config: Dict[str, Any],
         model_judge_config: Dict[str, Any],
-        model_judge_infer_config: Dict[str, Any],
         model_bench_mark: str,
         model_bench_mark_config: Dict[str, Any],
         model_bench_mark_infer_config: Dict[str, Any],
         tokenizer_bench_mark_config: Dict[str, Any],
         prompt_template: str,
         prompt_config: Dict[str, Any],
+        tokenizer_judge_config: Dict[str, Any]=None,
+        model_judge_infer_config: Dict[str, Any]=None,
     ):
         """
         init the class

@@ -1094,3 +1094,29 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
             ]
 
         return res_df
+
+
+    def extract_score_explanation(self, response) -> Dict[str, Any]:
+        """
+        Extract the score and the explanation from the response
+        :param response: the response to extract the score and the explanation from
+        :return: the score and the explanation
+        """
+        # Adjusted pattern to match the text format and separate lines
+        pattern = r'''score of assistant (a|b)": (\d+),\s*"explanation of assistant \1": "(.*?)'''
+        matches = re.findall(pattern, response, re.DOTALL)
+
+        if matches:
+            result_dict = {}
+            for match in matches:
+                assistant, score, explanation = match
+                result_dict[f"score_of_assistant_{assistant}".lower()] = int(score)
+                result_dict[
+                    f"explanation_of_assistant_{assistant}".lower()
+                ] = explanation.strip()
+            return result_dict
+        else:
+            raise ValueError(
+                "No matches found after '[Output]:' marker. "
+                "Please check the format of the response."
+            )

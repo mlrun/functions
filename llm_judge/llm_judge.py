@@ -510,11 +510,11 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         super().__init__(
             name,
             model_judge,
+            prompt_template,
+            prompt_config,
             model_judge_config,
             tokenizer_judge_config,
             model_judge_infer_config,
-            prompt_template,
-            prompt_config,
         )
         self.model_bench_mark = model_bench_mark
         self.model_bench_mark_config = model_bench_mark_config

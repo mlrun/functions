@@ -35,7 +35,7 @@ from mlrun.utils import logger
 JUDGE_MODEL = "TheBloke/Mistral-7B-OpenOrca-GPTQ"
 JUDGE_CONFIG = {
     "device_map": "auto",
-    "revision": "gptq-8bit--1g-actorder_True",
+    "revision": "gptq-8bit-128g-actorder_True", 
     "trust_remote_code": False,
 }
 JUDGE_INFER_CONFIG = {
@@ -45,19 +45,18 @@ TOKENIZER_JUDGE_CONFIG = {"use_fast": True}
 BENCHMARK_MODEL = "microsoft/phi-2"
 BENCHMARK_CONFIG = {
     "max_length": 1500,
-    "device_map": "cpu",
+    "device_map": "auto",
     "revision": "main",
     "trust_remote_code": True,
     "torch_dtype": "auto",
-    # "flash_attn": True,
 }
 TOKENIZER_BENCHMARK_CONFIG = {"trust_remote_code": True}
 BENCHMARK_INFER_CONFIG = {"max_length": 1500}
 
-JUDGE_MODEL = BENCHMARK_MODEL
-JUDGE_CONFIG = BENCHMARK_CONFIG
-JUDGE_INFER_CONFIG = BENCHMARK_INFER_CONFIG
-TOKENIZER_JUDGE_CONFIG = TOKENIZER_BENCHMARK_CONFIG
+#JUDGE_MODEL = BENCHMARK_MODEL
+#JUDGE_CONFIG = BENCHMARK_CONFIG
+#JUDGE_INFER_CONFIG = BENCHMARK_INFER_CONFIG
+#TOKENIZER_JUDGE_CONFIG = TOKENIZER_BENCHMARK_CONFIG
 
 
 

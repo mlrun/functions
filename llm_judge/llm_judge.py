@@ -27,6 +27,7 @@ from mlrun.model import ModelObj
 from mlrun.utils import logger
 import openai
 import json
+import pathlib
 
 # These prmopt are used to generate the grade for LLM-as a judge
 
@@ -1039,3 +1040,32 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         return res_df
 
 
+def _get_metrics(
+    name: str,
+    prompt_template: str,
+    prompt_config: Dict[str, Any],
+    **kwargs,
+    ) -> LLMJudgeBaseMetric:
+
+    pass
+
+
+
+
+
+def llm_judge(
+    context: mlrun.MLClientCtx,
+    input_path: Union[str, pathlib.Path],
+    metric: LLMJudgeBaseMetric,
+    ) -> pd.DataFrame:
+    """
+    Compute the metrics over a dataset
+    :param context: the mlrun context
+    :param input_path: the path to the input data
+    :param metric: the metric to use
+    :param output_path: the path to the output data
+    :return: the metrics score and the explanation
+    """
+    sample_df = pd.read_csv(input_path)
+    res_df = metric.compute_over_data(sample_df)
+    return res_df

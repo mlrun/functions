@@ -1,0 +1,39 @@
+apiVersion: v1
+categories: 
+  - machine-learning
+  - monitoring
+description: This function is used to compute the metrics using llm as a judge
+doc: ''
+example: llm_judge.ipynb
+generationDate: 
+hidden: false
+icon: ''
+labels:
+  author: pgw
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.4.0
+name: llm_judge
+platformVersion: 3.5.3
+spec:
+  filename: llm_judge.py
+  handler: llm_judge
+  image: mlrun/mlrun
+  kind: job
+  requirements:
+          -pytest==5.2.0
+          -evaluate
+          -pandas
+          -openai
+          -mlrun==1.4.0
+          -auto-gptq
+          -openmpi
+          -mpi4py
+          -transformers
+          -torch=2.0.0
+          -accelerate
+          -einops
+          -optimum
+url: ''
+version: 0.2.0
+test_valid: False

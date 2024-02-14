@@ -919,13 +919,13 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
             name,
             model_judge,
             model_judge_config,
-            model_judge_infer_config,
             model_bench_mark,
             model_bench_mark_config,
             model_bench_mark_infer_config,
             tokenizer_bench_mark_config,
             prompt_template,
             prompt_config,
+            model_judge_infer_config,
         )
 
     def prepare_judge(self) -> None:

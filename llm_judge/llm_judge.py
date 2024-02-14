@@ -25,7 +25,6 @@ import transformers
 import mlrun
 from mlrun.model import ModelObj
 from mlrun.utils import logger
-from langchain_community.chat_models import ChatCohere, ChatAnthropic
 import openai
 
 # These prmopt are used to generate the grade for LLM-as a judge
@@ -1095,7 +1094,6 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
 
         return res_df
 
-
     def extract_score_explanation(self, response) -> Dict[str, Any]:
         """
         Extract the score and the explanation from the response
@@ -1103,7 +1101,7 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         :return: the score and the explanation
         """
         # Adjusted pattern to match the text format and separate lines
-        pattern = r'''score of assistant (a|b)": (\d+),\s*"explanation of assistant \1": "(.*?)'''
+        pattern = r"""score of assistant (a|b)": (\d+),\s*"explanation of assistant \1": "(.*?)"""
         matches = re.findall(pattern, response, re.DOTALL)
 
         if matches:

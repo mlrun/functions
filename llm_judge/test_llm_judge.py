@@ -100,6 +100,7 @@ def prompt_fixture():
     }
     return prompt_config
 
+
 def test_bleu_metric():
     metric = LLMEvaluateMetric(name="bleu")
     predictions = ["the cat is on the mat"]
@@ -137,6 +138,7 @@ def test_bleu_wrong_inputs():
         predictions = ["hi"]
         references = ["1", "2"]
         metric.compute_over_data(predictions, references)
+
 
 def test_single_grading_score(prompt_fixture):
     prompt_template = SINGLE_GRADE_PROMPT

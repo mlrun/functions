@@ -16,8 +16,8 @@
 import re
 from abc import ABC, abstractmethod
 from functools import wraps
-from typing import Any, ClassVar, Dict, List, Tuple, Union
-
+from typing import Any, ClassVar, Dict, List, Tuple, Union, Type, TypeVar, Callable
+from enum import Enum
 import mpi4py
 import pandas as pd
 import transformers
@@ -1065,28 +1065,33 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         return res_df
 
 
+MetricsType = TypeVar("MetricsType")
+
+
 def _get_metrics(
-    name: str,
-    prompt_template: str,
-    prompt_config: Dict[str, Any],
-    **kwargs,
-) -> LLMJudgeBaseMetric:
-    pass
+    metric_type: Type[MetricsType],
+    **kwargs: Any,
+) -> MetricsType:
+    """
+    Init the metric class based on different type of metrics
+    :param metric_type: the type of the metric
+    :param kwargs: the config of the metric
+    :return: the metric obj
+    """
+    return metric_type(**kwargs)
 
 
 def llm_judge(
-    context: mlrun.MLClientCtx,
     input_path: Union[str, pathlib.Path],
-    metric: LLMJudgeBaseMetric,
+    **kwargs,
 ) -> pd.DataFrame:
     """
     Compute the metrics over a dataset
-    :param context: the mlrun context
     :param input_path: the path to the input data
-    :param metric: the metric to use
-    :param output_path: the path to the output data
+    :param kwargs: the config of the metric
     :return: the metrics score and the explanation
     """
+    metric = _get_metrics(**kwargs)
     sample_df = pd.read_csv(input_path)
     res_df = metric.compute_over_data(sample_df)
     return res_df

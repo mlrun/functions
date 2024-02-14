@@ -100,7 +100,6 @@ def prompt_fixture():
     return prompt_config
 
 
-
 def test_single_grading_score(prompt_fixture):
     prompt_template = SINGLE_GRADE_PROMPT
     prompt_config = prompt_fixture

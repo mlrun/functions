@@ -1,8 +1,7 @@
 pytest==5.2.0
+evaluate
 pandas
-langchain
 openai
-anthropic
 mlrun==1.4.0
 auto-gptq
 openmpi
@@ -12,5 +11,4 @@ torch==2.0.0 # torch 2.0.0 works with our current cuda driver 11.7, the newer ve
 nltk
 accelerate
 einops
-auto-gptq
 optimum

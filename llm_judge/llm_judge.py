@@ -963,7 +963,8 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         :return: the score and the explanation
         """
         # Adjusted pattern to match the text format and separate lines
-        pattern = r"- score of assistant ([abAB]): (\d)\s*- explanation of assistant \1: (.*?)\s*(?=- score of assistant|$)"
+        pattern=r"- score of assistant ([AaBb]): (\d+)\n- explanation of assistant \1: (.*?)(?=\n- score of assistant|\Z)"
+
         matches = re.findall(pattern, response, re.DOTALL)
 
         if matches:

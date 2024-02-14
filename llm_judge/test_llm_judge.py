@@ -48,7 +48,7 @@ BENCHMARK_CONFIG = {
     "device_map": "cpu",
     "revision": "main",
     "trust_remote_code": True,
-    "torch_dtype": "torch.float32",
+    "torch_dtype": "auto",
     # "flash_attn": True,
 }
 TOKENIZER_BENCHMARK_CONFIG = {"trust_remote_code": True}

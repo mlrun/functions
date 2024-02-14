@@ -26,6 +26,7 @@ import mlrun
 from mlrun.model import ModelObj
 from mlrun.utils import logger
 import openai
+import json
 
 # These prmopt are used to generate the grade for LLM-as a judge
 
@@ -916,25 +917,13 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         :param response: the response to extract the score and the explanation from
         :return: the score and the explanation
         """
-        # Adjusted pattern to match the text format and separate lines
-        pattern = r"- score of assistant ([AaBb]): (\d+)\n- explanation of assistant \1: (.*?)(?=\n- score of assistant|\Z)"
-
-        matches = re.findall(pattern, response, re.DOTALL)
-
-        if matches:
-            result_dict = {}
-            for match in matches:
-                assistant, score, explanation = match
-                result_dict[f"score_of_assistant_{assistant}".lower()] = int(score)
-                result_dict[
-                    f"explanation_of_assistant_{assistant}".lower()
-                ] = explanation.strip()
-            return result_dict
-        else:
-            raise ValueError(
-                "No matches found after '[Output]:' marker. "
-                "Please check the format of the response."
-            )
+        res = json.loads(response)
+        result_dict = {}
+        result_dict['score_of_assistant_a'] = res['score of assistant a']
+        result_dict['score_of_assistant_b'] = res['score of assistant b']
+        result_dict['explanation_of_assistant_a'] = res['explanation of assistant a']
+        result_dict['explanation_of_assistant_b'] = res['explanation of assistant b']
+        return result_dict
 
 
 class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
@@ -1049,27 +1038,4 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
 
         return res_df
 
-    def extract_score_explanation(self, response) -> Dict[str, Any]:
-        """
-        Extract the score and the explanation from the response
-        :param response: the response to extract the score and the explanation from
-        :return: the score and the explanation
-        """
-        # Adjusted pattern to match the text format and separate lines
-        pattern = r"""score of assistant (a|b)": (\d+),\s*"explanation of assistant \1": "(.*?)"""
-        matches = re.findall(pattern, response, re.DOTALL)
 
-        if matches:
-            result_dict = {}
-            for match in matches:
-                assistant, score, explanation = match
-                result_dict[f"score_of_assistant_{assistant}".lower()] = int(score)
-                result_dict[
-                    f"explanation_of_assistant_{assistant}".lower()
-                ] = explanation.strip()
-            return result_dict
-        else:
-            raise ValueError(
-                "No matches found after '[Output]:' marker. "
-                "Please check the format of the response."
-            )

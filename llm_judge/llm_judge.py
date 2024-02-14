@@ -796,9 +796,9 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         "name",
         "model_judge",
         "model_judge_config",
-        "model_judge_infer_config",
         "prompt_template",
         "prompt_config",
+        "model_judge_infer_config",
     ]
     kind = "OPENAI_judge_single_grading"
 
@@ -807,9 +807,9 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         name: str,
         model_judge: str,
         model_judge_config: Dict[str, Any],
-        model_judge_infer_config: Dict[str, Any],
         prompt_template: str,
         prompt_config: Dict[str, str],
+        model_judge_infer_config: Dict[str, Any] = None,
     ):
         """
         init the grading with reference class

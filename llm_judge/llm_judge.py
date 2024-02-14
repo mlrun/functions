@@ -185,51 +185,6 @@ def open_mpi_handler(
 
     return decorator
 
-
-# The following class is used to compute the metrics of NLP. for example, BLEU, ROUGE, METEOR, etc.
-class LLMEvaluateMetric(ModelObj):
-    """
-    Base class of the metrics that computed by evluate package
-    We need the y_true as the reference and y_pred as the prediction to compute the metrics
-    """
-
-    _dict_fields = ["name"]
-    kind = "llm_evaluate_metric"
-    default_name: ClassVar[str] = "llm_metric"
-
-    def __init__(self, name: str):
-        """
-        These metrics are used to evaluate the model performance on a given dataset
-        and the algorithm is implemented in the evaluate library
-        :param name: name of the metric
-        """
-        try:
-            import evaluate
-        except ImportError:
-            raise ImportError(
-                "evaluate library is not installed. Please install it using pip install evaluate"
-            )
-        self.name = name or self.default_name
-        self.metric = evaluate.load(name)
-
-    def compute_over_data(
-        self, predictions: Union[List, Dict], references: Union[List, Dict], **kwargs
-    ) -> Dict[str, Any]:
-        """
-        Compute the metrics over the given data
-        :param predictions: the predictions to compute the metrics over
-        :param references: the references to compute the metrics over
-        :param kwargs: other arguments to pass to the compute function
-        :return: the metrics score and the explanation
-        """
-        if kwargs:
-            return self.metric.compute(
-                predictions=predictions, references=references, **kwargs
-            )
-        logger.info(f"Computing the metrics score of {self.name}")
-        return self.metric.compute(predictions=predictions, references=references)
-
-
 class LLMJudgeBaseMetric(ModelObj, ABC):
     """
     Base class of the metrics that computed by LLM as a judge

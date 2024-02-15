@@ -24,11 +24,6 @@ from llm_judge import (
     OPENAIJudgePairwiseGrading,
     OPENAIJudgeReferenceGrading,
 )
-from llm_judge import (
-    PAIR_GRADE_PROMPT,
-    REF_GRADE_PROMPT,
-    SINGLE_GRADE_PROMPT,
-)
 from mlrun.utils import logger
 
 JUDGE_MODEL = "TheBloke/Mistral-7B-OpenOrca-GPTQ"
@@ -101,7 +96,6 @@ def prompt_fixture():
 
 
 def test_single_grading_score(prompt_fixture):
-    prompt_template = SINGLE_GRADE_PROMPT
     prompt_config = prompt_fixture
     q1 = "What is the capital of China?"
     a1 = "The capital of China is Kongfu"
@@ -116,7 +110,6 @@ def test_single_grading_score(prompt_fixture):
         model_judge=JUDGE_MODEL,
         model_judge_config=JUDGE_CONFIG,
         model_judge_infer_config=JUDGE_INFER_CONFIG,
-        prompt_template=prompt_template,
         prompt_config=prompt_config,
         tokenizer_judge_config=TOKENIZER_JUDGE_CONFIG,
     )
@@ -127,7 +120,6 @@ def test_single_grading_score(prompt_fixture):
 
 
 def test_pairwise_grading_scores(prompt_fixture):
-    prompt_template = PAIR_GRADE_PROMPT
     prompt_config = prompt_fixture
 
     metric = LLMJudgePairwiseGrading(
@@ -140,7 +132,6 @@ def test_pairwise_grading_scores(prompt_fixture):
         model_bench_mark_config=BENCHMARK_CONFIG,
         model_bench_mark_infer_config=BENCHMARK_INFER_CONFIG,
         tokenizer_bench_mark_config=TOKENIZER_BENCHMARK_CONFIG,
-        prompt_template=prompt_template,
         prompt_config=prompt_config,
     )
 
@@ -158,7 +149,6 @@ def test_pairwise_grading_scores(prompt_fixture):
 
 
 def test_reference_grading_scores(prompt_fixture):
-    prompt_template = REF_GRADE_PROMPT
     prompt_config = prompt_fixture
 
     metric = LLMJudgeReferenceGrading(
@@ -171,7 +161,6 @@ def test_reference_grading_scores(prompt_fixture):
         model_bench_mark_config=BENCHMARK_CONFIG,
         model_bench_mark_infer_config=BENCHMARK_INFER_CONFIG,
         tokenizer_bench_mark_config=TOKENIZER_BENCHMARK_CONFIG,
-        prompt_template=prompt_template,
         prompt_config=prompt_config,
     )
 
@@ -218,7 +207,6 @@ def test_openai_single_grading_score(prompt_fixture):
 
 
 def test_openai_pairwise_grading_scores(prompt_fixture):
-    prompt_template = PAIR_GRADE_PROMPT
     prompt_config = prompt_fixture
 
     metric = OPENAIJudgePairwiseGrading(
@@ -229,7 +217,6 @@ def test_openai_pairwise_grading_scores(prompt_fixture):
         model_bench_mark_config=BENCHMARK_CONFIG,
         model_bench_mark_infer_config=BENCHMARK_INFER_CONFIG,
         tokenizer_bench_mark_config=TOKENIZER_BENCHMARK_CONFIG,
-        prompt_template=prompt_template,
         prompt_config=prompt_config,
     )
 
@@ -247,7 +234,6 @@ def test_openai_pairwise_grading_scores(prompt_fixture):
 
 
 def test_openai_reference_grading_scores(prompt_fixture):
-    prompt_template = REF_GRADE_PROMPT
     prompt_config = prompt_fixture
 
     metric = OPENAIJudgeReferenceGrading(
@@ -258,7 +244,6 @@ def test_openai_reference_grading_scores(prompt_fixture):
         model_bench_mark_config=BENCHMARK_CONFIG,
         model_bench_mark_infer_config=BENCHMARK_INFER_CONFIG,
         tokenizer_bench_mark_config=TOKENIZER_BENCHMARK_CONFIG,
-        prompt_template=prompt_template,
         prompt_config=prompt_config,
     )
 

@@ -295,9 +295,9 @@ class LLMJudgeSingleGrading(LLMJudgeBaseMetric):
         "model_judge",
         "model_judge_config",
         "model_judge_infer_config",
-        "prompt_template",
         "prompt_config",
         "tokenizer_judge_config",
+        "prompt_template",
     ]
     kind = "llm_judge_single_grading"
 
@@ -307,8 +307,8 @@ class LLMJudgeSingleGrading(LLMJudgeBaseMetric):
         model_judge: str,
         model_judge_config: Dict[str, Any],
         model_judge_infer_config: Dict[str, Any],
-        prompt_template: str,
         prompt_config: Dict[str, Any],
+        prompt_template: str = SINGLE_GRADE_PROMPT,
         tokenizer_judge_config: Dict[str, Any] = None,
     ):
         """
@@ -445,8 +445,8 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         model_bench_mark_config: Dict[str, Any],
         model_bench_mark_infer_config: Dict[str, Any],
         tokenizer_bench_mark_config: Dict[str, Any],
-        prompt_template: str,
         prompt_config: Dict[str, Any],
+        prompt_template: str = PAIR_GRADE_PROMPT,
         tokenizer_judge_config: Dict[str, Any] = None,
         model_judge_infer_config: Dict[str, Any] = None,
     ):
@@ -659,8 +659,8 @@ class LLMJudgeReferenceGrading(LLMJudgePairwiseGrading):
         model_bench_mark_config: Dict[str, Any],
         tokenizer_bench_mark_config: Dict[str, Any],
         model_bench_mark_infer_config: Dict[str, Any],
-        prompt_template: str,
         prompt_config: Dict[str, str],
+        prompt_template: str = REF_GRADE_PROMPT,
     ):
         """
         init the grading with reference class
@@ -684,8 +684,8 @@ class LLMJudgeReferenceGrading(LLMJudgePairwiseGrading):
             model_bench_mark_config,
             model_bench_mark_infer_config,
             tokenizer_bench_mark_config,
-            prompt_template,
             prompt_config,
+            prompt_template,
             tokenizer_judge_config,
             model_judge_infer_config,
         )
@@ -764,8 +764,8 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         name: str,
         model_judge: str,
         model_judge_config: Dict[str, Any],
-        prompt_template: str,
         prompt_config: Dict[str, str],
+        prompt_template: str = SINGLE_GRADE_PROMPT,
         model_judge_infer_config: Dict[str, Any] = None,
     ):
         """
@@ -782,8 +782,8 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
             model_judge,
             model_judge_config,
             model_judge_infer_config,
-            prompt_template,
             prompt_config,
+            prompt_template,
         )
 
     def _prepare_judge(self) -> None:
@@ -859,9 +859,9 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         model_bench_mark_config: Dict[str, Any],
         model_bench_mark_infer_config: Dict[str, Any],
         tokenizer_bench_mark_config: Dict[str, Any],
-        prompt_template: str,
         prompt_config: Dict[str, str],
         model_judge_infer_config: Dict[str, Any] = None,
+        prompt_template: str = PAIR_GRADE_PROMPT,
     ):
         """
         init the grading with reference class
@@ -880,8 +880,8 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
             model_bench_mark_config,
             model_bench_mark_infer_config,
             tokenizer_bench_mark_config,
-            prompt_template,
             prompt_config,
+            prompt_template,
             model_judge_infer_config,
         )
 
@@ -982,8 +982,8 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         model_bench_mark_config: Dict[str, Any],
         tokenizer_bench_mark_config: Dict[str, Any],
         model_bench_mark_infer_config: Dict[str, Any],
-        prompt_template: str,
         prompt_config: Dict[str, str],
+        prompt_template: str = REF_GRADE_PROMPT,
         model_judge_infer_config: Dict[str, Any] = None,
     ):
         """
@@ -1007,8 +1007,9 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
             model_bench_mark_config,
             model_bench_mark_infer_config,
             tokenizer_bench_mark_config,
-            prompt_template,
             prompt_config,
+            model_judge_infer_config,
+            prompt_template,
         )
 
     def _compute_over_one_data(self, question, response, reference) -> Dict[str, Any]:
@@ -1066,22 +1067,23 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
 
 
 MetricsType_dic = {
-        "LLMJudgeSingleGrading" : LLMJudgeSingleGrading,
-        "LLMJudgePairwiseGrading" : LLMJudgePairwiseGrading, 
-        "LLMJudgeReferenceGrading" : LLMJudgeReferenceGrading,
-        "OPENAIJudgeSingleGrading" : OPENAIJudgeSingleGrading,
-        "OPENAIJudgePairwiseGrading": OPENAIJudgePairwiseGrading,
-        "OPENAIJudgeReferenceGrading": OPENAIJudgeReferenceGrading
-        }
+    "LLMJudgeSingleGrading": LLMJudgeSingleGrading,
+    "LLMJudgePairwiseGrading": LLMJudgePairwiseGrading,
+    "LLMJudgeReferenceGrading": LLMJudgeReferenceGrading,
+    "OPENAIJudgeSingleGrading": OPENAIJudgeSingleGrading,
+    "OPENAIJudgePairwiseGrading": OPENAIJudgePairwiseGrading,
+    "OPENAIJudgeReferenceGrading": OPENAIJudgeReferenceGrading,
+}
 
-MetricsType=TypeVar("MetricsType", 
-        LLMJudgeSingleGrading,
-        LLMJudgePairwiseGrading, 
-        LLMJudgeReferenceGrading,
-        OPENAIJudgeSingleGrading,
-        OPENAIJudgePairwiseGrading,
-        OPENAIJudgeReferenceGrading
-        )
+MetricsType = TypeVar(
+    "MetricsType",
+    LLMJudgeSingleGrading,
+    LLMJudgePairwiseGrading,
+    LLMJudgeReferenceGrading,
+    OPENAIJudgeSingleGrading,
+    OPENAIJudgePairwiseGrading,
+    OPENAIJudgeReferenceGrading,
+)
 
 
 def _get_metrics(

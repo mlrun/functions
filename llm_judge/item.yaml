@@ -21,19 +21,18 @@ spec:
   image: mlrun/mlrun
   kind: job
   requirements:
-          -pytest==5.2.0
-          -evaluate
-          -pandas
-          -openai
-          -mlrun==1.4.0
-          -auto-gptq
-          -openmpi
-          -mpi4py
-          -transformers
-          -torch=2.0.0
-          -accelerate
-          -einops
-          -optimum
+    - pytest==5.2.0
+    - pandas
+    - openai
+    - mlrun==1.4.0
+    - auto-gptq
+    - openmpi
+    - mpi4py
+    - transformers
+    - torch=2.0.0
+    - accelerate
+    - einops
+    - optimum
 url: ''
 version: 0.2.0
 test_valid: False

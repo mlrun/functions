@@ -113,7 +113,7 @@ def test_single_grading_score(prompt_fixture):
         prompt_config=prompt_config,
         tokenizer_judge_config=TOKENIZER_JUDGE_CONFIG,
     )
-    result = single_grading.compute_over_data(sample_df)
+    result = single_grading._compute_over_data(sample_df)
 
     logger.info(f"result: {result}")
     assert all(0 <= score <= 5 for score in result["score"])
@@ -142,7 +142,7 @@ def test_pairwise_grading_scores(prompt_fixture):
     a2 = "The capital of France is Paris"
 
     sample_df = pd.DataFrame({"question": [q1, q2], "answer": [a1, a2]})
-    result = metric.compute_over_data(sample_df)
+    result = metric._compute_over_data(sample_df)
     logger.info(f"result: {result}")
     assert all(0 <= score <= 5 for score in result["score_of_assistant_a"].to_list())
     assert all(0 <= score <= 5 for score in result["score_of_assistant_b"].to_list())
@@ -176,7 +176,7 @@ def test_reference_grading_scores(prompt_fixture):
         {"question": [q1, q2], "answer": [a1, a2], "reference": [ref1, ref2]}
     )
 
-    result = metric.compute_over_data(sample_df)
+    result = metric._compute_over_data(sample_df)
     logger.info(f"result: {result}")
     assert all(0 <= score <= 5 for score in result["score_of_assistant_a"].to_list())
     assert all(0 <= score <= 5 for score in result["score_of_assistant_b"].to_list())
@@ -200,7 +200,7 @@ def test_openai_single_grading_score(prompt_fixture):
         prompt_template=prompt_template,
         prompt_config=prompt_config,
     )
-    result = single_grading.compute_over_data(sample_df)
+    result = single_grading._compute_over_data(sample_df)
 
     logger.info(f"result: {result}")
     assert all(0 <= score <= 5 for score in result["score"])
@@ -227,7 +227,7 @@ def test_openai_pairwise_grading_scores(prompt_fixture):
     a2 = "The capital of France is Paris"
 
     sample_df = pd.DataFrame({"question": [q1, q2], "answer": [a1, a2]})
-    result = metric.compute_over_data(sample_df)
+    result = metric._compute_over_data(sample_df)
     logger.info(f"result: {result}")
     assert all(0 <= score <= 5 for score in result["score_of_assistant_a"].to_list())
     assert all(0 <= score <= 5 for score in result["score_of_assistant_b"].to_list())
@@ -259,7 +259,7 @@ def test_openai_reference_grading_scores(prompt_fixture):
         {"question": [q1, q2], "answer": [a1, a2], "reference": [ref1, ref2]}
     )
 
-    result = metric.compute_over_data(sample_df)
+    result = metric._compute_over_data(sample_df)
     logger.info(f"result: {result}")
     assert all(0 <= score <= 5 for score in result["score_of_assistant_a"].to_list())
     assert all(0 <= score <= 5 for score in result["score_of_assistant_b"].to_list())

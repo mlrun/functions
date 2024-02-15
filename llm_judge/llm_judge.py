@@ -907,7 +907,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         self.prompt_config["answerB"] = self._compute_bench_mark_response(question)
         prompt = self._fill_prompt()
         res = self.model.chat.completions.create(
-            model=self.model_judge, messages=[{"role": "user", "content": prompt}]
+            model=self.model_judge, messages=[{"role": "user", "content": prompt}],
         )
         res_dic = self._extract_score_explanation(res.choices[0].message.content)
         res_dic["answerB"] = self.prompt_config["answerB"]
@@ -933,7 +933,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
             return result_dict
         except Exception as e:
             # Adjusted pattern to match the text format and separate lines
-            pattern = r"- score of assistant ([abAB]): (\d)\s*- explanation of assistant \1: (.*?)\s*(?=- score of assistant|$)"
+            pattern = r"-?\s?score of assistant ([a-zA-Z]+): (\d+).*?-?\s?explanation of assistant [a-zA-Z]+: (.*?)(?=-?\s?score of assistant [a-zA-Z]+:|$)"
             matches = re.findall(pattern, response, re.DOTALL)
 
             if matches:

@@ -183,7 +183,6 @@ def test_reference_grading_scores(prompt_fixture):
 
 
 def test_openai_single_grading_score(prompt_fixture):
-    prompt_template = SINGLE_GRADE_PROMPT
     prompt_config = prompt_fixture
     q1 = "What is the capital of China?"
     a1 = "The capital of China is Kongfu"
@@ -197,7 +196,6 @@ def test_openai_single_grading_score(prompt_fixture):
         name="accuracy_metrics",
         model_judge=OPENAI_MODEL,
         model_judge_config=OPENAI_JUDGE_CONFIG,
-        prompt_template=prompt_template,
         prompt_config=prompt_config,
     )
     result = single_grading._compute_over_data(sample_df)

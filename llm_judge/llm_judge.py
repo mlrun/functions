@@ -1065,11 +1065,27 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         return res_df
 
 
-MetricsType = TypeVar("MetricsType")
+MetricsType_dic = {
+        "LLMJudgeSingleGrading" : LLMJudgeSingleGrading,
+        "LLMJudgePairwiseGrading" : LLMJudgePairwiseGrading, 
+        "LLMJudgeReferenceGrading" : LLMJudgeReferenceGrading,
+        "OPENAIJudgeSingleGrading" : OPENAIJudgeSingleGrading,
+        "OPENAIJudgePairwiseGrading": OPENAIJudgePairwiseGrading,
+        "OPENAIJudgeReferenceGrading": OPENAIJudgeReferenceGrading
+        }
+
+MetricsType=TypeVar("MetricsType", 
+        LLMJudgeSingleGrading,
+        LLMJudgePairwiseGrading, 
+        LLMJudgeReferenceGrading,
+        OPENAIJudgeSingleGrading,
+        OPENAIJudgePairwiseGrading,
+        OPENAIJudgeReferenceGrading
+        )
 
 
 def _get_metrics(
-    metric_type: Type[MetricsType],
+    metric_type: str,
     **kwargs: Any,
 ) -> MetricsType:
     """
@@ -1078,7 +1094,7 @@ def _get_metrics(
     :param kwargs: the config of the metric
     :returns: the metric obj
     """
-    return metric_type(**kwargs)
+    return MetricsType_dic[metric_type](**kwargs)
 
 
 def llm_judge(

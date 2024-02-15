@@ -240,7 +240,7 @@ class LLMJudgeBaseMetric(ModelObj, ABC):
         Fill the prompt template with the prompt config
         :param prompt_template: the prompt template to fill
         :param prompt_config: the prompt config to fill the template with
-        :return: the filled prompt
+        :returns: the filled prompt
         """
         logger.info("Filling the prompt template with the prompt config")
         return self.prompt_template.format(**self.prompt_config)
@@ -258,7 +258,7 @@ class LLMJudgeBaseMetric(ModelObj, ABC):
         Compute the metrics over one data point
         :param question: the question to compute the metrics over
         :param response: the response to compute the metrics over
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         pass
 
@@ -270,7 +270,7 @@ class LLMJudgeBaseMetric(ModelObj, ABC):
         Compute the metrics over one data point
         :param question: the question to compute the metrics over
         :param response: the response to compute the metrics over
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         pass
 
@@ -279,7 +279,7 @@ class LLMJudgeBaseMetric(ModelObj, ABC):
         """
         Abstract the store of the result
         :param result: the result text
-        :return: the stored result
+        :returns: the stored result
         """
         pass
 
@@ -348,7 +348,7 @@ class LLMJudgeSingleGrading(LLMJudgeBaseMetric):
         Compute the metrics over one data point
         :param question: the question to compute the metrics over
         :param response: the response to compute the metrics over
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         logger.info(
             f"Computing the metrics over one data point with {question} and {response}"
@@ -376,7 +376,7 @@ class LLMJudgeSingleGrading(LLMJudgeBaseMetric):
         Compute the metrics over all data
         :param sample_df: the sample dataframe
         :param train_df: the train dataframe
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         self.prepare_judge()
         res_df = pd.DataFrame(columns=["question", "answer", "score", "explanation"])
@@ -399,7 +399,7 @@ class LLMJudgeSingleGrading(LLMJudgeBaseMetric):
         """
         Abstract the store of the result
         :param result: the result to store
-        :return: the stored result
+        :returns: the stored result
         """
         logger.info(f"Extracting the score and explanation from {result}")
         score_pattern = r"\bscore:\s*(\d+)\b"
@@ -506,7 +506,7 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         """
         Compute the response of the bench mark model
         :param question: the question to ask the model
-        :return: the response
+        :returns: the response
         """
         logger.info(f"Computing the bench mark response for {question}")
         input_ids = self.tokenizer_bench_mark(question, return_tensors="pt").input_ids
@@ -529,7 +529,7 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         """
         Compute the metrics over one data point
         :param kwargs: the data to compute the metrics over
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         logger.info(f"Computing the metrics over {question} and {response}")
         self.prompt_config["question"] = question
@@ -559,7 +559,7 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         Compute the metrics over all data
         :param sample_df: the sample dataframe
         :param train_df: the train dataframe
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         self.prepare_judge()
         self.prepare_bench_mark_model()
@@ -596,7 +596,7 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         """
         Extract the score and the explanation from the response
         :param response: the response to extract the score and the explanation from
-        :return: the score and the explanation
+        :returns: the score and the explanation
         """
         # Find the position of the "[Output]:" marker
         output_marker_index = response.find("[Output]:")
@@ -694,7 +694,7 @@ class LLMJudgeReferenceGrading(LLMJudgePairwiseGrading):
         """
         Compute the metrics over one data point
         :param kwargs: the data to compute the metrics over
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         self.prompt_config["reference"] = reference
         res_dic = super().compute_over_one_data(question, response)
@@ -707,7 +707,7 @@ class LLMJudgeReferenceGrading(LLMJudgePairwiseGrading):
         """
         Compute the metrics over a dataset
         :param sample_df: the data to compute the metrics over
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         self.prepare_judge()
         self.prepare_bench_mark_model()
@@ -800,7 +800,7 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         """
         Abstract the store of the result
         :param result: the result to store
-        :return: the stored result
+        :returns: the stored result
         """
         logger.info(f"Extracting the score and explanation from {result}")
         score_pattern = r'"score":\s*(\d+)'
@@ -818,7 +818,7 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         """
         Compute the metrics over one data point
         :param kwargs: the data to compute the metrics over
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         logger.info(f"Compute the metrics over one data point using openAI's model")
         self.prompt_config["answer"] = response
@@ -899,7 +899,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         """
         Compute the metrics over one data point
         :param kwargs: the data to compute the metrics over
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         logger.info(f"Computing the metrics over {question} and {response}")
         self.prompt_config["question"] = question
@@ -917,7 +917,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         """
         Extract the score and the explanation from the response
         :param response: the response to extract the score and the explanation from
-        :return: the score and the explanation
+        :returns: the score and the explanation
         """
         try:
             res = json.loads(response)
@@ -1015,7 +1015,7 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         """
         Compute the metrics over one data point
         :param kwargs: the data to compute the metrics over
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         self.prompt_config["reference"] = reference
         res_dic = super().compute_over_one_data(question, response)
@@ -1028,7 +1028,7 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         """
         Compute the metrics over a dataset
         :param sample_df: the data to compute the metrics over
-        :return: the metrics score and the explanation
+        :returns: the metrics score and the explanation
         """
         self.prepare_judge()
         self.prepare_bench_mark_model()
@@ -1076,7 +1076,7 @@ def _get_metrics(
     Init the metric class based on different type of metrics
     :param metric_type: the type of the metric
     :param kwargs: the config of the metric
-    :return: the metric obj
+    :returns: the metric obj
     """
     return metric_type(**kwargs)
 
@@ -1087,9 +1087,11 @@ def llm_judge(
 ) -> pd.DataFrame:
     """
     Compute the metrics over a dataset
+
     :param input_path: the path to the input data
     :param kwargs: the config of the metric
-    :return: the metrics score and the explanation
+
+    :returns: the metrics score and the explanation
     """
     metric = _get_metrics(**kwargs)
     sample_df = pd.read_csv(input_path)

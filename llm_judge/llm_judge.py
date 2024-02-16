@@ -763,10 +763,10 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         self,
         name: str,
         model_judge: str,
-        model_judge_config: Dict[str, Any],
         prompt_config: Dict[str, str],
         prompt_template: str = SINGLE_GRADE_PROMPT,
         model_judge_infer_config: Dict[str, Any] = None,
+        model_judge_config: Dict[str, Any] = None,
     ):
         """
         init the grading with reference class
@@ -791,6 +791,19 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         Prepare the judge model
         """
         logger.info("Prepare the openAI model as judge")
+
+        if not self.model_judge_config:
+            import os
+            from dotenv import load_dotenv
+            load_dotenv()
+            api_key = os.getenv("OPENAI_API_KEY")
+            base_url = os.getenv("OPENAI_API_BASE")
+            OPENAI_JUDGE_CONFIG = {
+                "api_key": api_key,
+                "base_url": base_url,
+            }
+            self.model_judge_config = OPENAI_JUDGE_CONFIG
+
         self.model = openai.OpenAI(
             api_key=self.model_judge_config["api_key"],
             base_url=self.model_judge_config["base_url"],
@@ -854,12 +867,12 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         self,
         name: str,
         model_judge: str,
-        model_judge_config: Dict[str, Any],
         model_bench_mark: str,
         model_bench_mark_config: Dict[str, Any],
         model_bench_mark_infer_config: Dict[str, Any],
         tokenizer_bench_mark_config: Dict[str, Any],
         prompt_config: Dict[str, str],
+        model_judge_config: Dict[str, Any] = None,
         model_judge_infer_config: Dict[str, Any] = None,
         prompt_template: str = PAIR_GRADE_PROMPT,
     ):
@@ -890,6 +903,17 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         Prepare the judge model
         """
         logger.info("Prepare the openAI model as judge")
+        if not self.model_judge_config:
+            import os
+            from dotenv import load_dotenv
+            load_dotenv()
+            api_key = os.getenv("OPENAI_API_KEY")
+            base_url = os.getenv("OPENAI_API_BASE")
+            OPENAI_JUDGE_CONFIG = {
+                "api_key": api_key,
+                "base_url": base_url,
+            }
+            self.model_judge_config = OPENAI_JUDGE_CONFIG
         self.model = openai.OpenAI(
             api_key=self.model_judge_config["api_key"],
             base_url=self.model_judge_config["base_url"],
@@ -977,12 +1001,12 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         self,
         name: str,
         model_judge: str,
-        model_judge_config: Dict[str, Any],
         model_bench_mark: str,
         model_bench_mark_config: Dict[str, Any],
         tokenizer_bench_mark_config: Dict[str, Any],
         model_bench_mark_infer_config: Dict[str, Any],
         prompt_config: Dict[str, str],
+        model_judge_config: Dict[str, Any]=None,
         prompt_template: str = REF_GRADE_PROMPT,
         model_judge_infer_config: Dict[str, Any] = None,
     ):
@@ -1002,12 +1026,12 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         super().__init__(
             name,
             model_judge,
-            model_judge_config,
             model_bench_mark,
             model_bench_mark_config,
             model_bench_mark_infer_config,
             tokenizer_bench_mark_config,
             prompt_config,
+            model_judge_config,
             model_judge_infer_config,
             prompt_template,
         )

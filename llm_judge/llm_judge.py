@@ -263,13 +263,10 @@ class LLMJudgeBaseMetric(ModelObj, ABC):
         pass
 
     @abstractmethod
-    def _compute_over_data(
-        self, sample_df: pd.DataFrame, train_df: pd.DataFrame = None
-    ) -> Dict[str, Any]:
+    def _compute_over_data(self, sample_df: pd.DataFrame) -> Dict[str, Any]:
         """
         Compute the metrics over one data point
-        :param question: the question to compute the metrics over
-        :param response: the response to compute the metrics over
+        :param sample_df: the sample dataframe to compute the metrics over
         :returns: the metrics score and the explanation
         """
         pass
@@ -370,12 +367,12 @@ class LLMJudgeSingleGrading(LLMJudgeBaseMetric):
 
     @_open_mpi_handler(worker_inputs="sample_df")
     def _compute_over_data(
-        self, sample_df: pd.DataFrame, train_df: pd.DataFrame = None
-    ) -> Dict[str, Any]:
+        self,
+        sample_df: pd.DataFrame,
+    ) -> pd.DataFrame:
         """
         Compute the metrics over all data
         :param sample_df: the sample dataframe
-        :param train_df: the train dataframe
         :returns: the metrics score and the explanation
         """
         self._prepare_judge()
@@ -553,12 +550,12 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
 
     @_open_mpi_handler(worker_inputs="sample_df")
     def _compute_over_data(
-        self, sample_df: pd.DataFrame, train_df: pd.DataFrame = None
-    ) -> Dict[str, Any]:
+        self,
+        sample_df: pd.DataFrame,
+    ) -> pd.DataFrame:
         """
         Compute the metrics over all data
         :param sample_df: the sample dataframe
-        :param train_df: the train dataframe
         :returns: the metrics score and the explanation
         """
         self._prepare_judge()
@@ -702,46 +699,17 @@ class LLMJudgeReferenceGrading(LLMJudgePairwiseGrading):
 
     @_open_mpi_handler(worker_inputs="sample_df")
     def _compute_over_data(
-        self, sample_df: pd.DataFrame, train_df: pd.DataFrame = None
+        self,
+        sample_df: pd.DataFrame,
     ) -> pd.DataFrame:
         """
         Compute the metrics over a dataset
         :param sample_df: the data to compute the metrics over
         :returns: the metrics score and the explanation
         """
-        self._prepare_judge()
-        self._prepare_bench_mark_model()
-        res_df = pd.DataFrame(
-            columns=[
-                "question",
-                "answerA",
-                "answerB",
-                "reference",
-                "score_of_assistant_a",
-                "explanation_of_assistant_a",
-                "score_of_assistant_b",
-                "explanation_of_assistant_b",
-            ]
-        )
-
-        for i in range(len(sample_df)):
-            res_dic = self._compute_over_one_data(
-                sample_df.loc[i, "question"],
-                sample_df.loc[i, "answer"],
-                sample_df.loc[i, "reference"],
-            )
-            res_df.loc[i] = [
-                sample_df.loc[i, "question"],
-                sample_df.loc[i, "answer"],
-                sample_df.loc[i, "reference"],
-                res_dic["answerB"],
-                res_dic["score_of_assistant_a"],
-                res_dic["explanation_of_assistant_a"],
-                res_dic["score_of_assistant_b"],
-                res_dic["explanation_of_assistant_b"],
-            ]
-
-        return res_df
+        df = super()._compute_over_data(self, sample_df)
+        df["reference"] = sample_df["reference"]
+        return df
 
 
 class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
@@ -795,6 +763,7 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         if not self.model_judge_config:
             import os
             from dotenv import load_dotenv
+
             load_dotenv()
             api_key = os.getenv("OPENAI_API_KEY")
             base_url = os.getenv("OPENAI_API_BASE")
@@ -906,6 +875,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         if not self.model_judge_config:
             import os
             from dotenv import load_dotenv
+
             load_dotenv()
             api_key = os.getenv("OPENAI_API_KEY")
             base_url = os.getenv("OPENAI_API_BASE")
@@ -931,7 +901,8 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         self.prompt_config["answerB"] = self._compute_bench_mark_response(question)
         prompt = self._fill_prompt()
         res = self.model.chat.completions.create(
-            model=self.model_judge, messages=[{"role": "user", "content": prompt}],
+            model=self.model_judge,
+            messages=[{"role": "user", "content": prompt}],
         )
         res_dic = self._extract_score_explanation(res.choices[0].message.content)
         res_dic["answerB"] = self.prompt_config["answerB"]
@@ -976,7 +947,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
                 )
 
 
-class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
+class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading, LLMJudgeReferenceGrading):
     """
     OPENAI Judge Reference Grading class
     you need to give the name of the metrics, give the grading rubric and the bench mark model to use
@@ -1006,7 +977,7 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         tokenizer_bench_mark_config: Dict[str, Any],
         model_bench_mark_infer_config: Dict[str, Any],
         prompt_config: Dict[str, str],
-        model_judge_config: Dict[str, Any]=None,
+        model_judge_config: Dict[str, Any] = None,
         prompt_template: str = REF_GRADE_PROMPT,
         model_judge_infer_config: Dict[str, Any] = None,
     ):
@@ -1047,47 +1018,13 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
         return res_dic
 
     @_open_mpi_handler(worker_inputs="sample_df")
-    def _compute_over_data(
-        self, sample_df: pd.DataFrame, train_df: pd.DataFrame = None
-    ) -> pd.DataFrame:
+    def _compute_over_data(self, sample_df: pd.DataFrame) -> pd.DataFrame:
         """
         Compute the metrics over a dataset
         :param sample_df: the data to compute the metrics over
         :returns: the metrics score and the explanation
         """
-        self._prepare_judge()
-        self._prepare_bench_mark_model()
-        res_df = pd.DataFrame(
-            columns=[
-                "question",
-                "answerA",
-                "answerB",
-                "reference",
-                "score_of_assistant_a",
-                "explanation_of_assistant_a",
-                "score_of_assistant_b",
-                "explanation_of_assistant_b",
-            ]
-        )
-
-        for i in range(len(sample_df)):
-            res_dic = self._compute_over_one_data(
-                sample_df.loc[i, "question"],
-                sample_df.loc[i, "answer"],
-                sample_df.loc[i, "reference"],
-            )
-            res_df.loc[i] = [
-                sample_df.loc[i, "question"],
-                sample_df.loc[i, "answer"],
-                sample_df.loc[i, "reference"],
-                res_dic["answerB"],
-                res_dic["score_of_assistant_a"],
-                res_dic["explanation_of_assistant_a"],
-                res_dic["score_of_assistant_b"],
-                res_dic["explanation_of_assistant_b"],
-            ]
-
-        return res_df
+        return LLMReferenceGrading._compute_over_data(self, sample_df)
 
 
 MetricsType_dic = {

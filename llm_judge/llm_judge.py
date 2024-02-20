@@ -687,16 +687,6 @@ class LLMJudgeReferenceGrading(LLMJudgePairwiseGrading):
             model_judge_infer_config,
         )
 
-    def _compute_over_one_data(self, question, response, reference) -> Dict[str, Any]:
-        """
-        Compute the metrics over one data point
-        :param kwargs: the data to compute the metrics over
-        :returns: the metrics score and the explanation
-        """
-        self.prompt_config["reference"] = reference
-        res_dic = super()._compute_over_one_data(question, response)
-        return res_dic
-
     @_open_mpi_handler(worker_inputs="sample_df")
     def _compute_over_data(
         self,

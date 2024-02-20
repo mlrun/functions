@@ -16,8 +16,7 @@
 import re
 from abc import ABC, abstractmethod
 from functools import wraps
-from typing import Any, ClassVar, Dict, List, Tuple, Union, Type, TypeVar, Callable
-from enum import Enum
+from typing import Any, ClassVar, Dict, Tuple, Union, TypeVar
 import mpi4py
 import pandas as pd
 import transformers
@@ -522,7 +521,9 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
 
         return response
 
-    def _compute_over_one_data(self, question, response, reference=None) -> Dict[str, Any]:
+    def _compute_over_one_data(
+        self, question, response, reference=None
+    ) -> Dict[str, Any]:
         """
         Compute the metrics over one data point
         :param question
@@ -583,9 +584,7 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
                 ref = None
 
             res_dic = self._compute_over_one_data(
-                sample_df.loc[i, "question"],
-                sample_df.loc[i, "answer"],
-                ref
+                sample_df.loc[i, "question"], sample_df.loc[i, "answer"], ref
             )
             res_df.loc[i] = [
                 sample_df.loc[i, "question"],
@@ -802,7 +801,7 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         :param kwargs: the data to compute the metrics over
         :returns: the metrics score and the explanation
         """
-        logger.info(f"Compute the metrics over one data point using openAI's model")
+        logger.info("Compute the metrics over one data point using openAI's model")
         self.prompt_config["answer"] = response
         self.prompt_config["question"] = question
         prompt = self._fill_prompt()
@@ -926,7 +925,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
                 "explanation of assistant b"
             ]
             return result_dict
-        except Exception as e:
+        except Exception:
             # Adjusted pattern to match the text format and separate lines
             pattern = r"-?\s?score of assistant ([a-zA-Z]+): (\d+).*?-?\s?explanation of assistant [a-zA-Z]+: (.*?)(?=-?\s?score of assistant [a-zA-Z]+:|$)"
             matches = re.findall(pattern, response, re.DOTALL)

@@ -784,8 +784,8 @@ class OPENAIJudgeSingleGrading(LLMJudgeSingleGrading):
         :returns: the stored result
         """
         logger.info(f"Extracting the score and explanation from {result}")
-        score_pattern = r'"score":\s*(\d+)'
-        explanation_pattern = r'"explanation":\s*"([^"]+)"'
+        score_pattern = r'[sS]core:\s*(\d+)'
+        explanation_pattern = r'[eE]xplanation:\s*"([^"]+)"'
 
         score_match = re.search(score_pattern, result)
         score = int(score_match.group(1)) if score_match else None
@@ -888,7 +888,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
             base_url=self.model_judge_config["base_url"],
         )
 
-    def _compute_over_one_data(self, question, response) -> Dict[str, Any]:
+    def _compute_over_one_data(self, question, response, reference=None) -> Dict[str, Any]:
         """
         Compute the metrics over one data point
         :param kwargs: the data to compute the metrics over
@@ -897,6 +897,8 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         logger.info(f"Computing the metrics over {question} and {response}")
         self.prompt_config["question"] = question
         self.prompt_config["answerA"] = response
+        if reference:
+            self.prompt_config['reference'] = reference
         self.prompt_config["answerB"] = self._compute_bench_mark_response(question)
         prompt = self._fill_prompt()
         res = self.model.chat.completions.create(
@@ -927,7 +929,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
             return result_dict
         except Exception:
             # Adjusted pattern to match the text format and separate lines
-            pattern = r"-?\s?score of assistant ([a-zA-Z]+): (\d+).*?-?\s?explanation of assistant [a-zA-Z]+: (.*?)(?=-?\s?score of assistant [a-zA-Z]+:|$)"
+            pattern = r"-?\s?[Ss]core of assistant ([a-zA-Z]+): (\d+).*?-?\s?[Ee]xplanation of assistant [a-zA-Z]+: (.*?)(?=-?\s?score of assistant [a-zA-Z]+:|$)"
             matches = re.findall(pattern, response, re.DOTALL)
 
             if matches:
@@ -1005,16 +1007,6 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading, LLMJudgeReferenceG
             model_judge_infer_config,
             prompt_template,
         )
-
-    def _compute_over_one_data(self, question, response, reference) -> Dict[str, Any]:
-        """
-        Compute the metrics over one data point
-        :param kwargs: the data to compute the metrics over
-        :returns: the metrics score and the explanation
-        """
-        self.prompt_config["reference"] = reference
-        res_dic = super()._compute_over_one_data(question, response)
-        return res_dic
 
     @_open_mpi_handler(worker_inputs="sample_df")
     def _compute_over_data(self, sample_df: pd.DataFrame) -> pd.DataFrame:

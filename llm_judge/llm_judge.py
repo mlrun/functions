@@ -263,7 +263,7 @@ class LLMJudgeBaseMetric(ModelObj, ABC):
         pass
 
     @abstractmethod
-    def _compute_over_data(self, sample_df: pd.DataFrame) -> Dict[str, Any]:
+    def _compute_over_data(self, sample_df: pd.DataFrame) -> pd.DataFrame:
         """
         Compute the metrics over one data point
         :param sample_df: the sample dataframe to compute the metrics over
@@ -525,7 +525,7 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
     def _compute_over_one_data(self, question, response) -> Dict[str, Any]:
         """
         Compute the metrics over one data point
-        :param kwargs: the data to compute the metrics over
+        :param question
         :returns: the metrics score and the explanation
         """
         logger.info(f"Computing the metrics over {question} and {response}")
@@ -707,7 +707,7 @@ class LLMJudgeReferenceGrading(LLMJudgePairwiseGrading):
         :param sample_df: the data to compute the metrics over
         :returns: the metrics score and the explanation
         """
-        df = super()._compute_over_data(self, sample_df)
+        df = super()._compute_over_data(sample_df)
         df["reference"] = sample_df["reference"]
         return df
 
@@ -1024,7 +1024,7 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading, LLMJudgeReferenceG
         :param sample_df: the data to compute the metrics over
         :returns: the metrics score and the explanation
         """
-        return LLMReferenceGrading._compute_over_data(self, sample_df)
+        return LLMJudgeReferenceGrading._compute_over_data(self, sample_df)
 
 
 MetricsType_dic = {

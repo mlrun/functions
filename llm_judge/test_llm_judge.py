@@ -47,13 +47,7 @@ TOKENIZER_BENCHMARK_CONFIG = {"trust_remote_code": True}
 BENCHMARK_INFER_CONFIG = {"max_length": 1500}
 
 
-api_key = os.getenv("OPENAI_API_KEY")
-base_url = os.getenv("OPENAI_API_BASE")
 OPENAI_MODEL = "gpt-3.5-turbo"
-OPENAI_JUDGE_CONFIG = {
-    "api_key": api_key,
-    "base_url": base_url,
-}
 
 
 @pytest.fixture
@@ -194,7 +188,6 @@ def test_openai_single_grading_score(prompt_fixture):
     single_grading = OPENAIJudgeSingleGrading(
         name="accuracy_metrics",
         model_judge=OPENAI_MODEL,
-        model_judge_config=OPENAI_JUDGE_CONFIG,
         prompt_config=prompt_config,
     )
     result = single_grading._compute_over_data(sample_df)
@@ -209,7 +202,6 @@ def test_openai_pairwise_grading_scores(prompt_fixture):
     metric = OPENAIJudgePairwiseGrading(
         name="accuracy_metrics",
         model_judge=OPENAI_MODEL,
-        model_judge_config=OPENAI_JUDGE_CONFIG,
         model_bench_mark=BENCHMARK_MODEL,
         model_bench_mark_config=BENCHMARK_CONFIG,
         model_bench_mark_infer_config=BENCHMARK_INFER_CONFIG,
@@ -236,7 +228,6 @@ def test_openai_reference_grading_scores(prompt_fixture):
     metric = OPENAIJudgeReferenceGrading(
         name="accuracy_metrics",
         model_judge=OPENAI_MODEL,
-        model_judge_config=OPENAI_JUDGE_CONFIG,
         model_bench_mark=BENCHMARK_MODEL,
         model_bench_mark_config=BENCHMARK_CONFIG,
         model_bench_mark_infer_config=BENCHMARK_INFER_CONFIG,

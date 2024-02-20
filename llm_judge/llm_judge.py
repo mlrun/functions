@@ -522,7 +522,7 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
 
         return response
 
-    def _compute_over_one_data(self, question, response) -> Dict[str, Any]:
+    def _compute_over_one_data(self, question, response, reference=None) -> Dict[str, Any]:
         """
         Compute the metrics over one data point
         :param question
@@ -531,6 +531,8 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         logger.info(f"Computing the metrics over {question} and {response}")
         self.prompt_config["question"] = question
         self.prompt_config["answerA"] = response
+        if reference:
+            self.prompt_config["reference"] = reference
         self.prompt_config["answerB"] = self._compute_bench_mark_response(question)
         input_ids = self.tokenizer(self._fill_prompt(), return_tensors="pt").input_ids
         outputs = self.model.generate(
@@ -560,6 +562,8 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         """
         self._prepare_judge()
         self._prepare_bench_mark_model()
+        cols = sample_df.columns
+
         res_df = pd.DataFrame(
             columns=[
                 "question",
@@ -573,9 +577,15 @@ class LLMJudgePairwiseGrading(LLMJudgeBaseMetric):
         )
 
         for i in range(len(sample_df)):
+            if "reference" in cols:
+                ref = sample_df.loc[i, "reference"]
+            else:
+                ref = None
+
             res_dic = self._compute_over_one_data(
                 sample_df.loc[i, "question"],
                 sample_df.loc[i, "answer"],
+                ref
             )
             res_df.loc[i] = [
                 sample_df.loc[i, "question"],

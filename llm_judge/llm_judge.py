@@ -915,6 +915,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         :param response: the response to extract the score and the explanation from
         :returns: the score and the explanation
         """
+        logger.info(f"Extract the score and the explanation from the response")
         try:
             res = json.loads(response)
             result_dict = {}

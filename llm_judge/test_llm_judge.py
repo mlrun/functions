@@ -30,7 +30,6 @@ JUDGE_MODEL = "TheBloke/Mistral-7B-OpenOrca-GPTQ"
 JUDGE_CONFIG = {
     "device_map": "auto",
     "revision": "gptq-8bit-128g-actorder_True",
-    "trust_remote_code": False,
 }
 JUDGE_INFER_CONFIG = {
     "max_length": 1500,

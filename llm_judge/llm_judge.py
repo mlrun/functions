@@ -915,7 +915,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
         :param response: the response to extract the score and the explanation from
         :returns: the score and the explanation
         """
-        logger.info(f"Extract the score and the explanation from the response")
+        logger.info(f"Extract the score and the explanation from the {response}")
         try:
             res = json.loads(response)
             result_dict = {}
@@ -930,7 +930,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
             return result_dict
         except Exception:
             # Adjusted pattern to match the text format and separate lines
-            pattern = r"-?\s?[Ss]core of assistant ([a-zA-Z]+): (\d+).*?-?\s?[Ee]xplanation of assistant [a-zA-Z]+: (.*?)(?=-?\s?score of assistant [a-zA-Z]+:|$)"
+            pattern = r"-?\s?[Ss]core of [aA]ssistant ([a-zA-Z]+): (\d+).*?-?\s?[Ee]xplanation of [aA]ssistant [a-zA-Z]+: (.*?)(?=-?\s?[sS]core of [aA]ssistant [a-zA-Z]+:|$)"
             matches = re.findall(pattern, response, re.DOTALL)
 
             if matches:
@@ -949,7 +949,7 @@ class OPENAIJudgePairwiseGrading(LLMJudgePairwiseGrading):
                 )
 
 
-class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading, LLMJudgeReferenceGrading):
+class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading):
     """
     OPENAI Judge Reference Grading class
     you need to give the name of the metrics, give the grading rubric and the bench mark model to use
@@ -1008,16 +1008,6 @@ class OPENAIJudgeReferenceGrading(OPENAIJudgePairwiseGrading, LLMJudgeReferenceG
             model_judge_infer_config,
             prompt_template,
         )
-
-    @_open_mpi_handler(worker_inputs="sample_df")
-    def _compute_over_data(self, sample_df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Compute the metrics over a dataset
-        :param sample_df: the data to compute the metrics over
-        :returns: the metrics score and the explanation
-        """
-        return LLMJudgeReferenceGrading._compute_over_data(self, sample_df)
-
 
 MetricsType_dic = {
     "LLMJudgeSingleGrading": LLMJudgeSingleGrading,

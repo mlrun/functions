@@ -229,8 +229,8 @@ def test_openai_reference_grading_scores(prompt_fixture):
         model_judge=OPENAI_MODEL,
         model_bench_mark=BENCHMARK_MODEL,
         model_bench_mark_config=BENCHMARK_CONFIG,
-        model_bench_mark_infer_config=BENCHMARK_INFER_CONFIG,
         tokenizer_bench_mark_config=TOKENIZER_BENCHMARK_CONFIG,
+        model_bench_mark_infer_config=BENCHMARK_INFER_CONFIG,
         prompt_config=prompt_config,
     )
 

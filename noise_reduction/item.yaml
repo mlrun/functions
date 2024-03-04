@@ -1,9 +1,11 @@
 apiVersion: v1
-categories: []
+categories:
+  - data-preparation
+  - machine-learning
 description: Reduce noise from audio files
 doc: ''
 example: noise_reduction.ipynb
-generationDate: 2023-01-02:10-30
+generationDate: 2024-03-04:17-30
 hidden: false
 icon: ''
 labels:

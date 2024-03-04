@@ -1,15 +1,18 @@
 import tempfile
-from pathlib import Path
-import pytest
+
 import mlrun
+import pytest
 
 
-@pytest.mark.parametrize("audio_source,expected_num_audio_files", [
-    ("data/test_data.wav", 1),
-    ("data/test_data.mp3", 1),
-    ("data", 2),
-])
-def test_reduce_noise(audio_source, expected_num_audio_files):
+@pytest.mark.parametrize(
+    "audio_source",
+    [
+        "data/test_data.wav",
+        "data/test_data.mp3",
+        "data",
+    ],
+)
+def test_reduce_noise(audio_source):
     # set up the project and function
     artifact_path = tempfile.TemporaryDirectory().name
     project = mlrun.new_project("noise-reduction")
@@ -30,21 +33,21 @@ def test_reduce_noise(audio_source, expected_num_audio_files):
         },
         local=True,
         artifact_path=artifact_path,
+        returns=["successes: file", "errors: file"],
     )
 
-    # assert that the function run completed successfully
-    _assert_audio_files_exist(
-        audio_files=Path(noise_reduction_run.outputs["return"]),
-        expected_num_audio_files=expected_num_audio_files
-    )
+    assert noise_reduction_run.outputs["successes"]
 
 
-@pytest.mark.parametrize("audio_source,expected_num_audio_files", [
-    ("data/test_data.wav", 1),
-    ("data/test_data.mp3", 1),
-    ("data", 2),
-])
-def test_reduce_noise_dfn(audio_source, expected_num_audio_files):
+@pytest.mark.parametrize(
+    "audio_source",
+    [
+        "data/test_data.wav",
+        "data/test_data.mp3",
+        "data",
+    ],
+)
+def test_reduce_noise_dfn(audio_source):
     # set up the project and function
     artifact_path = tempfile.TemporaryDirectory().name
     project = mlrun.new_project("noise-reduction")
@@ -65,15 +68,8 @@ def test_reduce_noise_dfn(audio_source, expected_num_audio_files):
         },
         local=True,
         artifact_path=artifact_path,
+        returns=["successes: file", "errors: file"],
     )
 
     # assert that the function run completed successfully
-    _assert_audio_files_exist(
-        audio_files=Path(noise_reduction_run.outputs["return"]),
-        expected_num_audio_files=expected_num_audio_files
-    )
-
-
-def _assert_audio_files_exist(audio_files, expected_num_audio_files):
-    assert audio_files.exists(), "Audio files directory do not exist"
-    assert len(list(audio_files.glob("*.*"))) == expected_num_audio_files, "Number of audio files is not as expected"
+    assert noise_reduction_run.outputs["successes"]

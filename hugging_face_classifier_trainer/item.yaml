@@ -12,13 +12,13 @@ labels:
   author: davids
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.2.0
+mlrunVersion: 1.6.1
 name: hugging_face_classifier_trainer
-platformVersion: 3.5.0
+platformVersion: 3.5.5
 spec:
   filename: hugging_face_classifier_trainer.py
   handler: train
-  image: mlrun/ml-models
+  image: mlrun/mlrun
   kind: job
   requirements:
   - onnx~=1.10.1
@@ -28,4 +28,4 @@ spec:
   - datasets~=2.10.1
   - scikit-learn~=1.0.2
 url: ''
-version: 0.1.0
+version: 0.2.0

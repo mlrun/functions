@@ -17,6 +17,7 @@ from mlrun.artifacts.manager import Artifact, PlotlyArtifact
 from mlrun.datastore import is_store_uri
 from mlrun.frameworks._common import CommonTypes, MLRunInterface
 from mlrun.utils import logger
+from trl import DPOTrainer
 from peft import (LoraConfig, PeftModel, get_peft_model,
                   prepare_model_for_kbit_training)
 from plotly import graph_objects as go

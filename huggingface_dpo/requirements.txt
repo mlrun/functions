@@ -4,3 +4,4 @@ torch
 datasets
 plotly
 trl
+mlrun

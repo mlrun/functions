@@ -3,3 +3,4 @@ transformers
 torch
 datasets
 plotly
+trl

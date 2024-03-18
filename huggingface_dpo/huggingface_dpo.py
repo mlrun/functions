@@ -44,11 +44,12 @@ supported_tasks = [
 class ConfigKeys:
     deepspeed = "deepspeed"
     quantization = "quantization"
-    lora = "lora"
     training = "training"
     tokenizer_pretrained = "tokenizer_pretrained"
     model_pretrained = "model_pretrained"
+    peft_config = "peft_config"
     data_collator = "data_collator"
+    beta = "beta"
 
 
 # ----------------------from MLRUN--------------------------------
@@ -70,7 +71,7 @@ class HFTrainerMLRunInterface(MLRunInterface, ABC):
     @classmethod
     def add_interface(
         cls,
-        obj: Trainer,
+        obj: DPOTrainer,
         restoration: CommonTypes.MLRunInterfaceRestorationType = None,
     ):
         super(HFTrainerMLRunInterface, cls).add_interface(
@@ -79,7 +80,7 @@ class HFTrainerMLRunInterface(MLRunInterface, ABC):
 
     @classmethod
     def mlrun_train(cls):
-        def wrapper(self: Trainer, *args, **kwargs):
+        def wrapper(self: DPOTrainer, *args, **kwargs):
             # Restore the evaluation method as `train` will use it:
             # cls._restore_attribute(obj=self, attribute_name="evaluate")
 
@@ -386,7 +387,6 @@ def _set_model_and_tokenizer(
     tokenizer: Union[str, List[str]],
     task: str,
     framework: str,
-    lora_config: dict,
     quantization_config: dict,
     use_cuda: bool,
     tokenizer_pretrained_config,
@@ -400,7 +400,6 @@ def _set_model_and_tokenizer(
     :param tokenizer: a tuple containing tokenizer name and class, or str with tokenizer name or path
     :param task: a supported nlp task, used to choose model if not provided
     :param framework: pt or tf
-    :param lora_config: lora config or None, to load model in appropriate way
     :param quantization_config: quantization config or None, to load model in appropriate way
     :param use_cuda: use gpu or not
     :param tokenizer_pretrained_config: config to load the pretrained tokenizer
@@ -469,10 +468,6 @@ def _set_model_and_tokenizer(
     if quantization_config:
         model.gradient_checkpointing_enable()
         model = peft.prepare_model_for_kbit_training(model)
-
-    # If lora config was given we want to do lora fine tune, we update model here
-    if lora_config:
-        model = peft.get_peft_model(model, lora_config)
 
     # if not specified we choose the default tokenizer that corresponding to the model
     if tokenizer is None:
@@ -639,7 +634,8 @@ def finetune_llm(
     tokenizer: Union[str, List[str]] = None,
     deepspeed_config: Union[dict, bool] = False,
     quantization_config: Union[dict, bool] = False,
-    lora_config: Union[dict, bool] = False,
+    peft_config: Union[dict, bool] = False,
+    beta: Union[float, bool] = False,
     training_config: dict = {},
     model_pretrained_config: dict = {},
     tokenizer_pretrained_config: dict = {},
@@ -683,11 +679,12 @@ def finetune_llm(
     configs = {
         ConfigKeys.deepspeed: deepspeed_config,
         ConfigKeys.quantization: quantization_config,
-        ConfigKeys.lora: lora_config,
         ConfigKeys.training: training_config,
         ConfigKeys.model_pretrained: model_pretrained_config,
         ConfigKeys.tokenizer_pretrained: tokenizer_pretrained_config,
         ConfigKeys.data_collator: data_collator_config,
+        ConfigKeys.peft_config: peft_config,
+        ConfigKeys.beta: beta,
     }
     _update_config(dst=configs, src=kwargs)
 
@@ -705,7 +702,6 @@ def finetune_llm(
         tokenizer=tokenizer,
         task=task,
         framework=framework,
-        lora_config=configs[ConfigKeys.lora],
         quantization_config=configs[ConfigKeys.quantization],
         use_cuda=use_cuda,
         tokenizer_pretrained_config=tokenizer_pretrained_config,
@@ -744,10 +740,13 @@ def finetune_llm(
         **train_kwargs,
     )
 
-    trainer = transformers.Trainer(
+    trainer = trl.DPOTrainer(
         model=model,
+        ref_model = None,
         train_dataset=tokenized_train,
         eval_dataset=tokenized_eval,
+        peft_config=configs[ConfigKeys.peft_config],
+        beta = configs[ConfigKeys.beta],
         tokenizer=tokenizer,
         data_collator=data_collator,
         args=training_args,

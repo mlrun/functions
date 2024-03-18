@@ -5,7 +5,7 @@ import mlrun
 
 def test_train():
 
-    model_name = "distilgpt2"
+    model_name = "mistralai/Mistral-7B-Instruct-v0.2"
     tokenizer = model_name
     auto_trainer = mlrun.import_function("function.yaml")
 

@@ -244,7 +244,7 @@ class MLRunCallback(TrainerCallback):
 
 
 def apply_mlrun(
-    trainer: transformers.Trainer,
+    trainer: trl.DPOTrainer,
     model_name: str = None,
     tag: str = "",
     context: mlrun.MLClientCtx = None,
@@ -302,10 +302,11 @@ QUANTIZATION_CONFIG = transformers.BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.bfloat16,
 )
 
-LORA_CONFIG = peft.LoraConfig(
+PEFT_CONFIG = peft.LoraConfig(
     r=8,
-    lora_alpha=32,
-    target_modules=["query_key_value"],
+    lora_alpha=16,
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
+        "gate_proj", "up_proj", "down_proj"],
     lora_dropout=0.05,
     bias="none",
     task_type="CAUSAL_LM",

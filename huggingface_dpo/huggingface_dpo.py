@@ -347,7 +347,7 @@ def _update_config(src: dict, dst: dict):
             config = QUANTIZATION_CONFIG
 
         if config is True and config_name == "lora":
-            config = LORA_CONFIG
+            config = PEFT_CONFIG
 
         if config is True and config_name == "deepspeed":
             config = DEEPSPEED_CONFIG
@@ -624,7 +624,7 @@ def _prepare_dataset(
     return tokenized_train_dataset, tokenized_eval_dataset
 
 
-def finetune_llm(
+def dpo_train(
     context: mlrun.MLClientCtx,
     train_dataset: Union[str, mlrun.datastore.DataItem],
     eval_dataset: str = None,

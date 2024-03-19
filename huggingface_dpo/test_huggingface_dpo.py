@@ -33,7 +33,7 @@ def test_train():
             auto_trainer.run(
                 local=True,
                 params=params,
-                handler="finetune_llm",
+                handler="dpo_train",
                 returns=["model"],
                 workdir=test_directory,
             )

@@ -3,7 +3,7 @@ import tempfile
 import mlrun
 
 
-def test_train():
+def test_dpo_train():
 
     model_name = "mistralai/Mistral-7B-Instruct-v0.2"
     tokenizer = model_name

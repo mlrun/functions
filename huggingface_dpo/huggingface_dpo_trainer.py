@@ -1,3 +1,17 @@
+# Copyright 2023 Iguazio
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import importlib
 import os
 import shutil
@@ -244,7 +258,7 @@ class MLRunCallback(TrainerCallback):
 
 
 def apply_mlrun(
-    trainer: trl.DPOTrainer,
+    trainer: DPOTrainer,
     model_name: str = None,
     tag: str = "",
     context: mlrun.MLClientCtx = None,
@@ -675,8 +689,6 @@ def dpo_train(
 
     # TODO: match forward.keyword to dataset.keyword - check if relevant in new design
     # TODO: add warning for label, and add option to modify dataset col names - check if relevant in new design
-    import pdb
-    pdb.set_trace()
     # Look for updates to configs given in kwargs
     configs = {
         ConfigKeys.deepspeed: deepspeed_config,
@@ -710,21 +722,24 @@ def dpo_train(
         model_pretrained_config=configs[ConfigKeys.model_pretrained],
         device_map=device_map,
     )
-
+    whole_dataset = load_dataset(train_dataset, split='train')
+    whole_dataset = whole_dataset.shuffle(seed=42).train_test_split(seed=42, test_size=.3)
+    train_dataset =  whole_dataset['train']
+    eval_dataset = whole_dataset['test']
     # Load datasets
-    tokenized_train, tokenized_eval = _prepare_dataset(
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
-        train_load_dataset_kwargs=train_load_dataset_kwargs,
-        eval_load_dataset_kwargs=eval_load_dataset_kwargs,
-        tokenizer=tokenizer,
-        dataset_columns_to_train=dataset_columns_to_train,
-    )
+    #tokenized_train, tokenized_eval = _prepare_dataset(
+    #    train_dataset=train_dataset,
+    #    eval_dataset=eval_dataset,
+    #    train_load_dataset_kwargs=train_load_dataset_kwargs,
+    #    eval_load_dataset_kwargs=eval_load_dataset_kwargs,
+    #    tokenizer=tokenizer,
+    #    dataset_columns_to_train=dataset_columns_to_train,
+    #)
 
     # Initialize the data collator for the trainer to use in order to create batches of data
-    data_collator = transformers.DataCollatorForLanguageModeling(
-        tokenizer=tokenizer, mlm=False, **data_collator_config
-    )
+    #data_collator = transformers.DataCollatorForLanguageModeling(
+    #    tokenizer=tokenizer, mlm=False, **data_collator_config
+    #)
 
     # Initialize training kwargs from user kwargs:
     train_kwargs = configs[ConfigKeys.training]
@@ -742,15 +757,15 @@ def dpo_train(
         **train_kwargs,
     )
 
-    trainer = trl.DPOTrainer(
+    trainer = DPOTrainer(
         model=model,
         ref_model = None,
-        train_dataset=tokenized_train,
-        eval_dataset=tokenized_eval,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
         peft_config=configs[ConfigKeys.peft_config],
         beta = configs[ConfigKeys.beta],
         tokenizer=tokenizer,
-        data_collator=data_collator,
+        #data_collator=data_collator,
         args=training_args,
     )
 

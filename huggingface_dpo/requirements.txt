@@ -5,3 +5,4 @@ datasets
 plotly
 trl
 mlrun
+bitsandbytes

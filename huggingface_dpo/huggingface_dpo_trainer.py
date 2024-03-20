@@ -37,7 +37,7 @@ from peft import (LoraConfig, PeftModel, get_peft_model,
 from plotly import graph_objects as go
 from transformers import (AutoModelForCausalLM, AutoTokenizer,
                           BitsAndBytesConfig, DataCollatorForLanguageModeling,
-                          PreTrainedModel, PreTrainedTokenizer, Trainer,
+                          PreTrainedModel, PreTrainedTokenizer, 
                           TrainerCallback, TrainerControl, TrainerState,
                           TrainingArguments)
 

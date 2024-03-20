@@ -51,6 +51,8 @@ def test_dpo_fn():
            use_cuda = True,
            beta = 0.1,
            split='train',
+           max_length=1024,
+           max_prompt_length=2048,
            )
 
     

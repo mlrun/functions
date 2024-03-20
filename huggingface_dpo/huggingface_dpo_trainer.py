@@ -767,6 +767,8 @@ def dpo_train(
         tokenizer=tokenizer,
         #data_collator=data_collator,
         args=training_args,
+        max_length=1024,
+        max_prompt_length=2048,
     )
 
     apply_mlrun(trainer, model_name=model_name.split("/")[-1])

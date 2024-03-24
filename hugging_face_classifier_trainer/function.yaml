@@ -2,7 +2,7 @@ kind: job
 metadata:
   name: hugging-face-classifier-trainer
   tag: ''
-  hash: 132c7f20cd597d6fb8c86a8d6e3eb4ceb2fa64b3
+  hash: e8113e81f04c96fc9a8a94e717dea81ee3e05a18
   project: ''
   labels:
     author: davids
@@ -20,8 +20,8 @@ spec:
     code_origin: ''
     origin_filename: ''
     requirements:
-    - onnx~=1.10.1
-    - onnxruntime~=1.8.1
+    - onnx~=1.14.1
+    - onnxruntime~=1.16.1
     - optimum~=1.6.4
     - transformers~=4.26.1
     - datasets~=2.10.1

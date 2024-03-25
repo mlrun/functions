@@ -2,14 +2,14 @@ kind: job
 metadata:
   name: structured-data-generator
   tag: ''
-  hash: ac969f46aae91804024ea736856267c26578864b
+  hash: aa811f5c583d081b71d4da97088837546e29c4a1
   project: ''
   labels:
     author: zeevr
   categories:
   - machine-learning
-  - data-preparation
-  - data-generation
+  - Data Preparation
+  - Data Generation
   - GenAI
 spec:
   command: ''

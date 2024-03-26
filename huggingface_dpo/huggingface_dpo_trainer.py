@@ -41,19 +41,6 @@ from transformers import (AutoModelForCausalLM, AutoTokenizer,
                           TrainerCallback, TrainerControl, TrainerState,
                           TrainingArguments)
 
-supported_tasks = [
-    "question-answering",
-    "summarization",
-    "table-question-answering",
-    "text2text-generation",
-    "text-classification",
-    "sentiment-analysis",
-    "text-generation",
-    "token-classification",
-    "translation",
-    "translation_xx_to_yy",
-]
-
 
 class ConfigKeys:
     deepspeed = "deepspeed"
@@ -61,7 +48,7 @@ class ConfigKeys:
     training = "training"
     tokenizer_pretrained = "tokenizer_pretrained"
     model_pretrained = "model_pretrained"
-    peft_config = "peft_config"
+    peft_config = "peft"
     data_collator = "data_collator"
     beta = "beta"
 
@@ -317,7 +304,7 @@ QUANTIZATION_CONFIG = transformers.BitsAndBytesConfig(
 )
 
 PEFT_CONFIG = peft.LoraConfig(
-    r=8,
+    r=16,
     lora_alpha=16,
     target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
         "gate_proj", "up_proj", "down_proj"],
@@ -360,7 +347,7 @@ def _update_config(src: dict, dst: dict):
         if config is True and config_name == "quantization":
             config = QUANTIZATION_CONFIG
 
-        if config is True and config_name == "lora":
+        if config is True and config_name == "peft":
             config = PEFT_CONFIG
 
         if config is True and config_name == "deepspeed":
@@ -423,11 +410,6 @@ def _set_model_and_tokenizer(
 
     :returns: model and tokenizer
     """
-    # if task is not supported and no model was given we can't choose one
-    if task and task not in supported_tasks and not model:
-        logger.error("unsupported task option chosen")
-        raise
-
     # load model from store
     if isinstance(model, str) and is_store_uri(model):
         pass
@@ -702,6 +684,7 @@ def dpo_train(
     }
     _update_config(dst=configs, src=kwargs)
 
+
     # check gpu permission and availability
     if use_cuda:
         if torch.cuda.is_available():
@@ -765,10 +748,9 @@ def dpo_train(
         peft_config=configs[ConfigKeys.peft_config],
         beta = configs[ConfigKeys.beta],
         tokenizer=tokenizer,
-        #data_collator=data_collator,
         args=training_args,
-        max_length=1024,
-        max_prompt_length=2048,
+        max_length=2048,
+        max_prompt_length=4096,
     )
 
     apply_mlrun(trainer, model_name=model_name.split("/")[-1])

@@ -20,6 +20,7 @@ import mlrun
 def test_dpo_fn():
     ctx = mlrun.get_or_create_ctx(name='test_dpo')
     train_dataset = "unalignment/toxic-dpo-v0.2"
+
     training_arguments = {
             "evaluation_strategy": "steps",
             "do_eval": True,
@@ -28,12 +29,12 @@ def test_dpo_fn():
             "gradient_accumulation_steps": 4,
             "per_device_eval_batch_size": 1,
             "log_level": "info",
-            "save_steps": 100,
+            "save_steps": 2,
             "learning_rate": 5e-7,
-            "eval_steps": 100,
+            "eval_steps": 1,
             "num_train_epochs": 1,
-            "max_steps": 100,
-            "warmup_steps": 20,
+            "max_steps": 10,
+            "warmup_steps": 5,
             "fp16": True,
             "lr_scheduler_type": "cosine",
             "remove_unused_columns": True,
@@ -44,15 +45,12 @@ def test_dpo_fn():
     dpo_train(
            context = ctx,
            train_dataset = train_dataset,
-           model = (model_name,"transformers.AutoModelForCausalLM"),
+           peft_config=True,
+           model = model_name,
            tokenizer = tokenizer,
-           dataset_columns_to_train = ['chosen', 'rejected'],
            training_config = training_arguments,
            use_cuda = True,
            beta = 0.1,
-           split='train',
-           max_length=1024,
-           max_prompt_length=2048,
            )
 
     

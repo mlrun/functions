@@ -1,5 +1,5 @@
-onnx~=1.10.1
-onnxruntime~=1.8.1
+onnx~=1.14.1
+onnxruntime~=1.16.1
 optimum~=1.6.4
 transformers~=4.26.1
 datasets~=2.10.1

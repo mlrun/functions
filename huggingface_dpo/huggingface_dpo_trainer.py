@@ -239,11 +239,11 @@ class MLRunCallback(TrainerCallback):
         )
 
         # Create the plotly artifact:
+        if '/' in name:
+            name = '_'.join(name.split('/'))
         artifact_name = f"{name}_plot"
         artifact = PlotlyArtifact(key=artifact_name, figure=metric_figure)
-        import pdb
-        pdb.set_trace()
-        #self._artifacts[artifact_name] = self._context.log_artifact(artifact)
+        self._artifacts[artifact_name] = self._context.log_artifact(artifact)
 
 
 def apply_mlrun(

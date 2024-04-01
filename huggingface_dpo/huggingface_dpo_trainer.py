@@ -32,14 +32,20 @@ from mlrun.datastore import is_store_uri
 from mlrun.frameworks._common import CommonTypes, MLRunInterface
 from mlrun.utils import logger
 from trl import DPOTrainer
-from peft import (LoraConfig, PeftModel, get_peft_model,
-                  prepare_model_for_kbit_training)
+from peft import LoraConfig, PeftModel, get_peft_model, prepare_model_for_kbit_training
 from plotly import graph_objects as go
-from transformers import (AutoModelForCausalLM, AutoTokenizer,
-                          BitsAndBytesConfig, DataCollatorForLanguageModeling,
-                          PreTrainedModel, PreTrainedTokenizer, 
-                          TrainerCallback, TrainerControl, TrainerState,
-                          TrainingArguments)
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig,
+    DataCollatorForLanguageModeling,
+    PreTrainedModel,
+    PreTrainedTokenizer,
+    TrainerCallback,
+    TrainerControl,
+    TrainerState,
+    TrainingArguments,
+)
 
 
 class ConfigKeys:
@@ -239,8 +245,8 @@ class MLRunCallback(TrainerCallback):
         )
 
         # Create the plotly artifact:
-        if '/' in name:
-            name = '_'.join(name.split('/'))
+        if "/" in name:
+            name = "_".join(name.split("/"))
         artifact_name = f"{name}_plot"
         artifact = PlotlyArtifact(key=artifact_name, figure=metric_figure)
         self._artifacts[artifact_name] = self._context.log_artifact(artifact)
@@ -308,8 +314,15 @@ QUANTIZATION_CONFIG = transformers.BitsAndBytesConfig(
 PEFT_CONFIG = peft.LoraConfig(
     r=16,
     lora_alpha=16,
-    target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
-        "gate_proj", "up_proj", "down_proj"],
+    target_modules=[
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj",
+    ],
     lora_dropout=0.05,
     bias="none",
     task_type="CAUSAL_LM",
@@ -384,6 +397,8 @@ def _get_class_object(class_path: str) -> type:
     module_path, class_name = class_path.rsplit(".", 1)
     module = importlib.import_module(module_path)
     return getattr(module, class_name)
+
+
 def _set_model_and_tokenizer(
     model: Union[str, List[str]],
     tokenizer: Union[str, List[str]],
@@ -488,6 +503,7 @@ def _set_model_and_tokenizer(
 
     return model_name, model, tokenizer
 
+
 def _dataset_loader(dataset: str, is_train: bool = True, **kwargs) -> Dataset:
     """
     loads the specific dataset provided by the user
@@ -561,7 +577,6 @@ def _prepare_dataset(
             logger.error("train dataset is mandatory")
             raise KeyError("no train dataset found in given dataset")
 
-
     return train_dataset, eval_dataset
 
 
@@ -579,8 +594,8 @@ def dpo_train(
     beta: Union[float, bool] = False,
     training_config: dict = {},
     model_pretrained_config: dict = {},
-    tokenizer_pretrained_config: dict = {}, 
-    data_collator_config : dict={},
+    tokenizer_pretrained_config: dict = {},
+    data_collator_config: dict = {},
     task: str = "text-generation",
     use_cuda: bool = True,
     framework: str = "pt",
@@ -626,7 +641,6 @@ def dpo_train(
     }
     _update_config(dst=configs, src=kwargs)
 
-
     # check gpu permission and availability
     if use_cuda:
         if torch.cuda.is_available():
@@ -640,15 +654,17 @@ def dpo_train(
         model=model,
         tokenizer=tokenizer,
         framework=framework,
-        task = task,
+        task=task,
         quantization_config=configs[ConfigKeys.quantization],
         use_cuda=use_cuda,
         tokenizer_pretrained_config=tokenizer_pretrained_config,
         model_pretrained_config=configs[ConfigKeys.model_pretrained],
         device_map=device_map,
     )
-    train_dataset, eval_dataset = _prepare_dataset(train_dataset, eval_dataset, train_load_dataset_kwargs, eval_load_dataset_kwargs)
-    
+    train_dataset, eval_dataset = _prepare_dataset(
+        train_dataset, eval_dataset, train_load_dataset_kwargs, eval_load_dataset_kwargs
+    )
+
     # Initialize training kwargs from user kwargs:
     train_kwargs = configs[ConfigKeys.training]
 
@@ -667,11 +683,11 @@ def dpo_train(
 
     trainer = DPOTrainer(
         model=model,
-        ref_model = None,
+        ref_model=None,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         peft_config=configs[ConfigKeys.peft_config],
-        beta = configs[ConfigKeys.beta],
+        beta=configs[ConfigKeys.beta],
         tokenizer=tokenizer,
         args=training_args,
         max_length=2048,

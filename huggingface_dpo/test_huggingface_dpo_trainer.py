@@ -18,40 +18,43 @@ from huggingface_dpo_trainer import dpo_train
 import mlrun
 
 def test_dpo_fn():
+    model_name = "mistralai/Mistral-7B-Instruct-v0.2"
+    tokenizer = model_name
+    #dop_trainer = mlrun.import_function("function.yaml")
+
     ctx = mlrun.get_or_create_ctx(name='test_dpo')
     train_dataset = "unalignment/toxic-dpo-v0.2"
-
+    eval_dataset = "unalignment/toxic-dpo-v0.2"
     training_arguments = {
             "evaluation_strategy": "steps",
-            "do_eval": True,
+            "do_eval": False,
             "optim": "paged_adamw_8bit",
             "per_device_train_batch_size": 1,
             "gradient_accumulation_steps": 4,
             "per_device_eval_batch_size": 1,
             "log_level": "info",
-            "save_steps": 2,
+            "save_steps": 5,
             "learning_rate": 5e-7,
             "eval_steps": 1,
             "num_train_epochs": 1,
-            "max_steps": 10,
+            "max_steps": 5,
             "warmup_steps": 5,
             "fp16": True,
             "lr_scheduler_type": "cosine",
             "remove_unused_columns": True,
             "gradient_checkpointing": True,
         }
-    model_name = "mistralai/Mistral-7B-Instruct-v0.2"
-    tokenizer = model_name
     dpo_train(
            context = ctx,
            train_dataset = train_dataset,
+           eval_dataset = eval_dataset,
            peft_config=True,
            model = model_name,
            tokenizer = tokenizer,
            training_config = training_arguments,
            use_cuda = True,
            beta = 0.1,
-           )
+    )
 
     
 

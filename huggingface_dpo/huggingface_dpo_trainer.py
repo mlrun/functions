@@ -384,8 +384,6 @@ def _get_class_object(class_path: str) -> type:
     module_path, class_name = class_path.rsplit(".", 1)
     module = importlib.import_module(module_path)
     return getattr(module, class_name)
-
-
 def _set_model_and_tokenizer(
     model: Union[str, List[str]],
     tokenizer: Union[str, List[str]],
@@ -490,7 +488,6 @@ def _set_model_and_tokenizer(
 
     return model_name, model, tokenizer
 
-
 def _dataset_loader(dataset: str, is_train: bool = True, **kwargs) -> Dataset:
     """
     loads the specific dataset provided by the user
@@ -517,6 +514,7 @@ def _dataset_loader(dataset: str, is_train: bool = True, **kwargs) -> Dataset:
         return dataset.get("eval")
     elif "validation" in dataset:
         return dataset.get("validation")
+    return dataset
 
 
 def _prepare_dataset(
@@ -524,8 +522,6 @@ def _prepare_dataset(
     eval_dataset: str,
     train_load_dataset_kwargs,
     eval_load_dataset_kwargs,
-    tokenizer,
-    dataset_columns_to_train: Union[str, list],
 ) -> (Dataset, Union[Dataset, None]):
     """
     Loads the train and eval datasets (if provided) passes them through the tokenizer and
@@ -533,34 +529,11 @@ def _prepare_dataset(
 
     :param train_dataset: the name or path to the train dataset
     :param eval_dataset: the name or path to the eval dataset
-    :param dataset_columns_to_train: which columns to pass to the model as inputs
-                                        (need to pass through the tokenizer first)
     :param train_load_dataset_kwargs: kwargs for dataset loading
     :param eval_load_dataset_kwargs: kwargs for dataset loading
-    :param tokenizer: the tokenizer to pass the data through
 
     :returns: tokenized datasets
     """
-    if not tokenizer.pad_token:
-        tokenizer.pad_token = tokenizer.eos_token
-
-    # we take col name/s in a list for easy generalization
-    if isinstance(dataset_columns_to_train, str):
-        dataset_columns_to_train = [dataset_columns_to_train]
-
-    if isinstance(train_dataset, mlrun.datastore.DataItem):
-        train_dataset = Dataset.from_pandas(train_dataset.as_df())
-        return (
-            train_dataset.map(
-                lambda examples: tokenizer(
-                    *[examples[col] for col in dataset_columns_to_train],
-                    truncation=True,
-                    padding=True,
-                ),
-                batched=True,
-            ),
-            None,
-        )
 
     # Load datasets
     # if provided two paths/names we load each separately using designated func
@@ -571,7 +544,6 @@ def _prepare_dataset(
         eval_dataset = _dataset_loader(
             dataset=eval_dataset, is_train=False, **eval_load_dataset_kwargs
         )
-
     # if only on path is given then we must check if it contains both dataset or if only one should be used
     else:
         dataset = load_dataset(train_dataset, **train_load_dataset_kwargs)
@@ -584,42 +556,13 @@ def _prepare_dataset(
             elif "validation" in dataset:
                 eval_dataset = dataset.get("validation")
             else:
-                # only train dataset given, tokenize and return it
-                return (
-                    train_dataset.map(
-                        lambda examples: tokenizer(
-                            *[examples[col] for col in dataset_columns_to_train],
-                            truncation=True,
-                            padding=True,
-                        ),
-                        batched=True,
-                    ),
-                    None,
-                )
+                return train_dataset
         else:
             logger.error("train dataset is mandatory")
             raise KeyError("no train dataset found in given dataset")
 
-    # Tokenize the data so the model can understand it
-    tokenized_train_dataset = train_dataset.map(
-        lambda examples: tokenizer(
-            *[examples[col] for col in dataset_columns_to_train],
-            truncation=True,
-            padding=True,
-        ),
-        batched=True,
-    )
 
-    tokenized_eval_dataset = eval_dataset.map(
-        lambda examples: tokenizer(
-            *[examples[col] for col in dataset_columns_to_train],
-            truncation=True,
-            padding=True,
-        ),
-        batched=True,
-    )
-
-    return tokenized_train_dataset, tokenized_eval_dataset
+    return train_dataset, eval_dataset
 
 
 def dpo_train(
@@ -628,7 +571,6 @@ def dpo_train(
     eval_dataset: str = None,
     train_load_dataset_kwargs: dict = {},
     eval_load_dataset_kwargs: dict = {},
-    dataset_columns_to_train: Union[str, list] = "text",
     model: Union[str, List[str]] = "huggingface-model",
     tokenizer: Union[str, List[str]] = None,
     deepspeed_config: Union[dict, bool] = False,
@@ -637,8 +579,8 @@ def dpo_train(
     beta: Union[float, bool] = False,
     training_config: dict = {},
     model_pretrained_config: dict = {},
-    tokenizer_pretrained_config: dict = {},
-    data_collator_config: dict = {},
+    tokenizer_pretrained_config: dict = {}, 
+    data_collator_config : dict={},
     task: str = "text-generation",
     use_cuda: bool = True,
     framework: str = "pt",
@@ -646,33 +588,31 @@ def dpo_train(
     **kwargs,
 ):
     """
-    Fine-tunes a Language Model (LLM) on a specific task using the provided dataset.
+    Form a dpo training job to do llm alignment
      The function takes various configuration parameters to customize the training process
      and adapt the model to specific tasks using a provided dataset.
 
     :param context: mlrun context in order to log trained model
-    :param dataset_columns_to_train: which columns to pass to the model as inputs
-    :param eval_load_dataset_kwargs: kwargs for dataset loading
-    :param train_load_dataset_kwargs: kwargs for dataset loading
-    :param framework: pt ot tf
-    :param use_cuda: use gpu or not
-    :param tokenizer_pretrained_config: config to load the pretrained tokenizer
-    :param model_pretrained_config: config to load the pretrained model
-    :param tokenizer: a tuple containing tokenizer name and class, or str with tokenizer name or path
-    :param model: a tuple containing model name and class, or str with model name or path
     :param train_dataset: The train dataset used for fine-tuning the language model.
     :param eval_dataset: The eval dataset used for evaluate the language model during training.
+    :param train_load_dataset_kwargs: kwargs for dataset loading
+    :param eval_load_dataset_kwargs: kwargs for dataset loading
+    :param model: a tuple containing model name and class, or str with model name or path
+    :param tokenizer: a tuple containing tokenizer name and class, or str with tokenizer name or path
     :param deepspeed_config: Configuration options for DeepSpeed (optional).
     :param quantization_config: Configuration options for model quantization (optional).
-    :param lora_config: Configuration options for Low-Rank Approximation (LoRA) (optional).
+    :param peft_config: Configuration options for Low-Rank Approximation (LoRA) (optional).
+    :param beta: super parameter of KL divergence
     :param training_config: Configuration options specific to the fine-tuning training process (optional).
+    :param model_pretrained_config: config to load the pretrained model
+    :param tokenizer_pretrained_config: config to load the pretrained tokenizer
     :param data_collator_config: Configuration options for data collation during training (optional).
     :param task: A description of the specific task the model is being fine-tuned for.
+    :param use_cuda: use gpu or not
+    :param framework: pt ot tf
     :param kwargs: Additional keyword arguments.
     """
 
-    # TODO: match forward.keyword to dataset.keyword - check if relevant in new design
-    # TODO: add warning for label, and add option to modify dataset col names - check if relevant in new design
     # Look for updates to configs given in kwargs
     configs = {
         ConfigKeys.deepspeed: deepspeed_config,
@@ -699,33 +639,16 @@ def dpo_train(
     model_name, model, tokenizer = _set_model_and_tokenizer(
         model=model,
         tokenizer=tokenizer,
-        task=task,
         framework=framework,
+        task = task,
         quantization_config=configs[ConfigKeys.quantization],
         use_cuda=use_cuda,
         tokenizer_pretrained_config=tokenizer_pretrained_config,
         model_pretrained_config=configs[ConfigKeys.model_pretrained],
         device_map=device_map,
     )
-    whole_dataset = load_dataset(train_dataset, split='train')
-    whole_dataset = whole_dataset.shuffle(seed=42).train_test_split(seed=42, test_size=.3)
-    train_dataset =  whole_dataset['train']
-    eval_dataset = whole_dataset['test']
-    # Load datasets
-    #tokenized_train, tokenized_eval = _prepare_dataset(
-    #    train_dataset=train_dataset,
-    #    eval_dataset=eval_dataset,
-    #    train_load_dataset_kwargs=train_load_dataset_kwargs,
-    #    eval_load_dataset_kwargs=eval_load_dataset_kwargs,
-    #    tokenizer=tokenizer,
-    #    dataset_columns_to_train=dataset_columns_to_train,
-    #)
-
-    # Initialize the data collator for the trainer to use in order to create batches of data
-    #data_collator = transformers.DataCollatorForLanguageModeling(
-    #    tokenizer=tokenizer, mlm=False, **data_collator_config
-    #)
-
+    train_dataset, eval_dataset = _prepare_dataset(train_dataset, eval_dataset, train_load_dataset_kwargs, eval_load_dataset_kwargs)
+    
     # Initialize training kwargs from user kwargs:
     train_kwargs = configs[ConfigKeys.training]
 

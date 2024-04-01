@@ -21,7 +21,6 @@ import mlrun
 def test_dpo_fn():
     model_name = "mistralai/Mistral-7B-Instruct-v0.2"
     tokenizer = model_name
-    # dop_trainer = mlrun.import_function("function.yaml")
 
     ctx = mlrun.get_or_create_ctx(name="test_dpo")
     train_dataset = "unalignment/toxic-dpo-v0.2"
@@ -56,43 +55,3 @@ def test_dpo_fn():
         use_cuda=True,
         beta=0.1,
     )
-
-
-def test_dpo_train():
-
-    model_name = "mistralai/Mistral-7B-Instruct-v0.2"
-    tokenizer = model_name
-    dop_trainer = mlrun.import_function("function.yaml")
-
-    training_arguments = {
-        "per_device_train_batch_size": 4,
-        "gradient_accumulation_steps": 1,
-        "warmup_steps": 2,
-        "max_steps": 10,
-        "learning_rate": 2e-4,
-        "logging_steps": 1,
-    }
-
-    params = {
-        "model": (model_name, "transformers.AutoModelForCausalLM"),
-        "ref_model": None,
-        "tokenizer": tokenizer,
-        "train_dataset": "Abirate/english_quotes",
-        "training_config": training_arguments,
-        "dataset_columns_to_train": "quote",
-        "model_pretrained_config": {"use_cache": False},
-        "use_cuda": False,
-    }
-
-    try:
-        with tempfile.TemporaryDirectory() as test_directory:
-            dpo_trainer.run(
-                local=True,
-                params=params,
-                handler="dpo_train",
-                returns=["model"],
-                workdir=test_directory,
-            )
-
-    except Exception as exception:
-        print(f"- The training failed - raised the following error:\n- {exception}")

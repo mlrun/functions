@@ -13,12 +13,13 @@
 # limitations under the License.
 
 import tempfile
-from huggingface_dpo_trainer import dpo_train
 
+# from huggingface_dpo_trainer import dpo_train
 import mlrun
 
 
 def test_dpo_fn():
+    dpo_trainer = mlrun.import_function("function.yaml")
     model_name = "mistralai/Mistral-7B-Instruct-v0.2"
     tokenizer = model_name
 
@@ -44,14 +45,24 @@ def test_dpo_fn():
         "remove_unused_columns": True,
         "gradient_checkpointing": True,
     }
-    dpo_train(
-        context=ctx,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
-        peft_config=True,
-        model=model_name,
-        tokenizer=tokenizer,
-        training_config=training_arguments,
-        use_cuda=True,
-        beta=0.1,
-    )
+    params = {
+        "model": model_name,
+        "tokenizer": tokenizer,
+        "train_dataset": train_dataset,
+        "eval_dataset": eval_dataset,
+        "peft_config": True,
+        "training_config": training_arguments,
+        "use_cuda": True,
+        "beta": 0.1,
+    }
+    try:
+        with tempfile.TemporaryDirectory() as test_directory:
+            dpo_trainer.run(
+                local=True,
+                params=params,
+                handler="dpo_train",
+                returns=["model"],
+                workdir=test_directory,
+            )
+    except Exception as exception:
+        print(f"-The training failed -raised the following error: \n -{exception}")

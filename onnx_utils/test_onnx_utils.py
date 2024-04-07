@@ -257,7 +257,7 @@ def test_pytorch_to_onnx():
         filename="test_onnx_utils.py",
         name="log_model",
         kind="job",
-        image="mlrun/ml-models",
+        image="mlrun/mlrun",
     )
 
     # Run the function to log the model:
@@ -341,7 +341,7 @@ def test_optimize():
         filename="test_onnx_utils.py",
         name="log_model",
         kind="job",
-        image="mlrun/ml-models",
+        image="mlrun/mlrun",
     )
 
     # Run the function to log the model:

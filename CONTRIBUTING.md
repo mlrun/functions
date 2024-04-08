@@ -118,17 +118,18 @@ version: 0.0.1         # Function version, should follow the standard semantic v
 The table below represents the available options to choose from when filling `item.yaml`'s `categories` property. Please 
 select one or more categories and feel free to suggest additional options.
 
-| Name | How should it be written in item.yaml | When should i choose this category? |
-|------|---------------------------------------|-------------------------------------|
-| Data Preparation | <b>data-preparation</b> | A function that prepares, cleans or otherwise processes data in any other number of ways |
-| Extract, Transform, Load | <b>etl</b> | A function that can be used to take data from some source, transforms it and finally load it to some destination |
-| Machine Learning | <b>machine-learning</b> | A function that is related to machine learning in any way, can be used along-side categories like Data Preparation, Model Training, Model Serving |
-| Model Serving | <b>model-serving</b> | A function that can be used to serve models via V2ModelServer |
-| Model Training | <b>model-training</b> | A function that can be used for training Machine Learning models |
-| Model Testing | <b>model-testing</b> | A function that can be used to test trained models |
-| Data Analysis | <b>data-analysis</b> | A function that can be used to preform analysis and exploration on data |
-| Monitoring | <b>monitoring</b> | A function that can be used to monitor and/or measure metrics regarding data, models and model endpoints |
-| Utilities | <b>Utilities</b> | A function that is used to alert, notify or provide services in any way |
+| Name                     | How should it be written in item.yaml | When should i choose this category? |
+|--------------------------|---------------------------------------|-------------------------------------|
+| Data Preparation         | <b>data-preparation</b>               | A function that prepares, cleans or otherwise processes data in any other number of ways |
+| Extract, Transform, Load | <b>etl</b>                            | A function that can be used to take data from some source, transforms it and finally load it to some destination |
+| Machine Learning         | <b>machine-learning</b>               | A function that is related to machine learning in any way, can be used along-side categories like Data Preparation, Model Training, Model Serving |
+| Model Serving            | <b>model-serving</b>                  | A function that can be used to serve models via V2ModelServer |
+| Model Training           | <b>model-training</b>                 | A function that can be used for training Machine Learning models |
+| Model Testing            | <b>model-testing</b>                  | A function that can be used to test trained models |
+| Data Analysis            | <b>data-analysis</b>                  | A function that can be used to preform analysis and exploration on data |
+| Deep Learning            | <b>deep-learning</b>                  | A function that can be used to teaches computers to process data in a way that is inspired by the human brain |
+| Monitoring               | <b>monitoring</b>                     | A function that can be used to monitor and/or measure metrics regarding data, models and model endpoints |
+| Utilities                | <b>Utilities</b>                      | A function that is used to alert, notify or provide services in any way |
 
 ## Installation Guide
 It is highly advised using the functions package in a dedicated environment, since Pipenv is used as part of the testing routine, 

@@ -2,12 +2,12 @@ kind: job
 metadata:
   name: silero-vad
   tag: ''
-  hash: bc0ad5572cc391fcdc93baaee48e1ef949a7984d
+  hash: 61b7a70c167b7819481fdabf9350fc6fa344d2f5
   project: ''
   labels:
     author: guyl
   categories:
-  - Deep Learning
+  - deep-learning
   - PyTorch
   - Audio
 spec:
@@ -34,8 +34,9 @@ spec:
       outputs:
       - doc: The audio file of the task.
         type: Path
-        default: ''
       lineno: 43
+      has_varargs: false
+      has_kwargs: false
     do_task:
       name: do_task
       doc: Do the task on the given speech timestamps. The task will diarize the VAD
@@ -46,9 +47,10 @@ spec:
         type: List[List[Dict[str, int]]]
         doc: The speech timestamps per channel to do the task on as outputted from
           the VAD.
-      outputs:
-      - default: ''
+      outputs: []
       lineno: 94
+      has_varargs: false
+      has_kwargs: false
     get_result:
       name: get_result
       doc: Get the result of the task. A tuple of the audio file name and the result.
@@ -56,8 +58,10 @@ spec:
       - name: self
       outputs:
       - doc: The result of the task.
-        default: ''
+        type: Tuple[str, list]
       lineno: 61
+      has_varargs: false
+      has_kwargs: false
     to_tuple:
       name: to_tuple
       doc: Convert the task to a tuple to reconstruct it later (used for multiprocessing
@@ -66,8 +70,10 @@ spec:
       - name: self
       outputs:
       - doc: The converted task.
-        default: ''
+        type: Tuple[str, dict]
       lineno: 116
+      has_varargs: false
+      has_kwargs: false
     create_task:
       name: create_task
       doc: Create a task with the given audio file.
@@ -79,8 +85,9 @@ spec:
       outputs:
       - doc: The created task.
         type: BaseTask
-        default: ''
       lineno: 146
+      has_varargs: false
+      has_kwargs: false
     from_tuple:
       name: from_tuple
       doc: Create a task from a tuple of the audio file name and the task kwargs.
@@ -92,8 +99,9 @@ spec:
       outputs:
       - doc: The created task.
         type: BaseTask
-        default: ''
       lineno: 157
+      has_varargs: false
+      has_kwargs: false
     load:
       name: load
       doc: Load the VAD model.
@@ -104,9 +112,10 @@ spec:
         doc: Whether to force reload the model even if it was already loaded. Default
           is True.
         default: true
-      outputs:
-      - default: ''
+      outputs: []
       lineno: 234
+      has_varargs: false
+      has_kwargs: false
     detect_voice:
       name: detect_voice
       doc: "Perform voice activity detection on given audio files using the silero\
@@ -186,9 +195,10 @@ spec:
         type: bool
         doc: Verbosity.
         default: false
-      outputs:
-      - default: ''
+      outputs: []
       lineno: 393
+      has_varargs: false
+      has_kwargs: false
     diarize:
       name: diarize
       doc: "Perform speech diarization on given audio files using the silero VAD model\
@@ -264,9 +274,10 @@ spec:
         type: bool
         doc: Verbosity.
         default: false
-      outputs:
-      - default: ''
+      outputs: []
       lineno: 517
+      has_varargs: false
+      has_kwargs: false
   description: Silero VAD (Voice Activity Detection) functions.
   default_handler: detect_voice
   disable_auto_mount: false

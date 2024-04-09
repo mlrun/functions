@@ -2,11 +2,13 @@ kind: job
 metadata:
   name: hugging-face-classifier-trainer
   tag: ''
-  hash: e8113e81f04c96fc9a8a94e717dea81ee3e05a18
+  hash: f9d8aa4a2c66e24fa418bb163829adc3e2ada06c
   project: ''
   labels:
     author: davids
   categories:
+  - deep-learning
+  - huggingface
   - machine-learning
   - model-training
 spec:

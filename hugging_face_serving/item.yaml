@@ -1,5 +1,7 @@
 apiVersion: v1
 categories:
+- huggingface
+- genai
 - model-serving
 - machine-learning
 description: Generic Hugging Face model server.
@@ -26,4 +28,4 @@ spec:
   - transformers==4.21.3
   - tensorflow==2.9.2
 url: ''
-version: 1.0.0
+version: 1.1.0

@@ -3,7 +3,7 @@ categories:
 - machine-learning
 - data-preparation
 - data-generation
-- GenAI
+- genai
 description: GenAI approach of generating structured data according to a given schema
 doc: ''
 example: structured_data_generator.ipynb

@@ -29,3 +29,4 @@ spec:
   - tensorflow==2.9.2
 url: ''
 version: 1.1.0
+test_valid: false

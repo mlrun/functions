@@ -1,5 +1,7 @@
 apiVersion: v1
 categories:
+- deep-learning
+- huggingface
 - machine-learning
 - model-training
 description: Automatic train and optimize functions for HuggingFace framework
@@ -28,4 +30,4 @@ spec:
   - datasets~=2.10.1
   - scikit-learn~=1.0.2
 url: ''
-version: 0.2.0
+version: 0.3.0

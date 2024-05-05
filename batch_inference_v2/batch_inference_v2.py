@@ -11,11 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-
-from typing import Any, Dict, List, Union
-
+from inspect import signature
+from typing import Any, Dict, List, Union, Optional
 import mlrun
 
 try:
@@ -26,15 +24,12 @@ except ModuleNotFoundError:
         f"older version of the batch inference function."
     )
 
-
 import numpy as np
 import pandas as pd
 from mlrun.frameworks.auto_mlrun import AutoMLRun
 
 
-def _prepare_result_set(
-    x: pd.DataFrame, label_columns: List[str], y_pred: np.ndarray
-) -> pd.DataFrame:
+def _prepare_result_set(x: pd.DataFrame, label_columns: List[str], y_pred: np.ndarray) -> pd.DataFrame:
     """
     Set default label column names and validate given names to prepare the result set - a concatenation of the inputs
     (x) and the model predictions (y_pred).
@@ -79,32 +74,57 @@ def _prepare_result_set(
     )
 
 
+def _get_sample_set_statistics_parameters(context: mlrun.MLClientCtx,
+                                          model_endpoint_sample_set: Union[
+                                              mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
+                                          model_artifact_feature_stats: dict,
+                                          feature_columns: Optional[List],
+                                          drop_columns: Optional[List],
+                                          label_columns: Optional[List]) -> Dict[str, Any]:
+    statics_input_full_dict = dict(sample_set=model_endpoint_sample_set,
+                                   model_artifact_feature_stats=model_artifact_feature_stats,
+                                   sample_set_columns=feature_columns,
+                                   sample_set_drop_columns=drop_columns,
+                                   sample_set_label_columns=label_columns)
+    get_sample_statics_function = mlrun.model_monitoring.api.get_sample_set_statistics
+    statics_function_input_dict = signature(get_sample_statics_function).parameters
+    #  As a result of changes to input parameters in the mlrun-get_sample_set_statistics function,
+    #  we will now send only the parameters it expects.
+    statistics_input_filtered = {key: statics_input_full_dict[key] for key in statics_function_input_dict}
+    if len(statistics_input_filtered) != len(statics_function_input_dict):
+        context.logger.warning(f"get_sample_set_statistics is in an older version; "
+                               "some parameters will not be sent to the function."
+                               f" Expected input: {list(statics_function_input_dict.keys())},"
+                               f" actual input: {list(statistics_input_filtered.keys())}")
+    return statistics_input_filtered
+
+
 def infer(
-    context: mlrun.MLClientCtx,
-    dataset: Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
-    model_path: Union[str, mlrun.DataItem],
-    drop_columns: Union[str, List[str], int, List[int]] = None,
-    label_columns: Union[str, List[str]] = None,
-    feature_columns: Union[str, List[str]] = None,
-    log_result_set: bool = True,
-    result_set_name: str = "prediction",
-    batch_id: str = None,
-    artifacts_tag: str = "",
-    # Drift analysis parameters
-    perform_drift_analysis: bool = None,
-    trigger_monitoring_job: bool = False,
-    batch_image_job: str = "mlrun/mlrun",
-    endpoint_id: str = "",
-    # The following model endpoint parameters are relevant only if:
-    # perform drift analysis is not disabled
-    # a new model endpoint record is going to be generated
-    model_endpoint_name: str = "batch-infer",
-    model_endpoint_drift_threshold: float = 0.7,
-    model_endpoint_possible_drift_threshold: float = 0.5,
-    model_endpoint_sample_set: Union[
-        mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray
-    ] = None,
-    **predict_kwargs: Dict[str, Any],
+        context: mlrun.MLClientCtx,
+        dataset: Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray],
+        model_path: Union[str, mlrun.DataItem],
+        drop_columns: Union[str, List[str], int, List[int]] = None,
+        label_columns: Union[str, List[str]] = None,
+        feature_columns: Union[str, List[str]] = None,
+        log_result_set: bool = True,
+        result_set_name: str = "prediction",
+        batch_id: str = None,
+        artifacts_tag: str = "",
+        # Drift analysis parameters
+        perform_drift_analysis: bool = None,
+        trigger_monitoring_job: bool = False,
+        batch_image_job: str = "mlrun/mlrun",
+        endpoint_id: str = "",
+        # The following model endpoint parameters are relevant only if:
+        # perform drift analysis is not disabled
+        # a new model endpoint record is going to be generated
+        model_endpoint_name: str = "batch-infer",
+        model_endpoint_drift_threshold: float = 0.7,
+        model_endpoint_possible_drift_threshold: float = 0.5,
+        model_endpoint_sample_set: Union[
+            mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndarray
+        ] = None,
+        **predict_kwargs: Dict[str, Any],
 ):
     """
     Perform a prediction on a given dataset with the given model. Please make sure that you have already logged the model
@@ -217,17 +237,21 @@ def infer(
 
     # Check for performing drift analysis
     if (
-        perform_drift_analysis is None
-        and model_handler._model_artifact.spec.feature_stats is not None
+            perform_drift_analysis is None
+            and model_handler._model_artifact.spec.feature_stats is not None
     ):
         perform_drift_analysis = True
     if perform_drift_analysis:
         context.logger.info("Performing drift analysis...")
         # Get the sample set statistics (either from the sample set or from the statistics logged with the model)
-        sample_set_statistics = mlrun.model_monitoring.api.get_sample_set_statistics(
-            sample_set=model_endpoint_sample_set,
+        statistics_input_filtered = _get_sample_set_statistics_parameters(
+            context=context,
+            model_endpoint_sample_set=model_endpoint_sample_set,
             model_artifact_feature_stats=model_handler._model_artifact.spec.feature_stats,
-        )
+            feature_columns=feature_columns,
+            drop_columns=drop_columns,
+            label_columns=label_columns)
+        sample_set_statistics = mlrun.model_monitoring.api.get_sample_set_statistics(**statistics_input_filtered)
         mlrun.model_monitoring.api.record_results(
             project=context.project,
             context=context,

@@ -1,3 +1,5 @@
-openai-whisper
+transformers
+torch
+torchaudio
 tqdm
-librosa
+accelerate

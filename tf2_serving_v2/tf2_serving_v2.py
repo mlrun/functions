@@ -69,14 +69,3 @@ class TFModel(mlrun.serving.V2ModelServer):
         predicted_probability = self.model.predict(images)
 
         return predicted_probability.tolist()[0]
-
-
-from mlrun.runtimes import nuclio_init_hook
-
-
-def init_context(context):
-    nuclio_init_hook(context, globals(), "serving_v2")
-
-
-def handler(context, event):
-    return context.mlrun_handler(context, event)

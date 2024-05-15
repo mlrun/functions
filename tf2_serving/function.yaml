@@ -46,7 +46,7 @@ spec:
       - name: MODEL_CLASS
         value: TF2Model
       handler: tf2_serving:handler
-      runtime: python:3.6
+      runtime: python:3.9
       volumes: []
   source: ''
   function_kind: serving

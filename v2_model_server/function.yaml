@@ -70,7 +70,7 @@ spec:
       annotations:
         nuclio.io/generated_by: function generated from /home/michaell/projects/functions/v2_model_server/v2_model_server.py
     spec:
-      runtime: python:3.6
+      runtime: python:3.9
       handler: v2_model_server:handler
       env: []
       volumes: []

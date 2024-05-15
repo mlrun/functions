@@ -30,7 +30,7 @@ spec:
       annotations:
         nuclio.io/generated_by: function generated from /home/kali/functions/tf1_serving/tf1_serving.py
     spec:
-      runtime: python:3.6
+      runtime: python:3.9
       handler: tf1_serving:handler
       env: []
       volumes: []

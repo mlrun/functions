@@ -28,7 +28,7 @@ spec:
       annotations:
         nuclio.io/generated_by: function generated from /User/test/functions/concept_drift_streaming/concept_drift_streaming.py
     spec:
-      runtime: python:3.6
+      runtime: python:3.9
       handler: concept_drift_streaming:handler
       env: []
       volumes: []

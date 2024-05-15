@@ -251,7 +251,7 @@ spec:
       annotations:
         nuclio.io/generated_by: function generated from /home/michaell/projects/functions/model_monitoring_stream/model_monitoring_stream.py
     spec:
-      runtime: python:3.6
+      runtime: python:3.9
       handler: model_monitoring_stream:handler
       env: []
       volumes: []

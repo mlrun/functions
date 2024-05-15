@@ -29,7 +29,7 @@ spec:
       annotations:
         nuclio.io/generated_by: function generated from /User/functions/churn_server/churn_server.py
     spec:
-      runtime: python:3.6
+      runtime: python:3.9
       handler: churn_server:handler
       env: []
       volumes: []

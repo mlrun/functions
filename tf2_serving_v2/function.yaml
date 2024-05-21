@@ -26,7 +26,7 @@ spec:
       annotations:
         nuclio.io/generated_by: function generated from /home/kali/functions/tf2_serving_v2/tf2_serving_v2.py
     spec:
-      runtime: python:3.6
+      runtime: python:3.9
       handler: tf2_serving_v2:handler
       env: []
       volumes: []

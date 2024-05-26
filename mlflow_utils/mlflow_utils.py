@@ -13,7 +13,7 @@ class MLFlowModelServer(V2ModelServer):
 
     def load(self):
         """
-        loads an model that was logged by the MLFlow tracker model
+        loads a model that was logged by the MLFlow tracker model
         """
         # Unzip the model dir and then use mlflow's load function
         model_file, _ = self.get_model(".zip")

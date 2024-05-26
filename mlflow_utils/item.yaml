@@ -14,7 +14,7 @@ labels:
   author: zeevr
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.7.0
+mlrunVersion: 1.7.0-rc17
 name: mlflow_utils
 platformVersion: ''
 spec:

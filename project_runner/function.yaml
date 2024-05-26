@@ -48,6 +48,6 @@ spec:
         noBaseImagesPull: true
       env: []
       handler: project_runner:handler
-      runtime: python:3.6
+      runtime: python:3.9
       volumes: []
   source: ''

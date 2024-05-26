@@ -25,7 +25,7 @@ from sklearn.metrics import accuracy_score, log_loss
 from sklearn.model_selection import train_test_split
 
 import os
-os.environ["MLRUN_IGNORE_ENV_FILE"] = "True"  #TODO remove before push
+# os.environ["MLRUN_IGNORE_ENV_FILE"] = "True"  #TODO remove before push
 
 import mlrun
 import mlrun.launcher.local

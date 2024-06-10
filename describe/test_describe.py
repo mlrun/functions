@@ -318,7 +318,7 @@ def test_import_function_describe_dask():
 def test_code_to_function_describe_dask():
     dask_uri = "dask_func.yaml"
     _create_dask_func(dask_uri)
-    describe_func = code_to_function(filename="describe.py", kind="local")
+    describe_func = import_function("function.yaml")
     is_test_passed = True
     _create_data(n_samples=100, n_features=5, n_classes=3, n_informative=3)
     describe_func.spec.command = "describe_dask.py"

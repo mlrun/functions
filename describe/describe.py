@@ -36,7 +36,7 @@ from mlrun.artifacts import (
 )
 from mlrun.datastore import DataItem
 from mlrun.execution import MLClientCtx
-from mlrun.feature_store import FeatureSet, FeatureVector
+from mlrun.feature_store import FeatureSet
 from plotly.subplots import make_subplots
 
 pd.set_option("display.float_format", lambda x: "%.2f" % x)
@@ -234,24 +234,24 @@ def _create_features_histogram_artifacts(
     if label_column is not None and problem_type == "classification":
         all_labels = df[label_column].unique()
     visible = True
-    for (columnName, _) in df.iteritems():
-        if columnName == label_column:
+    for column_name in df.columns:
+        if column_name == label_column:
             continue
 
         if label_column is not None and problem_type == "classification":
             for label in all_labels:
                 sub_fig = go.Histogram(
                     histfunc="count",
-                    x=df.loc[df[label_column] == label][columnName],
+                    x=df.loc[df[label_column] == label][column_name],
                     name=str(label),
                     visible=visible,
                 )
-                figs[f"{columnName}@?@{label}"] = sub_fig
+                figs[f"{column_name}@?@{label}"] = sub_fig
         else:
-            sub_fig = go.Histogram(histfunc="count", x=df[columnName], visible=visible)
-            figs[f"{columnName}@?@{1}"] = sub_fig
+            sub_fig = go.Histogram(histfunc="count", x=df[column_name], visible=visible)
+            figs[f"{column_name}@?@{1}"] = sub_fig
         if visible:
-            first_feature_name = columnName
+            first_feature_name = column_name
         visible = False
 
     fig = go.Figure()
@@ -338,7 +338,7 @@ def _create_features_2d_scatter_artifacts(
     Create and log a scatter-2d artifact for each couple of features
     """
     features = [
-        columnName for (columnName, _) in df.iteritems() if columnName != label_column
+        column_name for column_name in df.columns if column_name != label_column
     ]
     max_feature_len = float(max(len(elem) for elem in features))
     if label_column is not None:
@@ -450,11 +450,12 @@ def _create_violin_artifact(
 
     plot_num = 0
 
-    for (columnName, columnData) in df.iteritems():
+    for column_name in df.columns:
+        column_data = df[column_name]
         violin = go.Violin(
-            x=[columnName] * columnData.shape[0],
-            y=columnData,
-            name=columnName,
+            x=[column_name] * column_data.shape[0],
+            y=column_data,
+            name=column_name,
         )
 
         fig.add_trace(
@@ -491,15 +492,15 @@ def _create_imbalance_artifact(
     """
     if label_column:
         if problem_type == "classification":
+            values_column = "count"
             labels_count = df[label_column].value_counts().sort_index()
             df_labels_count = pd.DataFrame(labels_count)
-            df_labels_count.rename(columns={label_column: "Total"}, inplace=True)
             df_labels_count[label_column] = labels_count.index
-            df_labels_count["weights"] = df_labels_count["Total"] / sum(
-                df_labels_count["Total"]
+            df_labels_count.rename(columns={"": values_column}, inplace=True)
+            df_labels_count[values_column] = df_labels_count[values_column] / sum(
+                df_labels_count[values_column]
             )
-
-            fig = px.pie(df_labels_count, names=label_column, values="Total")
+            fig = px.pie(df_labels_count, names=label_column, values=values_column)
         else:
             fig = px.histogram(
                 histfunc="count",
@@ -532,7 +533,7 @@ def _create_corr_artifact(
     """
     if label_column is not None:
         df = df.drop([label_column], axis=1)
-    tblcorr = df.corr()
+    tblcorr = df.corr(numeric_only=True)
     extra_data["correlation-matrix-csv"] = context.log_artifact(
         TableArtifact("correlation-matrix-csv", df=tblcorr, visible=True),
         local_path=f"{plots_dest}/correlation-matrix.csv",

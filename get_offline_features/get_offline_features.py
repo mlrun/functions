@@ -20,7 +20,8 @@ from mlrun.datastore.store_resources import is_store_uri, parse_store_uri
 from mlrun.datastore.targets import get_target_driver, kind_to_driver
 from mlrun.datastore.base import DataItem
 from mlrun.execution import MLClientCtx
-from mlrun.utils import StorePrefix, parse_versioned_object_uri
+from mlrun.utils import StorePrefix
+from mlrun.common.helpers import parse_versioned_object_uri
 from mlrun.errors import MLRunInvalidArgumentError
 
 

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import os
 import subprocess
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -237,7 +236,6 @@ class TestPY(TestSuite):
         item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
         mlrun_version = list(get_item_yaml_values(path, "mlrunVersion")["mlrunVersion"])[0]
         install_requirements(path, ["pytest", f"mlrun=={mlrun_version}"] + item_requirements)
-        click.echo(os.popen("pip list").read())
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ; pipenv run python -m pytest",

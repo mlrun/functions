@@ -39,10 +39,7 @@ def _validate_paths(paths: Set):
         if Path(full_path).is_file():
             print(f"{path} exist")
         else:
-            pwd = os.popen("pwd").read()
-            ls_l = os.popen("ls -l").read()
-            ls_l_base = os.popen(f"ls -l {os.path.abspath(base_folder)}").read()
-            raise FileNotFoundError(f"{path} not found!,\npwd: {pwd}\nls -l: {ls_l}\n\nls -l {os.path.abspath(base_folder)}: {ls_l_base}")
+            raise FileNotFoundError(f"{path} not found!")
 
 
 @pytest.fixture(autouse=True)

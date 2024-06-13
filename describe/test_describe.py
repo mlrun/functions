@@ -313,37 +313,3 @@ def test_import_function_describe_dask():
         }
     )
     assert is_test_passed
-
-
-def test_code_to_function_describe_dask():
-    dask_uri = "dask_func.yaml"
-    _create_dask_func(dask_uri)
-    describe_func = import_function("function.yaml")
-    is_test_passed = True
-    _create_data(n_samples=100, n_features=5, n_classes=3, n_informative=3)
-    describe_func.spec.command = "describe_dask.py"
-
-    try:
-        describe_run = describe_func.run(
-            name="task-describe",
-            handler="analyze",
-            inputs={"table": DATA_PATH},
-            params={
-                "label_column": "label",
-                "dask_function": dask_uri,
-                "dask_flag": True,
-            },
-            artifact_path=os.path.abspath("./artifacts"),
-            local=True,
-        )
-
-    except Exception as exception:
-        print(f"- The test failed - raised the following error:\n- {exception}")
-        is_test_passed = False
-    _validate_paths(
-        {
-            "imbalance.html",
-            "imbalance-weights-vec.csv",
-        }
-    )
-    assert is_test_passed

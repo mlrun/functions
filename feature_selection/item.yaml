@@ -12,7 +12,7 @@ labels:
   author: orz
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.6.3
 name: feature-selection
 platformVersion: 3.5.0
 spec:
@@ -22,4 +22,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 1.4.0
+version: 1.5.0

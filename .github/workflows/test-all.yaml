@@ -136,6 +136,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V4 }}
           USERNAME: iguazio-cicd
+          USEREMAIL: iguaziocicd@gmail.com
           REPO_PATH: marketplace
           BASE_REPO: mlrun
           BASE_BRANCH: master
@@ -153,6 +154,8 @@ jobs:
               exit 1;
           };
           git config --local user.name $USERNAME
+          git config --global user.email $USEREMAIL
+          git config --global user.name $USERNAME
           git branch --set-upstream-to origin/master
           git remote -v
           echo "Checking out [$BRANCH_NAME]..."

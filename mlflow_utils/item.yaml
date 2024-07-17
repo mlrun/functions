@@ -27,5 +27,6 @@ spec:
   requirements:
   - mlflow==2.12.2
   - lightgbm
+  - xgboost
 url: ''
 version: 1.0.0

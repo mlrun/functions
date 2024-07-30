@@ -9,7 +9,7 @@ metadata:
   categories:
   - data-prep
   credentials:
-    access_key: ec09bfc8-1cb4-466d-9049-852081973ce3
+    access_key: 
 spec:
   command: ''
   args: []

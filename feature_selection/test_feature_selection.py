@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from mlrun import code_to_function
+from mlrun import code_to_function, get_dataitem
 from pathlib import Path
 import shutil
 
@@ -44,5 +44,5 @@ def test_run_local_feature_selection():
         inputs={'df_artifact': 'data/metrics.pq'},
         artifact_path='artifacts/',
     )
-    assert run.artifact('feature_scores').get() and run.artifact('selected_features').get()
+    assert run.outputs['feature_scores'] and run.outputs['selected_features']
     _delete_outputs({ARTIFACTS_PATH, RUNS_PATH, SCHEDULES_PATH})

@@ -1,7 +1,0 @@
-pandas
-typing
-xgboost
-matplotlib
-scikit-learn
-seaborn
-scikit-plot

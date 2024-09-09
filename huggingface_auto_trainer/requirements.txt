@@ -1,5 +1,0 @@
-peft
-transformers
-torch
-datasets
-plotly

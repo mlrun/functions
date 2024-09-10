@@ -3,7 +3,6 @@ categories:
 - genai
 - model-serving
 - machine-learning
-- mlflow
 description: Mlflow model server, and additional utils.
 doc: ''
 example: mlflow_utils.ipynb

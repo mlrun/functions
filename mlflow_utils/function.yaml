@@ -4,7 +4,6 @@ metadata:
   - genai
   - model-serving
   - machine-learning
-  - mlflow
   tag: ''
 spec:
   default_handler: ''

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from mlrun import code_to_function, get_dataitem
+from mlrun import code_to_function
 from pathlib import Path
 import shutil
 

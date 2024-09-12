@@ -44,5 +44,5 @@ def test_run_local_feature_selection():
         inputs={'df_artifact': 'data/metrics.pq'},
         artifact_path='artifacts/',
     )
-    assert run.artifact('feature_scores').get() and run.artifact('selected_features').get()
+    assert run.outputs['feature_scores'] and run.outputs['selected_features']
     _delete_outputs({ARTIFACTS_PATH, RUNS_PATH, SCHEDULES_PATH})

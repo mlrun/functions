@@ -2,12 +2,14 @@ kind: job
 metadata:
   name: transcribe
   tag: ''
-  hash: 5cd620de67a936ee8a87cfc1f0b97e19730d0a69
+  hash: 8810ac74045bd15cee15a2e4e89563e8e29908d3
   project: ''
   labels:
     author: yonatans
   categories:
   - data-preparation
+  - genai
+  - huggingface
   - machine-learning
 spec:
   command: ''
@@ -24,6 +26,7 @@ spec:
     - tqdm
     - torchaudio
     - torch
+    - accelerate
   entry_points:
     do_task:
       name: do_task

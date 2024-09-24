@@ -2,14 +2,14 @@ kind: job
 metadata:
   name: pyannote-audio
   tag: ''
-  hash: c45be8d7f51f0b2203155b08c307814a2cb0ac78
+  hash: aed670a0534ebf30690dd2af7acad35595c7d5b1
   project: ''
   labels:
     author: guyl
   categories:
   - deep-learning
-  - Huggingface
-  - Audio
+  - huggingface
+  - audio
 spec:
   command: ''
   args: []

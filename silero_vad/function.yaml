@@ -2,14 +2,14 @@ kind: job
 metadata:
   name: silero-vad
   tag: ''
-  hash: 61b7a70c167b7819481fdabf9350fc6fa344d2f5
+  hash: 59336f808643a74f3a2c5d506977387010427208
   project: ''
   labels:
     author: guyl
   categories:
   - deep-learning
-  - PyTorch
-  - Audio
+  - pytorch
+  - audio
 spec:
   command: ''
   args: []

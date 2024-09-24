@@ -18,19 +18,19 @@ from mlrun import import_function
 import os.path
 from os import path
 import mlrun
-from pygit2 import Repository
+# from pygit2 import Repository
 
 
 MODEL_PATH = os.path.join(os.path.abspath("./"), "models")
 MODEL = MODEL_PATH + "model.pt"
 
 
-def set_mlrun_hub_url():
-    branch = Repository(".").head.shorthand
-    hub_url = "https://raw.githubusercontent.com/mlrun/functions/{}/churn_server/function.yaml".format(
-        branch
-    )
-    mlrun.mlconf.hub_url = hub_url
+# def set_mlrun_hub_url():
+#     branch = Repository(".").head.shorthand
+#     hub_url = "https://raw.githubusercontent.com/mlrun/functions/{}/churn_server/function.yaml".format(
+#         branch
+#     )
+#     mlrun.mlconf.hub_url = hub_url
 
 
 def download_pretrained_model(model_path):

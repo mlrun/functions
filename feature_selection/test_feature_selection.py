@@ -66,3 +66,4 @@ def test_run_local_feature_selection():
         ]
     )
     _delete_outputs({ARTIFACTS_PATH, RUNS_PATH, SCHEDULES_PATH})
+    assert run.outputs['feature_scores'] and run.outputs['selected_features']

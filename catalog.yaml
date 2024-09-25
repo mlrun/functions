@@ -128,15 +128,6 @@ github-utils:
   kind: job
   versions:
     latest: github_utils/function.yaml
-load-dask:
-  categories:
-  - data-movement
-  - utils
-  description: load dask cluster with data
-  docfile: load_dask/load_dask.ipynb
-  kind: dask
-  versions:
-    latest: load_dask/function.yaml
 load-dataset:
   categories:
   - data-source

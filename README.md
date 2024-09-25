@@ -21,7 +21,6 @@ it is expected that contributors follow certain guidelines/protocols (please chi
 | [feature-selection](feature_selection/feature_selection.ipynb) | job | Select features through multiple Statistical and Model filters | data-prep, ml |
 | [gen-class-data](gen_class_data/gen_class_data.ipynb) | job | Create a binary classification sample dataset and save. | data-prep |
 | [github-utils](github_utils/github_utils.ipynb) | job | add comments to github pull request | notifications, utils |
-| [load-dask](load_dask/load_dask.ipynb) | dask | load dask cluster with data | data-movement, utils |
 | [load-dataset](load_dataset/load_dataset.ipynb) | job | load a toy dataset from scikit-learn | data-source, ml |
 | [model-monitoring-batch](model_monitoring_batch/model_monitoring_batch.ipynb) | job |  |  |
 | [model-monitoring-stream](model_monitoring_stream/model_monitoring_stream.ipynb) | nuclio |  |  |

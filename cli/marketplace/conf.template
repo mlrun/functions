@@ -93,6 +93,7 @@ html_theme_options = {
     "path_to_docs": "docs",
     "repository_branch": "{{repository_branch}}",
     "single_page": True,
+    "navigation_with_keys": False,
 }
 
 html_title = "{{html_title}}"

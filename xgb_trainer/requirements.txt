@@ -1,8 +1,0 @@
-pandas
-xgboost
-cloudpickle
-pygit2
-scikit-learn==1.0.2
-matplotlib
-seaborn
-scikit-plot

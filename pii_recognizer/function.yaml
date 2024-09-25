@@ -2,13 +2,14 @@ kind: job
 metadata:
   name: pii-recognizer
   tag: ''
-  hash: b09b7b9a4ffd55088d665a0191055411e9198a2f
+  hash: 818930645d33704e9cada919769ee9d93cbb9434
   project: ''
   labels:
     author: pgw
   categories:
   - machine-learning
   - data-preparation
+  - NLP
 spec:
   command: ''
   args: []

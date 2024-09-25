@@ -2,11 +2,13 @@ kind: job
 metadata:
   name: question-answering
   tag: ''
-  hash: 90e67d116b256a98da7d5819724e43df01d8b4eb
+  hash: aed62db95f17576c69b457767e3595c2de1d5465
   project: ''
   labels:
     author: yonish
   categories:
+  - genai
+  - huggingface
   - machine-learning
 spec:
   command: ''

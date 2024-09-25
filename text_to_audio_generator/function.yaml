@@ -2,13 +2,14 @@ kind: job
 metadata:
   name: text-to-audio-generator
   tag: ''
-  hash: 534e34d316098dcb345860a786ea013102150e67
+  hash: 89fcaf3fab53e7b7fbba448a5e65c253d7fa66ed
   project: ''
   labels:
     author: yonatans
   categories:
   - data-preparation
   - machine-learning
+  - pytorch
 spec:
   command: ''
   args: []

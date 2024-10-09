@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import json
+
 import os
 import pickle
+import time
 import uuid
 import numpy as np
 import pandas as pd
@@ -30,14 +31,13 @@ import mlrun
 import mlrun.common.schemas
 from batch_inference_v2 import infer
 import shutil
-
+from mlrun.model_monitoring.api import get_or_create_model_endpoint
 REQUIRED_ENV_VARS = [
     "MLRUN_DBPATH",
     "V3IO_USERNAME",
     "V3IO_API",
     "V3IO_ACCESS_KEY",
 ]
-
 
 def _validate_environment_variables() -> bool:
     """
@@ -86,26 +86,32 @@ def train(training_set: pd.DataFrame):
     model.fit(training_set, labels)
 
 
-def assert_batch_predict(n_features, batch_inference_run):
+def assert_batch_predict(n_features, batch_inference_run, with_monitoring=False, project_name="batch-infer-test"):
     # Check the logged results:
     assert "batch_id" in batch_inference_run.status.results
-    assert "drift_metric" in batch_inference_run.status.results
-    assert batch_inference_run.status.results["drift_status"] is True
+    assert len(batch_inference_run.status.artifacts) == 1
+    assert len(batch_inference_run.artifact("prediction").as_df().columns) == n_features + 1
+    if with_monitoring:
+        # Check that the drift analysis was performed:
+        time.sleep(60)
+        # Retrieve the model endpoint
+        project = get_or_create_project(project_name)
+        endpoint = get_or_create_model_endpoint(project=project.name, model_endpoint_name="my_cool_endpoint")
 
-    # Check that 3 artifacts were generated
-    assert len(batch_inference_run.status.artifacts) == 3
+        # Validate that the artifacts were logged in the project
+        artifacts = project.list_artifacts(
+            labels={
+                "mlrun/producer-type": "model-monitoring-app",
+                "mlrun/app-name": "histogram-data-drift",
+                "mlrun/endpoint-id": endpoint.metadata.uid,
+            }
+        )
 
-    # Check drift table artifact url
-    assert (
-            batch_inference_run.artifact("drift_table_plot").artifact_url
-            == batch_inference_run.outputs["drift_table_plot"]
-    )
+        assert len(artifacts) == 2
 
-    # Check the features drift results json:
-    drift_results_file = batch_inference_run.artifact("features_drift_results").local()
-    with open(drift_results_file, "r") as json_file:
-        drift_results = json.load(json_file)
-    assert len(drift_results) == n_features + 1
+        # Validate that the model endpoint has been updated as expected
+        assert endpoint.status.current_stats
+        assert endpoint.status.drift_status
 
 
 @pytest.mark.skipif(
@@ -141,16 +147,29 @@ def test_batch_predict():
         params={
             "model_path": train_run.outputs["model"],
             "label_columns": "target_label",
-            "trigger_monitoring_job": True,
-            "perform_drift_analysis": True,
-            "model_endpoint_drift_threshold": 0.2,
-            "model_endpoint_possible_drift_threshold": 0.1,
+            "perform_drift_analysis": False,
         },
         local=True,
     )
 
     # Check the logged results:
     assert_batch_predict(n_features=n_features, batch_inference_run=batch_inference_run)
+
+    # Enable model monitoring
+    project.set_model_monitoring_credentials(
+        endpoint_store_connection="v3io",
+        tsdb_connection="v3io",
+        stream_path="v3io")
+
+    # Deploy model monitoring infrastructure
+    project.enable_model_monitoring(wait_for_deployment=True, base_period=1)
+
+    # Wait until the monitoring application is triggered
+    import time
+    time.sleep(60)
+
+    # Check the logged results:
+    assert_batch_predict(n_features=n_features, batch_inference_run=batch_inference_run, with_monitoring=True)
 
     # Clean resources
     _delete_project(project=project.metadata.name)
@@ -222,13 +241,11 @@ class TestBatchInferUnitTests:
               label_columns="target_label",
               model_endpoint_name=f"model-endpoint-name-{uuid.uuid4()}",
               trigger_monitoring_job=True,
-              perform_drift_analysis=True,
-              model_endpoint_drift_threshold=0.7,
-              model_endpoint_possible_drift_threshold=0.5)
+              perform_drift_analysis=True)
         #  a workaround until ML-4636 will be solved.
         batch_inference_run = self.project.list_runs(name=self.context.name).to_objects()[0]
         mlrun.get_run_db().update_run(updates={"status.state": "completed"}, uid=batch_inference_run.uid())
-        assert_batch_predict(n_features=n_features, batch_inference_run=batch_inference_run)
+        assert_batch_predict(n_features=n_features, batch_inference_run=batch_inference_run, project_name=self.project_name)
 
 
 def _delete_project(project: str):

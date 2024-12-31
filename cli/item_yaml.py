@@ -40,7 +40,7 @@ def update_functions_yaml(root_directory: str,
         if (inner_dir / item_yaml).exists():
             path = str(inner_dir)+"/"+item_yaml
             stream = open(path, 'r')
-            data = yaml.load(stream)
+            data = yaml.load(stream=stream, Loader=yaml.FullLoader)
             if version:
                 data['version'] = version
             if mlrun_version:

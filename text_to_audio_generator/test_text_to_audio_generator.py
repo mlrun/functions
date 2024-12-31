@@ -20,7 +20,7 @@ import pytest
 
 
 @pytest.mark.skipif(
-    condition=os.getenv("OPENAI_BASE_URL") is None
+    condition=os.getenv("OPENAI_API_BASE") is None
     and os.getenv("OPENAI_API_KEY") is None,
     reason="OpenAI API key and base URL are required to run this test",
 )

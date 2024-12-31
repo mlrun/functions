@@ -31,7 +31,7 @@ from pydub import AudioSegment
 _LOGGER = logging.getLogger()
 
 OPENAI_API_KEY = "OPENAI_API_KEY"
-OPENAI_BASE_URL = "OPENAI_BASE_URL"
+OPENAI_BASE_URL = "OPENAI_API_BASE"
 SAMPLE_RATE = 24000
 
 

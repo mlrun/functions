@@ -26,7 +26,6 @@ import pandas as pd
 import torch
 import torchaudio
 import tqdm
-from pydub import AudioSegment
 
 # Get the global logger:
 _LOGGER = logging.getLogger()

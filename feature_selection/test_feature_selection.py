@@ -12,14 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from mlrun import code_to_function
-from pathlib import Path
+import os
 import shutil
+from pathlib import Path
 
-METRICS_PATH = 'data/metrics.pq'
-ARTIFACTS_PATH = 'artifacts'
-RUNS_PATH = 'runs'
-SCHEDULES_PATH = 'schedules'
+import mlrun
+
+METRICS_PATH = "data/metrics.pq"
+ARTIFACTS_PATH = "artifacts"
+RUNS_PATH = "runs"
+SCHEDULES_PATH = "schedules"
+PLOTS_PATH = os.path.abspath("./artifacts/feature-selection-feature-selection/0")
+
+
+def _validate_paths(paths):
+    """
+    Check if all the expected plot are saved
+    """
+    base_folder = PLOTS_PATH
+    for path in paths:
+        full_path = os.path.join(base_folder, path)
+        if Path(full_path).is_file():
+            print(f"{path} exist")
+        else:
+            raise FileNotFoundError(f"{path} not found!")
+    return True
 
 
 def _delete_outputs(paths):
@@ -29,20 +46,24 @@ def _delete_outputs(paths):
 
 
 def test_run_local_feature_selection():
-    fn = code_to_function(name='test_run_local_feature_selection',
-                          filename="feature_selection.py",
-                          handler="feature_selection",
-                          kind="local",
-                          )
-    fn.spec.command = "feature_selection.py"
+    fn = mlrun.import_function("function.yaml")
     run = fn.run(
         params={
-            'k': 2,
-            'min_votes': 0.3,
-            'label_column': 'is_error',
+            "k": 2,
+            "min_votes": 0.3,
+            "label_column": "is_error",
         },
-        inputs={'df_artifact': 'data/metrics.pq'},
-        artifact_path='artifacts/',
+        inputs={"df_artifact": "data/metrics.pq"},
+        artifact_path="artifacts/",
+        local=True,
     )
-    assert run.artifact('feature_scores').get() and run.artifact('selected_features').get()
+    assert _validate_paths(
+        [
+            "chi2.html",
+            "f_classif.html",
+            "f_regression.html",
+            "mutual_info_classif.html",
+        ]
+    )
     _delete_outputs({ARTIFACTS_PATH, RUNS_PATH, SCHEDULES_PATH})
+    assert run.outputs['feature_scores'] and run.outputs['selected_features']

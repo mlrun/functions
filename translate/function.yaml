@@ -2,13 +2,16 @@ kind: job
 metadata:
   name: translate
   tag: ''
-  hash: bc26313449cd13554a18106ed9893535fb79dd6e
+  hash: 7eedf684bcebfbfd964e5503afbb56335c8f4097
   project: ''
   labels:
     author: guyl
   categories:
   - data-preparation
+  - huggingface
   - machine-learning
+  - deep-learning
+  - NLP
 spec:
   command: ''
   args: []
@@ -34,24 +37,27 @@ spec:
       - name: root_worker_inputs
         type: Dict[str, Any]
         default: null
-      outputs:
-      - default: ''
+      outputs: []
       lineno: 56
+      has_varargs: false
+      has_kwargs: false
     decorator:
       name: decorator
       doc: ''
       parameters:
       - name: handler
-      outputs:
-      - default: ''
+      outputs: []
       lineno: 68
+      has_varargs: false
+      has_kwargs: false
     wrapper:
       name: wrapper
       doc: ''
       parameters: []
-      outputs:
-      - default: ''
+      outputs: []
       lineno: 73
+      has_varargs: false
+      has_kwargs: true
     translate:
       name: translate
       doc: 'Translate text files using a transformer model from Huggingface''s hub
@@ -112,8 +118,10 @@ spec:
         default: false
       outputs:
       - doc: 'A tuple of:'
-        default: ''
+        type: Tuple[str, pd.DataFrame, dict]
       lineno: 135
+      has_varargs: false
+      has_kwargs: false
   description: Translate text files from one language to another
   default_handler: translate
   disable_auto_mount: false

@@ -15,62 +15,6 @@ arc-to-parquet:
   kind: job
   versions:
     latest: arc_to_parquet/function.yaml
-bert-embeddings:
-  categories:
-  - NLP
-  - BERT
-  - embeddings
-  description: Get BERT based embeddings for given text
-  docfile: bert_embeddings/bert_embeddings.ipynb
-  kind: remote
-  versions:
-    latest: bert_embeddings/function.yaml
-churn-server:
-  categories:
-  - serving
-  - ml
-  description: churn classification and predictor
-  docfile: churn_server/churn_server.ipynb
-  kind: serving
-  versions:
-    latest: churn_server/function.yaml
-concept-drift:
-  categories:
-  - ml
-  - serve
-  description: Deploy a streaming Concept Drift detector on a labeled stream
-  docfile: concept_drift/concept_drift.ipynb
-  kind: job
-  versions:
-    latest: concept_drift/function.yaml
-concept-drift-streaming:
-  categories:
-  - ml
-  - serve
-  description: Deploy a streaming Concept Drift detector on a labeled stream. the
-    nuclio part of the concept_drift function
-  docfile: concept_drift_streaming/concept_drift_streaming.ipynb
-  kind: remote
-  versions:
-    latest: concept_drift_streaming/function.yaml
-coxph-test:
-  categories:
-  - ml
-  - test
-  description: Test cox proportional hazards model
-  docfile: coxph_test/coxph_test.ipynb
-  kind: job
-  versions:
-    latest: coxph_test/function.yaml
-coxph-trainer:
-  categories:
-  - training
-  - ml
-  description: cox proportional hazards, kaplan meier plots
-  docfile: coxph_trainer/coxph_trainer.ipynb
-  kind: job
-  versions:
-    latest: coxph_trainer/function.yaml
 describe:
   categories:
   - analysis
@@ -94,14 +38,6 @@ describe-spark:
   kind: job
   versions:
     latest: describe_spark/function.yaml
-feature-perms:
-  categories:
-  - analysis
-  description: estimate feature importances using permutations
-  docfile: feature_perms/feature_perms.ipynb
-  kind: job
-  versions:
-    latest: feature_perms/function.yaml
 feature-selection:
   categories:
   - data-prep
@@ -128,15 +64,6 @@ github-utils:
   kind: job
   versions:
     latest: github_utils/function.yaml
-load-dask:
-  categories:
-  - data-movement
-  - utils
-  description: load dask cluster with data
-  docfile: load_dask/load_dask.ipynb
-  kind: dask
-  versions:
-    latest: load_dask/function.yaml
 load-dataset:
   categories:
   - data-source
@@ -153,13 +80,6 @@ model-monitoring-batch:
   kind: job
   versions:
     latest: model_monitoring_batch/function.yaml
-model-monitoring-stream:
-  categories: []
-  description: ''
-  docfile: model_monitoring_stream/model_monitoring_stream.ipynb
-  kind: remote
-  versions:
-    latest: model_monitoring_stream/function.yaml
 model-server:
   categories:
   - serving
@@ -187,30 +107,6 @@ open-archive:
   kind: job
   versions:
     latest: open_archive/function.yaml
-pandas-profiling-report:
-  categories:
-  - analysis
-  description: Create Pandas Profiling Report from Dataset
-  docfile: pandas_profiling_report/pandas_profiling_report.ipynb
-  kind: job
-  versions:
-    latest: pandas_profiling_report/function.yaml
-project-runner:
-  categories:
-  - utils
-  description: Nuclio based - Cron scheduler for running your MLRun projects
-  docfile: project_runner/project_runner.ipynb
-  kind: remote
-  versions:
-    latest: project_runner/function.yaml
-rnn-serving:
-  categories:
-  - model-serving
-  description: deploy an rnn based stock analysis model server.
-  docfile: rnn_serving/rnn_serving.ipynb
-  kind: serving
-  versions:
-    latest: rnn_serving/function.yaml
 send-email:
   categories:
   - notifications
@@ -249,14 +145,6 @@ sklearn-classifier-dask:
   kind: job
   versions:
     latest: sklearn_classifier_dask/function.yaml
-slack-notify:
-  categories:
-  - ops
-  description: Send Slack notification
-  docfile: slack_notify/slack_notify.ipynb
-  kind: job
-  versions:
-    latest: slack_notify/function.yaml
 spark-submit:
   categories: []
   description: ''
@@ -264,23 +152,6 @@ spark-submit:
   kind: job
   versions:
     latest: spark_submit/function.yaml
-sql-to-file:
-  categories:
-  - data-prep
-  description: SQL To File - Ingest data using SQL query
-  docfile: sql_to_file/sql_to_file.ipynb
-  kind: job
-  versions:
-    latest: sql_to_file/function.yaml
-stream-to-parquet:
-  categories:
-  - ml
-  - serve
-  description: Saves a stream to Parquet and can lunch drift detection task on it
-  docfile: stream_to_parquet/stream_to_parquet.ipynb
-  kind: remote
-  versions:
-    latest: stream_to_parquet/function.yaml
 test-classifier:
   categories:
   - ml
@@ -290,15 +161,6 @@ test-classifier:
   kind: job
   versions:
     latest: test_classifier/function.yaml
-tf1-serving:
-  categories:
-  - serving
-  - dl
-  description: tf1 image classification server
-  docfile: tf1_serving/tf1_serving.ipynb
-  kind: remote
-  versions:
-    latest: tf1_serving/function.yaml
 tf2-serving:
   categories:
   - serving
@@ -308,15 +170,6 @@ tf2-serving:
   kind: remote
   versions:
     latest: tf2_serving/function.yaml
-tf2-serving-v2:
-  categories:
-  - serving
-  - dl
-  description: tf2 image classification server v2
-  docfile: tf2_serving_v2/tf2_serving_v2.ipynb
-  kind: serving
-  versions:
-    latest: tf2_serving_v2/function.yaml
 v2-model-server:
   categories:
   - serving
@@ -335,45 +188,3 @@ v2-model-tester:
   kind: job
   versions:
     latest: v2_model_tester/function.yaml
-virtual-drift:
-  categories:
-  - ml
-  - serve
-  - concept-drift
-  description: Compute drift magnitude between Time-Samples T and U
-  docfile: virtual_drift/virtual_drift.ipynb
-  kind: job
-  versions:
-    latest: virtual_drift/function.yaml
-xgb-custom:
-  categories:
-  - model-testing
-  description: simulate data with outliers.
-  docfile: xgb_custom/xgb_custom.ipynb
-  kind: job
-  versions:
-    latest: xgb_custom/function.yaml
-xgb-serving:
-  categories:
-  - model-serving
-  description: deploy an XGBoost model server.
-  docfile: xgb_serving/xgb_serving.ipynb
-  kind: remote
-  versions:
-    latest: xgb_serving/function.yaml
-xgb-test:
-  categories:
-  - model-test
-  description: Test one or more classifier models against held-out dataset.
-  docfile: xgb_test/xgb_test.ipynb
-  kind: job
-  versions:
-    latest: xgb_test/function.yaml
-xgb-trainer:
-  categories:
-  - model-prep
-  description: train multiple model types using xgboost.
-  docfile: xgb_trainer/xgb_trainer.ipynb
-  kind: job
-  versions:
-    latest: xgb_trainer/function.yaml

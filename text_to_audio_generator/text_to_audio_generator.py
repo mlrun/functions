@@ -11,12 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import importlib
+import io
 import logging
+import os
 import pathlib
 import random
+import tempfile
+from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Tuple, Union
 
-import bark
 import numpy as np
 import pandas as pd
 import torch
@@ -26,15 +30,22 @@ import tqdm
 # Get the global logger:
 _LOGGER = logging.getLogger()
 
+OPENAI_API_KEY = "OPENAI_API_KEY"
+OPENAI_BASE_URL = "OPENAI_API_BASE"
+SAMPLE_RATE = 24000
+
 
 def generate_multi_speakers_audio(
     data_path: str,
-    output_directory: str,
     speakers: Union[List[str], Dict[str, int]],
     available_voices: List[str],
-    use_gpu: bool = True,
-    use_small_models: bool = False,
-    offload_cpu: bool = False,
+    engine: str = "openai",
+    output_directory: str = None,
+    use_gpu: Optional[bool] = None,
+    use_small_models: Optional[bool] = None,
+    offload_cpu: Optional[bool] = None,
+    model: Optional[str] = None,
+    speed: Optional[float] = None,
     sample_rate: int = 16000,
     file_format: str = "wav",
     verbose: bool = True,
@@ -44,16 +55,23 @@ def generate_multi_speakers_audio(
     Generate audio files from text files.
 
     :param data_path:           Path to the text file or directory containing the text files to generate audio from.
-    :param output_directory:    Path to the directory to save the generated audio files to.
     :param speakers:            List / Dict of speakers to generate audio for.
                                 If a list is given, the speakers will be assigned to channels in the order given.
                                 If dictionary, the keys will be the speakers and the values will be the channels.
     :param available_voices:    List of available voices to use for the generation.
-                        See here for the available voices:
+                        See here for the available voices for bark engine:
                         https://suno-ai.notion.site/8b8e8749ed514b0cbf3f699013548683?v=bc67cff786b04b50b3ceb756fd05f68c
-    :param use_gpu:             Whether to use the GPU for the generation.
-    :param use_small_models:    Whether to use the small models for the generation.
+                        See here for the available voices for openai engine:
+                        https://beta.openai.com/docs/api-reference/speech
+    :param engine:              The engine to use for the generation. Select either "bark" or "openai". Default is "openai".
+    :param output_directory:    Path to the directory to save the generated audio files to.
+    :param use_gpu:             Whether to use the GPU for the generation. Supported only in "bark" engine.
+    :param use_small_models:    Whether to use the small models for the generation. Supported only in "bark" engine.
     :param offload_cpu:         To reduce the memory footprint, the models can be offloaded to the CPU after loading.
+                                Supported only in "bark" engine.
+    :param model:               Which model to use for the generation. Supported only in "openai" engine.
+                                Default is "tts-1".
+    :param speed:               The speed of the generated audio. Select a value from `0.25` to `4.0`. `1.0` is the default.
     :param sample_rate:         The sampling rate of the generated audio.
     :param file_format:         The format of the generated audio files.
     :param verbose:             Whether to print the progress of the generation.
@@ -63,7 +81,7 @@ def generate_multi_speakers_audio(
     :returns:                   A tuple of:
                                 - The output directory path.
                                 - The generated audio files dataframe.
-                                - The errors dictionary.
+                                - The errors' dictionary.
     """
 
     global _LOGGER
@@ -72,16 +90,16 @@ def generate_multi_speakers_audio(
     data_path = pathlib.Path(data_path).absolute()
     text_files = _get_text_files(data_path=data_path)
 
-    # Load the bark models according to the given configurations:
-    bark.preload_models(
-        text_use_gpu=use_gpu,
-        text_use_small=use_small_models,
-        coarse_use_gpu=use_gpu,
-        coarse_use_small=use_small_models,
-        fine_use_gpu=use_gpu,
-        fine_use_small=use_small_models,
-        codec_use_gpu=use_gpu,
-        force_reload=offload_cpu,
+
+    # Prepare the speech engine:
+    engine = _get_engine(
+        engine=engine,
+        use_gpu=use_gpu,
+        use_small_models=use_small_models,
+        offload_cpu=offload_cpu,
+        model=model,
+        file_format=file_format,
+        speed=speed
     )
 
     # Check for per channel generation:
@@ -97,19 +115,22 @@ def generate_multi_speakers_audio(
 
     # Prepare the resampling module:
     resampler = torchaudio.transforms.Resample(
-        orig_freq=bark.SAMPLE_RATE, new_freq=sample_rate, dtype=torch.float32
+        orig_freq=SAMPLE_RATE, new_freq=sample_rate, dtype=torch.float32
     )
 
     # Prepare the gap between each speaker:
-    gap_between_speakers = np.zeros(int(0.5 * bark.SAMPLE_RATE))
+    gap_between_speakers = np.zeros(int(0.5 * SAMPLE_RATE))
 
     # Prepare the successes dataframe and errors dictionary to be returned:
     successes = []
     errors = {}
 
     # Create the output directory:
+    if output_directory is None:
+        output_directory = tempfile.mkdtemp()
     output_directory = pathlib.Path(output_directory)
-    output_directory.mkdir(exist_ok=True)
+    if not output_directory.exists():
+        output_directory.mkdir(exist_ok=True, parents=True)
 
     # Start generating audio:
     # Go over the audio files and transcribe:
@@ -152,11 +173,11 @@ def generate_multi_speakers_audio(
                     )
                 for sentence in _split_line(line=sentences):
                     # Generate words audio:
-                    audio = bark.generate_audio(
-                        sentence,
-                        history_prompt=chosen_voices[current_speaker],
-                        silent=True,
+                    audio = engine._generate_audio(
+                        text=sentence,
+                        voice=chosen_voices[current_speaker],
                     )
+
                     if speaker_per_channel:
                         silence = np.zeros_like(audio)
                         for speaker in audio_pieces.keys():
@@ -210,6 +231,117 @@ def generate_multi_speakers_audio(
     return str(output_directory), successes, errors
 
 
+class SpeechEngine(ABC):
+    @abstractmethod
+    def _generate_audio(self, text: str, voice: str) -> np.ndarray:
+        pass
+
+
+class BarkEngine(SpeechEngine):
+    def __init__(self, use_gpu: bool = True, use_small_models: bool = False, offload_cpu: bool = False):
+        try:
+            self.bark = importlib.import_module("bark")
+        except ImportError:
+            raise ImportError(
+                "The 'bark' library is required for the BarkEngine. Please install it using 'pip install bark-ai'."
+            )
+
+        self.bark.preload_models(
+            text_use_gpu=use_gpu,
+            text_use_small=use_small_models,
+            coarse_use_gpu=use_gpu,
+            coarse_use_small=use_small_models,
+            fine_use_gpu=use_gpu,
+            fine_use_small=use_small_models,
+            codec_use_gpu=use_gpu,
+            force_reload=offload_cpu,
+        )
+
+    def _generate_audio(self, text: str, voice: str) -> np.ndarray:
+        # Generate words audio:
+        audio = self.bark.generate_audio(
+            text,
+            history_prompt=voice,
+            silent=True,
+        )
+        return audio
+
+
+class OpenAIEngine(SpeechEngine):
+    def __init__(self, model: str = "tts-1", file_format: str = "wav", speed: float = 1.0):
+        try:
+            self.openai = importlib.import_module("openai")
+            self.pydub = importlib.import_module("pydub")
+        except ImportError:
+            raise ImportError(
+                "The 'openai' and 'pydub' libraries are required for the OpenAIEngine. Please install them using 'pip install openai pydub'."
+            )
+
+        api_key = os.getenv(OPENAI_API_KEY)
+        base_url = os.getenv(OPENAI_BASE_URL)
+        # Check if the key is already in the environment variables:
+        if not api_key or not base_url:
+            try:
+                import mlrun
+
+                context = mlrun.get_or_create_ctx(name="context")
+                # Check if the key is in the secrets:
+                api_key = context.get_secret(OPENAI_API_KEY)
+                base_url = context.get_secret(OPENAI_BASE_URL)
+            except ModuleNotFoundError:
+                raise EnvironmentError(
+                    f"One or more of the OpenAI required environment variables ('{OPENAI_API_KEY}', '{OPENAI_BASE_URL}') are missing."
+                    f"Please set them as environment variables or install mlrun (`pip install mlrun`)"
+                    f"and set them as project secrets using `project.set_secrets`."
+                )
+
+        self.client = self.openai.OpenAI(api_key=api_key, base_url=base_url)
+        self.model = model
+        self.file_format = file_format
+        self.speed = speed
+
+    def _generate_audio(self, text: str, voice: str) -> np.ndarray:
+        # Generate words audio:
+        audio = self.client.audio.speech.create(
+            model=self.model,
+            input=text,
+            voice=voice,
+            response_format=self.file_format,
+            speed=self.speed,
+        )
+        audio = audio.content
+        audio = self._bytes_to_np_array(audio=audio)
+        return audio
+
+    def _bytes_to_np_array(self, audio: bytes):
+        if self.file_format == "mp3":
+            audio_segment = self.pydub.AudioSegment.from_mp3(io.BytesIO(audio))
+
+            # Convert to raw PCM audio data
+            samples = audio_segment.get_array_of_samples()
+
+            # Convert to numpy array
+            audio_array = np.array(samples)
+
+            # Normalize to float between -1 and 1
+            return audio_array.astype(np.float32) / np.iinfo(samples.typecode).max
+        else:
+            return np.frombuffer(audio, dtype=np.int16) / 32768.0
+
+
+def _get_engine(engine: str, file_format: str, **kwargs) -> SpeechEngine:
+    # eliminate the None values:
+    kwargs = {key: value for key, value in kwargs.items() if value is not None}
+
+    if engine == "bark":
+        return BarkEngine(**kwargs)
+    elif engine == "openai":
+        return OpenAIEngine(file_format=file_format, **kwargs)
+    else:
+        raise ValueError(
+            f"Unrecognized engine. The parameter `engine` must be either 'bark' or 'openai'. Given: {engine}"
+        )
+
 def _get_text_files(
     data_path: pathlib.Path,
 ) -> List[pathlib.Path]:
@@ -257,6 +389,7 @@ def _get_logger():
     global _LOGGER
     try:
         import mlrun
+
         # Check if MLRun is available:
         context = mlrun.get_or_create_ctx(name="mlrun")
         return context.logger

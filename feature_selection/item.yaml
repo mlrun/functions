@@ -12,9 +12,9 @@ labels:
   author: orz
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.6.4
 name: feature-selection
-platformVersion: 3.5.0
+platformVersion: 3.6.0
 spec:
   filename: feature_selection.py
   handler: feature_selection
@@ -22,4 +22,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 1.3.0
+version: 1.5.0

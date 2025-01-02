@@ -22,7 +22,6 @@ spec:
   image: mlrun/mlrun
   kind: job
   requirements:
-    - openai
     - torchaudio
     - pydub
 url: ''

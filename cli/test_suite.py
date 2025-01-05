@@ -599,7 +599,7 @@ def clean_pipenv(directory: str):
 # load item yaml
 def load_item(path):
     with open(path, 'r') as stream:
-        data = yaml.load(stream)
+        data = yaml.load(stream=stream, Loader=yaml.FullLoader)
     return data
 
 

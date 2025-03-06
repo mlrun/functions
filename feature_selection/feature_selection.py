@@ -313,7 +313,7 @@ def feature_selection(
 
         # Saving
         top_features_fv.save()
-        fs.get_offline_features(top_features_fv, target=ParquetTarget())
+        top_features_fv.get_offline_features(target=ParquetTarget())
 
         # Logging our new feature vector URI
         context.log_result("top_features_vector", top_features_fv.uri)

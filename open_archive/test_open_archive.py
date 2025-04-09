@@ -37,7 +37,7 @@ def test_open_archive():
                           kind="local",
                           )
     fn.spec.command = "open_archive.py"
-    run = fn.run(inputs={'archive_url': ARCHIVE_URL},
+    fn.run(inputs={'archive_url': ARCHIVE_URL},
                  params={'key': 'test_archive', 'target_path': os.getcwd() + '/content/'},
                  local=True)
     

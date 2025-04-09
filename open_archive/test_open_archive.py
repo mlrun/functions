@@ -50,6 +50,5 @@ def test_open_archive_import_function():
     run = fn.run(inputs={'archive_url': ARCHIVE_URL},
                  params={'key': 'test_archive', 'target_path': os.getcwd() + '/content/'},
                  local=True)
-    print(run.to_dict())
-    assert (run.artifact('test_archive'))
+    assert (run.status.artifact_uris["test_archive"])
     _delete_outputs({'artifacts', 'runs', 'schedules', 'content'})

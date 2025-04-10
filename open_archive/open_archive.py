@@ -21,7 +21,7 @@ from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
 from mlrun.artifacts.base import DirArtifact
 
-import boto3
+
 from urllib.parse import urlparse
 
 def open_archive(
@@ -58,41 +58,19 @@ def open_archive(
     # When working on CE, target path might be on s3
     if 's3' in (target_path or subdir):
         context.logger.info(f'Using s3 scheme, extracting to {target_path or subdir}')
-        if os.environ.get('S3_ENDPOINT_URL'):
-            client = boto3.client('s3', endpoint_url = os.environ.get('S3_ENDPOINT_URL')) 
-        else:
-            client = boto3.client('s3')  
             
         if archive_url.endswith("gz"):
-            with tarfile.open(archive_url, mode="r|gz") as ref:
-                for member in ref.getmembers():
-                    data=ref.extractfile(member=member).read()
-                    client.put_object(Body=data, Bucket=urlparse(target_path or subdir).netloc, Key=f'{urlparse(target_path or subdir).path[1:]}{member.name}')
+            _extract_gz_file(archive_url=archive_url, subdir=subdir, target_path=target_path, in_s3=True)
 
         elif archive_url.endswith("zip"):
-            with zipfile.ZipFile(archive_url, "r") as ref:
-                for filename in ref.namelist():
-                    data=ref.read(filename)
-                    client.put_object(Body=data, Bucket=urlparse(target_path or subdir).netloc, Key=f'{urlparse(target_path or subdir).path[1:]}{filename}')
+            _extract_zip_file(archive_url=archive_url, subdir=subdir, target_path=target_path, in_s3=True)
         else:
             raise ValueError(f"unsupported archive type in {archive_url}")
-    
     else:
-        os.makedirs(target_path or subdir, exist_ok=True)
         if archive_url.endswith("gz"):
-            with tarfile.open(archive_url, mode="r:gz") as ref:
-                # Validate that there is no path traversal in the archive
-                for entry in ref.getmembers():
-                    if os.path.isabs(entry.name) or ".." in entry.name:
-                        raise ValueError(f"Illegal tar archive entry: {entry.name}")
-                ref.extractall(target_path or subdir)
+            _extract_gz_file(archive_url=archive_url, subdir=subdir, target_path=target_path)
         elif archive_url.endswith("zip"):
-            with zipfile.ZipFile(archive_url, "r") as ref:
-                # Validate that there is no path traversal in the archive
-                for entry in ref.namelist():
-                    if os.path.isabs(entry) or ".." in entry:
-                        raise ValueError(f"Illegal zip archive entry: {entry}")
-                ref.extractall(target_path or subdir)
+            _extract_zip_file(archive_url=archive_url, subdir=subdir, target_path=target_path)
         else:
             raise ValueError(f"unsupported archive type in {archive_url}")
             
@@ -101,3 +79,46 @@ def open_archive(
         
     context.logger.info(f'Logging artifact to {(target_path or subdir)}')
     context.log_artifact(DirArtifact(key=key, target_path=(target_path or subdir)))
+
+
+def _extract_gz_file(archive_url: str, target_path: str = None, subdir: str = "content/", in_s3: bool = False):
+    if in_s3:
+        client = _init_boto3_client()
+        with tarfile.open(archive_url, mode="r|gz") as ref:
+            for member in ref.getmembers():
+                data = ref.extractfile(member=member).read()
+                client.put_object(Body=data, Bucket=urlparse(target_path or subdir).netloc,
+                                  Key=f'{urlparse(target_path or subdir).path[1:]}{member.name}')
+    else:
+        with tarfile.open(archive_url, mode="r:gz") as ref:
+            # Validate that there is no path traversal in the archive
+            for entry in ref.getmembers():
+                if os.path.isabs(entry.name) or ".." in entry.name:
+                    raise ValueError(f"Illegal tar archive entry: {entry.name}")
+            os.makedirs(target_path or subdir, exist_ok=True)
+            ref.extractall(target_path or subdir)
+
+def _extract_zip_file(archive_url, target_path: str = None, subdir: str = "content/", in_s3: bool = False):
+    if in_s3:
+        client = _init_boto3_client()
+        with zipfile.ZipFile(archive_url, "r") as ref:
+            for filename in ref.namelist():
+                data = ref.read(filename)
+                client.put_object(Body=data, Bucket=urlparse(target_path or subdir).netloc,
+                                  Key=f'{urlparse(target_path or subdir).path[1:]}{filename}')
+    else:
+        with zipfile.ZipFile(archive_url, "r") as ref:
+            # Validate that there is no path traversal in the archive
+            for entry in ref.namelist():
+                if os.path.isabs(entry) or ".." in entry:
+                    raise ValueError(f"Illegal zip archive entry: {entry}")
+            os.makedirs(target_path or subdir, exist_ok=True)
+            ref.extractall(target_path or subdir)
+
+def _init_boto3_client():
+    import boto3
+    if os.environ.get('S3_ENDPOINT_URL'):
+        client = boto3.client('s3', endpoint_url = os.environ.get('S3_ENDPOINT_URL'))
+    else:
+        client = boto3.client('s3')
+    return client

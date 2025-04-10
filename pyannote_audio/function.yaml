@@ -2,14 +2,14 @@ kind: job
 metadata:
   name: pyannote-audio
   tag: ''
-  hash: 335752327ddd14b62222bd45faa3a88704505b66
+  hash: aed670a0534ebf30690dd2af7acad35595c7d5b1
   project: ''
   labels:
     author: guyl
   categories:
-  - Deep Learning
-  - Huggingface
-  - Audio
+  - deep-learning
+  - huggingface
+  - audio
 spec:
   command: ''
   args: []
@@ -35,24 +35,27 @@ spec:
       - name: root_worker_inputs
         type: Dict[str, Any]
         default: null
-      outputs:
-      - default: ''
+      outputs: []
       lineno: 61
+      has_varargs: false
+      has_kwargs: false
     decorator:
       name: decorator
       doc: ''
       parameters:
       - name: handler
-      outputs:
-      - default: ''
+      outputs: []
       lineno: 73
+      has_varargs: false
+      has_kwargs: false
     wrapper:
       name: wrapper
       doc: ''
       parameters: []
-      outputs:
-      - default: ''
+      outputs: []
       lineno: 78
+      has_varargs: false
+      has_kwargs: true
     diarize:
       name: diarize
       doc: "Perform speech diarization on given audio files using pyannote-audio (https://github.com/pyannote/pyannote-audio).\n\
@@ -131,8 +134,10 @@ spec:
         default: false
       outputs:
       - doc: 'A tuple of:'
-        default: ''
+        type: Tuple[Dict[str, List[Tuple[float, float, str]]], Dict[str, str]]
       lineno: 139
+      has_varargs: false
+      has_kwargs: false
   description: pyannote's speech diarization of audio files
   default_handler: diarize
   disable_auto_mount: false

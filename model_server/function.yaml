@@ -44,7 +44,7 @@ spec:
       - name: MODEL_CLASS
         value: ClassifierModel
       handler: model_server:handler
-      runtime: python:3.6
+      runtime: python:3.9
       volumes: []
   source: ''
   function_kind: serving

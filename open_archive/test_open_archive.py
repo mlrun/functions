@@ -15,13 +15,14 @@
 from pathlib import Path
 import shutil
 import os
-
+import tarfile
 from mlrun import code_to_function, import_function
+import open_archive
+import pytest
 
 ARTIFACTS_PATH = 'artifacts'
 CONTENT_PATH = 'content/data/images'
 ARCHIVE_URL = "https://s3.wasabisys.com/iguazio/data/cats-vs-dogs/cats-vs-dogs-labeling-demo.zip"
-
 
 
 def _delete_outputs(paths):
@@ -37,10 +38,10 @@ def test_open_archive():
                           kind="local",
                           )
     fn.spec.command = "open_archive.py"
-    run = fn.run(inputs={'archive_url': ARCHIVE_URL},
-                 params={'key': 'test_archive', 'target_path': os.getcwd() + '/content/'},
-                 local=True)
-    
+    fn.run(inputs={'archive_url': ARCHIVE_URL},
+           params={'key': 'test_archive', 'target_path': os.getcwd() + '/content/'},
+           local=True)
+
     assert Path(CONTENT_PATH).is_dir()
     _delete_outputs({'artifacts', 'runs', 'schedules', 'content'})
 
@@ -50,6 +51,20 @@ def test_open_archive_import_function():
     run = fn.run(inputs={'archive_url': ARCHIVE_URL},
                  params={'key': 'test_archive', 'target_path': os.getcwd() + '/content/'},
                  local=True)
-    
-    assert (run.artifact('test_archive'))
+    assert (run.status.artifact_uris["test_archive"])
     _delete_outputs({'artifacts', 'runs', 'schedules', 'content'})
+
+
+def test_traversal_entry():
+    with tarfile.open("malicious.tar.gz", "w:gz") as tar:
+        # create a file with a traversal attack
+        with open("malicious.txt", "w") as f:
+            f.write("malicious content to test traversal attack")
+
+        # add the file to the tar archive with a traversal attack path
+        tar.add("malicious.txt", arcname="../malicious.txt")
+
+    with pytest.raises(ValueError):
+        open_archive._extract_gz_file("malicious.tar.gz", target_path=os.getcwd() + '/content/')
+    os.remove("malicious.txt")
+    os.remove("malicious.tar.gz")

@@ -1,8 +1,8 @@
 apiVersion: v1
 categories:
-  - Deep Learning
-  - Huggingface
-  - Audio
+- deep-learning
+- huggingface
+- audio
 description: pyannote's speech diarization of audio files
 doc: ''
 example: pyannote_audio.ipynb
@@ -22,9 +22,9 @@ spec:
   image: mlrun/mlrun-gpu
   kind: job
   requirements:
-    - pyannote.audio
-    - pyannote.core
-    - torchaudio
-    - tqdm
+  - pyannote.audio
+  - pyannote.core
+  - torchaudio
+  - tqdm
 url: ''
-version: 1.0.0
+version: 1.2.0

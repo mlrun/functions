@@ -90,13 +90,14 @@ def _extract_gz_file(archive_url: str, target_path: str = None, subdir: str = "c
                 client.put_object(Body=data, Bucket=urlparse(target_path or subdir).netloc,
                                   Key=f'{urlparse(target_path or subdir).path[1:]}{member.name}')
     else:
+        os.makedirs(target_path or subdir, exist_ok=True)
         with tarfile.open(archive_url, mode="r:gz") as ref:
-            # Validate that there is no path traversal in the archive
-            for entry in ref.getmembers():
+            for entry in ref:
+                # Validate that there is no path traversal in the archive
                 if os.path.isabs(entry.name) or ".." in entry.name:
                     raise ValueError(f"Illegal tar archive entry: {entry.name}")
-            os.makedirs(target_path or subdir, exist_ok=True)
-            ref.extractall(target_path or subdir)
+
+                ref.extract(entry, target_path or subdir)
 
 
 def _extract_zip_file(archive_url, target_path: str = None, subdir: str = "content/", in_s3: bool = False):

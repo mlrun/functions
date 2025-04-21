@@ -71,6 +71,8 @@ def _log_tf_keras_model(context: mlrun.MLClientCtx, model_name: str):
     :param context:    The context to log to.
     :param model_name: The model name to use.
     """
+    # To use `tf_keras` instead of `tensorflow.keras`
+    os.environ["TF_USE_LEGACY_KERAS"] = "true"
     from mlrun.frameworks.tf_keras import TFKerasModelHandler
     from tensorflow import keras
 
@@ -93,8 +95,8 @@ def _log_pytorch_model(context: mlrun.MLClientCtx, model_name: str):
     :param context:    The context to log to.
     :param model_name: The model name to use.
     """
-    from mlrun.frameworks.pytorch import PyTorchModelHandler
     import torchvision
+    from mlrun.frameworks.pytorch import PyTorchModelHandler
 
     # Download the MobileNetV2 model:
     model = torchvision.models.mobilenet_v2()
@@ -112,38 +114,6 @@ def _log_pytorch_model(context: mlrun.MLClientCtx, model_name: str):
     model_handler.log()
 
 
-def _log_onnx_model(context: mlrun.MLClientCtx, model_name: str):
-    """
-    Create and log an ONNX model - MNIST.
-
-    :param context:    The context to log to.
-    :param model_name: The model name to use.
-    """
-    import mlrun.frameworks.onnx as mlrun_onnx
-    import requests
-
-    # Download the MNIST model:
-    mnist_model_name = "mnist-12"
-    requested_model = requests.get(
-        f"https://github.com/onnx/models/blob/main/vision/classification/mnist/model/{mnist_model_name}.onnx?raw=true"
-    )
-    with open(
-        os.path.join(context.artifact_path, f"{model_name}.onnx"), "bw"
-    ) as onnx_file:
-        onnx_file.write(requested_model.content)
-
-    # Initialize a model handler for logging the model:
-    model_handler = mlrun_onnx.ONNXModelHandler(
-        model_name=model_name,
-        model_path=context.artifact_path,
-        context=context,
-    )
-    model_handler.load()
-
-    # Log the model:
-    model_handler.log()
-
-
 def test_to_onnx_help():
     """
     Test the 'to_onnx' handler, passing "help" in the 'framework_kwargs'.
@@ -151,7 +121,7 @@ def test_to_onnx_help():
     # Setup the tests environment:
     artifact_path = _setup_environment()
 
-    # Create the function parsing this notebook's code using 'code_to_function':
+    # Create the function:
     log_model_function = mlrun.code_to_function(
         filename="test_onnx_utils.py",
         name="log_model",
@@ -177,9 +147,9 @@ def test_to_onnx_help():
             handler="to_onnx",
             artifact_path=artifact_path,
             params={
-                "model_path": log_model_run.outputs[
-                    "model"
-                ],  # <- Take the logged model from the previous function.
+                # Take the logged model from the previous function.
+                "model_path": log_model_run.status.artifacts[0]["spec"]["target_path"],
+                "load_model_kwargs": {"model_name": MODEL_NAME},
                 "framework_kwargs": "help",
             },
             local=True,
@@ -203,7 +173,7 @@ def test_tf_keras_to_onnx():
     # Setup the tests environment:
     artifact_path = _setup_environment()
 
-    # Create the function parsing this notebook's code using 'code_to_function':
+    # Create the function:
     log_model_function = mlrun.code_to_function(
         filename="test_onnx_utils.py",
         name="log_model",
@@ -227,9 +197,9 @@ def test_tf_keras_to_onnx():
         handler="to_onnx",
         artifact_path=artifact_path,
         params={
-            "model_path": log_model_run.outputs[
-                "model"
-            ],  # <- Take the logged model from the previous function.
+            # Take the logged model from the previous function.
+            "model_path": log_model_run.status.artifacts[0]["spec"]["target_path"],
+            "load_model_kwargs": {"model_name": MODEL_NAME},
             "onnx_model_name": ONNX_MODEL_NAME,
         },
         local=True,
@@ -252,7 +222,7 @@ def test_pytorch_to_onnx():
     # Setup the tests environment:
     artifact_path = _setup_environment()
 
-    # Create the function parsing this notebook's code using 'code_to_function':
+    # Create the function:
     log_model_function = mlrun.code_to_function(
         filename="test_onnx_utils.py",
         name="log_model",
@@ -276,9 +246,13 @@ def test_pytorch_to_onnx():
         handler="to_onnx",
         artifact_path=artifact_path,
         params={
-            "model_path": log_model_run.outputs[
-                "model"
-            ],  # <- Take the logged model from the previous function.
+            # Take the logged model from the previous function.
+            "model_path": log_model_run.status.artifacts[1]["spec"]["target_path"],
+            "load_model_kwargs": {
+                "model_name": MODEL_NAME,
+                "model_class": "mobilenet_v2",
+                "modules_map": log_model_run.status.artifacts[0]["spec"]["target_path"],
+            },
             "onnx_model_name": ONNX_MODEL_NAME,
             "framework_kwargs": {"input_signature": [((32, 3, 224, 224), "float32")]},
         },
@@ -336,7 +310,7 @@ def test_optimize():
     # Setup the tests environment:
     artifact_path = _setup_environment()
 
-    # Create the function parsing this notebook's code using 'code_to_function':
+    # Create the function:
     log_model_function = mlrun.code_to_function(
         filename="test_onnx_utils.py",
         name="log_model",
@@ -346,7 +320,7 @@ def test_optimize():
 
     # Run the function to log the model:
     log_model_run = log_model_function.run(
-        handler="_log_onnx_model",
+        handler="_log_tf_keras_model",
         artifact_path=artifact_path,
         params={"model_name": MODEL_NAME},
         local=True,
@@ -355,14 +329,29 @@ def test_optimize():
     # Import the ONNX Utils function:
     onnx_function = mlrun.import_function("function.yaml")
 
+    # Run the function to convert our model to ONNX:
+    to_onnx_function_run = onnx_function.run(
+        handler="to_onnx",
+        artifact_path=artifact_path,
+        params={
+            # Take the logged model from the previous function.
+            "model_path": log_model_run.status.artifacts[0]["spec"]["target_path"],
+            "load_model_kwargs": {"model_name": MODEL_NAME},
+            "onnx_model_name": ONNX_MODEL_NAME,
+        },
+        local=True,
+    )
+
     # Run the function to optimize our model:
-    onnx_function_run = onnx_function.run(
+    optimize_function_run = onnx_function.run(
         handler="optimize",
         artifact_path=artifact_path,
         params={
-            "model_path": log_model_run.outputs[
-                "model"
-            ],  # <- Take the logged model from the previous function.
+            # Take the logged model from the previous function.
+            "model_path": to_onnx_function_run.status.artifacts[0]["spec"][
+                "target_path"
+            ],
+            "handler_init_kwargs": {"model_name": ONNX_MODEL_NAME},
             "optimized_model_name": OPTIMIZED_ONNX_MODEL_NAME,
         },
         local=True,
@@ -372,7 +361,7 @@ def test_optimize():
     _cleanup_environment(artifact_path=artifact_path)
 
     # Print the outputs list:
-    print(f"Produced outputs: {onnx_function_run.outputs}")
+    print(f"Produced outputs: {optimize_function_run.outputs}")
 
     # Verify the '.onnx' model was created:
-    assert "model" in onnx_function_run.outputs
+    assert "model" in optimize_function_run.outputs

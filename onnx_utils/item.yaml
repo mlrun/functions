@@ -12,7 +12,7 @@ labels:
   author: guyl
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.7.2
 name: onnx_utils
 platformVersion: 3.5.0
 spec:

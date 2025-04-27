@@ -678,6 +678,7 @@ def build_temp_docs(temp_root, temp_docs, source_dir):
 
     :param temp_root:   The project's temporary functions root.
     :param temp_docs:   The project's temporary docs root.
+    :param source_dir:  Path to the source directory to build the marketplace from
     """
     click.echo("[Sphinx] Running autodoc...")
 

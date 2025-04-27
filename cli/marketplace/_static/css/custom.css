@@ -6,3 +6,7 @@
     height: 0;
     background-color: transparent;
 }
+
+.footer-content {
+    display: none;
+}

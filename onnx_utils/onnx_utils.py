@@ -146,7 +146,7 @@ class _ToONNXConversions:
             input_layers_names=input_layers_names,
             output_layers_names=output_layers_names,
             dynamic_axes=dynamic_axes,
-            is_batched=is_batched
+            is_batched=is_batched,
         )
 
 
@@ -160,6 +160,7 @@ _CONVERSION_MAP = {
 def to_onnx(
     context: mlrun.MLClientCtx,
     model_path: str,
+    load_model_kwargs: dict = None,
     onnx_model_name: str = None,
     optimize_model: bool = True,
     framework_kwargs: Dict[str, Any] = None,
@@ -167,19 +168,23 @@ def to_onnx(
     """
     Convert the given model to an ONNX model.
 
-    :param context:          The MLRun function execution context
-    :param model_path:       The model path store object.
-    :param onnx_model_name:  The name to use to log the converted ONNX model. If not given, the given `model_name` will
-                             be used with an additional suffix `_onnx`. Defaulted to None.
-    :param optimize_model:   Whether to optimize the ONNX model using 'onnxoptimizer' before saving the model. Defaulted
-                             to True.
-    :param framework_kwargs: Additional arguments each framework may require in order to convert to ONNX. To get the doc
-                             string of the desired framework onnx conversion function, pass "help".
+    :param context:           The MLRun function execution context
+    :param model_path:        The model path store object.
+    :param load_model_kwargs: Keyword arguments to pass to the `AutoMLRun.load_model` method.
+    :param onnx_model_name:   The name to use to log the converted ONNX model. If not given, the given `model_name` will
+                              be used with an additional suffix `_onnx`. Defaulted to None.
+    :param optimize_model:    Whether to optimize the ONNX model using 'onnxoptimizer' before saving the model.
+                              Defaulted to True.
+    :param framework_kwargs:  Additional arguments each framework may require to convert to ONNX. To get the doc string
+                              of the desired framework onnx conversion function, pass "help".
     """
     from mlrun.frameworks.auto_mlrun.auto_mlrun import AutoMLRun
 
     # Get a model handler of the required framework:
-    model_handler = AutoMLRun.load_model(model_path=model_path, context=context)
+    load_model_kwargs = load_model_kwargs or {}
+    model_handler = AutoMLRun.load_model(
+        model_path=model_path, context=context, **load_model_kwargs
+    )
 
     # Get the model's framework:
     framework = model_handler.FRAMEWORK_NAME
@@ -219,6 +224,7 @@ def to_onnx(
 def optimize(
     context: mlrun.MLClientCtx,
     model_path: str,
+    handler_init_kwargs: dict = None,
     optimizations: List[str] = None,
     fixed_point: bool = False,
     optimized_model_name: str = None,
@@ -228,8 +234,9 @@ def optimize(
 
     :param context:              The MLRun function execution context.
     :param model_path:           Path to the ONNX model object.
+    :param handler_init_kwargs:  Keyword arguments to pass to the `ONNXModelHandler` init method preloading.
     :param optimizations:        List of possible optimizations. To see what optimizations are available, pass "help".
-                                 If None, all of the optimizations will be used. Defaulted to None.
+                                 If None, all the optimizations will be used. Defaulted to None.
     :param fixed_point:          Optimize the weights using fixed point. Defaulted to False.
     :param optimized_model_name: The name of the optimized model. If None, the original model will be overridden.
                                  Defaulted to None.
@@ -245,8 +252,9 @@ def optimize(
         return
 
     # Create the model handler:
+    handler_init_kwargs = handler_init_kwargs or {}
     model_handler = ONNXModelHandler(
-        model_path=model_path, context=context
+        model_path=model_path, context=context, **handler_init_kwargs
     )
 
     # Load the ONNX model:

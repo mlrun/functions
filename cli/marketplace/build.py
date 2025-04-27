@@ -151,7 +151,7 @@ def build_marketplace(
     sphinx_quickstart(temp_docs, requirements)
 
     build_temp_project(source_dir, temp_root)
-    build_temp_docs(temp_root, temp_docs)
+    build_temp_docs(temp_root, temp_docs, source_dir)
     patch_temp_docs(source_dir, temp_docs)
 
     if _verbose:
@@ -668,7 +668,7 @@ def sphinx_quickstart(
     click.echo("[Sphinx] Done quickstart")
 
 
-def build_temp_docs(temp_root, temp_docs):
+def build_temp_docs(temp_root, temp_docs, source_dir):
     """
     Look recursively in <MODULE_PATH> for Python modules and packages and create
     one reST file with automodule directives per package in the <OUTPUT_PATH>. The
@@ -678,6 +678,7 @@ def build_temp_docs(temp_root, temp_docs):
 
     :param temp_root:   The project's temporary functions root.
     :param temp_docs:   The project's temporary docs root.
+    :param source_dir:  Path to the source directory to build the marketplace from
     """
     click.echo("[Sphinx] Running autodoc...")
 
@@ -686,6 +687,7 @@ def build_temp_docs(temp_root, temp_docs):
 
     sphinx_apidoc_cmd(cmd.split(" "))
 
+    shutil.copytree(source_dir / "cli" / "marketplace" / "_static" / "css", temp_docs / '_static/css')
     click.echo("[Sphinx] Done autodoc")
 
 

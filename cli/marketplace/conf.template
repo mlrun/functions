@@ -88,18 +88,19 @@ html_css_files = ["css/custom.css"]
 
 html_theme_options = {
     "repository_url": "{{repository_url}}",
-    "use_repository_button": True,
-    "use_issues_button": True,
-    "use_edit_page_button": True,
     "use_repository_button": False,
     "use_issues_button": False,
     "use_edit_page_button": False,
     "path_to_docs": "docs",
     "repository_branch": "{{repository_branch}}",
-    "single_page": True,
+    "home_page_in_toc": False,
     "navigation_with_keys": False,
-    "use_download_button": False,
     "use_fullscreen_button": False,
+    "show_navbar_depth": 1,
+    "theme_dev_mode": False,
+    "launch_buttons": {},
+    "default_mode": "light",
+    "switcher": False,
 }
 
 html_title = "{{html_title}}"

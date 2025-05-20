@@ -13,6 +13,7 @@
 
 import re
 import sys
+import os
 
 sys.path.insert(0, "{{sphinx_docs_target}}")
 
@@ -28,7 +29,7 @@ master_doc = "index"
 # The short X.Y version
 version = "{{version}}"
 release = "{{release}}"
-
+master_doc = "index"
 
 # -- General configuration ---------------------------------------------------
 
@@ -72,6 +73,8 @@ source_suffix = {
     ".md": "myst-nb",
 }
 
+# If you want to mock imports during autodoc
+autodoc_mock_imports = [{{mock_imports}}]
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -101,7 +104,12 @@ html_theme_options = {
     "launch_buttons": {},
     "default_mode": "light",
     "switcher": False,
+    "search_bar_text": "",
+    "search_bar_position": "none",
 }
+
+# Prevents generation of searchindex.js
+html_search = False
 
 html_title = "{{html_title}}"
 html_logo = "{{html_logo}}"
@@ -125,3 +133,12 @@ def copy_doc(src, dest, title=""):
                     changed = True
                 out.write(line)
 {% endraw %}
+
+# -- Post-build cleanup ------------------------------------------------------
+def remove_searchtools(app, exception):
+    searchtools_path = os.path.join(app.outdir, '_static', 'searchtools.js')
+    if os.path.exists(searchtools_path):
+        os.remove(searchtools_path)
+
+def setup(app):
+    app.connect("build-finished", remove_searchtools)

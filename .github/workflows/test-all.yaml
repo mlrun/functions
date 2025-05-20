@@ -68,7 +68,7 @@ jobs:
           path: functions
       # Install python 3.10
       - name: Install python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.10
       # Install dependencies
@@ -115,7 +115,7 @@ jobs:
           repository: mlrun/marketplace
           path: marketplace
       - name: Install python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.10
       - name: Install requirements

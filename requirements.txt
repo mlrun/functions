@@ -6,8 +6,8 @@ pipenv
 myst_nb
 black~=22.0
 isort~=5.7
-sphinx==7.2.6
-sphinx-book-theme==1.1.2
+sphinx~=8.1.0
+sphinx-book-theme~=1.1.3
 sphinx-togglebutton==0.3.2
 sphinxcontrib-applehelp==1.0.8
 sphinxcontrib-devhelp==1.0.6

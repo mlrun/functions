@@ -43,13 +43,6 @@ html:root {
     display: none !important;
 }
 
-.bd-header-article,
-.article-header-buttons,
-.article-header-buttons .dropdown{
-    height: 100%;
-    align-items: center;
-}
-
 .bd-header-article {
     position: relative;
     box-shadow: none !important;

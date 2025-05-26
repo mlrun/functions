@@ -89,20 +89,25 @@ html_theme = "sphinx_book_theme"
 html_static_path = ["_static"]
 html_css_files = ["css/custom.css"]
 
+# conf.py
+
+html_context = {
+    "default_mode": "light",  # Enforces light mode on page load
+}
+
 html_theme_options = {
     "repository_url": "{{repository_url}}",
+    "repository_branch": "{{repository_branch}}",
+    "path_to_docs": "docs",
     "use_repository_button": False,
     "use_issues_button": False,
     "use_edit_page_button": False,
-    "path_to_docs": "docs",
-    "repository_branch": "{{repository_branch}}",
     "home_page_in_toc": False,
     "navigation_with_keys": False,
     "use_fullscreen_button": False,
     "show_navbar_depth": 1,
     "theme_dev_mode": False,
     "launch_buttons": {},
-    "default_mode": "light",
     "switcher": False,
     "search_bar_text": "",
     "search_bar_position": "none",

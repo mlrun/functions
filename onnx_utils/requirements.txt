@@ -1,7 +1,7 @@
 tqdm~=4.67.1
 tensorflow~=2.19.0
 tf_keras~=2.19.0
-torch~=2.6.0
+torch~=2.7.1
 torchvision~=0.21.0
 onnx~=1.17.0
 onnxruntime~=1.19.2

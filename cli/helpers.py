@@ -61,19 +61,10 @@ def install_pipenv():
     )
     exit_on_non_zero_return(pipenv_install)
 
-    print("Creating pipenv environment using Python 3.10...")
-    pipenv_setup = subprocess.run(
-        "pipenv --python 3.10 install",
-        stdout=sys.stdout,
-        stderr=subprocess.PIPE,
-        shell=True,
-    )
-    exit_on_non_zero_return(pipenv_setup)
-
 
 def install_python(directory: Union[str, Path]):
     print(f"Installing python for {directory} ...")
-    install_command = f"pipenv --rm;pipenv --python 3.9"
+    install_command = f"pipenv --rm;pipenv --python 3.10.7"
     if (os.environ.get('CONDA_DEFAULT_ENV') is not None) and (os.environ.get('CONDA_PREFIX') is not None):
         print("conda env detected using conda to get pipenv python version")
         install_command = f"pipenv --rm;pipenv --python=$(conda run which python) --site-packages"

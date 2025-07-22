@@ -60,7 +60,14 @@ def install_pipenv():
         shell=True,
     )
     exit_on_non_zero_return(pipenv_install)
-
+    print("Creating pipenv environment using Python 3.10...")
+    pipenv_setup = subprocess.run(
+        "pipenv --python 3.10.7 install",
+        stdout=sys.stdout,
+        stderr=subprocess.PIPE,
+        shell=True,
+    )
+    exit_on_non_zero_return(pipenv_setup)
 
 def install_python(directory: Union[str, Path]):
     print(f"Installing python for {directory} ...")

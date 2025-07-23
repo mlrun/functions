@@ -1,9 +1,7 @@
 apiVersion: v1
 categories:
-- data-preparation
 - genai
-- huggingface
-- machine-learning
+- audio
 description: Transcribe audio files into text files
 doc: ''
 example: transcribe.ipynb

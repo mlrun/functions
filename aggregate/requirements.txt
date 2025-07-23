@@ -1,3 +1,2 @@
 pandas
 s3fs
-pyyaml==6.0

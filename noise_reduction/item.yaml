@@ -11,7 +11,7 @@ icon: ''
 labels:
   author: yonatans
 maintainers: []
-mlrunVersion: 1.5.2
+mlrunVersion: 1.7.0
 name: noise-reduction
 platformVersion: 3.5.3
 spec:
@@ -26,4 +26,4 @@ spec:
     torchaudio>=2.1.2,
   ]
 url: ''
-version: 1.0.0
+version: 1.1.0

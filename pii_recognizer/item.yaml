@@ -12,7 +12,7 @@ labels:
   author: pgw
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.4.0
+mlrunVersion: 1.7.0
 name: pii-recognizer
 platformVersion: 3.5.3
 spec:
@@ -30,5 +30,5 @@ spec:
    - st-annotated-text
    - https://huggingface.co/beki/en_spacy_pii_distilbert/resolve/main/en_spacy_pii_distilbert-any-py3-none-any.whl
 url: ''
-version: 0.3.0
+version: 0.4.0
 test_valid: False

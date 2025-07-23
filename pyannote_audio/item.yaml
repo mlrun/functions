@@ -12,7 +12,7 @@ labels:
   author: guyl
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.5.2
+mlrunVersion: 1.7.0
 name: pyannote-audio
 platformVersion: 3.5.3
 spec:
@@ -26,4 +26,4 @@ spec:
   - torchaudio
   - tqdm
 url: ''
-version: 1.2.0
+version: 1.3.0

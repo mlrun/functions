@@ -1,8 +1,7 @@
 apiVersion: v1
 categories:
-- genai
 - model-serving
-- machine-learning
+- utils
 description: Mlflow model server, and additional utils.
 doc: ''
 example: mlflow_utils.ipynb

@@ -11,7 +11,7 @@ labels:
   author: avia
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.7.0
+mlrunVersion: 1.4.1
 name: aggregate
 platformVersion: 3.5.4
 spec:

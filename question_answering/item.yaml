@@ -1,8 +1,6 @@
 apiVersion: v1
 categories:
 - genai
-- huggingface
-- machine-learning
 description: GenAI approach of question answering on a given data
 doc: ''
 example: question_answering.ipynb

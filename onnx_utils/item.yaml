@@ -1,6 +1,7 @@
 apiVersion: v1
 categories:
 - utils
+- deep-learning
 description: ONNX intigration in MLRun, some utils functions for the ONNX framework,
   optimizing and converting models from different framework to ONNX using MLRun.
 doc: ''

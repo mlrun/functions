@@ -12,7 +12,7 @@ labels:
   author: zeevr
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.7.0-rc17
+mlrunVersion: 1.8.0
 name: mlflow_utils
 platformVersion: ''
 spec:
@@ -27,4 +27,4 @@ spec:
   - lightgbm
   - xgboost
 url: ''
-version: 1.0.0
+version: 1.1.0

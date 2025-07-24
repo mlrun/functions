@@ -1,19 +1,19 @@
 apiVersion: v1
 categories:
+- machine-learning
 - model-serving
 description: AzureML serving function
 doc: ''
 example: azureml_serving.ipynb
-generationDate: 2022-08-28:17-25
-hidden: false
+generationDate: 2022-06-07:16-30
 icon: ''
 labels:
   author: yonish
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: ''
 name: azureml_serving
-platformVersion: 3.5.0
+platformVersion: ''
 spec:
   customFields:
     default_class: mlrun.frameworks.sklearn.PickleModelServer
@@ -23,4 +23,4 @@ spec:
   requirements:
   - azureml-automl-runtime~=1.38.1
 url: ''
-version: 1.1.0
+version: 1.0.0

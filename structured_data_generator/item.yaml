@@ -12,7 +12,7 @@ labels:
   author: zeevr
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.7.0
+mlrunVersion: 1.8.0
 name: structured_data_generator
 platformVersion: 3.5.5
 spec:

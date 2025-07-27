@@ -1,9 +1,7 @@
 apiVersion: v1
 categories:
-- data-preparation
+- audio
 - genai
-- huggingface
-- machine-learning
 description: Transcribe audio files into text files
 doc: ''
 example: transcribe.ipynb
@@ -14,7 +12,7 @@ labels:
   author: yonatans
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.5.1
+mlrunVersion: 1.7.0
 name: transcribe
 platformVersion: 3.5.3
 spec:
@@ -29,4 +27,4 @@ spec:
     - torch
     - accelerate
 url: ''
-version: 1.1.0
+version: 1.2.0

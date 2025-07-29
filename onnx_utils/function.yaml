@@ -176,7 +176,6 @@ spec:
     - onnxoptimizer~=0.3.13
     - onnxmltools~=1.13.0
     - tf2onnx~=1.16.1
-    - plotly~=5.4.0
     origin_filename: ''
   disable_auto_mount: false
 metadata:

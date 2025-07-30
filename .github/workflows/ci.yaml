@@ -1,10 +1,12 @@
 name: Test functions
-
+permissions:
+  contents: read
 on:
   pull_request:
     types: [opened,synchronize]
     branches-ignore:
       - testing
+  workflow_dispatch: {}
 
 jobs:
   build_strategy_matrix:

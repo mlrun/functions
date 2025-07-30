@@ -1,5 +1,6 @@
 name: Test all functions, build marketplace
-
+permissions:
+  contents: read
 on:
   push:
     branches:

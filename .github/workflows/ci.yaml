@@ -6,6 +6,7 @@ on:
     types: [opened,synchronize]
     branches-ignore:
       - testing
+  workflow_dispatch: {}
 
 jobs:
   build_strategy_matrix:

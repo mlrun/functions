@@ -36,4 +36,4 @@ def test_gen_class_data():
         local=True,
         artifact_path="./artifacts",
         )
-    assert os.path.isfile(run.status.artifacts[0]['spec']['target_path']), 'dataset is not available'
+    assert "classifier-data" in run.status.artifact_uris, 'dataset was not logged'

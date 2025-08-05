@@ -24,8 +24,6 @@ jobs:
         run: |
           echo "Changed files compared to origin/development:"
           git diff origin/development --name-only || echo "git diff failed"
-      - name: Create mock functions/ folder for compatibility
-        run: ln -s . functions
       - uses: actions/checkout@v3
       - id: set-matrix
         # This is very hacky, but it goes like that:
@@ -105,7 +103,7 @@ jobs:
        id: cache
        with:
          path: ~/.cache/pip
-         key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
+         key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
          restore-keys: |
            ${{ runner.os }}-pip-
      - name: Install requirements

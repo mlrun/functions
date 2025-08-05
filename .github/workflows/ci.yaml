@@ -109,7 +109,7 @@ jobs:
      - name: Install requirements
        run: |
          pip install --upgrade pip
-         pip install -r functions/requirements.txt
+         pip install -r requirements.txt
 
      - name: Run py tests
        run: python functions/functions.py  run-tests -r functions/src -s py -fn ${{ matrix.package }}

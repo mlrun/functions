@@ -47,7 +47,7 @@ jobs:
           fi
           matrix=$((
             echo '{ "package" : ['
-            git diff ${{ github.base_ref }} --name-only | grep '^functions/src/' | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
+            git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
             echo " ]}"
           ) | jq 'del(.[][] | select(. == ""))'  -c)
           echo "::set-output name=matrix::$matrix"

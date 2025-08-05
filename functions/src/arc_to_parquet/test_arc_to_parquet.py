@@ -17,6 +17,7 @@ from mlrun import code_to_function, import_function
 DATA_URL = "https://s3.wasabisys.com/iguazio/data/market-palce/arc_to_parquet/higgs-sample.csv.gz"
 
 def test_run_arc_to_parquet():
+    print("change made to function to trigger test") # todo: delete
     fn = code_to_function(name='test_arc_to_parquet',
                           filename="arc_to_parquet.py",
                           handler="arc_to_parquet",

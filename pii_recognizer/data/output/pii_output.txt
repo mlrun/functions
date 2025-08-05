@@ -1,1 +1,0 @@
-<PERSON> <ORGANIZATION> is <SSN>, connect him with <EMAIL> or <PHONE>, he can pay you with <CREDIT_CARD>

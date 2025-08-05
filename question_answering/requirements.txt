@@ -1,4 +1,0 @@
-transformers
-tqdm
-torch
-einops

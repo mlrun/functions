@@ -1,0 +1,2 @@
+pandas
+s3fs

@@ -1,0 +1,26 @@
+apiVersion: v1
+categories:
+- machine-learning
+- model-training
+description: Automatic train, evaluate and predict functions for the ML frameworks
+  - Scikit-Learn, XGBoost and LightGBM.
+doc: ''
+example: auto_trainer.ipynb
+generationDate: 2022-08-28:17-25
+hidden: false
+icon: ''
+labels:
+  author: yonish
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.5.2
+name: auto_trainer
+platformVersion: 3.5.0
+spec:
+  filename: auto_trainer.py
+  handler: train
+  image: mlrun/mlrun
+  kind: job
+  requirements: []
+url: ''
+version: 1.7.0

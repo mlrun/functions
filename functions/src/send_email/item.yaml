@@ -1,0 +1,24 @@
+apiVersion: v1
+categories:
+- utils
+description: Send Email messages through SMTP server
+doc: ''
+example: send_email.ipynb
+generationDate: 2022-08-28:17-25
+hidden: false
+icon: ''
+labels:
+  author: saarc
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.4.1
+name: send-email
+platformVersion: 3.5.3
+spec:
+  filename: send_email.py
+  handler: send_email
+  image: mlrun/mlrun
+  kind: job
+  requirements: []
+url: ''
+version: 1.2.0

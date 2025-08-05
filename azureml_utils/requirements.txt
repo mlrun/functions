@@ -1,3 +1,0 @@
-azureml-core==1.54.0.post1
-azureml-train-automl-client==1.54.0.post1
-plotly~=5.4

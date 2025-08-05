@@ -1,0 +1,26 @@
+apiVersion: v1
+categories:
+- model-serving
+- machine-learning
+description: generic sklearn model server
+doc: ''
+example: model_server.ipynb
+generationDate: 2022-08-28:17-25
+hidden: false
+icon: ''
+labels:
+  author: yaronh
+  framework: sklearn
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.1.0
+name: model-server
+platformVersion: 3.5.0
+spec:
+  filename: model_server.py
+  handler: handler
+  image: mlrun/mlrun
+  kind: nuclio:serving
+  requirements: []
+url: ''
+version: 1.1.0

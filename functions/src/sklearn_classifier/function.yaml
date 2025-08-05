@@ -1,0 +1,109 @@
+kind: job
+metadata:
+  name: sklearn-classifier
+  tag: ''
+  hash: d1d3c125c302e7c40c7d07fa3ed4cfc2cfabcbac
+  project: ''
+  labels:
+    author: yjb
+    framework: sklearn
+  categories:
+  - machine-learning
+  - model-training
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IHdhcm5pbmdzCgp3YXJuaW5ncy5zaW1wbGVmaWx0ZXIoYWN0aW9uPSJpZ25vcmUiLCBjYXRlZ29yeT1GdXR1cmVXYXJuaW5nKQoKCmZyb20gY2xvdWRwaWNrbGUgaW1wb3J0IGR1bXBzCmltcG9ydCBwYW5kYXMgYXMgcGQKZnJvbSB0eXBpbmcgaW1wb3J0IExpc3QKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CmZyb20gbWxydW4uZGF0YXN0b3JlIGltcG9ydCBEYXRhSXRlbQpmcm9tIG1scnVuLm1sdXRpbHMuZGF0YSBpbXBvcnQgZ2V0X3NhbXBsZSwgZ2V0X3NwbGl0cwpmcm9tIG1scnVuLm1sdXRpbHMubW9kZWxzIGltcG9ydCBnZW5fc2tsZWFybl9tb2RlbCwgZXZhbF9tb2RlbF92Mgpmcm9tIG1scnVuLnV0aWxzLmhlbHBlcnMgaW1wb3J0IGNyZWF0ZV9jbGFzcwoKCmRlZiB0cmFpbl9tb2RlbCgKICAgIGNvbnRleHQ6IE1MQ2xpZW50Q3R4LAogICAgbW9kZWxfcGtnX2NsYXNzOiBzdHIsCiAgICBkYXRhc2V0OiBEYXRhSXRlbSwKICAgIGxhYmVsX2NvbHVtbjogc3RyID0gImxhYmVscyIsCiAgICBlbmNvZGVfY29sczogTGlzdFtzdHJdID0gW10sCiAgICBzYW1wbGU6IGludCA9IC0xLAogICAgdGVzdF9zaXplOiBmbG9hdCA9IDAuMzAsCiAgICB0cmFpbl92YWxfc3BsaXQ6IGZsb2F0ID0gMC43MCwKICAgIHRlc3Rfc2V0X2tleTogc3RyID0gInRlc3Rfc2V0IiwKICAgIG1vZGVsX2V2YWx1YXRvcj1Ob25lLAogICAgbW9kZWxzX2Rlc3Q6IHN0ciA9ICIiLAogICAgcGxvdHNfZGVzdDogc3RyID0gInBsb3RzIiwKICAgIGZpbGVfZXh0OiBzdHIgPSAicGFycXVldCIsCiAgICBtb2RlbF9wa2dfZmlsZTogc3RyID0gIiIsCiAgICByYW5kb21fc3RhdGU6IGludCA9IDEsCikgLT4gTm9uZToKICAgICIiInRyYWluIGEgY2xhc3NpZmllcgoKICAgIEFuIG9wdGlvbmFsIGN1dG9tIG1vZGVsIGV2YWx1YXRvciBjYW4gYmUgc3VwcGxpZWQgdGhhdCBzaG91bGQgaGF2ZSB0aGUgc2lnbmF0dXJlOgogICAgYG15X2N1c3RvbV9ldmFsdWF0b3IoY29udGV4dCwgeHZhbGlkLCB5dmFsaWQsIG1vZGVsKWAgYW5kIHJldHVybiBhIGRpY3Rpb25hcnkgb2YKICAgIHNjYWxhciAicmVzdWx0cyIsIGEgInBsb3RzIiBrZXlzIHdpdGggYSBsaXN0IG9mIFBsb3RBcnRpZmFjdHMsIGFuZAogICAgYW5kICJ0YWJsZXMiIGtleSBjb250YWluaW5nIGEgcmV0dXJuZWQgbGlzdCBvZiBUYWJsZUFydGlmYWN0cy4KCiAgICA6cGFyYW0gY29udGV4dDogICAgICAgICAgIHRoZSBmdW5jdGlvbiBjb250ZXh0CiAgICA6cGFyYW0gbW9kZWxfcGtnX2NsYXNzOiAgIHRoZSBtb2RlbCB0byB0cmFpbiwgZS5nLCAic2tsZWFybi5uZXVyYWxfbmV0d29ya3MuTUxQQ2xhc3NpZmllciIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG9yIGpzb24gbW9kZWwgY29uZmlnCiAgICA6cGFyYW0gZGF0YXNldDogICAgICAgICAgICgiZGF0YSIpIG5hbWUgb2YgcmF3IGRhdGEgZmlsZQogICAgOnBhcmFtIGxhYmVsX2NvbHVtbjogICAgICBncm91bmQtdHJ1dGggKHkpIGxhYmVscwogICAgOnBhcmFtIGVuY29kZV9jb2xzOiAgICAgICBkaWN0aW9uYXJ5IG9mIG5hbWVzIGFuZCBwcmVmaXhlcyBmb3IgY29sdW1ucyB0aGF0IGFyZQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0byBob3QgYmUgZW5jb2RlZC4KICAgIDpwYXJhbSBzYW1wbGU6ICAgICAgICAgICAgU2VsZWN0cyB0aGUgZmlyc3QgbiByb3dzLCBvciBzZWxlY3QgYSBzYW1wbGUKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RhcnRpbmcgZnJvbSB0aGUgZmlyc3QuIElmIG5lZ2F0aXZlIDwtMSwgc2VsZWN0CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGEgcmFuZG9tIHNhbXBsZQogICAgOnBhcmFtIHRlc3Rfc2l6ZTogICAgICAgICAoMC4wNSkgdGVzdCBzZXQgc2l6ZQogICAgOnBhcmFtIHRyYWluX3ZhbF9zcGxpdDogICAoMC43NSkgT25jZSB0aGUgdGVzdCBzZXQgaGFzIGJlZW4gcmVtb3ZlZCB0aGUKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdHJhaW5pbmcgc2V0IGdldHMgdGhpcyBwcm9wb3J0aW9uLgogICAgOnBhcmFtIHRlc3Rfc2V0X2tleTogICAgICBrZXkgb2YgaGVsZCBvdXQgZGF0YSBpbiBhcnRpZmFjdCBzdG9yZQogICAgOnBhcmFtIG1vZGVsX2V2YWx1YXRvcjogICAoTm9uZSkgYSBjdXN0b20gbW9kZWwgZXZhbHVhdG9yIGNhbiBiZSBzcGVjaWZpZWQKICAgIDpwYXJhbSBtb2RlbHNfZGVzdDogICAgICAgKCIiKSBtb2RlbHMgc3ViZm9sZGVyIG9uIGFydGlmYWN0IHBhdGgKICAgIDpwYXJhbSBwbG90c19kZXN0OiAgICAgICAgcGxvdCBzdWJmb2xkZXIgb24gYXJ0aWZhY3QgcGF0aAogICAgOnBhcmFtIGZpbGVfZXh0OiAgICAgICAgICAoInBhcnF1ZXQiKSBmb3JtYXQgZm9yIHRlc3Rfc2V0X2tleSBob2xkIG91dCBkYXRhCiAgICA6cGFyYW0gcmFuZG9tX3N0YXRlOiAgICAgICgxKSBza2xlYXJuIHJuZyBzZWVkCgogICAgIiIiCiAgICBtb2RlbHNfZGVzdCA9IG1vZGVsc19kZXN0IG9yICJtb2RlbCIKCiAgICByYXcsIGxhYmVscywgaGVhZGVyID0gZ2V0X3NhbXBsZShkYXRhc2V0LCBzYW1wbGUsIGxhYmVsX2NvbHVtbikKCiAgICBpZiBlbmNvZGVfY29sczoKICAgICAgICByYXcgPSBwZC5nZXRfZHVtbWllcygKICAgICAgICAgICAgcmF3LAogICAgICAgICAgICBjb2x1bW5zPWxpc3QoZW5jb2RlX2NvbHMua2V5cygpKSwKICAgICAgICAgICAgcHJlZml4PWxpc3QoZW5jb2RlX2NvbHMudmFsdWVzKCkpLAogICAgICAgICAgICBkcm9wX2ZpcnN0PVRydWUsCiAgICAgICAgKQoKICAgICh4dHJhaW4sIHl0cmFpbiksICh4dmFsaWQsIHl2YWxpZCksICh4dGVzdCwgeXRlc3QpID0gZ2V0X3NwbGl0cygKICAgICAgICByYXcsIGxhYmVscywgMywgdGVzdF9zaXplLCAxIC0gdHJhaW5fdmFsX3NwbGl0LCByYW5kb21fc3RhdGUKICAgICkKCiAgICB0ZXN0X3NldCA9IHBkLmNvbmNhdChbeHRlc3QsIHl0ZXN0LnRvX2ZyYW1lKCldLCBheGlzPTEpCiAgICBjb250ZXh0LmxvZ19kYXRhc2V0KAogICAgICAgIHRlc3Rfc2V0X2tleSwKICAgICAgICBkZj10ZXN0X3NldCwKICAgICAgICBmb3JtYXQ9ZmlsZV9leHQsCiAgICAgICAgaW5kZXg9RmFsc2UsCiAgICAgICAgbGFiZWxzPXsiZGF0YS10eXBlIjogImhlbGQtb3V0In0sCiAgICAgICAgYXJ0aWZhY3RfcGF0aD1jb250ZXh0LmFydGlmYWN0X3N1YnBhdGgoImRhdGEiKSwKICAgICkKCiAgICBtb2RlbF9jb25maWcgPSBnZW5fc2tsZWFybl9tb2RlbChtb2RlbF9wa2dfY2xhc3MsIGNvbnRleHQucGFyYW1ldGVycy5pdGVtcygpKQoKICAgIG1vZGVsX2NvbmZpZ1siRklUIl0udXBkYXRlKHsiWCI6IHh0cmFpbiwgInkiOiB5dHJhaW4udmFsdWVzfSkKCiAgICBDbGFzc2lmaWVyQ2xhc3MgPSBjcmVhdGVfY2xhc3MobW9kZWxfY29uZmlnWyJNRVRBIl1bImNsYXNzIl0pCgogICAgbW9kZWwgPSBDbGFzc2lmaWVyQ2xhc3MoKiptb2RlbF9jb25maWdbIkNMQVNTIl0pCgogICAgbW9kZWwuZml0KCoqbW9kZWxfY29uZmlnWyJGSVQiXSkKCiAgICBhcnRpZmFjdF9wYXRoID0gY29udGV4dC5hcnRpZmFjdF9zdWJwYXRoKG1vZGVsc19kZXN0KQogICAgcGxvdHNfcGF0aCA9IGNvbnRleHQuYXJ0aWZhY3Rfc3VicGF0aChtb2RlbHNfZGVzdCwgcGxvdHNfZGVzdCkKICAgIGlmIG1vZGVsX2V2YWx1YXRvcjoKICAgICAgICBldmFsX21ldHJpY3MgPSBtb2RlbF9ldmFsdWF0b3IoCiAgICAgICAgICAgIGNvbnRleHQsIHh2YWxpZCwgeXZhbGlkLCBtb2RlbCwgcGxvdHNfYXJ0aWZhY3RfcGF0aD1wbG90c19wYXRoCiAgICAgICAgKQogICAgZWxzZToKICAgICAgICBldmFsX21ldHJpY3MgPSBldmFsX21vZGVsX3YyKAogICAgICAgICAgICBjb250ZXh0LCB4dmFsaWQsIHl2YWxpZCwgbW9kZWwsIHBsb3RzX2FydGlmYWN0X3BhdGg9cGxvdHNfcGF0aAogICAgICAgICkKCiAgICBrd2FyZ3MgPSB7InRyYWluaW5nX3NldCI6IHRlc3Rfc2V0LCAibGFiZWxfY29sdW1uIjogbGFiZWxfY29sdW1ufQogICAgc3BsaXQgPSBtb2RlbF9wa2dfY2xhc3MucnNwbGl0KCIuIiwgMSkKICAgIGlmIHNwbGl0IGFuZCBsZW4oc3BsaXQpID09IDI6CiAgICAgICAga3dhcmdzWyJhbGdvcml0aG0iXSA9IHNwbGl0WzFdCgogICAgaWYgZGF0YXNldC5tZXRhIGFuZCBkYXRhc2V0Lm1ldGEua2luZCA9PSAiRmVhdHVyZVZlY3RvciI6CiAgICAgICAga3dhcmdzWyJmZWF0dXJlX3ZlY3RvciJdID0gZGF0YXNldC5tZXRhLnVyaQoKICAgIGNvbnRleHQuc2V0X2xhYmVsKCJjbGFzcyIsIG1vZGVsX3BrZ19jbGFzcykKICAgIGNvbnRleHQubG9nX21vZGVsKAogICAgICAgICJtb2RlbCIsCiAgICAgICAgYm9keT1kdW1wcyhtb2RlbCksCiAgICAgICAgYXJ0aWZhY3RfcGF0aD1hcnRpZmFjdF9wYXRoLAogICAgICAgIGV4dHJhX2RhdGE9ZXZhbF9tZXRyaWNzLAogICAgICAgIG1vZGVsX2ZpbGU9Im1vZGVsLnBrbCIsCiAgICAgICAgbWV0cmljcz1jb250ZXh0LnJlc3VsdHMsCiAgICAgICAgbGFiZWxzPXsiY2xhc3MiOiBtb2RlbF9wa2dfY2xhc3N9LAogICAgICAgIGZyYW1ld29yaz0ic2tsZWFybiIsCiAgICAgICAgKiprd2FyZ3MKICAgICkK
+    commands: []
+    code_origin: https://github.com/mlrun/functions.git#02396d14cd7e3ce7f542a8b44fd72bcc23b41ffd:/Users/yonatanshelach/yoni/projects/functions/sklearn_classifier/sklearn_classifier.py
+    origin_filename: /Users/yonatanshelach/yoni/projects/functions/sklearn_classifier/sklearn_classifier.py
+  entry_points:
+    train_model:
+      name: train_model
+      doc: 'train a classifier
+
+
+        An optional cutom model evaluator can be supplied that should have the signature:
+
+        `my_custom_evaluator(context, xvalid, yvalid, model)` and return a dictionary
+        of
+
+        scalar "results", a "plots" keys with a list of PlotArtifacts, and
+
+        and "tables" key containing a returned list of TableArtifacts.'
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+        default: ''
+      - name: model_pkg_class
+        type: str
+        doc: the model to train, e.g, "sklearn.neural_networks.MLPClassifier", or
+          json model config
+        default: ''
+      - name: dataset
+        type: DataItem
+        doc: ("data") name of raw data file
+        default: ''
+      - name: label_column
+        type: str
+        doc: ground-truth (y) labels
+        default: labels
+      - name: encode_cols
+        type: List[str]
+        doc: dictionary of names and prefixes for columns that are to hot be encoded.
+        default: []
+      - name: sample
+        type: int
+        doc: Selects the first n rows, or select a sample starting from the first.
+          If negative <-1, select a random sample
+        default: <_ast.USub object at 0x10a4ae190>
+      - name: test_size
+        type: float
+        doc: (0.05) test set size
+        default: 0.3
+      - name: train_val_split
+        type: float
+        doc: (0.75) Once the test set has been removed the training set gets this
+          proportion.
+        default: 0.7
+      - name: test_set_key
+        type: str
+        doc: key of held out data in artifact store
+        default: test_set
+      - name: model_evaluator
+        doc: (None) a custom model evaluator can be specified
+        default: null
+      - name: models_dest
+        type: str
+        doc: ("") models subfolder on artifact path
+        default: ''
+      - name: plots_dest
+        type: str
+        doc: plot subfolder on artifact path
+        default: plots
+      - name: file_ext
+        type: str
+        doc: ("parquet") format for test_set_key hold out data
+        default: parquet
+      - name: model_pkg_file
+        type: str
+        default: ''
+      - name: random_state
+        type: int
+        doc: (1) sklearn rng seed
+        default: 1
+      outputs:
+      - default: ''
+      lineno: 18
+  description: train any classifier using scikit-learn's API
+  default_handler: train_model
+  disable_auto_mount: false
+  env: []
+  priority_class_name: ''
+  preemption_mode: prevent
+  affinity: null
+  tolerations: null
+verbose: false

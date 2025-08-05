@@ -1,0 +1,29 @@
+apiVersion: v1
+categories:
+- deep-learning
+- audio
+description: pyannote's speech diarization of audio files
+doc: ''
+example: pyannote_audio.ipynb
+generationDate: 2023-12-03:14-30
+hidden: false
+icon: ''
+labels:
+  author: guyl
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.7.0
+name: pyannote-audio
+platformVersion: 3.5.3
+spec:
+  filename: pyannote_audio.py
+  handler: diarize
+  image: mlrun/mlrun-gpu
+  kind: job
+  requirements:
+  - pyannote.audio
+  - pyannote.core
+  - torchaudio
+  - tqdm
+url: ''
+version: 1.3.0

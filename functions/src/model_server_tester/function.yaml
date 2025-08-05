@@ -1,0 +1,58 @@
+kind: job
+metadata:
+  name: model-server-tester
+  tag: ''
+  hash: 3b203a2799e44992539eafd32a4b8979bbcc8001
+  project: ''
+  labels:
+    author: yaronh
+  categories:
+  - monitoring
+  - model-serving
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  env: []
+  default_handler: model_server_tester
+  entry_points:
+    model_server_tester:
+      name: model_server_tester
+      doc: Test a model server
+      parameters:
+      - name: context
+        default: ''
+      - name: table
+        type: DataItem
+        doc: csv/parquet table with test data
+        default: ''
+      - name: addr
+        type: str
+        doc: function address/url
+        default: ''
+      - name: label_column
+        type: str
+        doc: name of the label column in table
+        default: label
+      - name: model
+        type: str
+        doc: tested model name
+        default: ''
+      - name: match_err
+        type: bool
+        doc: raise error on validation (require proper test set)
+        default: false
+      - name: rows
+        type: int
+        doc: number of rows to use from test set
+        default: 20
+      outputs:
+      - default: ''
+      lineno: 14
+  description: test model servers
+  build:
+    functionSourceCode: IyBHZW5lcmF0ZWQgYnkgbnVjbGlvLmV4cG9ydC5OdWNsaW9FeHBvcnRlcgoKaW1wb3J0IG9zCmltcG9ydCBwYW5kYXMgYXMgcGQKaW1wb3J0IHJlcXVlc3RzCmltcG9ydCBqc29uCmltcG9ydCBudW1weSBhcyBucAoKZnJvbSBkYXRldGltZSBpbXBvcnQgZGF0ZXRpbWUKZnJvbSBtbHJ1bi5kYXRhc3RvcmUgaW1wb3J0IERhdGFJdGVtCmZyb20gbWxydW4uYXJ0aWZhY3RzIGltcG9ydCBnZXRfbW9kZWwsIENoYXJ0QXJ0aWZhY3QKCgpkZWYgbW9kZWxfc2VydmVyX3Rlc3RlcigKICAgIGNvbnRleHQsCiAgICB0YWJsZTogRGF0YUl0ZW0sCiAgICBhZGRyOiBzdHIsCiAgICBsYWJlbF9jb2x1bW46IHN0ciA9ICJsYWJlbCIsCiAgICBtb2RlbDogc3RyID0gIiIsCiAgICBtYXRjaF9lcnI6IGJvb2wgPSBGYWxzZSwKICAgIHJvd3M6IGludCA9IDIwLAopOgogICAgIiIiVGVzdCBhIG1vZGVsIHNlcnZlcgoKICAgIDpwYXJhbSB0YWJsZTogICAgICAgICBjc3YvcGFycXVldCB0YWJsZSB3aXRoIHRlc3QgZGF0YQogICAgOnBhcmFtIGFkZHI6ICAgICAgICAgIGZ1bmN0aW9uIGFkZHJlc3MvdXJsCiAgICA6cGFyYW0gbGFiZWxfY29sdW1uOiAgbmFtZSBvZiB0aGUgbGFiZWwgY29sdW1uIGluIHRhYmxlCiAgICA6cGFyYW0gbW9kZWw6ICAgICAgICAgdGVzdGVkIG1vZGVsIG5hbWUKICAgIDpwYXJhbSBtYXRjaF9lcnI6ICAgICByYWlzZSBlcnJvciBvbiB2YWxpZGF0aW9uIChyZXF1aXJlIHByb3BlciB0ZXN0IHNldCkKICAgIDpwYXJhbSByb3dzOiAgICAgICAgICBudW1iZXIgb2Ygcm93cyB0byB1c2UgZnJvbSB0ZXN0IHNldAogICAgIiIiCgogICAgdGFibGUgPSB0YWJsZS5hc19kZigpCgogICAgeV9saXN0ID0gdGFibGUucG9wKGxhYmVsX2NvbHVtbikudmFsdWVzLnRvbGlzdCgpCiAgICBjb250ZXh0LmxvZ2dlci5pbmZvKGYidGVzdGluZyB3aXRoIGRhdGFzZXQgYWdhaW5zdCB7YWRkcn0sIG1vZGVsOiB7bW9kZWx9IikKICAgIGlmIHJvd3MgYW5kIHJvd3MgPCB0YWJsZS5zaGFwZVswXToKICAgICAgICB0YWJsZSA9IHRhYmxlLnNhbXBsZShyb3dzKQoKICAgIGNvdW50ID0gZXJyX2NvdW50ID0gbWF0Y2ggPSAwCiAgICB0aW1lcyA9IFtdCiAgICBmb3IgeCwgeSBpbiB6aXAodGFibGUudmFsdWVzLCB5X2xpc3QpOgogICAgICAgIGNvdW50ICs9IDEKICAgICAgICBldmVudF9kYXRhID0ganNvbi5kdW1wcyh7Imluc3RhbmNlcyI6IFt4LnRvbGlzdCgpXX0pCiAgICAgICAgaGFkX2VyciA9IEZhbHNlCiAgICAgICAgdHJ5OgogICAgICAgICAgICBzdGFydCA9IGRhdGV0aW1lLm5vdygpCiAgICAgICAgICAgIHJlc3AgPSByZXF1ZXN0cy5wdXQoZiJ7YWRkcn0ve21vZGVsfS9wcmVkaWN0IiwganNvbj1ldmVudF9kYXRhKQogICAgICAgICAgICBpZiBub3QgcmVzcC5vazoKICAgICAgICAgICAgICAgIGNvbnRleHQubG9nZ2VyLmVycm9yKGYiYmFkIGZ1bmN0aW9uIHJlc3AhIVxue3Jlc3AudGV4dH0iKQogICAgICAgICAgICAgICAgZXJyX2NvdW50ICs9IDEKICAgICAgICAgICAgICAgIGNvbnRpbnVlCiAgICAgICAgICAgIHRpbWVzLmFwcGVuZCgoZGF0ZXRpbWUubm93KCkgLSBzdGFydCkubWljcm9zZWNvbmRzKQoKICAgICAgICBleGNlcHQgT1NFcnJvciBhcyBlcnI6CiAgICAgICAgICAgIGNvbnRleHQubG9nZ2VyLmVycm9yKGYiZXJyb3IgaW4gcmVxdWVzdCwgZGF0YTp7ZXZlbnRfZGF0YX0sIGVycm9yOiB7ZXJyfSIpCiAgICAgICAgICAgIGVycl9jb3VudCArPSAxCiAgICAgICAgICAgIGNvbnRpbnVlCgogICAgICAgIHlfcmVzcCA9IHJlc3AuanNvbigpWzBdCiAgICAgICAgaWYgeSA9PSB5X3Jlc3A6CiAgICAgICAgICAgIG1hdGNoICs9IDEKCiAgICBjb250ZXh0LmxvZ19yZXN1bHQoInRvdGFsX3Rlc3RzIiwgY291bnQpCiAgICBjb250ZXh0LmxvZ19yZXN1bHQoImVycm9ycyIsIGVycl9jb3VudCkKICAgIGNvbnRleHQubG9nX3Jlc3VsdCgibWF0Y2giLCBtYXRjaCkKICAgIGlmIGNvdW50IC0gZXJyX2NvdW50ID4gMDoKICAgICAgICB0aW1lc19hcnIgPSBucC5hcnJheSh0aW1lcykKICAgICAgICBjb250ZXh0LmxvZ19yZXN1bHQoImF2Z19sYXRlbmN5IiwgaW50KG5wLm1lYW4odGltZXNfYXJyKSkpCiAgICAgICAgY29udGV4dC5sb2dfcmVzdWx0KCJtaW5fbGF0ZW5jeSIsIGludChucC5hbWluKHRpbWVzX2FycikpKQogICAgICAgIGNvbnRleHQubG9nX3Jlc3VsdCgibWF4X2xhdGVuY3kiLCBpbnQobnAuYW1heCh0aW1lc19hcnIpKSkKCiAgICAgICAgY2hhcnQgPSBDaGFydEFydGlmYWN0KCJsYXRlbmN5IiwgaGVhZGVyPVsiVGVzdCIsICJMYXRlbmN5IChtaWNyb3NlYykiXSkKICAgICAgICBmb3IgaSBpbiByYW5nZShsZW4odGltZXMpKToKICAgICAgICAgICAgY2hhcnQuYWRkX3JvdyhbaSArIDEsIGludCh0aW1lc1tpXSldKQogICAgICAgIGNvbnRleHQubG9nX2FydGlmYWN0KGNoYXJ0KQoKICAgIGNvbnRleHQubG9nZ2VyLmluZm8oCiAgICAgICAgZiJydW4ge2NvdW50fSB0ZXN0cywge2Vycl9jb3VudH0gZXJyb3JzIGFuZCB7bWF0Y2h9IG1hdGNoIGV4cGVjdGVkIHZhbHVlIgogICAgKQoKICAgIGlmIGVycl9jb3VudDoKICAgICAgICByYWlzZSBWYWx1ZUVycm9yKGYiZmFpbGVkIG9uIHtlcnJfY291bnR9IHRlc3RzIG9mIHtjb3VudH0iKQoKICAgIGlmIG1hdGNoX2VyciBhbmQgbWF0Y2ggIT0gY291bnQ6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcihmIm9ubHkge21hdGNofSByZXN1bHRzIG1hdGNoIG91dCBvZiB7Y291bnR9IikK
+    commands: []
+    code_origin: https://github.com/daniels290813/functions.git#55a79c32be5d233cc11efcf40cd3edbe309bfdef:/home/kali/functions/model_server_tester/model_server_tester.py
+  affinity: null
+verbose: false

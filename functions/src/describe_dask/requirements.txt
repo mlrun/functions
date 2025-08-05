@@ -1,0 +1,7 @@
+dask
+yellowbrick
+matplotlib
+seaborn
+scikit-learn
+scikit-plot
+dask-kubernetes

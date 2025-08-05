@@ -1,0 +1,24 @@
+apiVersion: v1
+categories:
+- data-generation
+description: Create a binary classification sample dataset and save.
+doc: ''
+example: gen_class_data.ipynb
+generationDate: 2022-08-28:17-25
+hidden: false
+icon: ''
+labels:
+  author: Daniel
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.7.0
+name: gen_class_data
+platformVersion: 3.5.3
+spec:
+  filename: gen_class_data.py
+  handler: gen_class_data
+  image: mlrun/mlrun
+  kind: job
+  requirements: []
+url: ''
+version: 1.3.0

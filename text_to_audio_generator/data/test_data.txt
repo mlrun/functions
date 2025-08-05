@@ -1,2 +1,0 @@
-Client: I love MLRun!
-Agent: Me too!

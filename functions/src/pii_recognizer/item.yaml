@@ -1,0 +1,34 @@
+apiVersion: v1
+categories: 
+  - data-preparation
+  - NLP
+description: This function is used to recognize PII in a directory of text files
+doc: ''
+example: pii_recognizer.ipynb
+generationDate: 2023-08-15:10-24
+hidden: false
+icon: ''
+labels:
+  author: pgw
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.7.0
+name: pii-recognizer
+platformVersion: 3.5.3
+spec:
+  filename: pii_recognizer.py
+  handler: recognize_pii
+  image: mlrun/mlrun
+  kind: job
+  requirements:
+   - nltk
+   - pandas
+   - presidio-anonymizer
+   - presidio-analyzer
+   - torch
+   - flair@git+https://github.com/flairNLP/flair.git@d4ed67bf663e4066517f00397412510d90043653
+   - st-annotated-text
+   - https://huggingface.co/beki/en_spacy_pii_distilbert/resolve/main/en_spacy_pii_distilbert-any-py3-none-any.whl
+url: ''
+version: 0.4.0
+test_valid: False

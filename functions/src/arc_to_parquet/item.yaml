@@ -1,6 +1,7 @@
 apiVersion: v1
 categories:
 - utils
+- dummy-category
 description: retrieve remote archive, open and save as parquet
 doc: ''
 example: arc_to_parquet.ipynb

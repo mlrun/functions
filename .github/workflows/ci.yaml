@@ -20,6 +20,11 @@ jobs:
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
         id: myref
 
+      - name: Show changed files from development
+        run: |
+          echo "Changed files compared to origin/development:"
+          git diff origin/development --name-only || echo "git diff failed"
+
       - uses: actions/checkout@v3
       - id: set-matrix
         # This is very hacky, but it goes like that:
@@ -39,17 +44,30 @@ jobs:
         # Based on instructions regarding https://docs.github.com/en/actions/learn-github-actions/contexts#github-context , github.base_ref triggers a workflow run is either pull_request or pull_request_target
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            base_ref="${{ github.base_ref }}"
-            git fetch origin $base_ref:$base_ref
+            echo "Detected PR event, using base_ref: ${{ github.base_ref }}"
+            git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+            base_ref="origin/${{ github.base_ref }}"
           else
-            base_ref="origin/development"
+            echo "Detected push event, using base_ref: origin/development"
             git fetch origin development:refs/remotes/origin/development
+            base_ref="origin/development"
           fi
-          matrix=$((
-            echo '{ "package" : ['
-            git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
-            echo " ]}"
-          ) | jq 'del(.[][] | select(. == ""))'  -c)
+      
+          echo "Diffing against $base_ref:"
+          git diff $base_ref --name-only || echo "Diff failed"
+      
+          matrix=$( 
+            {
+              echo '{ "package" : ['
+              git diff $base_ref --name-only \
+                | sed 's,/*[^/]\+/*$,,g' \
+                | sort | uniq \
+                | grep -v '^\.' \
+                | sed 's/.*/"&"/' \
+                | sed '$!s/.*/&,/'
+              echo "]}"
+            } | jq 'del(.[][] | select(. == ""))' -c
+          )
           echo "::set-output name=matrix::$matrix"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}

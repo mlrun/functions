@@ -38,7 +38,13 @@ jobs:
         # This is old git diff version:             git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
         # Based on instructions regarding https://docs.github.com/en/actions/learn-github-actions/contexts#github-context , github.base_ref triggers a workflow run is either pull_request or pull_request_target
         run: |
-          git fetch --no-tags --prune --depth=1 origin ${{ github.base_ref }}:${{ github.base_ref }}
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base_ref="${{ github.base_ref }}"
+            git fetch origin $base_ref:$base_ref
+          else
+            base_ref="origin/main"  # or origin/development
+            git fetch origin main:refs/remotes/origin/main
+          fi
           matrix=$((
             echo '{ "package" : ['
             git diff ${{ github.base_ref }} --name-only | grep '^functions/src/' | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'

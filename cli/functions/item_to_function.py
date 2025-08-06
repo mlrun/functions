@@ -22,8 +22,8 @@ from black import format_str, FileMode
 from mlrun import code_to_function
 from yaml import full_load
 
-from functions.cli.utils.helpers import is_item_dir
-from functions.cli.utils.path_iterator import PathIterator
+from cli.utils.helpers import is_item_dir
+from cli.utils.path_iterator import PathIterator
 
 
 @click.command()

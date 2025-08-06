@@ -19,8 +19,8 @@ from typing import Union
 import click
 import yaml
 
-from functions.cli.utils.helpers import is_function_dir
-from functions.cli.utils.path_iterator import PathIterator
+from cli.utils.helpers import is_function_dir
+from cli.utils.path_iterator import PathIterator
 
 
 @click.command()

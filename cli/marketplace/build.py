@@ -26,10 +26,10 @@ from bs4 import BeautifulSoup
 from sphinx.cmd.build import main as sphinx_build_cmd
 from sphinx.ext.apidoc import main as sphinx_apidoc_cmd
 
-from functions.cli.utils.helpers import (PROJECT_ROOT, get_item_yaml_values,
-                                         get_mock_requirements, is_item_dir, render_jinja)
-from functions.cli.marketplace.changelog import ChangeLog
-from functions.cli.utils.path_iterator import PathIterator
+from cli.utils.helpers import (PROJECT_ROOT, get_item_yaml_values,
+                               get_mock_requirements, is_item_dir, render_jinja)
+from cli.marketplace.changelog import ChangeLog
+from cli.utils.path_iterator import PathIterator
 
 _verbose = False
 
@@ -360,7 +360,7 @@ def update_or_create_item(
     # Copy source directories to target directories, if target already has the directory, archive previous version
     item_yaml = yaml.full_load(open(item_dir / "item.yaml", "r"))
     source_version = item_yaml["version"]
-    relative_path = "../../../"
+    relative_path = "../../"
 
     marketplace_item = marketplace_dir / item_dir.stem
     target_latest = marketplace_item / "latest"
@@ -694,7 +694,7 @@ def build_temp_docs(temp_root, temp_docs, source_dir):
 if __name__ == "__main__":
     # build_marketplace_cli()
     build_marketplace(
-        source_dir="../../../functions",
+        source_dir="../../functions",
         marketplace_dir="../../../marketplace",
         verbose=True,
         channel="development",

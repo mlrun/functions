@@ -87,10 +87,10 @@ jobs:
           pip install -r functions/requirements.txt
 
       - name: Run py tests
-        run: python -m functions.cli.functions_cli  run-tests -r functions/src -s py -fn ${{ matrix.package }}
+        run: python -m cli.cli  run-tests -r functions/src -s py -fn ${{ matrix.package }}
         continue-on-error: true
 #      - name: Run ipynb tests
-#        run: python functions/cli/functions_cli.py  run-tests -r functions -s ipynb
+#        run: python functions/cli/cli.py  run-tests -r functions -s ipynb
       - name: Clean
         run: |
           rm -rf functions
@@ -133,7 +133,7 @@ jobs:
           pwd
           git pull origin
           cd ..
-          python functions/functions.py build-marketplace -s functions -m marketplace -c $CHANNEL -v -f
+          python -m cli.cli build-marketplace -s . -m marketplace -c $CHANNEL -v -f
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V3 }}

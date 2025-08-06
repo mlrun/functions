@@ -14,12 +14,12 @@
 #
 import click
 
-from functions.cli.function_to_item import function_to_item_cli
-from functions.cli.item_to_function import item_to_function_cli
-from functions.cli.marketplace.build import build_marketplace_cli
-from functions.cli.new_item import new_item
-from functions.cli.test_suite import test_suite
-from functions.cli.item_yaml import update_functions_yaml
+from functions.function_to_item import function_to_item_cli
+from functions.item_to_function import item_to_function_cli
+from marketplace.build import build_marketplace_cli
+from functions.new_function_item import new_item
+from common.test_suite import test_suite
+from common.item_yaml import update_functions_yaml
 
 
 @click.group()

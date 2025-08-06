@@ -176,8 +176,8 @@ def infer(
                                                     Performing drift analysis on a new endpoint id will generate a new model endpoint
                                                     record.
     :param endpoint_id:                             Model endpoint unique ID. If `perform_drift_analysis` was set, the endpoint_id
-                                                    will be used either to perform the analysis on existing model endpoint or to
-                                                    generate a new model endpoint record.
+                                                    will be used to perform the analysis on existing model endpoint, or if it does not
+                                                    exist a new model endpoint will be created with a newly generated ID.
     :param model_endpoint_name:                     If a new model endpoint is generated, the model name will be presented under this
                                                     endpoint.
     :param model_endpoint_sample_set:               A sample dataset to give to compare the inputs in the drift analysis.

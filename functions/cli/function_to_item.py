@@ -26,7 +26,7 @@ from functions.cli.utils.path_iterator import PathIterator
 @click.command()
 @click.option(
     "-p",
-    "-path",
+    "--path",
     help="Path to one of: specific function.yaml, directory containing function.yaml or a root directory to search function.yamls in",
 )
 def function_to_item_cli(path: str):

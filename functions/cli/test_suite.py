@@ -23,14 +23,14 @@ import click
 import yaml
 import re
 
-from cli.helpers import (
+from functions.cli.utils.helpers import (
     is_item_dir,
     install_pipenv,
     install_python,
     install_requirements,
     get_item_yaml_values,
 )
-from cli.path_iterator import PathIterator
+from functions.cli.utils.path_iterator import PathIterator
 
 
 @click.command()

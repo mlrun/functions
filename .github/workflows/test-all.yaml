@@ -6,6 +6,7 @@ on:
     branches:
       - development
       - master
+      - monorepo-design
 
 jobs:
   build_strategy_matrix:
@@ -86,10 +87,10 @@ jobs:
           pip install -r functions/requirements.txt
 
       - name: Run py tests
-        run: python functions/functions.py  run-tests -r functions -s py -fn ${{ matrix.package }}
+        run: python functions/functions_cli.py  run-tests -r functions -s py -fn ${{ matrix.package }}
         continue-on-error: true
 #      - name: Run ipynb tests
-#        run: python functions/functions.py  run-tests -r functions -s ipynb
+#        run: python functions/functions_cli.py  run-tests -r functions -s ipynb
       - name: Clean
         run: |
           rm -rf functions

@@ -13,8 +13,8 @@
 # limitations under the License.
 #
 import click
-from cli.path_iterator import PathIterator
-from cli.helpers import is_item_dir
+from functions.cli.utils.path_iterator import PathIterator
+from functions.cli.utils.helpers import is_item_dir
 import yaml
 import datetime
 

@@ -26,10 +26,10 @@ from bs4 import BeautifulSoup
 from sphinx.cmd.build import main as sphinx_build_cmd
 from sphinx.ext.apidoc import main as sphinx_apidoc_cmd
 
-from cli.helpers import (PROJECT_ROOT, get_item_yaml_values,
-                         get_mock_requirements, is_item_dir, render_jinja)
-from cli.marketplace.changelog import ChangeLog
-from cli.path_iterator import PathIterator
+from functions.cli.utils.helpers import (PROJECT_ROOT, get_item_yaml_values,
+                                         get_mock_requirements, is_item_dir, render_jinja)
+from functions.cli.marketplace.changelog import ChangeLog
+from functions.cli.utils.path_iterator import PathIterator
 
 _verbose = False
 

@@ -66,8 +66,6 @@ jobs:
       # Source
       - name: Checkout current repo
         uses: actions/checkout@v4
-        with:
-          path: functions
       # Install python 3.10.17
       - name: Install python 3.10.17
         uses: actions/setup-python@v4
@@ -78,16 +76,16 @@ jobs:
         id: cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Install requirements
         run: |
           pip install --upgrade pip
-          pip install -r functions/requirements.txt
+          pip install -r requirements.txt
 
       - name: Run py tests
-        run: python -m cli.cli  run-tests -r functions/src -s py -fn ${{ matrix.package }}
+        run: python -m cli.cli run-tests -r functions/src -s py -fn ${{ matrix.package }}
         continue-on-error: true
 #      - name: Run ipynb tests
 #        run: python functions/cli/cli.py  run-tests -r functions -s ipynb
@@ -109,8 +107,6 @@ jobs:
         id: branch
       - name: Checkout current repo
         uses: actions/checkout@v4
-        with:
-          path: functions
       - name: Checkout Marketplace
         uses: actions/checkout@v4
         with:
@@ -122,12 +118,12 @@ jobs:
           python-version: 3.10.17
       - name: Install requirements
         run: |
-          cd functions
           pip install --upgrade pip
           pip install -r requirements.txt
       - name: Build marketplace docs
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
+        # todo: make sure the python command works as expected
         run: |
           cd marketplace
           pwd

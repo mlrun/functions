@@ -110,9 +110,13 @@ jobs:
        run: |
          pip install --upgrade pip
          pip install -r requirements.txt
-
+     - name: Print workspace structure
+       run: |
+         echo "Current directory: $(pwd)"
+         echo "Tree structure:"
+         find . -type f | sort
      - name: Run py tests
-       run: python functions/cli/functions_cli.py  run-tests -r functions -s py -fn ${{ matrix.package }}
+       run: python -m functions.cli.functions_cli.py  run-tests -r functions/src -s py -fn ${{ matrix.package }}
 
      - name: Clean
        run: |

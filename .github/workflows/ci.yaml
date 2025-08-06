@@ -112,7 +112,7 @@ jobs:
          pip install -r requirements.txt
 
      - name: Run py tests
-       run: python functions/functions_cli.py  run-tests -r functions/src -s py -fn ${{ matrix.package }}
+       run: python functions/cli/functions_cli.py  run-tests -r functions/src -s py -fn ${{ matrix.package }}
 
      - name: Clean
        run: |

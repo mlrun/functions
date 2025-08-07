@@ -159,13 +159,16 @@ class TestSuite(ABC):
             process_count = mp.cpu_count() - 1
         print("running tests with {} process".format(process_count))
         discovered_functions = self.discover(path)
+        click.echo("discovered functions 1: {}".format(discovered_functions)) # todo: delete
         if function_name is not None:
             discovered_functions = [fn for fn in discovered_functions if function_name == Path(fn).stem]
+            click.echo("discovered functions 2: {}".format(discovered_functions)) # todo: delete
         for path in discovered_functions:
             if re.match(".+/test_*", path):
                 discovered_functions.remove(path)
                 print("a function name cannot start with test, please rename {} ".format(path))
 
+        click.echo("discovered functions 3: {}".format(discovered_functions)) # todo: delete
         self.before_run()
 
         # pool = mp.Pool(process_count)
@@ -180,6 +183,7 @@ class TestSuite(ABC):
     def directory_process(self, directory):
         self.before_each(directory)
         result = self.run(directory)
+        click.echo("result: {}".format(result)) # todo: delete
         self.test_results.append(result)
         self.after_each(directory, result)
 
@@ -277,7 +281,6 @@ class TestPY(TestSuite):
         ignored_tests = []
 
         for test_result in self.test_results:
-            click.echo(f"test_result status: {test_result.status}")
             if test_result.status == "Failed":
                 failed_tests.append(test_result)
             elif test_result.status == "Passed":

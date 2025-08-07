@@ -13,7 +13,7 @@ labels:
   framework: sklearn
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.4.1
+mlrunVersion: 1.7.0
 name: sklearn-classifier
 platformVersion: 3.5.3
 spec:

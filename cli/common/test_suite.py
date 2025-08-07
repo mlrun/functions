@@ -162,7 +162,7 @@ class TestSuite(ABC):
         click.echo("discovered functions 1: {}".format(discovered_functions)) # todo: delete
         if function_name is not None:
             click.echo("running test with name {}".format(function_name))
-            discovered_functions = [fn for fn in discovered_functions if function_name == Path(fn).stem]
+            discovered_functions = [fn for fn in discovered_functions if Path(function_name).stem == Path(fn).stem]
             click.echo("discovered functions 2: {}".format(discovered_functions)) # todo: delete
         for path in discovered_functions:
             if re.match(".+/test_*", path):

@@ -11,7 +11,7 @@ labels:
   author: Iguazio
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.7.0
 name: describe-dask
 platformVersion: 3.5.0
 spec:

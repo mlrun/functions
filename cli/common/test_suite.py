@@ -277,6 +277,7 @@ class TestPY(TestSuite):
         ignored_tests = []
 
         for test_result in self.test_results:
+            click.echo(f"test_result status: {test_result.status}")
             if test_result.status == "Failed":
                 failed_tests.append(test_result)
             elif test_result.status == "Passed":

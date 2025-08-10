@@ -181,7 +181,6 @@ class TestSuite(ABC):
     def directory_process(self, directory):
         self.before_each(directory)
         result = self.run(directory)
-        click.echo("result: {}".format(result)) # todo: delete
         self.test_results.append(result)
         self.after_each(directory, result)
 

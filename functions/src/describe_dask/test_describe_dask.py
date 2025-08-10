@@ -33,40 +33,54 @@ def _create_dask_func(uri):
 
 
 def test_code_to_function_describe_dask():
+    print("Starting test_code_to_function_describe_dask")
     dask_uri = "dask_func.yaml"
     _create_dask_func(dask_uri)
+    print("Created Dask function")
     fn = code_to_function(filename="describe_dask.py", kind='local')
     fn.spec.command = "describe_dask.py"
-
-    run = fn.run(
-        inputs={"dataset": DATA_URL},
-        params={
-            'update_dataset': True,
-            'label_column': 'label',
-            'dask_function': dask_uri,
-        },
-        handler="summarize",
-    )
-
-    assert all(run.artifact(artifact).get() for artifact in GENERATED_ARTIFACTS)
+    print("About to run function")
+    try:
+        run = fn.run(
+            inputs={"dataset": DATA_URL},
+            params={
+                'update_dataset': True,
+                'label_column': 'label',
+                'dask_function': dask_uri,
+            },
+            handler="summarize",
+        )
+        print("Function run completed")
+        assert all(run.artifact(artifact).get() for artifact in GENERATED_ARTIFACTS)
+        print("All artifacts retrieved successfully")
+    except Exception as e:
+        print(f"Exception in test_code_to_function_describe_dask: {e}")
+        raise
 
 
 def test_import_function_describe_dask():
+    print("Starting test_import_function_describe_dask")
     dask_uri = "dask_func.yaml"
     _create_dask_func(dask_uri)
+    print("Created Dask function")
     fn = import_function('function.yaml')
-
-    run = fn.run(
-        inputs={
-            "dataset": DATA_URL},
-        params={
-            'update_dataset': True,
-            'label_column': 'label',
-            'dask_function': dask_uri,
-        },
-        handler="summarize",
-        artifact_path=os.getcwd() + '/artifacts',
-        local=True,
-    )
-
-    assert all(run.artifact(artifact).get() for artifact in GENERATED_ARTIFACTS)
+    print("Imported function")
+    try:
+        run = fn.run(
+            inputs={
+                "dataset": DATA_URL},
+            params={
+                'update_dataset': True,
+                'label_column': 'label',
+                'dask_function': dask_uri,
+            },
+            handler="summarize",
+            artifact_path=os.getcwd() + '/artifacts',
+            local=True,
+        )
+        print("Function run completed")
+        assert all(run.artifact(artifact).get() for artifact in GENERATED_ARTIFACTS)
+        print("All artifacts retrieved successfully")
+    except Exception as e:
+        print(f"Exception in test_import_function_describe_dask: {e}")
+        raise

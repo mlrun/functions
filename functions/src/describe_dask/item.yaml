@@ -21,4 +21,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 1.2.0
+version: 1.1.0

@@ -1,23 +1,40 @@
 kind: job
 metadata:
+  name: load-dataset
   tag: ''
+  hash: d05aa41d618533335eeaeab38aa434a14e3e3980
+  project: ''
+  labels:
+    author: yjb
+    framework: sklearn
   categories:
   - data-preparation
-  name: load-dataset
 spec:
   command: ''
-  default_handler: load_dataset
+  args: []
   image: mlrun/mlrun
   build:
+    functionSourceCode: IyBDb3B5cmlnaHQgMjAxOSBJZ3VhemlvCiMKIyBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIyB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiMgWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CiMKIyAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCiMKIyBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiMgZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIyBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIyBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiMgbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCiMKaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCBwYW5kYXMgYXMgcGQKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CgoKZGVmIGxvYWRfZGF0YXNldCgKICAgIGNvbnRleHQ6IE1MQ2xpZW50Q3R4LAogICAgZGF0YXNldDogc3RyLAogICAgbmFtZTogc3RyID0gIiIsCiAgICBmaWxlX2V4dDogc3RyID0gInBhcnF1ZXQiLAogICAgcGFyYW1zOiBkaWN0ID0ge30sCikgLT4gTm9uZToKICAgICIiIkxvYWRzIGEgc2Npa2l0LWxlYXJuIHRveSBkYXRhc2V0IGZvciBjbGFzc2lmaWNhdGlvbiBvciByZWdyZXNzaW9uCgogICAgVGhlIGZvbGxvd2luZyBkYXRhc2V0cyBhcmUgYXZhaWxhYmxlICgnbmFtZScgOiBkZXNyaXB0aW9uKToKCiAgICAgICAgJ2Jvc3RvbicgICAgICAgICAgOiBib3N0b24gaG91c2UtcHJpY2VzIGRhdGFzZXQgKHJlZ3Jlc3Npb24pCiAgICAgICAgJ2lyaXMnICAgICAgICAgICAgOiBpcmlzIGRhdGFzZXQgKGNsYXNzaWZpY2F0aW9uKQogICAgICAgICdkaWFiZXRlcycgICAgICAgIDogZGlhYmV0ZXMgZGF0YXNldCAocmVncmVzc2lvbikKICAgICAgICAnZGlnaXRzJyAgICAgICAgICA6IGRpZ2l0cyBkYXRhc2V0IChjbGFzc2lmaWNhdGlvbikKICAgICAgICAnbGlubmVydWQnICAgICAgICA6IGxpbm5lcnVkIGRhdGFzZXQgKG11bHRpdmFyaWF0ZSByZWdyZXNzaW9uKQogICAgICAgICd3aW5lJyAgICAgICAgICAgIDogd2luZSBkYXRhc2V0IChjbGFzc2lmaWNhdGlvbikKICAgICAgICAnYnJlYXN0X2NhbmNlcicgICA6IGJyZWFzdCBjYW5jZXIgd2lzY29uc2luIGRhdGFzZXQgKGNsYXNzaWZpY2F0aW9uKQoKICAgIFRoZSBzY2lraXQtbGVhcm4gZnVuY3Rpb25zIHJldHVybiBhIGRhdGEgYnVuY2ggaW5jbHVkaW5nIHRoZSBmb2xsb3dpbmcgaXRlbXM6CiAgICAtIGRhdGEgICAgICAgICAgICAgIHRoZSBmZWF0dXJlcyBtYXRyaXgKICAgIC0gdGFyZ2V0ICAgICAgICAgICAgdGhlIGdyb3VuZCB0cnV0aCBsYWJlbHMKICAgIC0gREVTQ1IgICAgICAgICAgICAgYSBkZXNjcmlwdGlvbiBvZiB0aGUgZGF0YXNldAogICAgLSBmZWF0dXJlX25hbWVzICAgICBoZWFkZXIgZm9yIGRhdGEKCiAgICBUaGUgZmVhdHVyZXMgKGFuZCB0aGVpciBuYW1lcykgYXJlIHN0b3JlZCB3aXRoIHRoZSB0YXJnZXQgbGFiZWxzIGluIGEgRGF0YUZyYW1lLgoKICAgIEZvciBmdXJ0aGVyIGRldGFpbHMgc2VlIGh0dHBzOi8vc2Npa2l0LWxlYXJuLm9yZy9zdGFibGUvZGF0YXNldHMvaW5kZXguaHRtbCN0b3ktZGF0YXNldHMKCiAgICA6cGFyYW0gY29udGV4dDogICAgZnVuY3Rpb24gZXhlY3V0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBkYXRhc2V0OiAgICBuYW1lIG9mIHRoZSBkYXRhc2V0IHRvIGxvYWQKICAgIDpwYXJhbSBuYW1lOiAgICAgICBhcnRpZmFjdCBuYW1lIChkZWZhdWx0cyB0byBkYXRhc2V0KQogICAgOnBhcmFtIGZpbGVfZXh0OiAgIG91dHB1dCBmaWxlX2V4dDogcGFycXVldCBvciBjc3YKICAgIDpwYXJhbSBwYXJhbXM6ICAgICBwYXJhbXMgb2YgdGhlIHNrbGVhcm4gbG9hZF9kYXRhIG1ldGhvZAogICAgIiIiCiAgICBkYXRhc2V0ID0gc3RyKGRhdGFzZXQpCiAgICBwa2dfbW9kdWxlID0gInNrbGVhcm4uZGF0YXNldHMiCiAgICBmbmFtZSA9IGYibG9hZF97ZGF0YXNldH0iCgogICAgcGtnX21vZHVsZSA9IF9faW1wb3J0X18ocGtnX21vZHVsZSwgZnJvbWxpc3Q9W2ZuYW1lXSkKICAgIGxvYWRfZGF0YV9mbiA9IGdldGF0dHIocGtnX21vZHVsZSwgZm5hbWUpCgogICAgZGF0YSA9IGxvYWRfZGF0YV9mbigqKnBhcmFtcykKICAgIGZlYXR1cmVfbmFtZXMgPSBkYXRhWyJmZWF0dXJlX25hbWVzIl0KCiAgICB4eSA9IG5wLmNvbmNhdGVuYXRlKFtkYXRhWyJkYXRhIl0sIGRhdGFbInRhcmdldCJdLnJlc2hhcGUoLTEsIDEpXSwgYXhpcz0xKQogICAgaWYgaGFzYXR0cihmZWF0dXJlX25hbWVzLCAiYXBwZW5kIik6CiAgICAgICAgZmVhdHVyZV9uYW1lcy5hcHBlbmQoImxhYmVscyIpCiAgICBlbHNlOgogICAgICAgIGZlYXR1cmVfbmFtZXMgPSBucC5hcHBlbmQoZmVhdHVyZV9uYW1lcywgImxhYmVscyIpCiAgICBkZiA9IHBkLkRhdGFGcmFtZShkYXRhPXh5LCBjb2x1bW5zPWZlYXR1cmVfbmFtZXMpCgogICAgY29udGV4dC5sb2dfZGF0YXNldChuYW1lIG9yIGRhdGFzZXQsIGRmPWRmLCBmb3JtYXQ9ZmlsZV9leHQsIGluZGV4PUZhbHNlKQo=
+    commands: []
     code_origin: ''
     origin_filename: ''
-    functionSourceCode: IyBDb3B5cmlnaHQgMjAxOSBJZ3VhemlvCiMKIyBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIyB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiMgWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CiMKIyAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCiMKIyBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiMgZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIyBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIyBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiMgbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCiMKaW1wb3J0IG51bXB5IGFzIG5wCmltcG9ydCBwYW5kYXMgYXMgcGQKZnJvbSBtbHJ1bi5leGVjdXRpb24gaW1wb3J0IE1MQ2xpZW50Q3R4CgoKZGVmIGxvYWRfZGF0YXNldCgKICAgIGNvbnRleHQ6IE1MQ2xpZW50Q3R4LAogICAgZGF0YXNldDogc3RyLAogICAgbmFtZTogc3RyID0gIiIsCiAgICBmaWxlX2V4dDogc3RyID0gInBhcnF1ZXQiLAogICAgcGFyYW1zOiBkaWN0ID0ge30sCikgLT4gTm9uZToKICAgICIiIkxvYWRzIGEgc2Npa2l0LWxlYXJuIHRveSBkYXRhc2V0IGZvciBjbGFzc2lmaWNhdGlvbiBvciByZWdyZXNzaW9uCgogICAgVGhlIGZvbGxvd2luZyBkYXRhc2V0cyBhcmUgYXZhaWxhYmxlICgnbmFtZScgOiBkZXNyaXB0aW9uKToKCiAgICAgICAgJ2Jvc3RvbicgICAgICAgICAgOiBib3N0b24gaG91c2UtcHJpY2VzIGRhdGFzZXQgKHJlZ3Jlc3Npb24pCiAgICAgICAgJ2lyaXMnICAgICAgICAgICAgOiBpcmlzIGRhdGFzZXQgKGNsYXNzaWZpY2F0aW9uKQogICAgICAgICdkaWFiZXRlcycgICAgICAgIDogZGlhYmV0ZXMgZGF0YXNldCAocmVncmVzc2lvbikKICAgICAgICAnZGlnaXRzJyAgICAgICAgICA6IGRpZ2l0cyBkYXRhc2V0IChjbGFzc2lmaWNhdGlvbikKICAgICAgICAnbGlubmVydWQnICAgICAgICA6IGxpbm5lcnVkIGRhdGFzZXQgKG11bHRpdmFyaWF0ZSByZWdyZXNzaW9uKQogICAgICAgICd3aW5lJyAgICAgICAgICAgIDogd2luZSBkYXRhc2V0IChjbGFzc2lmaWNhdGlvbikKICAgICAgICAnYnJlYXN0X2NhbmNlcicgICA6IGJyZWFzdCBjYW5jZXIgd2lzY29uc2luIGRhdGFzZXQgKGNsYXNzaWZpY2F0aW9uKQoKICAgIFRoZSBzY2lraXQtbGVhcm4gZnVuY3Rpb25zIHJldHVybiBhIGRhdGEgYnVuY2ggaW5jbHVkaW5nIHRoZSBmb2xsb3dpbmcgaXRlbXM6CiAgICAtIGRhdGEgICAgICAgICAgICAgIHRoZSBmZWF0dXJlcyBtYXRyaXgKICAgIC0gdGFyZ2V0ICAgICAgICAgICAgdGhlIGdyb3VuZCB0cnV0aCBsYWJlbHMKICAgIC0gREVTQ1IgICAgICAgICAgICAgYSBkZXNjcmlwdGlvbiBvZiB0aGUgZGF0YXNldAogICAgLSBmZWF0dXJlX25hbWVzICAgICBoZWFkZXIgZm9yIGRhdGEKCiAgICBUaGUgZmVhdHVyZXMgKGFuZCB0aGVpciBuYW1lcykgYXJlIHN0b3JlZCB3aXRoIHRoZSB0YXJnZXQgbGFiZWxzIGluIGEgRGF0YUZyYW1lLgoKICAgIEZvciBmdXJ0aGVyIGRldGFpbHMgc2VlIGh0dHBzOi8vc2Npa2l0LWxlYXJuLm9yZy9zdGFibGUvZGF0YXNldHMvaW5kZXguaHRtbCN0b3ktZGF0YXNldHMKCiAgICA6cGFyYW0gY29udGV4dDogICAgZnVuY3Rpb24gZXhlY3V0aW9uIGNvbnRleHQKICAgIDpwYXJhbSBkYXRhc2V0OiAgICBuYW1lIG9mIHRoZSBkYXRhc2V0IHRvIGxvYWQKICAgIDpwYXJhbSBuYW1lOiAgICAgICBhcnRpZmFjdCBuYW1lIChkZWZhdWx0cyB0byBkYXRhc2V0KQogICAgOnBhcmFtIGZpbGVfZXh0OiAgIG91dHB1dCBmaWxlX2V4dDogcGFycXVldCBvciBjc3YKICAgIDpwYXJhbSBwYXJhbXM6ICAgICBwYXJhbXMgb2YgdGhlIHNrbGVhcm4gbG9hZF9kYXRhIG1ldGhvZAogICAgIiIiCiAgICBkYXRhc2V0ID0gc3RyKGRhdGFzZXQpCiAgICBwa2dfbW9kdWxlID0gInNrbGVhcm4uZGF0YXNldHMiCiAgICBmbmFtZSA9IGYibG9hZF97ZGF0YXNldH0iCgogICAgcGtnX21vZHVsZSA9IF9faW1wb3J0X18ocGtnX21vZHVsZSwgZnJvbWxpc3Q9W2ZuYW1lXSkKICAgIGxvYWRfZGF0YV9mbiA9IGdldGF0dHIocGtnX21vZHVsZSwgZm5hbWUpCgogICAgZGF0YSA9IGxvYWRfZGF0YV9mbigqKnBhcmFtcykKICAgIGZlYXR1cmVfbmFtZXMgPSBkYXRhWyJmZWF0dXJlX25hbWVzIl0KCiAgICB4eSA9IG5wLmNvbmNhdGVuYXRlKFtkYXRhWyJkYXRhIl0sIGRhdGFbInRhcmdldCJdLnJlc2hhcGUoLTEsIDEpXSwgYXhpcz0xKQogICAgaWYgaGFzYXR0cihmZWF0dXJlX25hbWVzLCAiYXBwZW5kIik6CiAgICAgICAgZmVhdHVyZV9uYW1lcy5hcHBlbmQoImxhYmVscyIpCiAgICBlbHNlOgogICAgICAgIGZlYXR1cmVfbmFtZXMgPSBucC5hcHBlbmQoZmVhdHVyZV9uYW1lcywgImxhYmVscyIpCiAgICBkZiA9IHBkLkRhdGFGcmFtZShkYXRhPXh5LCBjb2x1bW5zPWZlYXR1cmVfbmFtZXMpCgogICAgY29udGV4dC5sb2dfZGF0YXNldChuYW1lIG9yIGRhdGFzZXQsIGRmPWRmLCBmb3JtYXQ9ZmlsZV9leHQsIGluZGV4PUZhbHNlKQo=
+    requirements: []
   entry_points:
     load_dataset:
-      has_kwargs: false
       name: load_dataset
-      has_varargs: false
-      lineno: 20
+      doc: "Loads a scikit-learn toy dataset for classification or regression\n\n\
+        The following datasets are available ('name' : desription):\n\n    'boston'\
+        \          : boston house-prices dataset (regression)\n    'iris'        \
+        \    : iris dataset (classification)\n    'diabetes'        : diabetes dataset\
+        \ (regression)\n    'digits'          : digits dataset (classification)\n\
+        \    'linnerud'        : linnerud dataset (multivariate regression)\n    'wine'\
+        \            : wine dataset (classification)\n    'breast_cancer'   : breast\
+        \ cancer wisconsin dataset (classification)\n\nThe scikit-learn functions\
+        \ return a data bunch including the following items:\n- data             \
+        \ the features matrix\n- target            the ground truth labels\n- DESCR\
+        \             a description of the dataset\n- feature_names     header for\
+        \ data\n\nThe features (and their names) are stored with the target labels\
+        \ in a DataFrame.\n\nFor further details see https://scikit-learn.org/stable/datasets/index.html#toy-datasets"
       parameters:
       - name: context
         type: MLClientCtx
@@ -37,21 +54,19 @@ spec:
         type: dict
         doc: params of the sklearn load_data method
         default: {}
-      doc: "Loads a scikit-learn toy dataset for classification or regression\n\n\
-        The following datasets are available ('name' : desription):\n\n    'boston'\
-        \          : boston house-prices dataset (regression)\n    'iris'        \
-        \    : iris dataset (classification)\n    'diabetes'        : diabetes dataset\
-        \ (regression)\n    'digits'          : digits dataset (classification)\n\
-        \    'linnerud'        : linnerud dataset (multivariate regression)\n    'wine'\
-        \            : wine dataset (classification)\n    'breast_cancer'   : breast\
-        \ cancer wisconsin dataset (classification)\n\nThe scikit-learn functions\
-        \ return a data bunch including the following items:\n- data             \
-        \ the features matrix\n- target            the ground truth labels\n- DESCR\
-        \             a description of the dataset\n- feature_names     header for\
-        \ data\n\nThe features (and their names) are stored with the target labels\
-        \ in a DataFrame.\n\nFor further details see https://scikit-learn.org/stable/datasets/index.html#toy-datasets"
       outputs:
       - type: None
-  disable_auto_mount: false
+      lineno: 20
+      has_varargs: false
+      has_kwargs: false
   description: load a toy dataset from scikit-learn
+  default_handler: load_dataset
+  disable_auto_mount: false
+  clone_target_dir: ''
+  env: []
+  priority_class_name: ''
+  preemption_mode: prevent
+  affinity: null
+  tolerations: null
+  security_context: {}
 verbose: false

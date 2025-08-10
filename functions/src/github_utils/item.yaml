@@ -11,7 +11,7 @@ labels:
   author: yaronh
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.7.0
+mlrunVersion: 1.1.0
 name: github-utils
 platformVersion: 3.5.0
 spec:
@@ -21,4 +21,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 1.2.0
+version: 1.1.0

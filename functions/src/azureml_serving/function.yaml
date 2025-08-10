@@ -1,30 +1,51 @@
-spec:
-  max_replicas: 4
-  description: AzureML serving function
-  disable_auto_mount: false
-  default_class: mlrun.frameworks.sklearn.PickleModelServer
-  command: ''
-  build:
-    requirements:
-    - azureml-automl-runtime~=1.38.1
-    code_origin: ''
-    functionSourceCode: IyBDb3B5cmlnaHQgMjAxOSBJZ3VhemlvCiMKIyBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIyB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiMgWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CiMKIyAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCiMKIyBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiMgZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIyBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIyBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiMgbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCiMKIyBEbyBub3QgZGVsZXRlIQoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nX3YyJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
-    origin_filename: ''
-  function_kind: serving_v2
-  default_handler: ''
-  base_image_pull: false
-  image: mlrun/mlrun
-  min_replicas: 1
-  function_handler: azureml-serving-nuclio:handler
-  source: ''
-  env:
-  - name: MLRUN_HTTPDB__NUCLIO__EXPLICIT_ACK
-    value: enabled
-verbose: false
 kind: serving
 metadata:
+  name: azureml-serving
+  tag: ''
+  hash: c0f404820b8f0fe92d2d1cfe9dbcc068be1a13bf
+  project: ''
+  labels:
+    author: yonish
   categories:
   - machine-learning
   - model-serving
-  tag: ''
-  name: azureml-serving
+spec:
+  command: ''
+  args: []
+  image: mlrun/mlrun
+  build:
+    commands:
+    - python -m pip install azureml-automl-runtime~=1.38.1
+    code_origin: https://github.com/mlrun/functions.git#f9ba6e95866bb638e9e8b861430fcab5b52b2db5:/Users/yonatanshelach/yoni/projects/functions/azureml_serving/azureml_serving.py
+    origin_filename: /Users/yonatanshelach/yoni/projects/functions/azureml_serving/azureml_serving.py
+  description: AzureML serving function
+  disable_auto_mount: false
+  env: []
+  priority_class_name: ''
+  preemption_mode: prevent
+  min_replicas: 1
+  max_replicas: 4
+  base_spec:
+    apiVersion: nuclio.io/v1
+    kind: Function
+    metadata:
+      name: azureml-serving
+      labels: {}
+      annotations:
+        nuclio.io/generated_by: function generated from /Users/yonatanshelach/yoni/projects/functions/azureml_serving/azureml_serving.py
+    spec:
+      runtime: python
+      handler: azureml_serving:handler
+      env: []
+      volumes: []
+      build:
+        commands: []
+        noBaseImagesPull: true
+        functionSourceCode: IyBEbyBub3QgZGVsZXRlIQoKZnJvbSBtbHJ1bi5ydW50aW1lcyBpbXBvcnQgbnVjbGlvX2luaXRfaG9vawpkZWYgaW5pdF9jb250ZXh0KGNvbnRleHQpOgogICAgbnVjbGlvX2luaXRfaG9vayhjb250ZXh0LCBnbG9iYWxzKCksICdzZXJ2aW5nX3YyJykKCmRlZiBoYW5kbGVyKGNvbnRleHQsIGV2ZW50KToKICAgIHJldHVybiBjb250ZXh0Lm1scnVuX2hhbmRsZXIoY29udGV4dCwgZXZlbnQpCg==
+  source: ''
+  function_kind: serving_v2
+  default_class: mlrun.frameworks.sklearn.PickleModelServer
+  secret_sources: []
+  affinity: null
+  tolerations: null
+verbose: false

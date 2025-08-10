@@ -85,7 +85,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run py tests
-        run: python -m cli.cli run-tests -r functions/src -s py -fn ${{ matrix.package }}
+        run: python -m cli.cli run-tests -r ${{ matrix.package }} -s py -fn $(basename "${{ matrix.package }}")
         continue-on-error: true
 #      - name: Run ipynb tests
 #        run: python functions/cli/cli.py  run-tests -r functions -s ipynb

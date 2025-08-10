@@ -13,7 +13,7 @@ labels:
   framework: sklearn
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.7.0
 name: model-server
 platformVersion: 3.5.0
 spec:
@@ -23,4 +23,4 @@ spec:
   kind: nuclio:serving
   requirements: []
 url: ''
-version: 1.1.0
+version: 1.2.0

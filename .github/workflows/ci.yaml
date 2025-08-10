@@ -63,9 +63,13 @@ jobs:
           if [[ -z "$packages" ]]; then
             matrix_json='{"package":[]}'
           else
-            # Turn newline-separated list into {"package":[ "...", ... ]}
-            matrix_json=$(printf '%s\n' "$packages" | jq -R . | jq -s '{package: .}')
+            matrix_json=$(printf '%s\n' "$packages" \
+              | jq -R . \
+              | jq -s '{package: .}' \
+              | jq -c)   # <-- compact
           fi
+          
+          echo "Matrix: $matrix_json"
           echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}

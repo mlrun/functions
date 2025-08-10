@@ -112,7 +112,7 @@ jobs:
          echo "Tree structure:"
          find . -type f | sort
      - name: Run py tests
-       run: python -m cli.cli  run-tests -r functions/src -s py -fn ${{ matrix.package }}
+       run: python -m cli.cli test-suite -r ${{ matrix.package }} -s py -fn $(basename "${{ matrix.package }}")
 
      - name: Clean
        run: |

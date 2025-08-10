@@ -240,7 +240,7 @@ class TestPY(TestSuite):
         install_requirements(path, ["pytest", f"mlrun=={mlrun_version}"] + item_requirements)
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
-            f"cd {path} ; pipenv run python -m pytest -s", # todo: remove the -s flag
+            f"cd {path} ; pipenv run python -m pytest -s",
             stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
@@ -613,7 +613,7 @@ def is_test_valid_by_item(item_posix_path):
         test_name = data.get("name")
         if not test_valid:
             click.echo("==================== Test {} Not valid ====================".format(test_name))
-            click.echo("==================== enable tet_valid in item yaml ====================")
+            click.echo("==================== enable test_valid in item.yaml ====================")
         return test_valid
     else:
         return True

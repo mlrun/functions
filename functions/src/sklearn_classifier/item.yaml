@@ -24,3 +24,4 @@ spec:
   requirements: []
 url: ''
 version: 1.2.0
+test_valid: false

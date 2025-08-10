@@ -11,7 +11,7 @@ labels:
   author: saarc
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.4.1
+mlrunVersion: 1.7.0
 name: send-email
 platformVersion: 3.5.3
 spec:
@@ -21,4 +21,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 1.2.0
+version: 1.3.0

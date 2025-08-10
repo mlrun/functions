@@ -12,7 +12,7 @@ labels:
   author: yonish
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.1.0
+mlrunVersion: 1.7.0
 name: azureml_serving
 platformVersion: 3.5.0
 spec:
@@ -24,4 +24,4 @@ spec:
   requirements:
   - azureml-automl-runtime~=1.38.1
 url: ''
-version: 1.1.0
+version: 1.2.0

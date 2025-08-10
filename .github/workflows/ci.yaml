@@ -54,8 +54,9 @@ jobs:
           packages=$(
             {
               echo "$changed_files" | awk -F'/' '/^functions\/src\// {print $1"/"$2"/"$3}';
-#              echo "$changed_files" | awk -F'/' '/^datasets\/src\// {print $1"/"$2"/"$3}';
-            } | sort -u
+              echo "$changed_files" | awk -F'/' '/^datasets\/src\// {print $1"/"$2"/"$3}';
+            }
+          | sort -u
           )
           if [[ -z "$packages" ]]; then
             matrix_json='{"package":[]}'

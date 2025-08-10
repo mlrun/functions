@@ -49,20 +49,20 @@ jobs:
           fi
       
           echo "Diffing against $base_ref:"
-          git diff $base_ref --name-only || echo "Diff failed"
-      
-          matrix=$( 
+          changed_files="$(git diff "$base_ref" --name-only || true)"
+
+          packages=$(
             {
-              echo '{ "package" : ['
-              git diff $base_ref --name-only \
-                | sed 's,/*[^/]\+/*$,,g' \
-                | sort | uniq \
-                | grep -v '^\.' \
-                | sed 's/.*/"&"/' \
-                | sed '$!s/.*/&,/'
-              echo "]}"
-            } | jq 'del(.[][] | select(. == ""))' -c
+              echo "$changed_files" | awk -F'/' '/^functions\/src\// {print $1"/"$2"/"$3}';
+#              echo "$changed_files" | awk -F'/' '/^datasets\/src\// {print $1"/"$2"/"$3}';
+            } | sort -u
           )
+          if [[ -z "$packages" ]]; then
+            matrix_json='{"package":[]}'
+          else
+            # Turn newline-separated list into {"package":[ "...", ... ]}
+            matrix_json=$(printf '%s\n' "$packages" | jq -R . | jq -s '{package: .}')
+          fi
           echo "::set-output name=matrix::$matrix"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}

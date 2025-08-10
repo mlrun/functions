@@ -33,13 +33,26 @@ jobs:
         # 3) Save matrix JSON to output
         # This is old fetch command it cant work cause base_ref is only avaliable on pull request actions: git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
         run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/${{ steps.myref.outputs.branch }}:refs/remotes/origin/${{ steps.myref.outputs.branch }}
-          matrix=$((
-            echo '{ "package" : ['
-            git ls-files *[^cli] | grep '/' | sort | uniq| sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
-            echo " ]}"
-          ) | jq -c .)
-          echo "::set-output name=matrix::$matrix"
+          all_files="$(git ls-files || true)"
+
+          # Keep only one-level dirs under functions/src/* etc
+          packages=$(
+            printf '%s\n' "$all_files" \
+            | awk -F'/' '
+                /^functions\/src\// {print $1"/"$2"/"$3}
+                /^modules\/src\//  {print $1"/"$2"/"$3}
+              ' \
+            | sort -u
+          )
+      
+          if [[ -z "$packages" ]]; then
+            matrix_json='{"package":[]}'
+          else
+            matrix_json=$(printf '%s\n' "$packages" | jq -R . | jq -s '{package: .}' | jq -c)
+          fi
+      
+          echo "Matrix: $matrix_json"
+          echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 

@@ -55,7 +55,7 @@ jobs:
             printf '%s\n' "$changed_files" \
             | awk -F'/' '
                 /^functions\/src\// {print $1"/"$2"/"$3}
-                /^datasets\/src\//  {print $1"/"$2"/"$3}
+                /^modules\/src\//  {print $1"/"$2"/"$3}
               ' \
             | sort -u
           )

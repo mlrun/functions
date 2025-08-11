@@ -74,6 +74,8 @@ source_suffix = {
     ".md": "myst-nb",
 }
 
+myst_heading_anchors = 6
+
 # If you want to mock imports during autodoc
 autodoc_mock_imports = [{{mock_imports}}]
 

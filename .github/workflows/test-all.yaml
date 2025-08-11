@@ -108,10 +108,9 @@ jobs:
           rm -rf functions
 
 
-  build-marketplace: # todo: return the if: github.repository == 'mlrun/functions' && github.event_name != 'pull_request'
+  build-marketplace: # todo: return the if: github.repository == 'mlrun/functions' && github.event_name != 'pull_request' and     needs: run_monorepo_tests
     name: Build marketplace
     runs-on: ubuntu-latest
-    needs: run_monorepo_tests
     continue-on-error: false
 
     steps:

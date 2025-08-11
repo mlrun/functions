@@ -1,1 +1,11 @@
 mlrunVersion: 1.7.0
+version: 0.1.0
+hidden: false
+example: dummy_module.ipynb
+spec:
+  filename: dummmy_module.py
+  handler: dummmy_module
+  image: mlrun/mlrun
+  kind: job
+  requirements: []
+generationDate: 2025-08-11:17-25

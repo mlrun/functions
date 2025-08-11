@@ -16,7 +16,7 @@ import sys
 import os
 
 sys.path.insert(0, "{{sphinx_docs_target}}")
-sys.path.insert(0, os.path.abspath(os.path.join("{{sphinx_docs_target}}", "../functions/src")))
+sys.path.insert(0, os.path.abspath(os.path.join("{{sphinx_docs_target}}", "../functions")))
 
 
 # -- Project information -----------------------------------------------------

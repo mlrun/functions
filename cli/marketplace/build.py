@@ -156,6 +156,7 @@ def build_marketplace(
 
     if _verbose:
         print_file_tree("Temporary project structure", temp_root)
+        print_file_tree("Temporary docs structure", temp_docs)
 
     render_html_files(temp_docs)
 

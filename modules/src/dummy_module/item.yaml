@@ -3,8 +3,8 @@ version: 0.1.0
 hidden: false
 example: dummy_module.ipynb
 spec:
-  filename: dummmy_module.py
-  handler: dummmy_module
+  filename: dummy_module.py
+  handler: dummy_module
   image: mlrun/mlrun
   kind: job
   requirements: []

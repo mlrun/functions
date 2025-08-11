@@ -143,6 +143,11 @@ jobs:
           git pull origin
           cd ..
           python -m cli.cli build-marketplace -s ./functions/src -sn functions -m marketplace -c $CHANNEL -v -f
+      - name: Upload built marketplace as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: marketplace-build
+          path: marketplace/**
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V3 }}

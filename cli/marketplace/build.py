@@ -687,7 +687,7 @@ def build_temp_docs(temp_root, temp_docs, source_dir):
 
     sphinx_apidoc_cmd(cmd.split(" "))
 
-    shutil.copytree(source_dir / "cli" / "marketplace" / "_static" / "css", temp_docs / '_static/css')
+    shutil.copytree(PROJECT_ROOT / "cli" / "marketplace" / "_static" / "css", temp_docs / '_static/css')
     click.echo("[Sphinx] Done autodoc")
 
 

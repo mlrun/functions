@@ -22,7 +22,7 @@ from glob import iglob
 import yaml
 from jinja2 import Template
 
-PROJECT_ROOT = Path(__file__).parent.parent.absolute()
+PROJECT_ROOT = Path(__file__).parent.parent.parent.absolute()
 
 
 def is_item_dir(path: Path) -> bool:

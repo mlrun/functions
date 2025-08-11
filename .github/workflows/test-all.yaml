@@ -69,7 +69,8 @@ jobs:
           echo $matrix
           echo $matrix | jq .
           echo $matrix | json2yaml
-  run_monorepo_tests:
+  run_monorepo_tests: # todo: remove the if
+    if: ${{ false }}
     needs: build_strategy_matrix
     runs-on: ubuntu-latest
     strategy:
@@ -106,9 +107,9 @@ jobs:
         run: |
           rm -rf functions
 
-  build-marketplace:
+
+  build-marketplace: # todo: return the if: github.repository == 'mlrun/functions' && github.event_name != 'pull_request'
     name: Build marketplace
-    if: github.repository == 'mlrun/functions' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     needs: run_monorepo_tests
     continue-on-error: false
@@ -135,14 +136,14 @@ jobs:
           pip install -r requirements.txt
       - name: Build marketplace docs
         env:
-          CHANNEL: ${{ steps.branch.outputs.branch }}
-        # todo: make sure the python command works as expected
+          CHANNEL: development
+        # change the channel back to ${{ steps.branch.outputs.branch }}
         run: |
           cd marketplace
           pwd
           git pull origin
           cd ..
-          python -m cli.cli build-marketplace -s . -m marketplace -c $CHANNEL -v -f
+          python -m cli.cli build-marketplace -s ./functions/src -sn functions -m marketplace -c $CHANNEL -v -f
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V3 }}

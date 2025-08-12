@@ -7,9 +7,6 @@ on:
     branches-ignore:
       - testing
   workflow_dispatch: {}
-  push: # delete
-    branches:
-      - monorepo-design
 
 jobs:
   build_strategy_matrix:
@@ -37,16 +34,9 @@ jobs:
         # This is previous fetch command that stopped working (wile invetsigating added WA bello in run sectiong): git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
         # This is old git diff version:             git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
         # Based on instructions regarding https://docs.github.com/en/actions/learn-github-actions/contexts#github-context , github.base_ref triggers a workflow run is either pull_request or pull_request_target
-        run: | # restore the old run config
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "Detected PR event, using base_ref: ${{ github.base_ref }}"
-            git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
-            base_ref="origin/${{ github.base_ref }}"
-          else
-            echo "Detected push event, using base_ref: origin/development"
-            git fetch origin development:refs/remotes/origin/development
-            base_ref="origin/development"
-          fi
+        run: | 
+          git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+          base_ref="origin/${{ github.base_ref }}"
       
           echo "Diffing against $base_ref:"
           changed_files="$(git diff "$base_ref" --name-only || true)"
@@ -68,9 +58,6 @@ jobs:
               | jq -s '{package: .}' \
               | jq -c)   # <-- compact
           fi
-          
-          echo "Matrix: $matrix_json"
-          echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
@@ -87,6 +74,7 @@ jobs:
           echo $matrix
           echo $matrix | jq .
           echo $matrix | json2yaml
+
   run_monorepo_tests:
     needs: build_strategy_matrix
     runs-on: ubuntu-latest

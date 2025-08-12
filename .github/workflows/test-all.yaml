@@ -107,6 +107,38 @@ jobs:
         run: |
           rm -rf functions
 
+  update_readmes: # todo: change the name of the repo to hub-assets and uncomment the if and add needs: run_monorepo_tests
+    # if: github.repository == 'mlrun/functions'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install python 3.10.17
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10.17
+      - name: Install deps
+        run: pip install pyyaml
+      - name: Regenerate README tables
+        run: python -m cli.cli update-readme --asset functions --asset modules
+      - name: Commit & push (if changed)
+        env:
+          GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V3 }}
+          USERNAME: iguazio-cicd
+          USEREMAIL: iguaziocicd@gmail.com
+        run: |
+          if git diff --quiet; then
+            echo "No README changes."
+            exit 0
+          fi
+          git config --local user.name $USERNAME
+          git config --local user.email $USEREMAIL
+          git add functions/README.md modules/README.md || true
+          git commit -m "chore(readme): auto-update asset tables [skip ci]"
+          git push
 
   build-marketplace: # todo: return the if: github.repository == 'mlrun/functions' && github.event_name != 'pull_request' and     needs: run_monorepo_tests
     name: Build marketplace

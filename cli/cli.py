@@ -20,7 +20,7 @@ from cli.marketplace.build import build_marketplace_cli
 from cli.functions.new_function_item import new_item
 from cli.common.test_suite import test_suite
 from cli.common.item_yaml import update_functions_yaml
-
+from cli.common.update_readme import update_readme
 
 @click.group()
 def cli():
@@ -33,6 +33,7 @@ cli.add_command(function_to_item_cli, name="function-to-item")
 cli.add_command(test_suite, name="run-tests")
 cli.add_command(build_marketplace_cli, name="build-marketplace")
 cli.add_command(update_functions_yaml, name="update-functions-yaml")
+cli.add_command(update_readme, name="update-readme")
 
 if __name__ == "__main__":
     cli()

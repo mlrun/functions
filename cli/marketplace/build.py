@@ -94,7 +94,7 @@ def build_marketplace_cli(
 def build_marketplace(
     source_dir: str,
     marketplace_dir: str,
-    source_name: Optional[str] = None,
+    source_name: str,
     temp_dir: str = "/tmp",
     channel: str = "development",
     verbose: bool = False,
@@ -104,7 +104,7 @@ def build_marketplace(
 
     :param source_dir: Path to the source directory to build the marketplace from
     :param marketplace_dir: Path to marketplace directory
-    :param source_name: Name of source, if not provided, name of source directory will be used instead
+    :param source_name: Name of source (e.g. 'functions', 'modules', etc.)
     :param temp_dir: Path to intermediate directory, used to build marketplace resources,
     if not provided '/tmp/<random_uuid>' will be used
     :param channel: The name of the marketplace channel to write to
@@ -117,7 +117,7 @@ def build_marketplace(
 
     # The root of the temporary project
     root_base = Path(temp_dir) / uuid.uuid4().hex
-    temp_root = root_base / "functions"
+    temp_root = root_base / source_name
     temp_docs = root_base / "docs"
 
     click.echo(f"Temporary working directory: {root_base}")
@@ -126,9 +126,9 @@ def build_marketplace(
     source_dir = Path(source_dir).resolve()
     # The target directory of the marketplace
     marketplace_root = Path(marketplace_dir).resolve()
-    marketplace_dir = marketplace_root / (source_name or source_dir.name) / channel
+    marketplace_dir = marketplace_root / source_name / channel
 
-    # Creating directories temp_root/functions, temp_root/docs and marketplace_root/functions/(development or master):
+    # Creating directories temp_root/source_name, temp_root/docs and marketplace_root/source_name/(development or master):
     temp_root.mkdir(parents=True)
     temp_docs.mkdir(parents=True)
     marketplace_dir.mkdir(parents=True, exist_ok=True)
@@ -165,6 +165,7 @@ def build_marketplace(
 
     update_or_create_items(
         source_dir,
+        source_name,
         marketplace_dir,
         temp_docs,
         change_log,
@@ -238,12 +239,12 @@ def copy_resources(marketplace_dir, temp_docs):
 
 
 def update_or_create_items(
-    source_dir, marketplace_dir, temp_docs, change_log, force_update: bool = False
+    source_dir, source_name, marketplace_dir, temp_docs, change_log, force_update: bool = False
 ):
     click.echo("Creating items...")
     for item_dir in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
         update_or_create_item(
-            item_dir, marketplace_dir, temp_docs, change_log, force_update
+            item_dir, source_name, marketplace_dir, temp_docs, change_log, force_update
         )
 
 
@@ -353,6 +354,7 @@ def add_assets(item_yaml: dict):
 
 def update_or_create_item(
     item_dir: Path,
+    source_name: str,
     marketplace_dir: Path,
     temp_docs: Path,
     change_log: ChangeLog,
@@ -460,19 +462,23 @@ def update_or_create_item(
         {"source_code": source_code},
     )
 
-    with open((item_dir / "function.yaml"), "r") as f:
-        source_code = f.read()
+    # render the yaml of the specific asset type if exists (e.g: function.yaml)
+    asset_name = source_name[:-1]
+    py_file_path = item_dir / f"{asset_name}.py"
 
-    render_jinja(
-        templates / "yaml.html",
-        latest_static / "function.html",
-        {"source_code": source_code},
-    )
-    render_jinja(
-        templates / "yaml.html",
-        version_static / "function.html",
-        {"source_code": source_code},
-    )
+    if py_file_path.exists():
+        with open(py_file_path, "r") as f:
+            source_code = f.read()
+        render_jinja(
+            templates / "python.html",
+            latest_static / "source.html",
+            {"source_code": source_code},
+        )
+        render_jinja(
+            templates / "python.html",
+            version_static / "source.html",
+            {"source_code": source_code},
+        )
 
     pass
 

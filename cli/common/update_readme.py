@@ -7,7 +7,6 @@ from typing import Iterable, List, Tuple
 import click
 import yaml
 
-DEFAULT_ASSETS = ("functions", "modules")
 MARKER_START = "<!-- AUTOGEN:START"
 MARKER_END = "<!-- AUTOGEN:END -->"
 COLUMNS = ("Name", "Description", "Kind", "Categories")
@@ -16,6 +15,7 @@ COLUMNS = ("Name", "Description", "Kind", "Categories")
 @click.option(
     "--asset",
     multiple=True,
+    required=True,
     help="Asset types to process (e.g: functions). "
          "Pass multiple: --assets functions --assets modules",
 )
@@ -26,7 +26,7 @@ def update_readme(asset: Iterable[str],
     """
     Regenerate the README tables for asset types from their item.yaml files.
     """
-    asset_list = list(asset) or list(DEFAULT_ASSETS)
+    asset_list = list(asset)
     changed_any = False
     touched: list[str] = []
 

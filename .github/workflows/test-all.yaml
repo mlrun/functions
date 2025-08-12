@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Get the current branch name
         shell: bash
-        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
         id: myref
 
       - uses: actions/checkout@v4
@@ -150,7 +150,7 @@ jobs:
     steps:
       - name: Get the current branch name
         shell: bash
-        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
         id: branch
       - name: Checkout current repo
         uses: actions/checkout@v4

@@ -478,7 +478,6 @@ def update_or_create_item(
             version_static / "source.html",
             {"source_code": source_code},
         )
-        # TODO: consider putting it somewhere else
         ASSETS[asset_name] = f"src/{asset_name}.yaml"
 
     pass

@@ -16,8 +16,8 @@ spec:
   build:
     commands:
     - python -m pip install azureml-automl-runtime~=1.38.1
-    code_origin: https://github.com/mlrun/functions.git#f9ba6e95866bb638e9e8b861430fcab5b52b2db5:/Users/yonatanshelach/yoni/projects/functions/azureml_serving/azureml_serving.py
-    origin_filename: /Users/yonatanshelach/yoni/projects/functions/azureml_serving/azureml_serving.py
+    code_origin: ""
+    origin_filename: ""
   description: AzureML serving function
   disable_auto_mount: false
   env: []

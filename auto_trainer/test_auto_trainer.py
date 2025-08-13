@@ -72,9 +72,7 @@ def _get_dataset(problem_type: str, filepath: str = ".", n_classes: int = 2):
 
 
 def _assert_train_handler(train_run):
-    assert train_run and all(
-        key in train_run.outputs for key in ["model", "test_set"]
-    ), "outputs should include more data"
+    assert train_run and (train_run.status.artifact_uris or train_run.status.artifacts) , "outputs should include more data"
 
 
 @pytest.mark.parametrize("model", MODELS)

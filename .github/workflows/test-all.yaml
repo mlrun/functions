@@ -3,9 +3,10 @@ permissions:
   contents: read
 on:
   push:
-    branches:
+    branches: # todo: delete
       - development
       - master
+      - monorepo-design
 
 jobs:
   build_strategy_matrix:
@@ -172,7 +173,7 @@ jobs:
           cd ..
           python -m cli.cli build-marketplace -s ./functions/src -sn functions -m marketplace -c $CHANNEL -v -f
           python -m cli.cli build-marketplace -s ./modules/src -sn modules -m marketplace -c $CHANNEL -v -f
-      - name: Upload built marketplace as artifact
+      - name: Upload built marketplace as artifact # TODO: delete
         uses: actions/upload-artifact@v4
         with:
           name: marketplace-build

@@ -38,7 +38,6 @@ _verbose = False
 ASSETS = {
     "example": ("example", "src/{}"),
     "source": ("spec.filename", "src/{}"),
-    "function": "src/function.yaml",
     "docs": "static/documentation.html",
 }
 
@@ -464,10 +463,10 @@ def update_or_create_item(
 
     # render the yaml of the specific asset type if exists (e.g: function.yaml)
     asset_name = source_name[:-1]
-    py_file_path = item_dir / f"{asset_name}.py"
+    asset_yaml_path = item_dir / f"{asset_name}.yaml"
 
-    if py_file_path.exists():
-        with open(py_file_path, "r") as f:
+    if asset_yaml_path.exists():
+        with open(asset_yaml_path, "r") as f:
             source_code = f.read()
         render_jinja(
             templates / "python.html",
@@ -479,6 +478,8 @@ def update_or_create_item(
             version_static / "source.html",
             {"source_code": source_code},
         )
+        # TODO: consider putting it somewhere else
+        ASSETS[asset_name] = f"src/{asset_name}.yaml"
 
     pass
 

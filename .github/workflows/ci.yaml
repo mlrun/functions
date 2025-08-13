@@ -1,4 +1,4 @@
-name: Test functions
+name: Test Assets
 permissions:
   contents: read
 on:
@@ -58,6 +58,7 @@ jobs:
               | jq -s '{package: .}' \
               | jq -c)   # <-- compact
           fi
+          echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
@@ -108,7 +109,3 @@ jobs:
          find . -type f | sort
      - name: Run py tests
        run: python -m cli.cli run-tests -r ${{ matrix.package }} -s py -fn $(basename "${{ matrix.package }}")
-
-     - name: Clean
-       run: |
-         rm -rf functions

@@ -1,0 +1,100 @@
+kind: job
+spec:
+  image: mlrun/mlrun
+  build:
+    functionSourceCode: IyBDb3B5cmlnaHQgMjAxOSBJZ3VhemlvCiMKIyBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIyB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiMgWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CiMKIyAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCiMKIyBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiMgZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIyBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIyBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiMgbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCiMKaW1wb3J0IHBhbmRhcyBhcyBwZAppbXBvcnQgcHlhcnJvdy5wYXJxdWV0IGFzIHBxCmltcG9ydCBweWFycm93IGFzIHBhCmltcG9ydCBudW1weSBhcyBucAoKCmZyb20gbWxydW4uZXhlY3V0aW9uIGltcG9ydCBNTENsaWVudEN0eApmcm9tIG1scnVuLmRhdGFzdG9yZSBpbXBvcnQgRGF0YUl0ZW0KCmZyb20gdHlwaW5nIGltcG9ydCBMaXN0CmltcG9ydCBvcwoKCgpkZWYgX2NodW5rX3JlYWR3cml0ZSgKICAgICAgICBhcmNoaXZlX3VybCwKICAgICAgICBkZXN0X3BhdGgsCiAgICAgICAgY2h1bmtzaXplLAogICAgICAgIGhlYWRlciwKICAgICAgICBlbmNvZGluZywKICAgICAgICBkdHlwZSwKICAgICAgICBkYXRhc2V0Cik6CiAgICAiIiJzdHJlYW0gcmVhZCBhbmQgd3JpdGUgYXJjaGl2ZXMKCiAgICBwYW5kYXMgcmVhZHMgYW5kIHBhcnF1ZXQgd3JpdGVzCgogICAgbm90ZXMKICAgIC0tLS0tCiAgICAqIGRlc3RfcGF0aCBjYW4gYmUgZWl0aGVyIGEgZmlsZS5wYXJxdWV0LCBvciBpbiBodGUgY2FzZSBvZiBwYXJ0aXRpb25lZCBwYXJxdWV0CiAgICAgIGl0IHdpbGwgYmUgb25seSB0aGUgZGVzdGluYXRpb24gZm9sZGVyIG9mIHRoZSBwYXJxdWV0IHBhcnRpdGlvbiBmaWxlcwogICAgIiIiCiAgICBwcXdyaXRlciA9IE5vbmUKICAgIGhlYWRlciA9IFtdCiAgICBmb3IgaSwgZGYgaW4gZW51bWVyYXRlKHBkLnJlYWRfY3N2KGFyY2hpdmVfdXJsLCBjaHVua3NpemU9Y2h1bmtzaXplLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBuYW1lcz1oZWFkZXIsIGVuY29kaW5nPWVuY29kaW5nLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkdHlwZT1kdHlwZSkpOgogICAgICAgIHRhYmxlID0gcGEuVGFibGUuZnJvbV9wYW5kYXMoZGYpCiAgICAgICAgaWYgaSA9PSAwOgogICAgICAgICAgICBpZiBkYXRhc2V0OgogICAgICAgICAgICAgICAgaGVhZGVyID0gbnAuY29weSh0YWJsZS5zY2hlbWEpCiAgICAgICAgICAgIGVsc2U6CiAgICAgICAgICAgICAgICBwcXdyaXRlciA9IHBxLlBhcnF1ZXRXcml0ZXIoZGVzdF9wYXRoLCB0YWJsZS5zY2hlbWEpCiAgICAgICAgaWYgZGF0YXNldDoKICAgICAgICAgICAgcHEud3JpdGVfdG9fZGF0YXNldCh0YWJsZSwgcm9vdF9wYXRoPWRlc3RfcGF0aCwgcGFydGl0aW9uX2NvbHM9cGFydGl0aW9uX2NvbHMpCiAgICAgICAgZWxzZToKICAgICAgICAgICAgcHF3cml0ZXIud3JpdGVfdGFibGUodGFibGUpCiAgICBpZiBwcXdyaXRlcjoKICAgICAgICBwcXdyaXRlci5jbG9zZSgpCgogICAgcmV0dXJuIGhlYWRlcgoKCmRlZiBhcmNfdG9fcGFycXVldCgKICAgICAgICBjb250ZXh0OiBNTENsaWVudEN0eCwKICAgICAgICBhcmNoaXZlX3VybDogRGF0YUl0ZW0sCiAgICAgICAgaGVhZGVyOiBMaXN0W3N0cl0gPSBbTm9uZV0sCiAgICAgICAgY2h1bmtzaXplOiBpbnQgPSAwLAogICAgICAgIGR0eXBlPU5vbmUsCiAgICAgICAgZW5jb2Rpbmc6IHN0ciA9ICJsYXRpbi0xIiwKICAgICAgICBrZXk6IHN0ciA9ICJkYXRhIiwKICAgICAgICBkYXRhc2V0OiBzdHIgPSAiTm9uZSIsCiAgICAgICAgcGFydF9jb2xzPVtdLAogICAgICAgIGZpbGVfZXh0OiBzdHIgPSAicGFycXVldCIsCiAgICAgICAgaW5kZXg6IGJvb2wgPSBGYWxzZSwKICAgICAgICByZWZyZXNoX2RhdGE6IGJvb2wgPSBGYWxzZSwKICAgICAgICBzdGF0czogYm9vbCA9IEZhbHNlCikgLT4gTm9uZToKICAgICIiIk9wZW4gYSBmaWxlL29iamVjdCBhcmNoaXZlIGFuZCBzYXZlIGFzIGEgcGFycXVldCBmaWxlIG9yIGRhdGFzZXQKCiAgICBOb3RlcwogICAgLS0tLS0KICAgICogdGhpcyBmdW5jdGlvbiBpcyB0eXBpY2FsbHkgZm9yIGxhcmdlIGZpbGVzLCBwbGVhc2UgYmUgc3VyZSB0byBjaGVjayBhbGwgc2V0dGluZ3MKICAgICogcGFydGl0aW9uaW5nIHJlcXVpcmVzIHByZWNpc2Ugc3BlY2lmaWNhdGlvbiBvZiBjb2x1bW4gdHlwZXMuCiAgICAqIHRoZSBhcmNoaXZlX3VybCBjYW4gYmUgYW55IGZpbGUgcmVhZGFibGUgYnkgcGFuZGFzIHJlYWRfY3N2LCB3aGljaCBpbmNsdWRlcyB0YXIgZmlsZXMKICAgICogaWYgdGhlIGBkYXRhc2V0YCBwYXJhbWV0ZXIgaXMgbm90IGVtcHR5LCB0aGVuIGEgcGFydGl0aW9uZWQgZGF0YXNldCB3aWxsIGJlIGNyZWF0ZWQKICAgIGluc3RlYWQgb2YgYSBzaW5nbGUgZmlsZSBpbiB0aGUgZm9sZGVyIGBkYXRhc2V0YAogICAgKiBpZiBhIGtleSBleGlzdHMgYWxyZWFkeSB0aGVuIGl0IHdpbGwgbm90IGJlIHJlLWFjcXVpcmVkIHVubGVzcyB0aGUgYHJlZnJlc2hfZGF0YWAgcGFyYW0KICAgIGlzIHNldCB0byBgVHJ1ZWAuICBUaGlzIGlzIGluIGNhc2UgdGhlIG9yaWdpbmFsIGZpbGUgaXMgY29ycnVwdCwgb3IgYSByZWZyZXNoIGlzCiAgICByZXF1aXJlZC4KCiAgICA6cGFyYW0gY29udGV4dDogICAgICAgIHRoZSBmdW5jdGlvbiBjb250ZXh0CiAgICA6cGFyYW0gYXJjaGl2ZV91cmw6ICAgIE1MUnVuIGRhdGEgaW5wdXQgKERhdGFJdGVtIG9iamVjdCkKICAgIDpwYXJhbSBjaHVua3NpemU6ICAgICAgKDApIHdoZW4gPiAwLCByb3cgc2l6ZSAoY2h1bmspIHRvIHJldHJpZXZlCiAgICAgICAgICAgICAgICAgICAgICAgICAgIHBlciBpdGVyYXRpb24KICAgIDpwYXJhbSBkdHlwZSAgICAgICAgICAgZGVzdGluYXRpb24gZGF0YSB0eXBlIG9mIHNwZWNpZmllZCBjb2x1bW5zCiAgICA6cGFyYW0gZW5jb2RpbmcgICAgICAgICgibGF0aW4tOCIpIGZpbGUgZW5jb2RpbmcKICAgIDpwYXJhbSBrZXk6ICAgICAgICAgICAga2V5IGluIGFydGlmYWN0IHN0b3JlICh3aGVuIGxvZ19kYXRhPVRydWUpCiAgICA6cGFyYW0gZGF0YXNldDogICAgICAgIChOb25lKSBpZiBub3QgTm9uZSB0aGVuICJ0YXJnZXRfcGF0aC9kYXRhc2V0IgogICAgICAgICAgICAgICAgICAgICAgICAgICBpcyBmb2xkZXIgZm9yIHBhcnRpdGlvbmVkIGZpbGVzCiAgICA6cGFyYW0gcGFydF9jb2xzOiAgICAgIChbXSkgbGlzdCBvZiBwYXJ0aXRpb25pbmcgY29sdW1ucwogICAgOnBhcmFtIGZpbGVfZXh0OiAgICAgICAocGFycXVldCkgY3N2L3BhcnF1ZXQgZmlsZSBleHRlbnNpb24KICAgIDpwYXJhbSBpbmRleDogICAgICAgICAgKEZhbHNlKSBwYW5kYXMgc2F2ZSBpbmRleCBvcHRpb24KICAgIDpwYXJhbSByZWZyZXNoX2RhdGE6ICAgKEZhbHNlKSBvdmVyd3JpdGUgZXhpc3RpbmcgZGF0YSBhdCB0aGF0IGxvY2F0aW9uCiAgICA6cGFyYW0gc3RhdHM6ICAgICAgICAgIChOb25lKSBjYWxjdWxhdGUgdGFibGUgc3RhdHMgd2hlbiBsb2dnaW5nIGFydGlmYWN0CiAgICAiIiIKICAgIGJhc2VfcGF0aCA9IGNvbnRleHQuYXJ0aWZhY3RfcGF0aAogICAgb3MubWFrZWRpcnMoYmFzZV9wYXRoLCBleGlzdF9vaz1UcnVlKQoKICAgIGFyY2hpdmVfdXJsID0gYXJjaGl2ZV91cmwubG9jYWwoKQoKICAgIGlmIGRhdGFzZXQgaXMgbm90IE5vbmU6CiAgICAgICAgZGVzdF9wYXRoID0gb3MucGF0aC5qb2luKGJhc2VfcGF0aCwgZGF0YXNldCkKICAgICAgICBleGlzdHMgPSBvcy5wYXRoLmlzZGlyKGRlc3RfcGF0aCkKICAgIGVsc2U6CiAgICAgICAgZGVzdF9wYXRoID0gb3MucGF0aC5qb2luKGJhc2VfcGF0aCwga2V5ICsgZiIue2ZpbGVfZXh0fSIpCiAgICAgICAgZXhpc3RzID0gb3MucGF0aC5pc2ZpbGUoZGVzdF9wYXRoKQoKICAgIGlmIG5vdCBleGlzdHM6CiAgICAgICAgY29udGV4dC5sb2dnZXIuaW5mbygiZGVzdGluYXRpb24gZmlsZSBkb2VzIG5vdCBleGlzdCwgZG93bmxvYWRpbmciKQogICAgICAgIGlmIGNodW5rc2l6ZSA+IDA6CiAgICAgICAgICAgIGhlYWRlciA9IF9jaHVua19yZWFkd3JpdGUoYXJjaGl2ZV91cmwsIGRlc3RfcGF0aCwgY2h1bmtzaXplLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGVuY29kaW5nLCBkdHlwZSwgZGF0YXNldCkKICAgICAgICAgICAgY29udGV4dC5sb2dfZGF0YXNldChrZXk9a2V5LCBzdGF0cz1zdGF0cywgZm9ybWF0PSdwYXJxdWV0JywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YXJnZXRfcGF0aD1kZXN0X3BhdGgpCiAgICAgICAgZWxzZToKICAgICAgICAgICAgZGYgPSBwZC5yZWFkX2NzdihhcmNoaXZlX3VybCkKICAgICAgICAgICAgY29udGV4dC5sb2dfZGF0YXNldChrZXksIGRmPWRmLCBmb3JtYXQ9ZmlsZV9leHQsIGluZGV4PWluZGV4KQogICAgZWxzZToKICAgICAgICBjb250ZXh0LmxvZ2dlci5pbmZvKCJkZXN0aW5hdGlvbiBmaWxlIGFscmVhZHkgZXhpc3RzLCBub3RoaW5nIGRvbmUiKQ==
+    origin_filename: ''
+    code_origin: ''
+  command: ''
+  default_handler: arc_to_parquet
+  description: retrieve remote archive, open and save as parquet
+  entry_points:
+    arc_to_parquet:
+      name: arc_to_parquet
+      has_varargs: false
+      parameters:
+      - name: context
+        type: MLClientCtx
+        doc: the function context
+      - name: archive_url
+        type: DataItem
+        doc: MLRun data input (DataItem object)
+      - name: header
+        type: List[str]
+        default:
+        - null
+      - name: chunksize
+        type: int
+        doc: (0) when > 0, row size (chunk) to retrieve per iteration
+        default: 0
+      - name: dtype
+        default: null
+      - name: encoding
+        type: str
+        default: latin-1
+      - name: key
+        type: str
+        doc: key in artifact store (when log_data=True)
+        default: data
+      - name: dataset
+        type: str
+        doc: (None) if not None then "target_path/dataset" is folder for partitioned
+          files
+        default: None
+      - name: part_cols
+        doc: ([]) list of partitioning columns
+        default: []
+      - name: file_ext
+        type: str
+        doc: (parquet) csv/parquet file extension
+        default: parquet
+      - name: index
+        type: bool
+        doc: (False) pandas save index option
+        default: false
+      - name: refresh_data
+        type: bool
+        doc: (False) overwrite existing data at that location
+        default: false
+      - name: stats
+        type: bool
+        doc: (None) calculate table stats when logging artifact
+        default: false
+      doc: 'Open a file/object archive and save as a parquet file or dataset
+
+
+        Notes
+
+        -----
+
+        * this function is typically for large files, please be sure to check all
+        settings
+
+        * partitioning requires precise specification of column types.
+
+        * the archive_url can be any file readable by pandas read_csv, which includes
+        tar files
+
+        * if the `dataset` parameter is not empty, then a partitioned dataset will
+        be created
+
+        instead of a single file in the folder `dataset`
+
+        * if a key exists already then it will not be re-acquired unless the `refresh_data`
+        param
+
+        is set to `True`.  This is in case the original file is corrupt, or a refresh
+        is
+
+        required.'
+      has_kwargs: false
+      outputs:
+      - type: None
+      lineno: 68
+  disable_auto_mount: false
+metadata:
+  categories:
+  - utils
+  name: arc-to-parquet
+  tag: ''
+verbose: false

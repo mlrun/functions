@@ -1,4 +1,4 @@
-name: Test all functions, build marketplace
+name: Test all assets, build marketplace
 permissions:
   contents: read
 on:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Get the current branch name
         shell: bash
-        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
         id: myref
 
       - uses: actions/checkout@v4
@@ -32,13 +32,22 @@ jobs:
         # 3) Save matrix JSON to output
         # This is old fetch command it cant work cause base_ref is only avaliable on pull request actions: git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
         run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/${{ steps.myref.outputs.branch }}:refs/remotes/origin/${{ steps.myref.outputs.branch }}
-          matrix=$((
-            echo '{ "package" : ['
-            git ls-files *[^cli] | grep '/' | sort | uniq| sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
-            echo " ]}"
-          ) | jq -c .)
-          echo "::set-output name=matrix::$matrix"
+          all_files="$(git ls-files || true)"
+          packages=$(
+            printf '%s\n' "$all_files" \
+            | awk -F'/' '
+                /^functions\/src\// {print $1"/"$2"/"$3}
+                /^modules\/src\//  {print $1"/"$2"/"$3}
+              ' \
+            | sort -u
+          )
+      
+          if [[ -z "$packages" ]]; then
+            matrix_json='{"package":[]}'
+          else
+            matrix_json=$(printf '%s\n' "$packages" | jq -R . | jq -s '{package: .}' | jq -c)
+          fi
+          echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
@@ -55,6 +64,7 @@ jobs:
           echo $matrix
           echo $matrix | jq .
           echo $matrix | json2yaml
+
   run_monorepo_tests:
     needs: build_strategy_matrix
     runs-on: ubuntu-latest
@@ -65,8 +75,6 @@ jobs:
       # Source
       - name: Checkout current repo
         uses: actions/checkout@v4
-        with:
-          path: functions
       # Install python 3.10.17
       - name: Install python 3.10.17
         uses: actions/setup-python@v4
@@ -77,26 +85,58 @@ jobs:
         id: cache
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Install requirements
         run: |
           pip install --upgrade pip
-          pip install -r functions/requirements.txt
+          pip install -r requirements.txt
 
       - name: Run py tests
-        run: python functions/functions.py  run-tests -r functions -s py -fn ${{ matrix.package }}
+        run: python -m cli.cli run-tests -r ${{ matrix.package }} -s py -fn $(basename "${{ matrix.package }}")
         continue-on-error: true
 #      - name: Run ipynb tests
-#        run: python functions/functions.py  run-tests -r functions -s ipynb
-      - name: Clean
+#        run: python functions/cli/cli.py  run-tests -r functions -s ipynb
+
+  update_readmes:
+    needs: build_strategy_matrix
+    if: github.repository == 'mlrun/functions' || github.repository == 'mlrun/hub-assets'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install python 3.10.17
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10.17
+      - name: Install requirements
         run: |
-          rm -rf functions
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Regenerate README tables
+        run: python -m cli.cli update-readme --asset functions --asset modules
+      - name: Commit & push (if changed)
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          USEREMAIL: ${{ secrets.USERMAIL }}
+        run: |
+          if git diff --quiet; then
+            echo "No README changes."
+            exit 0
+          fi
+          git config --local user.name $USERNAME
+          git config --local user.email $USEREMAIL
+          git add functions/README.md modules/README.md || true
+          git commit -m "chore(readme): auto-update asset tables [skip ci]"
+          git push
 
   build-marketplace:
     name: Build marketplace
-    if: github.repository == 'mlrun/functions' && github.event_name != 'pull_request'
+    if: (github.repository == 'mlrun/functions' || github.repository == 'mlrun/hub-assets')
     runs-on: ubuntu-latest
     needs: run_monorepo_tests
     continue-on-error: false
@@ -104,12 +144,10 @@ jobs:
     steps:
       - name: Get the current branch name
         shell: bash
-        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
         id: branch
       - name: Checkout current repo
         uses: actions/checkout@v4
-        with:
-          path: functions
       - name: Checkout Marketplace
         uses: actions/checkout@v4
         with:
@@ -121,7 +159,6 @@ jobs:
           python-version: 3.10.17
       - name: Install requirements
         run: |
-          cd functions
           pip install --upgrade pip
           pip install -r requirements.txt
       - name: Build marketplace docs
@@ -132,12 +169,19 @@ jobs:
           pwd
           git pull origin
           cd ..
-          python functions/functions.py build-marketplace -s functions -m marketplace -c $CHANNEL -v -f
+          python -m cli.cli build-marketplace -s ./functions/src -sn functions -m marketplace -c $CHANNEL -v -f
+          python -m cli.cli build-marketplace -s ./modules/src -sn modules -m marketplace -c $CHANNEL -v -f
+      ## Uncomment the following lines if you want to upload the built marketplace as an artifact
+#      - name: Upload built marketplace as artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: marketplace-build
+#          path: marketplace/**
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V3 }}
-          USERNAME: iguazio-cicd
-          USEREMAIL: iguaziocicd@gmail.com
+          USERNAME: ${{ secrets.USERNAME }}
+          USEREMAIL: ${{ secrets.USERMAIL }}
           REPO_PATH: marketplace
           BASE_REPO: mlrun
           BASE_BRANCH: master

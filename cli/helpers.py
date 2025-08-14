@@ -44,7 +44,7 @@ def render_jinja(
     with open(template_path, "r") as t:
         template_text = t.read()
 
-    template = Template(template_text)
+    template = Template(template_text, autoescape=True)
     rendered = template.render(**data)
 
     with open(output_path, "w+") as out_t:

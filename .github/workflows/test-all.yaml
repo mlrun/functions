@@ -6,7 +6,6 @@ on:
     branches:
       - development
       - master
-      - monorepo-design # TODO: delete
 
 jobs:
   build_strategy_matrix:

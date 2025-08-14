@@ -6,6 +6,7 @@ on:
     branches:
       - development
       - master
+      - monorepo-design # TODO: delete
 
 jobs:
   build_strategy_matrix:
@@ -13,7 +14,7 @@ jobs:
     steps:
       - name: Get the current branch name
         shell: bash
-        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+        run: echo "branch=${GITHUB_REF#refs/headsß/}" >> $GITHUB_OUTPUT
         id: myref
 
       - uses: actions/checkout@v4
@@ -121,8 +122,8 @@ jobs:
         run: python -m cli.cli update-readme --asset functions --asset modules
       - name: Commit & push (if changed)
         env:
-          USERNAME: iguazio-cicd
-          USEREMAIL: iguaziocicd@gmail.com
+          USERNAME: ${{ secrets.USERNAME }}
+          USEREMAIL: ${{ secrets.USERMAIL }}
         run: |
           if git diff --quiet; then
             echo "No README changes."
@@ -136,7 +137,7 @@ jobs:
 
   build-marketplace:
     name: Build marketplace
-    if: (github.repository == 'mlrun/functions' || github.repository == 'mlrun/hub-assets') && github.event_name != 'pull_request'
+    if: (github.repository == 'mlrun/functions' || github.repository == 'mlrun/hub-assets')
     runs-on: ubuntu-latest
     needs: run_monorepo_tests
     continue-on-error: false
@@ -163,8 +164,7 @@ jobs:
           pip install -r requirements.txt
       - name: Build marketplace docs
         env:
-          CHANNEL: development
-        # change the channel back to ${{ steps.branch.outputs.branch }}
+          CHANNEL: ${{ steps.branch.outputs.branch }}
         run: |
           cd marketplace
           pwd
@@ -172,6 +172,7 @@ jobs:
           cd ..
           python -m cli.cli build-marketplace -s ./functions/src -sn functions -m marketplace -c $CHANNEL -v -f
           python -m cli.cli build-marketplace -s ./modules/src -sn modules -m marketplace -c $CHANNEL -v -f
+      ## Uncomment the following lines if you want to upload the built marketplace as an artifact
 #      - name: Upload built marketplace as artifact
 #        uses: actions/upload-artifact@v4
 #        with:
@@ -180,8 +181,8 @@ jobs:
       - name: Publish marketplace release
         env:
           GITHUB_TOKEN: ${{ secrets.MARKETPLACE_ACCESS_TOKEN_V3 }}
-          USERNAME: iguazio-cicd
-          USEREMAIL: iguaziocicd@gmail.com
+          USERNAME: ${{ secrets.USERNAME }}
+          USEREMAIL: ${{ secrets.USERMAIL }}
           REPO_PATH: marketplace
           BASE_REPO: mlrun
           BASE_BRANCH: master

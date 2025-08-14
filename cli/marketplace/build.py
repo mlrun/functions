@@ -256,7 +256,7 @@ def build_catalog_json(
     with_assets: bool = False,
 ):
     """
-    Building JSON catalog with all the details of the functions in marketplace
+    Building JSON catalog with all the details of the assets in marketplace
     Each function in the catalog is seperated into different versions of the function,
     and in each version field, there is all the details that concerned the version.
 
@@ -600,7 +600,7 @@ def collect_values_from_items(
     Collecting all tags values from item.yaml files.
     If the `with_requirements` flag is on than also collecting requirements from ite.yaml and requirements.txt files.
 
-    :param source_dir:          The source directory that contains all the MLRun functions.
+    :param source_dir:          The source directory that contains the assets (e.g: src/functions).
     :param tags_set:            Set of tags to collect from item.yaml files.
 
     :returns:                   A dictionary contains the tags and requirements.
@@ -683,7 +683,7 @@ def build_temp_docs(temp_root, temp_docs, source_dir):
     from generation. Note: By default this script will not overwrite already
     created files.
 
-    :param temp_root:   The project's temporary functions root.
+    :param temp_root:   The project's temporary root.
     :param temp_docs:   The project's temporary docs root.
     :param source_dir:  Path to the source directory to build the marketplace from
     """
@@ -696,14 +696,3 @@ def build_temp_docs(temp_root, temp_docs, source_dir):
 
     shutil.copytree(PROJECT_ROOT / "cli" / "marketplace" / "_static" / "css", temp_docs / '_static/css')
     click.echo("[Sphinx] Done autodoc")
-
-
-if __name__ == "__main__":
-    # build_marketplace_cli()
-    build_marketplace(
-        source_dir="../../functions",
-        marketplace_dir="../../../marketplace",
-        verbose=True,
-        channel="development",
-        force_update_items=True,
-    )

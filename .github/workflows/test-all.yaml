@@ -3,7 +3,7 @@ permissions:
   contents: read
 on:
   push:
-    branches:
+    branches: # todo: remove the testing branch
       - development
       - master
       - monorepo-design
@@ -36,7 +36,7 @@ jobs:
         run: |
           all_files="$(git ls-files || true)"
           # Collect candidate package paths from diff
-          candidates=$(
+          packages=$(
             printf '%s\n' "$changed_files" \
             | awk -F'/' '
                 /^functions\/src\// {print $1"/"$2"/"$3}

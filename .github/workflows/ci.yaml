@@ -63,7 +63,7 @@ jobs:
             matrix_json='{"package":[]}'
           else
             matrix_json=$(printf '%s\n' "$packages" \
-              | grep -v '^$'
+              | grep -v '^$' \
               | jq -R . \
               | jq -s '{package: .}' \
               | jq -c)   # <-- compact

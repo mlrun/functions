@@ -7,6 +7,9 @@ on:
     branches-ignore:
       - testing
   workflow_dispatch: {}
+  push:
+    branches:
+      - monorepo-design
 
 jobs:
   build_strategy_matrix:
@@ -45,28 +48,26 @@ jobs:
           candidates=$(
             printf '%s\n' "$changed_files" \
             | awk -F'/' '
-                /^functions\/src\// {print $1"/"$2"/"$3}
-                /^modules\/src\//  {print $1"/"$2"/"$3}
+                /^functions\/src\// && NF >= 4 {print $1"/"$2"/"$3}
+                /^modules\/src\//  && NF >= 4 {print $1"/"$2"/"$3}
               ' \
             | sort -u
           )
           
-          # Keep only those that are actual directories
           packages=""
-          for dir in $candidates; do
+          while IFS= read -r dir; do
+            [[ -z "$dir" ]] && continue
             if [[ -d "$dir" ]]; then
               packages+="$dir"$'\n'
             fi
-          done
+          done <<< "$candidates"
           
           if [[ -z "$packages" ]]; then
-            matrix_json='{"package":[]}'
+            matrix_json='{"package":["__empty__"]}'
           else
-            matrix_json=$(printf '%s\n' "$packages" \
-              | jq -R . \
-              | jq -s '{package: .}' \
-              | jq -c)   # <-- compact
+            matrix_json=$(printf '%s\n' "$packages" | grep -v '^$' | jq -R . | jq -s '{package: .}' | jq -c)
           fi
+          
           echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}

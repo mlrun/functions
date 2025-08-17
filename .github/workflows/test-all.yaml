@@ -45,9 +45,6 @@ jobs:
             | sort -u
           )
           
-          echo "=== candidates ==="
-          printf '%s\n' "$candidates"
-          
           packages=""
           while IFS= read -r dir; do
             [[ -z "$dir" ]] && continue

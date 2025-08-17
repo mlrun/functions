@@ -3,7 +3,7 @@ permissions:
   contents: read
 on:
   push:
-    branches: # todo: remove the testing branch
+    branches:
       - development
       - master
       - monorepo-design
@@ -36,8 +36,8 @@ jobs:
         run: |
           all_files="$(git ls-files || true)"
           # Collect candidate package paths from diff
-          packages=$(
-            printf '%s\n' "$changed_files" \
+          candidates=$(
+            printf '%s\n' "all_files" \
             | awk -F'/' '
                 /^functions\/src\// {print $1"/"$2"/"$3}
                 /^modules\/src\//  {print $1"/"$2"/"$3}
@@ -45,6 +45,13 @@ jobs:
             | sort -u
           )
           
+          # Keep only those that are actual directories
+          packages=""
+          for dir in $candidates; do
+            if [[ -d "$dir" ]]; then
+              packages+="$dir"$'\n'
+            fi
+          done
       
           if [[ -z "$packages" ]]; then
             matrix_json='{"package":[]}'

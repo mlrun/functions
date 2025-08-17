@@ -6,6 +6,7 @@ on:
     branches:
       - development
       - master
+      - monorepo-design
   workflow_dispatch: {}
 
 jobs:

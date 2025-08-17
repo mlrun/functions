@@ -6,6 +6,7 @@ on:
     branches:
       - development
       - master
+      - monorepo-design
   workflow_dispatch: {}
 
 jobs:
@@ -43,6 +44,8 @@ jobs:
               ' \
             | sort -u
           )
+          
+          echo $candidates 
           
           # Keep only those that are actual directories
           packages=""

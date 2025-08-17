@@ -1,7 +1,0 @@
-spec:
-  desired_state: online
-  conda: ''
-  source: ''
-kind: project
-metadata:
-  name: aggregate-example-daniel-perez

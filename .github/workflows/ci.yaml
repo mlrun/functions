@@ -7,9 +7,6 @@ on:
     branches-ignore:
       - testing
   workflow_dispatch: {}
-  push:
-    branches:
-      - monorepo-design
 
 jobs:
   build_strategy_matrix:

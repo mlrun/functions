@@ -36,7 +36,7 @@ jobs:
           all_files="$(git ls-files || true)"
           # Collect candidate package paths from diff
           candidates=$(
-            printf '%s\n' "$changed_files" \
+            printf '%s\n' "$all_files" \
             | awk -F'/' '
                 /^functions\/src\// {print $1"/"$2"/"$3}
                 /^modules\/src\//  {print $1"/"$2"/"$3}
@@ -55,7 +55,7 @@ jobs:
           if [[ -z "$packages" ]]; then
             matrix_json='{"package":[]}'
           else
-            matrix_json=$(printf '%s\n' "$packages" | jq -R . | jq -s '{package: .}' | jq -c)
+            matrix_json=$(printf '%s\n' "$packages" | grep -v '^$' | jq -R . | jq -s '{package: .}' | jq -c)
           fi
           echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
     outputs:

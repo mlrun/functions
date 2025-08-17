@@ -36,7 +36,7 @@ jobs:
           all_files="$(git ls-files || true)"
           # Collect candidate package paths from diff
           candidates=$(
-            printf '%s\n' "$changed_files" \
+            printf '%s\n' "$all_files" \
             | awk -F'/' '
                 /^functions\/src\// {print $1"/"$2"/"$3}
                 /^modules\/src\//  {print $1"/"$2"/"$3}

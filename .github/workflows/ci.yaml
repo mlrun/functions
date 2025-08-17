@@ -87,14 +87,12 @@ jobs:
 
   run_monorepo_tests:
     needs: build_strategy_matrix
+    if: needs.build_strategy_matrix.outputs.matrix != '{"package":[]}'
     runs-on: ubuntu-latest
     strategy:
       # matrix: [{"package": some package that changed}, {...}, ...]
       matrix: ${{fromJson(needs.build_strategy_matrix.outputs.matrix)}}
     steps:
-     - name: Skip test if matrix is empty
-       if: matrix.package == '__empty__'
-       run: echo "No packages to test"
      - name: Checkout current repo
        uses: actions/checkout@v3
      # Install python 3.10.17

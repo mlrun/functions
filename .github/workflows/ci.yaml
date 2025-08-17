@@ -40,8 +40,9 @@ jobs:
       
           echo "Diffing against $base_ref:"
           changed_files="$(git diff "$base_ref" --name-only || true)"
-
-          packages=$(
+          
+          # Collect candidate package paths from diff
+          candidates=$(
             printf '%s\n' "$changed_files" \
             | awk -F'/' '
                 /^functions\/src\// {print $1"/"$2"/"$3}
@@ -49,6 +50,14 @@ jobs:
               ' \
             | sort -u
           )
+          
+          # Keep only those that are actual directories
+          packages=""
+          for dir in $candidates; do
+            if [[ -d "$dir" ]]; then
+              packages+="$dir"$'\n'
+            fi
+          done
           
           if [[ -z "$packages" ]]; then
             matrix_json='{"package":[]}'

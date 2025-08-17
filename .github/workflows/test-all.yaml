@@ -39,8 +39,8 @@ jobs:
           candidates=$(
             printf '%s\n' "$all_files" \
             | awk -F'/' '
-                /^functions\/src\// {print $1"/"$2"/"$3}
-                /^modules\/src\//  {print $1"/"$2"/"$3}
+                /^functions\/src\// && NF >= 4 {print $1"/"$2"/"$3}
+                /^modules\/src\//  && NF >= 4 {print $1"/"$2"/"$3}
               ' \
             | sort -u
           )
@@ -48,6 +48,7 @@ jobs:
           # Keep only those that are actual directories
           packages=""
           for dir in $candidates; do
+            [[ -z "$dir" ]] && continue
             if [[ -d "$dir" ]]; then
               packages+="$dir"$'\n'
             fi

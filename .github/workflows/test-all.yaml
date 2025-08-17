@@ -45,15 +45,6 @@ jobs:
             | sort -u
           )
           
-          echo $candidates 
-          
-          # Keep only those that are actual directories
-          packages=""
-          for dir in $candidates; do
-            if [[ -d "$dir" ]]; then
-              packages+="$dir"$'\n'
-            fi
-          done
       
           if [[ -z "$packages" ]]; then
             matrix_json='{"package":[]}'

@@ -35,7 +35,7 @@ jobs:
         # This is old fetch command it cant work cause base_ref is only avaliable on pull request actions: git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
         run: |
           all_files="$(git ls-files || true)"
-          # Collect candidate package paths from diff
+
           candidates=$(
             printf '%s\n' "$all_files" \
             | awk -F'/' '
@@ -45,20 +45,20 @@ jobs:
             | sort -u
           )
           
-          # Keep only those that are actual directories
           packages=""
-          for dir in $candidates; do
+          while IFS= read -r dir; do
             [[ -z "$dir" ]] && continue
             if [[ -d "$dir" ]]; then
               packages+="$dir"$'\n'
             fi
-          done
-      
+          done <<< "$candidates"
+          
           if [[ -z "$packages" ]]; then
-            matrix_json='{"package":[]}'
+            matrix_json='{"package":["__empty__"]}'
           else
             matrix_json=$(printf '%s\n' "$packages" | jq -R . | jq -s '{package: .}' | jq -c)
           fi
+          
           echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}

@@ -60,7 +60,7 @@ jobs:
           done <<< "$candidates"
           
           if [[ -z "$packages" ]]; then
-            matrix_json='{"package":["__empty__"]}'
+            matrix_json='{"package":[]}'
           else
             matrix_json=$(printf '%s\n' "$packages" | grep -v '^$' | jq -R . | jq -s '{package: .}' | jq -c)
           fi

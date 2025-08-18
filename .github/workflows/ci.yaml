@@ -1,4 +1,4 @@
-name: Test functions
+name: Test Assets
 permissions:
   contents: read
 on:
@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Get the current branch name
         shell: bash
-        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
         id: myref
 
       - uses: actions/checkout@v3
@@ -34,14 +34,42 @@ jobs:
         # This is previous fetch command that stopped working (wile invetsigating added WA bello in run sectiong): git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
         # This is old git diff version:             git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
         # Based on instructions regarding https://docs.github.com/en/actions/learn-github-actions/contexts#github-context , github.base_ref triggers a workflow run is either pull_request or pull_request_target
-        run: |
-          git fetch --no-tags --prune --depth=1 origin ${{ github.base_ref }}:${{ github.base_ref }}
-          matrix=$((
-            echo '{ "package" : ['
-            git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
-            echo " ]}"
-          ) | jq 'del(.[][] | select(. == ""))'  -c)
-          echo "::set-output name=matrix::$matrix"
+        run: | 
+          echo "base ref: ${{ github.base_ref }}"
+          git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+          base_ref="origin/${{ github.base_ref }}"
+      
+          echo "Diffing against $base_ref:"
+          changed_files="$(git diff "$base_ref" --name-only || true)"
+          
+          # Collect candidate package paths from diff
+          candidates=$(
+            printf '%s\n' "$changed_files" \
+            | awk -F'/' '
+                /^functions\/src\// {print $1"/"$2"/"$3}
+                /^modules\/src\//  {print $1"/"$2"/"$3}
+              ' \
+            | sort -u
+          )
+          
+          # Keep only those that are actual directories
+          packages=""
+          for dir in $candidates; do
+            if [[ -d "$dir" ]]; then
+              packages+="$dir"$'\n'
+            fi
+          done
+          
+          if [[ -z "$packages" ]]; then
+            matrix_json='{"package":[]}'
+          else
+            matrix_json=$(printf '%s\n' "$packages" \
+              | grep -v '^$' \
+              | jq -R . \
+              | jq -s '{package: .}' \
+              | jq -c)   # <-- compact
+          fi
+          echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
@@ -58,8 +86,10 @@ jobs:
           echo $matrix
           echo $matrix | jq .
           echo $matrix | json2yaml
+
   run_monorepo_tests:
     needs: build_strategy_matrix
+    if: needs.build_strategy_matrix.outputs.matrix != '{"package":[]}'
     runs-on: ubuntu-latest
     strategy:
       # matrix: [{"package": some package that changed}, {...}, ...]
@@ -67,8 +97,6 @@ jobs:
     steps:
      - name: Checkout current repo
        uses: actions/checkout@v3
-       with:
-         path: functions
      # Install python 3.10.17
      - name: Install python 3.10.17
        uses: actions/setup-python@v4
@@ -79,17 +107,17 @@ jobs:
        id: cache
        with:
          path: ~/.cache/pip
-         key: ${{ runner.os }}-pip-${{ hashFiles('functions/requirements.txt') }}
+         key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
          restore-keys: |
            ${{ runner.os }}-pip-
      - name: Install requirements
        run: |
          pip install --upgrade pip
-         pip install -r functions/requirements.txt
-
-     - name: Run py tests
-       run: python functions/functions.py  run-tests -r functions -s py -fn ${{ matrix.package }}
-
-     - name: Clean
+         pip install -r requirements.txt
+     - name: Print workspace structure
        run: |
-         rm -rf functions
+         echo "Current directory: $(pwd)"
+         echo "Tree structure:"
+         find . -type f | sort
+     - name: Run py tests
+       run: python -m cli.cli run-tests -r ${{ matrix.package }} -s py -fn $(basename "${{ matrix.package }}")

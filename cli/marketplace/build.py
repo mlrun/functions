@@ -26,10 +26,10 @@ from bs4 import BeautifulSoup
 from sphinx.cmd.build import main as sphinx_build_cmd
 from sphinx.ext.apidoc import main as sphinx_apidoc_cmd
 
-from cli.helpers import (PROJECT_ROOT, get_item_yaml_values,
-                         get_mock_requirements, is_item_dir, render_jinja)
+from cli.utils.helpers import (PROJECT_ROOT, get_item_yaml_values,
+                               get_mock_requirements, is_item_dir, render_jinja)
 from cli.marketplace.changelog import ChangeLog
-from cli.path_iterator import PathIterator
+from cli.utils.path_iterator import PathIterator
 
 _verbose = False
 
@@ -38,7 +38,6 @@ _verbose = False
 ASSETS = {
     "example": ("example", "src/{}"),
     "source": ("spec.filename", "src/{}"),
-    "function": "src/function.yaml",
     "docs": "static/documentation.html",
 }
 
@@ -94,7 +93,7 @@ def build_marketplace_cli(
 def build_marketplace(
     source_dir: str,
     marketplace_dir: str,
-    source_name: Optional[str] = None,
+    source_name: str,
     temp_dir: str = "/tmp",
     channel: str = "development",
     verbose: bool = False,
@@ -104,7 +103,7 @@ def build_marketplace(
 
     :param source_dir: Path to the source directory to build the marketplace from
     :param marketplace_dir: Path to marketplace directory
-    :param source_name: Name of source, if not provided, name of source directory will be used instead
+    :param source_name: Name of source (e.g. 'functions', 'modules', etc.)
     :param temp_dir: Path to intermediate directory, used to build marketplace resources,
     if not provided '/tmp/<random_uuid>' will be used
     :param channel: The name of the marketplace channel to write to
@@ -117,7 +116,7 @@ def build_marketplace(
 
     # The root of the temporary project
     root_base = Path(temp_dir) / uuid.uuid4().hex
-    temp_root = root_base / "functions"
+    temp_root = root_base / source_name
     temp_docs = root_base / "docs"
 
     click.echo(f"Temporary working directory: {root_base}")
@@ -126,9 +125,9 @@ def build_marketplace(
     source_dir = Path(source_dir).resolve()
     # The target directory of the marketplace
     marketplace_root = Path(marketplace_dir).resolve()
-    marketplace_dir = marketplace_root / (source_name or source_dir.name) / channel
+    marketplace_dir = marketplace_root / source_name / channel
 
-    # Creating directories temp_root/functions, temp_root/docs and marketplace_root/functions/(development or master):
+    # Creating directories temp_root/source_name, temp_root/docs and marketplace_root/source_name/(development or master):
     temp_root.mkdir(parents=True)
     temp_docs.mkdir(parents=True)
     marketplace_dir.mkdir(parents=True, exist_ok=True)
@@ -156,6 +155,7 @@ def build_marketplace(
 
     if _verbose:
         print_file_tree("Temporary project structure", temp_root)
+        print_file_tree("Temporary docs structure", temp_docs)
 
     render_html_files(temp_docs)
 
@@ -164,6 +164,7 @@ def build_marketplace(
 
     update_or_create_items(
         source_dir,
+        source_name,
         marketplace_dir,
         temp_docs,
         change_log,
@@ -237,12 +238,12 @@ def copy_resources(marketplace_dir, temp_docs):
 
 
 def update_or_create_items(
-    source_dir, marketplace_dir, temp_docs, change_log, force_update: bool = False
+    source_dir, source_name, marketplace_dir, temp_docs, change_log, force_update: bool = False
 ):
     click.echo("Creating items...")
     for item_dir in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
         update_or_create_item(
-            item_dir, marketplace_dir, temp_docs, change_log, force_update
+            item_dir, source_name, marketplace_dir, temp_docs, change_log, force_update
         )
 
 
@@ -255,7 +256,7 @@ def build_catalog_json(
     with_assets: bool = False,
 ):
     """
-    Building JSON catalog with all the details of the functions in marketplace
+    Building JSON catalog with all the details of the assets in marketplace
     Each function in the catalog is seperated into different versions of the function,
     and in each version field, there is all the details that concerned the version.
 
@@ -352,6 +353,7 @@ def add_assets(item_yaml: dict):
 
 def update_or_create_item(
     item_dir: Path,
+    source_name: str,
     marketplace_dir: Path,
     temp_docs: Path,
     change_log: ChangeLog,
@@ -360,7 +362,7 @@ def update_or_create_item(
     # Copy source directories to target directories, if target already has the directory, archive previous version
     item_yaml = yaml.full_load(open(item_dir / "item.yaml", "r"))
     source_version = item_yaml["version"]
-    relative_path = "../../../"
+    relative_path = "../../"
 
     marketplace_item = marketplace_dir / item_dir.stem
     target_latest = marketplace_item / "latest"
@@ -459,19 +461,24 @@ def update_or_create_item(
         {"source_code": source_code},
     )
 
-    with open((item_dir / "function.yaml"), "r") as f:
-        source_code = f.read()
+    # render the yaml of the specific asset type if exists (e.g: function.yaml)
+    asset_name = source_name[:-1]
+    asset_yaml_path = item_dir / f"{asset_name}.yaml"
 
-    render_jinja(
-        templates / "yaml.html",
-        latest_static / "function.html",
-        {"source_code": source_code},
-    )
-    render_jinja(
-        templates / "yaml.html",
-        version_static / "function.html",
-        {"source_code": source_code},
-    )
+    if asset_yaml_path.exists():
+        with open(asset_yaml_path, "r") as f:
+            source_code = f.read()
+        render_jinja(
+            templates / "python.html",
+            latest_static / "source.html",
+            {"source_code": source_code},
+        )
+        render_jinja(
+            templates / "python.html",
+            version_static / "source.html",
+            {"source_code": source_code},
+        )
+        ASSETS[asset_name] = f"src/{asset_name}.yaml"
 
     pass
 
@@ -593,7 +600,7 @@ def collect_values_from_items(
     Collecting all tags values from item.yaml files.
     If the `with_requirements` flag is on than also collecting requirements from ite.yaml and requirements.txt files.
 
-    :param source_dir:          The source directory that contains all the MLRun functions.
+    :param source_dir:          The source directory that contains the assets (e.g: src/functions).
     :param tags_set:            Set of tags to collect from item.yaml files.
 
     :returns:                   A dictionary contains the tags and requirements.
@@ -676,7 +683,7 @@ def build_temp_docs(temp_root, temp_docs, source_dir):
     from generation. Note: By default this script will not overwrite already
     created files.
 
-    :param temp_root:   The project's temporary functions root.
+    :param temp_root:   The project's temporary root.
     :param temp_docs:   The project's temporary docs root.
     :param source_dir:  Path to the source directory to build the marketplace from
     """
@@ -687,16 +694,5 @@ def build_temp_docs(temp_root, temp_docs, source_dir):
 
     sphinx_apidoc_cmd(cmd.split(" "))
 
-    shutil.copytree(source_dir / "cli" / "marketplace" / "_static" / "css", temp_docs / '_static/css')
+    shutil.copytree(PROJECT_ROOT / "cli" / "marketplace" / "_static" / "css", temp_docs / '_static/css')
     click.echo("[Sphinx] Done autodoc")
-
-
-if __name__ == "__main__":
-    # build_marketplace_cli()
-    build_marketplace(
-        source_dir="../../../functions",
-        marketplace_dir="../../../marketplace",
-        verbose=True,
-        channel="development",
-        force_update_items=True,
-    )

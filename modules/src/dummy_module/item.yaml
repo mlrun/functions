@@ -1,0 +1,18 @@
+categories: []
+description: this is a dummy module for testing purposes
+example: dummy_module.ipynb
+generationDate: 2025-08-11:17-25
+hidden: false
+icon: ''
+labels: {}
+mlrunVersion: 1.8.0
+name: dummy-module
+platformVersion: ''
+spec:
+  filename: dummy_module.py
+  handler: dummy_module
+  image: mlrun/mlrun
+  kind: job
+  requirements:
+    - requests
+version: 0.1.0

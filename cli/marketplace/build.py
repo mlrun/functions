@@ -464,18 +464,21 @@ def update_or_create_item(
     # render the yaml of the specific asset type if exists (e.g: function.yaml)
     asset_name = source_name[:-1]
     asset_yaml_path = item_dir / f"{asset_name}.yaml"
+    print(f"asset_yaml_path: {asset_yaml_path}")
 
     if asset_yaml_path.exists():
+        print(f"{asset_yaml_path} exists!")
         with open(asset_yaml_path, "r") as f:
             source_code = f.read()
+            print("read the source_code")
         render_jinja(
-            templates / "python.html",
-            latest_static / "source.html",
+            templates / "yaml.html",
+            latest_static / f"{asset_name}.html",
             {"source_code": source_code},
         )
         render_jinja(
-            templates / "python.html",
-            version_static / "source.html",
+            templates / "yaml.html",
+            version_static / f"{asset_name}.html",
             {"source_code": source_code},
         )
         ASSETS[asset_name] = f"src/{asset_name}.yaml"

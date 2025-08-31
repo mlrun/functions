@@ -241,7 +241,7 @@ class TestPY(TestSuite):
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ; pipenv run python -m pytest",
             stdout=sys.stdout,
-            stderr=sys.stdout,
+            stderr=subprocess.PIPE,
             cwd=path,
             shell=True,
         )

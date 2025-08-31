@@ -240,13 +240,11 @@ class TestPY(TestSuite):
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ; pipenv run python -m pytest",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=sys.stdout,
+            stderr=sys.stdout,
             cwd=path,
             shell=True,
         )
-        print(completed_process.stdout.decode("utf-8"))
-        print(completed_process.stderr.decode("utf-8"))
 
         meta_data = {"completed_process": completed_process, "test_path": path}
 

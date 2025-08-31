@@ -362,7 +362,7 @@ def update_or_create_item(
     # Copy source directories to target directories, if target already has the directory, archive previous version
     item_yaml = yaml.full_load(open(item_dir / "item.yaml", "r"))
     source_version = item_yaml["version"]
-    relative_path = "../../"
+    relative_path = "../../../"
 
     marketplace_item = marketplace_dir / item_dir.stem
     target_latest = marketplace_item / "latest"
@@ -469,13 +469,13 @@ def update_or_create_item(
         with open(asset_yaml_path, "r") as f:
             source_code = f.read()
         render_jinja(
-            templates / "python.html",
-            latest_static / "source.html",
+            templates / "yaml.html",
+            latest_static / f"{asset_name}.html",
             {"source_code": source_code},
         )
         render_jinja(
-            templates / "python.html",
-            version_static / "source.html",
+            templates / "yaml.html",
+            version_static / f"{asset_name}.html",
             {"source_code": source_code},
         )
         ASSETS[asset_name] = f"src/{asset_name}.yaml"

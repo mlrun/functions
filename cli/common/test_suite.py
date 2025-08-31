@@ -245,6 +245,8 @@ class TestPY(TestSuite):
             cwd=path,
             shell=True,
         )
+        print(completed_process.stdout.decode("utf-8"))
+        print(completed_process.stderr.decode("utf-8"))
 
         meta_data = {"completed_process": completed_process, "test_path": path}
 

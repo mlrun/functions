@@ -32,7 +32,7 @@ spec:
   requirements:
   - azureml-core==1.54.0.post1
   - azureml-train-automl-client==1.54.0.post1
-  - plotly~=5.4
+  - plotly~=5.23
 url: ''
 version: 1.4.0
 test_valid: True

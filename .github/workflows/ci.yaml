@@ -35,9 +35,6 @@ jobs:
         # This is old git diff version:             git diff ${{ github.base_ref }} --name-only | sed 's,/*[^/]\+/*$,,' | sort | uniq | grep -v '^\.' | sed 's/.*/"&"/' | sed '$!s/.*/&,/'
         # Based on instructions regarding https://docs.github.com/en/actions/learn-github-actions/contexts#github-context , github.base_ref triggers a workflow run is either pull_request or pull_request_target
         run: | 
-
-          echo "base ref: ${{ github.base_ref }}"
-
           git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
           base_ref="origin/${{ github.base_ref }}"
       

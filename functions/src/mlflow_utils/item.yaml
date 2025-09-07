@@ -23,7 +23,7 @@ spec:
   image: mlrun/mlrun
   kind: serving
   requirements:
-  - mlflow==2.20.3
+  - mlflow~=2.22
   - lightgbm
   - xgboost
 url: ''

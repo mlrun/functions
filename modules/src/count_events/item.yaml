@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: monitoring_application
+categories:
+- model-serving
+description: Count events in each time window
+example: ''
+generationDate: 2025-09-16:12-25
+hidden: false
+labels:
+  author: iguazio
+mlrunVersion: 1.10.0-rc27
+name: count_events
+requirements:
+version: 1.0.0

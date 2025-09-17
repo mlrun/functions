@@ -1,0 +1,17 @@
+apiVersion: v1
+categories:
+- model-serving
+description: Count events in each time window
+example: count_events.ipynb
+generationDate: 2025-09-16:12-25
+hidden: false
+labels:
+  author: iguazio
+mlrunVersion: 1.10.0-rc27
+name: count_events
+spec:
+    filename: count_events.py
+    image: mlrun/mlrun
+    kind: monitoring_application
+    requirements:
+version: 1.0.0

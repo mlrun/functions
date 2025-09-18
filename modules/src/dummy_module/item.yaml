@@ -1,0 +1,17 @@
+apiVersion: v1
+categories:
+description: this is a dummy module for testing purposes
+example: dummy_module.ipynb
+generationDate: 2025-09-18:13-05
+hidden: false
+labels:
+  author: iguazio
+mlrunVersion: 1.10.0-rc27
+name: dummy_module
+spec:
+  filename: dummy_module.py
+  image: mlrun/mlrun
+  kind: generic
+  requirements:
+    - requests
+version: 1.0.0

@@ -1,0 +1,17 @@
+categories: []              # List of category names
+description: ''             # Short description
+example: ''                 # Path to example notebook
+generationDate: ''          # Automatically generated ISO8601 datetime
+hidden: false               # Hide module from the UI
+icon: ''                    # Path to icon file
+labels: {}                  # Key values label pairs
+mlrunVersion: ''            # Module’s MLRun version requirement, should follow python’s versioning schema
+name: ''                    # Module name
+platformVersion: ''         # Module’s Iguazio version requirement, should follow python’s versioning schema
+spec:
+    filename: ''             # Implementation file
+    handler: ''              # Handler function name
+    image: ''                # Base image name
+    kind: ''                 # Module kind, should be one of the following: generic, monitoring, application
+    requirements: []         # List of Pythonic library requirements
+version: ''                 # Module version, should follow standard semantic versioning schema

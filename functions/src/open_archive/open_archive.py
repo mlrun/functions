@@ -120,8 +120,13 @@ def _extract_zip_file(archive_url, target_path: str = None, subdir: str = "conte
 
 def _init_boto3_client():
     import boto3
-    if os.environ.get('S3_ENDPOINT_URL'):
-        client = boto3.client('s3', endpoint_url=os.environ.get('S3_ENDPOINT_URL'))
+    
+    # Backward compatibility: Support both S3_ENDPOINT_URL (deprecated) and AWS_ENDPOINT_URL_S3
+    # TODO: Remove this in 1.12.0
+    endpoint_url = os.environ.get('AWS_ENDPOINT_URL_S3') or os.environ.get('S3_ENDPOINT_URL')
+    
+    if endpoint_url:
+        client = boto3.client('s3', endpoint_url=endpoint_url)
     else:
         client = boto3.client('s3')
     return client

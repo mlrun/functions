@@ -6,7 +6,7 @@ example: count_events.ipynb
 generationDate: 2025-09-16:12-25
 hidden: false
 labels:
-  author: iguazio
+  author: Iguazio
 mlrunVersion: 1.10.0-rc27
 name: count_events
 spec:

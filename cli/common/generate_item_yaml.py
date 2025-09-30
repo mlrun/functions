@@ -14,7 +14,7 @@ TEMPLATES = {
 @click.argument("type", type=click.Choice(list(TEMPLATES.keys())))
 @click.argument("name")
 @click.option("--overwrite", is_flag=True, help="Replace existing file instead of raising an error.")
-def generate_item_yaml(type, name, overwrite: bool = False):
+def generate_item_yaml(type: str, name: str, overwrite: bool = False):
     """
     Generate an item.yaml file from a template.
 

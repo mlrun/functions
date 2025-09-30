@@ -11,20 +11,22 @@ TEMPLATES = {
 
 
 @click.command()
-@click.argument("type", type=click.Choice(TEMPLATES.keys()))
+@click.argument("type", type=click.Choice(list(TEMPLATES.keys())))
 @click.argument("name")
-def generate_item_yaml(type, name):
+@click.option("--overwrite", is_flag=True, help="Replace existing file instead of raising an error.")
+def generate_item_yaml(type, name, overwrite: bool = False):
     """
     Generate an item.yaml file from a template.
 
-    TYPE: one of {function, module}
-    NAME: name of the function/module (also directory name)
+type: one of the supported types (currently only `function` or `module`)
+name: the function/module name (also used as the directory name)
+overwrite: whether to overwrite existing item.yaml file
     """
     # Construct the target path
     path = Path(f"{type}s/src/{name}").resolve()
     output_file = path / "item.yaml"
 
-    if output_file.exists():
+    if not overwrite and output_file.exists():
         click.echo(f"Error: {output_file} already exists.", err=True)
         sys.exit(1)
 

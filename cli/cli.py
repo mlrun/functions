@@ -17,22 +17,19 @@ import click
 from cli.functions.function_to_item import function_to_item_cli
 from cli.functions.item_to_function import item_to_function_cli
 from cli.marketplace.build import build_marketplace_cli
-from cli.functions.new_function_item import new_item as new_function_item
 from cli.common.test_suite import test_suite
-from cli.common.item_yaml import update_functions_yaml
 from cli.common.update_readme import update_readme
+from cli.common.generate_item_yaml import generate_item_yaml
 
 @click.group()
 def cli():
     pass
 
-
-cli.add_command(new_function_item)
+cli.add_command(generate_item_yaml, name="generate-item-yaml")
 cli.add_command(item_to_function_cli, name="item-to-function")
 cli.add_command(function_to_item_cli, name="function-to-item")
 cli.add_command(test_suite, name="run-tests")
 cli.add_command(build_marketplace_cli, name="build-marketplace")
-cli.add_command(update_functions_yaml, name="update-functions-yaml")
 cli.add_command(update_readme, name="update-readme")
 
 if __name__ == "__main__":

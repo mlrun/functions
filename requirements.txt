@@ -2,6 +2,7 @@ wheel
 bs4
 mlrun>=1.0.0
 jinja2~=3.1.2
+click>=8.0
 pipenv
 myst_nb
 black>=24.3.0

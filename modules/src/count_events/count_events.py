@@ -20,9 +20,20 @@ import mlrun.model_monitoring.applications.context as mm_context
 
 
 class CountApp(ModelMonitoringApplicationBase):
+    """
+    Model Monitoring Application that counts the number of events in the given time window.
+    """
     def do_tracking(
-        self, monitoring_context: mm_context.MonitoringApplicationContext
+        self,
+        monitoring_context: mm_context.MonitoringApplicationContext
     ) -> ModelMonitoringApplicationMetric:
+        """"
+        he do_tracking method implementation for the CountApp class.
+        It counts the number of events in the sample data-frame and logs the count.
+
+        :param monitoring_context: The monitoring application context. It includes the current window data as a
+                                   pandas data-frame: monitoring_context.sample_df.
+        """
         sample_df = monitoring_context.sample_df
         monitoring_context.logger.debug("Sample data-frame", sample_df=sample_df)
         count = len(sample_df)

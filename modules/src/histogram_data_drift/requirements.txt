@@ -1,0 +1,3 @@
+hypothesis[numpy]~=6.103
+plotly~=5.23
+pandas

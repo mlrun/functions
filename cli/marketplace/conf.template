@@ -15,8 +15,14 @@ import re
 import sys
 import os
 
-sys.path.insert(0, "{{sphinx_docs_target}}")
-sys.path.insert(0, os.path.abspath(os.path.join("{{sphinx_docs_target}}", "../functions")))
+import pathlib
+
+DOCS_DIR = pathlib.Path(__file__).resolve().parent
+REPO_ROOT = DOCS_DIR.parent
+
+# Add both source trees
+sys.path.insert(0, str(REPO_ROOT / "functions"))
+sys.path.insert(0, str(REPO_ROOT / "modules"))
 
 
 # -- Project information -----------------------------------------------------

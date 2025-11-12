@@ -1,4 +1,4 @@
 transformers
 tqdm
-torch
+torch>=2.6
 sentencepiece

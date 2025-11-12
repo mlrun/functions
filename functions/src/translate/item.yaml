@@ -23,8 +23,8 @@ spec:
   requirements:
     - transformers
     - sentencepiece
-    - torch
+    - torch>=2.6
     - tqdm
 url: ''
-version: 0.2.0
+version: 0.3.0
 test_valid: True

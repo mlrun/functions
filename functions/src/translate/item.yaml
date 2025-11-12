@@ -12,7 +12,7 @@ labels:
   author: Iguazio
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.7.0
+mlrunVersion: 1.10.0-rc41
 name: translate
 platformVersion: 3.5.3
 spec:
@@ -23,8 +23,8 @@ spec:
   requirements:
     - transformers
     - sentencepiece
-    - torch
+    - torch>=2.6
     - tqdm
 url: ''
-version: 0.2.0
+version: 0.3.0
 test_valid: True

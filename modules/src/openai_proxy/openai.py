@@ -13,182 +13,42 @@
 # limitations under the License.
 #
 
-import os
-import json
-from urllib.parse import urljoin
-from typing import Any, Dict, List, Optional
-
-import requests
-from fastapi import FastAPI, Request, Response, Body
-
-app = FastAPI(
-    title="OpenAI Proxy App",
-    description="Local FastAPI proxy for OpenAI style endpoints",
-    version="1.0.0",
-)
-
-OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com").rstrip("/")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-OPENAI_DEFAULT_MODEL = os.getenv("OPENAI_DEFAULT_MODEL", "gpt-4o-mini")
 
 
-def build_headers(incoming: dict) -> dict:
-    headers = {}
-    auth = incoming.get("authorization") or incoming.get("Authorization")
-    if auth:
-        headers["Authorization"] = auth
-    elif OPENAI_API_KEY:
-        headers["Authorization"] = f"Bearer {OPENAI_API_KEY}"
-    ctype = incoming.get("content-type") or incoming.get("Content-Type") or "application/json"
-    headers["Content-Type"] = ctype
-    return headers
+BASE64 = "IyBvcGVuYWlfcHJveHkvb3BlbmFpLnB5CgppbXBvcnQgb3MKaW1wb3J0IGpzb24KZnJvbSB1cmxsaWIucGFyc2UgaW1wb3J0IHVybGpvaW4KZnJvbSB0eXBpbmcgaW1wb3J0IEFueSwgRGljdCwgTGlzdCwgT3B0aW9uYWwKCmltcG9ydCByZXF1ZXN0cwpmcm9tIGZhc3RhcGkgaW1wb3J0IEZhc3RBUEksIFJlcXVlc3QsIFJlc3BvbnNlLCBCb2R5CgphcHAgPSBGYXN0QVBJKAogICAgdGl0bGU9Ik9wZW5BSSBQcm94eSBBcHAiLAogICAgZGVzY3JpcHRpb249IkxvY2FsIEZhc3RBUEkgcHJveHkgZm9yIE9wZW5BSSBzdHlsZSBlbmRwb2ludHMiLAogICAgdmVyc2lvbj0iMS4wLjAiLAopCgpPUEVOQUlfQkFTRV9VUkwgPSBvcy5nZXRlbnYoIk9QRU5BSV9CQVNFX1VSTCIsICJodHRwczovL2FwaS5vcGVuYWkuY29tIikucnN0cmlwKCIvIikKT1BFTkFJX0FQSV9LRVkgPSBvcy5nZXRlbnYoIk9QRU5BSV9BUElfS0VZIiwgIiIpCk9QRU5BSV9ERUZBVUxUX01PREVMID0gb3MuZ2V0ZW52KCJPUEVOQUlfREVGQVVMVF9NT0RFTCIsICJncHQtNG8tbWluaSIpCgoKZGVmIGJ1aWxkX2hlYWRlcnMoaW5jb21pbmc6IGRpY3QpIC0+IGRpY3Q6CiAgICBoZWFkZXJzID0ge30KICAgIGF1dGggPSBpbmNvbWluZy5nZXQoImF1dGhvcml6YXRpb24iKSBvciBpbmNvbWluZy5nZXQoIkF1dGhvcml6YXRpb24iKQogICAgaWYgYXV0aDoKICAgICAgICBoZWFkZXJzWyJBdXRob3JpemF0aW9uIl0gPSBhdXRoCiAgICBlbGlmIE9QRU5BSV9BUElfS0VZOgogICAgICAgIGhlYWRlcnNbIkF1dGhvcml6YXRpb24iXSA9IGYiQmVhcmVyIHtPUEVOQUlfQVBJX0tFWX0iCiAgICBjdHlwZSA9IGluY29taW5nLmdldCgiY29udGVudC10eXBlIikgb3IgaW5jb21pbmcuZ2V0KCJDb250ZW50LVR5cGUiKSBvciAiYXBwbGljYXRpb24vanNvbiIKICAgIGhlYWRlcnNbIkNvbnRlbnQtVHlwZSJdID0gY3R5cGUKICAgIHJldHVybiBoZWFkZXJzCgoKZGVmIGJ1aWxkX3RhcmdldChwYXRoOiBzdHIpIC0+IHN0cjoKICAgIGJhc2UgPSBPUEVOQUlfQkFTRV9VUkwKICAgIGlmIGJhc2UuZW5kc3dpdGgoIi92MSIpIG9yIGJhc2UuZW5kc3dpdGgoIi92MS8iKToKICAgICAgICBiYXNlID0gYmFzZVs6LTNdIGlmIGJhc2UuZW5kc3dpdGgoIi92MSIpIGVsc2UgYmFzZVs6LTRdCiAgICByZXR1cm4gdXJsam9pbihiYXNlICsgIi8iLCBwYXRoLmxzdHJpcCgiLyIpKQoKCmRlZiBmb3J3YXJkX2pzb24ocGF0aDogc3RyLCBib2R5OiBkaWN0LCBoZWFkZXJzOiBkaWN0LCBxdWVyeTogZGljdCk6CiAgICB0YXJnZXQgPSBidWlsZF90YXJnZXQocGF0aCkKICAgIHJlc3AgPSByZXF1ZXN0cy5wb3N0KAogICAgICAgIHRhcmdldCwKICAgICAgICBoZWFkZXJzPWhlYWRlcnMsCiAgICAgICAgcGFyYW1zPXF1ZXJ5LAogICAgICAgIGpzb249Ym9keSwKICAgICAgICB0aW1lb3V0PTYwLAogICAgKQogICAgcmV0dXJuIHJlc3AKCkBhcHAuZ2V0KCIvIikKZGVmIGhlYWx0aCgpOgogICAgcmV0dXJuIHsic3RhdHVzIjogIm9rIn0KCgojIHJlbGF4ZWQgY2hhdCBlbmRwb2ludCwgYWNjZXB0cyBhbnkgSlNPTiB0aGF0IGluY2x1ZGVzIG1lc3NhZ2VzCkBhcHAucG9zdCgiL3YxL2NoYXQvY29tcGxldGlvbnMiKQphc3luYyBkZWYgY2hhdF9jb21wbGV0aW9ucygKICAgIHJlcXVlc3Q6IFJlcXVlc3QsCiAgICBwYXlsb2FkOiBEaWN0W3N0ciwgQW55XSA9IEJvZHkoLi4uKSwKKToKICAgIGlmICJtZXNzYWdlcyIgbm90IGluIHBheWxvYWQgb3Igbm90IGlzaW5zdGFuY2UocGF5bG9hZFsibWVzc2FnZXMiXSwgbGlzdCk6CiAgICAgICAgcmV0dXJuIFJlc3BvbnNlKAogICAgICAgICAgICBjb250ZW50PWpzb24uZHVtcHMoeyJlcnJvciI6ICJtZXNzYWdlcyBtdXN0IGJlIGEgbGlzdCBvZiBjaGF0IG1lc3NhZ2VzIn0pLAogICAgICAgICAgICBzdGF0dXNfY29kZT00MDAsCiAgICAgICAgICAgIG1lZGlhX3R5cGU9ImFwcGxpY2F0aW9uL2pzb24iLAogICAgICAgICkKCiAgICBpZiAibW9kZWwiIG5vdCBpbiBwYXlsb2FkIG9yIHBheWxvYWRbIm1vZGVsIl0gaXMgTm9uZToKICAgICAgICBwYXlsb2FkWyJtb2RlbCJdID0gT1BFTkFJX0RFRkFVTFRfTU9ERUwKCiAgICBoZWFkZXJzID0gYnVpbGRfaGVhZGVycyhkaWN0KHJlcXVlc3QuaGVhZGVycykpCiAgICByZXNwID0gZm9yd2FyZF9qc29uKCIvdjEvY2hhdC9jb21wbGV0aW9ucyIsIHBheWxvYWQsIGhlYWRlcnMsIGRpY3QocmVxdWVzdC5xdWVyeV9wYXJhbXMpKQogICAgcmV0dXJuIFJlc3BvbnNlKAogICAgICAgIGNvbnRlbnQ9cmVzcC5jb250ZW50LAogICAgICAgIHN0YXR1c19jb2RlPXJlc3Auc3RhdHVzX2NvZGUsCiAgICAgICAgbWVkaWFfdHlwZT1yZXNwLmhlYWRlcnMuZ2V0KCJDb250ZW50LVR5cGUiLCAiYXBwbGljYXRpb24vanNvbiIpLAogICAgKQoKCkBhcHAucG9zdCgiL3YxL2VtYmVkZGluZ3MiKQphc3luYyBkZWYgZW1iZWRkaW5ncygKICAgIHJlcXVlc3Q6IFJlcXVlc3QsCiAgICBwYXlsb2FkOiBEaWN0W3N0ciwgQW55XSA9IEJvZHkoLi4uKSwKKToKICAgIGlmICJtb2RlbCIgbm90IGluIHBheWxvYWQgb3Igbm90IHBheWxvYWRbIm1vZGVsIl06CiAgICAgICAgcGF5bG9hZFsibW9kZWwiXSA9ICJ0ZXh0LWVtYmVkZGluZy0zLXNtYWxsIgogICAgaGVhZGVycyA9IGJ1aWxkX2hlYWRlcnMoZGljdChyZXF1ZXN0LmhlYWRlcnMpKQogICAgcmVzcCA9IGZvcndhcmRfanNvbigiL3YxL2VtYmVkZGluZ3MiLCBwYXlsb2FkLCBoZWFkZXJzLCBkaWN0KHJlcXVlc3QucXVlcnlfcGFyYW1zKSkKICAgIHJldHVybiBSZXNwb25zZSgKICAgICAgICBjb250ZW50PXJlc3AuY29udGVudCwKICAgICAgICBzdGF0dXNfY29kZT1yZXNwLnN0YXR1c19jb2RlLAogICAgICAgIG1lZGlhX3R5cGU9cmVzcC5oZWFkZXJzLmdldCgiQ29udGVudC1UeXBlIiwgImFwcGxpY2F0aW9uL2pzb24iKSwKICAgICkKCgpAYXBwLnBvc3QoIi92MS9yZXNwb25zZXMiKQphc3luYyBkZWYgcmVzcG9uc2VzX2FwaSgKICAgIHJlcXVlc3Q6IFJlcXVlc3QsCiAgICBwYXlsb2FkOiBEaWN0W3N0ciwgQW55XSA9IEJvZHkoLi4uKSwKKToKICAgIGlmICJtb2RlbCIgbm90IGluIHBheWxvYWQgb3IgcGF5bG9hZFsibW9kZWwiXSBpcyBOb25lOgogICAgICAgIHBheWxvYWRbIm1vZGVsIl0gPSBPUEVOQUlfREVGQVVMVF9NT0RFTAogICAgaGVhZGVycyA9IGJ1aWxkX2hlYWRlcnMoZGljdChyZXF1ZXN0LmhlYWRlcnMpKQogICAgcmVzcCA9IGZvcndhcmRfanNvbigiL3YxL3Jlc3BvbnNlcyIsIHBheWxvYWQsIGhlYWRlcnMsIGRpY3QocmVxdWVzdC5xdWVyeV9wYXJhbXMpKQogICAgcmV0dXJuIFJlc3BvbnNlKAogICAgICAgIGNvbnRlbnQ9cmVzcC5jb250ZW50LAogICAgICAgIHN0YXR1c19jb2RlPXJlc3Auc3RhdHVzX2NvZGUsCiAgICAgICAgbWVkaWFfdHlwZT1yZXNwLmhlYWRlcnMuZ2V0KCJDb250ZW50LVR5cGUiLCAiYXBwbGljYXRpb24vanNvbiIpLAogICAgKQoKCiMgLS0tLS0tLS0tLS0tLS0tLSBjbGllbnQgLS0tLS0tLS0tLS0tLS0tLQpjbGFzcyBPcGVuQUlQcm94eUNsaWVudDoKICAgICIiIgogICAgU2ltcGxlIGNsaWVudCBmb3IgdGhlIGxvY2FsIHByb3h5LgogICAgRGVmYXVsdCBiYXNlIHVybCBpcyBodHRwOi8vbG9jYWxob3N0OjgwMDAKICAgIElmIGFwaV9rZXkgaXMgbm90IHByb3ZpZGVkLCBpdCB1c2VzIE9QRU5BSV9BUElfS0VZIGZyb20gZW52aXJvbm1lbnQuCiAgICAiIiIKCiAgICBkZWYgX19pbml0X18oc2VsZiwgYmFzZV91cmw6IHN0ciA9ICJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCBhcGlfa2V5OiBPcHRpb25hbFtzdHJdID0gTm9uZSk6CiAgICAgICAgc2VsZi5iYXNlX3VybCA9IGJhc2VfdXJsLnJzdHJpcCgiLyIpCiAgICAgICAgc2VsZi5hcGlfa2V5ID0gYXBpX2tleQoKICAgIGRlZiBfaGVhZGVycyhzZWxmKSAtPiBEaWN0W3N0ciwgc3RyXToKICAgICAgICBoZWFkZXJzID0geyJDb250ZW50LVR5cGUiOiAiYXBwbGljYXRpb24vanNvbiJ9CiAgICAgICAga2V5ID0gc2VsZi5hcGlfa2V5IG9yIG9zLmdldGVudigiT1BFTkFJX0FQSV9LRVkiLCAiIikKICAgICAgICBpZiBrZXk6CiAgICAgICAgICAgIGhlYWRlcnNbIkF1dGhvcml6YXRpb24iXSA9IGYiQmVhcmVyIHtrZXl9IgogICAgICAgIHJldHVybiBoZWFkZXJzCgogICAgZGVmIGNoYXQoc2VsZiwgbWVzc2FnZXM6IExpc3RbRGljdFtzdHIsIHN0cl1dLCBtb2RlbDogT3B0aW9uYWxbc3RyXSA9IE5vbmUpIC0+IERpY3Rbc3RyLCBBbnldOgogICAgICAgIGJvZHk6IERpY3Rbc3RyLCBBbnldID0geyJtZXNzYWdlcyI6IG1lc3NhZ2VzfQogICAgICAgIGlmIG1vZGVsOgogICAgICAgICAgICBib2R5WyJtb2RlbCJdID0gbW9kZWwKICAgICAgICByZXNwID0gcmVxdWVzdHMucG9zdCgKICAgICAgICAgICAgZiJ7c2VsZi5iYXNlX3VybH0vdjEvY2hhdC9jb21wbGV0aW9ucyIsCiAgICAgICAgICAgIGhlYWRlcnM9c2VsZi5faGVhZGVycygpLAogICAgICAgICAgICBqc29uPWJvZHksCiAgICAgICAgICAgIHRpbWVvdXQ9NjAsCiAgICAgICAgKQogICAgICAgIHJlc3AucmFpc2VfZm9yX3N0YXR1cygpCiAgICAgICAgcmV0dXJuIHJlc3AuanNvbigpCgogICAgZGVmIGVtYmVkZGluZ3Moc2VsZiwgdGV4dDogQW55LCBtb2RlbDogT3B0aW9uYWxbc3RyXSA9IE5vbmUpIC0+IERpY3Rbc3RyLCBBbnldOgogICAgICAgIGJvZHk6IERpY3Rbc3RyLCBBbnldID0geyJpbnB1dCI6IHRleHR9CiAgICAgICAgaWYgbW9kZWw6CiAgICAgICAgICAgIGJvZHlbIm1vZGVsIl0gPSBtb2RlbAogICAgICAgIHJlc3AgPSByZXF1ZXN0cy5wb3N0KAogICAgICAgICAgICBmIntzZWxmLmJhc2VfdXJsfS92MS9lbWJlZGRpbmdzIiwKICAgICAgICAgICAgaGVhZGVycz1zZWxmLl9oZWFkZXJzKCksCiAgICAgICAgICAgIGpzb249Ym9keSwKICAgICAgICAgICAgdGltZW91dD02MCwKICAgICAgICApCiAgICAgICAgcmVzcC5yYWlzZV9mb3Jfc3RhdHVzKCkKICAgICAgICByZXR1cm4gcmVzcC5qc29uKCkKCiAgICBkZWYgcmVzcG9uc2VzKHNlbGYsIGlucHV0X3RleHQ6IEFueSwgbW9kZWw6IE9wdGlvbmFsW3N0cl0gPSBOb25lKSAtPiBEaWN0W3N0ciwgQW55XToKICAgICAgICBib2R5OiBEaWN0W3N0ciwgQW55XSA9IHsiaW5wdXQiOiBpbnB1dF90ZXh0fQogICAgICAgIGlmIG1vZGVsOgogICAgICAgICAgICBib2R5WyJtb2RlbCJdID0gbW9kZWwKICAgICAgICByZXNwID0gcmVxdWVzdHMucG9zdCgKICAgICAgICAgICAgZiJ7c2VsZi5iYXNlX3VybH0vdjEvcmVzcG9uc2VzIiwKICAgICAgICAgICAgaGVhZGVycz1zZWxmLl9oZWFkZXJzKCksCiAgICAgICAgICAgIGpzb249Ym9keSwKICAgICAgICAgICAgdGltZW91dD02MCwKICAgICAgICApCiAgICAgICAgcmVzcC5yYWlzZV9mb3Jfc3RhdHVzKCkKICAgICAgICByZXR1cm4gcmVzcC5qc29uKCkKCgojIG9wdGlvbmFsIHF1aWNrIHNlbGYgdGVzdCB3aGVuIHJ1bm5pbmcgdGhpcyBmaWxlIGRpcmVjdGx5CmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICAjIHN0YXJ0IHRoZSBzZXJ2ZXIgaW4gYW5vdGhlciB0ZXJtaW5hbCBmaXJzdDoKICAgICMgdXZpY29ybiBvcGVuYWlfcHJveHkub3BlbmFpOmFwcCAtLWhvc3QgMC4wLjAuMCAtLXBvcnQgODAwMCAtLXJlbG9hZAogICAgYyA9IE9wZW5BSVByb3h5Q2xpZW50KCkKICAgIHRyeToKICAgICAgICBwcmludCgiSGVhbHRoOiIsIHJlcXVlc3RzLmdldChmIntjLmJhc2VfdXJsfS8iKS5qc29uKCkpCiAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgcHJpbnQoIlNlcnZlciBub3QgcnVubmluZzoiLCBlKQo="
+CMD = r'''
+set -e
+python - <<'PY'
+import os, base64, pathlib
+code = os.environ["BASE64"]
+pathlib.Path("/opt/app").mkdir(parents=True, exist_ok=True)
+with open("/opt/app/openai.py","wb") as f:
+    f.write(base64.b64decode(code))
+print("Wrote /opt/app/openai.py")
+PY
 
+exec gunicorn openai:app \
+  --chdir /opt/app \
+  --bind 0.0.0.0:8000 \
+  --worker-class uvicorn.workers.UvicornWorker \
+  --log-level info
+'''.strip()
+class OpenAIModule:
+    def __init__(self,project):
+        self.project = project
+        self.fastapi_app = self.project.set_function(name="openai",kind="application",image="python:3.11")
+        self.fastapi_app.with_requirements([
+                "fastapi>=0.110,<1.0",
+                "uvicorn[standard]>=0.29,<1.0",
+                "gunicorn>=21.2,<22.0",
+                "requests>=2.31,<3.0",
+            ])
+        self.fastapi_app.set_env("BASE64",BASE64)
+        self.fastapi_app.set_internal_application_port(8000)
+        self.fastapi_app.spec.command = "/bin/sh"
+        self.fastapi_app.spec.args = ["-c", CMD]
+        
 
-def build_target(path: str) -> str:
-    base = OPENAI_BASE_URL
-    if base.endswith("/v1") or base.endswith("/v1/"):
-        base = base[:-3] if base.endswith("/v1") else base[:-4]
-    return urljoin(base + "/", path.lstrip("/"))
-
-
-def forward_json(path: str, body: dict, headers: dict, query: dict):
-    target = build_target(path)
-    resp = requests.post(
-        target,
-        headers=headers,
-        params=query,
-        json=body,
-        timeout=60,
-    )
-    return resp
-
-@app.get("/")
-def health():
-    return {"status": "ok"}
-
-
-# relaxed chat endpoint, accepts any JSON that includes messages
-@app.post("/v1/chat/completions")
-async def chat_completions(
-    request: Request,
-    payload: Dict[str, Any] = Body(...),
-):
-    if "messages" not in payload or not isinstance(payload["messages"], list):
-        return Response(
-            content=json.dumps({"error": "messages must be a list of chat messages"}),
-            status_code=400,
-            media_type="application/json",
-        )
-
-    if "model" not in payload or payload["model"] is None:
-        payload["model"] = OPENAI_DEFAULT_MODEL
-
-    headers = build_headers(dict(request.headers))
-    resp = forward_json("/v1/chat/completions", payload, headers, dict(request.query_params))
-    return Response(
-        content=resp.content,
-        status_code=resp.status_code,
-        media_type=resp.headers.get("Content-Type", "application/json"),
-    )
-
-
-@app.post("/v1/embeddings")
-async def embeddings(
-    request: Request,
-    payload: Dict[str, Any] = Body(...),
-):
-    if "model" not in payload or not payload["model"]:
-        payload["model"] = "text-embedding-3-small"
-    headers = build_headers(dict(request.headers))
-    resp = forward_json("/v1/embeddings", payload, headers, dict(request.query_params))
-    return Response(
-        content=resp.content,
-        status_code=resp.status_code,
-        media_type=resp.headers.get("Content-Type", "application/json"),
-    )
-
-
-@app.post("/v1/responses")
-async def responses_api(
-    request: Request,
-    payload: Dict[str, Any] = Body(...),
-):
-    if "model" not in payload or payload["model"] is None:
-        payload["model"] = OPENAI_DEFAULT_MODEL
-    headers = build_headers(dict(request.headers))
-    resp = forward_json("/v1/responses", payload, headers, dict(request.query_params))
-    return Response(
-        content=resp.content,
-        status_code=resp.status_code,
-        media_type=resp.headers.get("Content-Type", "application/json"),
-    )
-
-
-# ---------------- client ----------------
-class OpenAIProxyClient:
-    """
-    Simple client for the local proxy.
-    Default base url is http://localhost:8000
-    If api_key is not provided, it uses OPENAI_API_KEY from environment.
-    """
-
-    def __init__(self, base_url: str = "http://localhost:8000", api_key: Optional[str] = None):
-        self.base_url = base_url.rstrip("/")
-        self.api_key = api_key
-
-    def _headers(self) -> Dict[str, str]:
-        headers = {"Content-Type": "application/json"}
-        key = self.api_key or os.getenv("OPENAI_API_KEY", "")
-        if key:
-            headers["Authorization"] = f"Bearer {key}"
-        return headers
-
-    def chat(self, messages: List[Dict[str, str]], model: Optional[str] = None) -> Dict[str, Any]:
-        body: Dict[str, Any] = {"messages": messages}
-        if model:
-            body["model"] = model
-        resp = requests.post(
-            f"{self.base_url}/v1/chat/completions",
-            headers=self._headers(),
-            json=body,
-            timeout=60,
-        )
-        resp.raise_for_status()
-        return resp.json()
-
-    def embeddings(self, text: Any, model: Optional[str] = None) -> Dict[str, Any]:
-        body: Dict[str, Any] = {"input": text}
-        if model:
-            body["model"] = model
-        resp = requests.post(
-            f"{self.base_url}/v1/embeddings",
-            headers=self._headers(),
-            json=body,
-            timeout=60,
-        )
-        resp.raise_for_status()
-        return resp.json()
-
-    def responses(self, input_text: Any, model: Optional[str] = None) -> Dict[str, Any]:
-        body: Dict[str, Any] = {"input": input_text}
-        if model:
-            body["model"] = model
-        resp = requests.post(
-            f"{self.base_url}/v1/responses",
-            headers=self._headers(),
-            json=body,
-            timeout=60,
-        )
-        resp.raise_for_status()
-        return resp.json()
-
-
-# optional quick self test when running this file directly
-if __name__ == "__main__":
-    # start the server in another terminal first:
-    # uvicorn openai_proxy.openai:app --host 0.0.0.0 --port 8000 --reload
-    c = OpenAIProxyClient()
-    try:
-        print("Health:", requests.get(f"{c.base_url}/").json())
-    except Exception as e:
-        print("Server not running:", e)
+        
+    
+    

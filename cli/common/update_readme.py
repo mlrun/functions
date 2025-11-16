@@ -25,6 +25,7 @@ MARKER_END = "<!-- AUTOGEN:END -->"
 COLUMNS = ("Name", "Description", "Kind", "Categories")
 
 @click.command("update-readme")
+@click.option("-c", "--channel", default="master", help="Name of build channel")
 @click.option(
     "--asset",
     multiple=True,
@@ -34,7 +35,7 @@ COLUMNS = ("Name", "Description", "Kind", "Categories")
 )
 @click.option("--check", is_flag=True,
               help="Do not write; exit non‑zero if README(s) would change.")
-def update_readme(asset: Iterable[str],
+def update_readme(channel: str, asset: Iterable[str],
                       check: bool) -> None:
     """
     Regenerate the README tables for asset types from their item.yaml files.
@@ -50,7 +51,7 @@ def update_readme(asset: Iterable[str],
             root = Path(".").resolve()
             asset_dir = root / t
             readme = asset_dir / "README.md"
-            rows = _rows_for_asset_type(asset_dir)
+            rows = _rows_for_asset_type(channel, asset_dir)
             table_md = _build_table_md(rows)
             old = readme.read_text() if readme.exists() else f"# {t.title()}\n\n"
             new = _replace_block(old, table_md)
@@ -58,7 +59,7 @@ def update_readme(asset: Iterable[str],
                 changed_any = True
                 touched.append(str(readme))
         else:
-            if _update_one(t):
+            if _update_one(channel, t):
                 changed_any = True
                 touched.append(str((Path(t) / "README.md").as_posix()))
 
@@ -78,7 +79,7 @@ def update_readme(asset: Iterable[str],
             click.echo("No README changes.")
 
 
-def _rows_for_asset_type(asset_dir: Path) -> List[Tuple[str, str, str, str]]:
+def _rows_for_asset_type(channel: str, asset_dir: Path) -> List[Tuple[str, str, str, str]]:
     """Scan <asset>/src/*/item.yaml and return table rows."""
     src = asset_dir / "src"
     if not src.exists():
@@ -97,7 +98,9 @@ def _rows_for_asset_type(asset_dir: Path) -> List[Tuple[str, str, str, str]]:
         cats = data.get("categories") or []
         cats_str = ", ".join(c.strip() for c in cats) if isinstance(cats, list) else str(cats).strip()
         # Link the name to its source directory
-        link = f"[{asset_name}]({(asset_dir / 'src' / asset_name).as_posix()})"
+        # Construct the relative path from the repo root for the asset
+        rel_path = asset_dir.relative_to(Path(".").resolve())
+        link = f"[{asset_name}](https://github.com/mlrun/functions/tree/{channel}/{rel_path}/src/{asset_name})"
         rows.append((link, desc, kind, cats_str))
 
     rows.sort(key=lambda r: r[0].lower())
@@ -140,13 +143,13 @@ def _replace_block(readme_text: str, new_block: str) -> str:
     return readme_text[:start_close] + "\n" + new_block + "\n" + readme_text[ei:]
 
 
-def _update_one(asset_type: str) -> bool:
+def _update_one(channel: str, asset_type: str) -> bool:
     """Generate/replace the table in <asset_type>/README.md. Return True if changed."""
     root = Path(".").resolve()
     asset_dir = root / asset_type
     readme = asset_dir / "README.md"
 
-    rows = _rows_for_asset_type(asset_dir)
+    rows = _rows_for_asset_type(channel, asset_dir)
     table_md = _build_table_md(rows)
     old = readme.read_text() if readme.exists() else f"# {asset_type.title()}\n\n"
     new = _replace_block(old, table_md)

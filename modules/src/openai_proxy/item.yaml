@@ -13,7 +13,4 @@ spec:
     filename: openai.py
     image: mlrun/mlrun
     kind: general
-      requirements:
-      - fastapi>=0.110,<1.0
-      - requests>=2.31,<3.0
 version: 1.0.0

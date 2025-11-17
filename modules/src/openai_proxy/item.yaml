@@ -8,12 +8,9 @@ hidden: false
 labels:
   author: Iguazio
 mlrunVersion: 1.10.0
-name: openai
+name: openai_proxy_app
 spec:
     filename: openai.py
     image: mlrun/mlrun
-    kind: general
-      requirements:
-      - fastapi>=0.110,<1.0
-      - requests>=2.31,<3.0
+    kind: generic
 version: 1.0.0

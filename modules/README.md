@@ -9,4 +9,5 @@
 | [count_events](https://github.com/mlrun/functions/tree/development/modules/src/count_events) | Count events in each time window | monitoring_application | model-serving |
 | [evidently](https://github.com/mlrun/functions/tree/development/modules/src/evidently) | Demonstrates Evidently integration in MLRun for data quality and drift monitoring using the Iris dataset | monitoring_application | model-serving, structured-ML |
 | [histogram_data_drift](https://github.com/mlrun/functions/tree/development/modules/src/histogram_data_drift) | Model-monitoring application for detecting and visualizing data drift | monitoring_application | model-serving, structured-ML |
+| [openai_proxy_app](https://github.com/mlrun/functions/tree/development/modules/src/openai_proxy_app) | OpenAI application runtime based on fastapi | generic | genai |
 <!-- AUTOGEN:END -->

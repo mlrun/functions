@@ -135,20 +135,13 @@ jobs:
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
         run: python -m cli.cli update-readme -c $CHANNEL --asset functions --asset modules
-      - name: Commit & push (if changed)
-        env:
-          USERNAME: ${{ secrets.USERNAME }}
-          USEREMAIL: ${{ secrets.USERMAIL }}
-        run: |
-          if git diff --quiet; then
-            echo "No README changes."
-            exit 0
-          fi
-          git config --local user.name $USERNAME
-          git config --local user.email $USEREMAIL
-          git add functions/README.md modules/README.md || true
-          git commit -m "chore(readme): auto-update asset tables [skip ci]"
-          git push
+         - name: Upload updated READMEs as artifact
+         uses: actions/upload-artifact@v4
+         with:
+           name: updated-readmes
+           path: |
+             functions/README.md
+             modules/README.md
 
   build-marketplace:
     name: Build marketplace

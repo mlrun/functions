@@ -116,6 +116,10 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Get the current branch name
+        shell: bash
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+        id: branch
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -128,7 +132,9 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
       - name: Regenerate README tables
-        run: python -m cli.cli update-readme --asset functions --asset modules
+        env:
+          CHANNEL: ${{ steps.branch.outputs.branch }}
+        run: python -m cli.cli update-readme -c $CHANNEL --asset functions --asset modules
       - name: Commit & push (if changed)
         env:
           USERNAME: ${{ secrets.USERNAME }}

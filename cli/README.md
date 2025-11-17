@@ -60,7 +60,7 @@ Example:
 Regenerate the `README.md` files in each of the asset directories (functions/modules).
 
 Usage:
-    `python -m cli.cli update-readme --asset TYPE`
+    `python -m cli.cli update-readme -c CHANNEL --asset TYPE`
 
 Example:
-    `python -m cli.cli update-readme --asset functions --asset modules`
+    `python -m cli.cli update-readme -c master --asset functions --asset modules`

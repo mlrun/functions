@@ -135,13 +135,13 @@ jobs:
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
         run: python -m cli.cli update-readme -c $CHANNEL --asset functions --asset modules
-         - name: Upload updated READMEs as artifact
-         uses: actions/upload-artifact@v4
-         with:
-           name: updated-readmes
-           path: |
-             functions/README.md
-             modules/README.md
+      - name: Upload updated READMEs as artifact
+        uses: actions/upload-artifact@v4
+        with:
+         name: updated-readmes
+         path: |
+           functions/README.md
+           modules/README.md
 
   build-marketplace:
     name: Build marketplace

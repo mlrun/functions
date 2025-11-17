@@ -6,7 +6,6 @@ on:
     branches:
       - development
       - master
-      - readmes-broken-links
   workflow_dispatch: {}
 
 jobs:
@@ -78,7 +77,6 @@ jobs:
 
   run_monorepo_tests:
     needs: build_strategy_matrix
-    if: github.repository == 'mlrun/functions' || github.repository == 'mlrun/hub-assets'
     runs-on: ubuntu-latest
     strategy:
       # matrix: [{"package": some package that changed}, {...}, ...]
@@ -112,6 +110,8 @@ jobs:
 #        run: python functions/cli/cli.py  run-tests -r functions -s ipynb
 
   update_readmes:
+    needs: build_strategy_matrix
+    if: github.repository == 'mlrun/functions' || github.repository == 'mlrun/hub-assets'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -135,13 +135,20 @@ jobs:
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
         run: python -m cli.cli update-readme -c $CHANNEL --asset functions --asset modules
-      - name: Upload updated READMEs as artifact
-        uses: actions/upload-artifact@v4
-        with:
-         name: updated-readmes
-         path: |
-           functions/README.md
-           modules/README.md
+      - name: Commit & push (if changed)
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          USEREMAIL: ${{ secrets.USERMAIL }}
+        run: |
+          if git diff --quiet; then
+            echo "No README changes."
+            exit 0
+          fi
+          git config --local user.name $USERNAME
+          git config --local user.email $USEREMAIL
+          git add functions/README.md modules/README.md || true
+          git commit -m "chore(readme): auto-update asset tables [skip ci]"
+          git push
 
   build-marketplace:
     name: Build marketplace

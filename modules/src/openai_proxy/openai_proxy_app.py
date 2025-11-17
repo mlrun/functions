@@ -22,9 +22,9 @@ python - <<'PY'
 import os, base64, pathlib
 code = os.environ["BASE64"]
 pathlib.Path("/opt/app").mkdir(parents=True, exist_ok=True)
-with open("/opt/app/openai.py","wb") as f:
+with open("/opt/app/openai_proxy_app.py","wb") as f:
     f.write(base64.b64decode(code))
-print("Wrote /opt/app/openai.py")
+print("Wrote /opt/app/openai_proxy_app.py")
 PY
 
 exec gunicorn openai:app \

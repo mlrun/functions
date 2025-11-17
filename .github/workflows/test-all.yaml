@@ -134,7 +134,7 @@ jobs:
       - name: Regenerate README tables
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
-        run: python -m cli.cli update-readme $CHANNEL --asset functions --asset modules
+        run: python -m cli.cli update-readme -c $CHANNEL --asset functions --asset modules
       - name: Commit & push (if changed)
         env:
           USERNAME: ${{ secrets.USERNAME }}

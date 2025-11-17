@@ -1,3 +1,0 @@
-scikit-learn~=1.5.2
-evidently~=0.7.6
-pandas

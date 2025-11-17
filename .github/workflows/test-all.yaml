@@ -78,6 +78,7 @@ jobs:
 
   run_monorepo_tests:
     needs: build_strategy_matrix
+    if: github.repository == 'mlrun/functions' || github.repository == 'mlrun/hub-assets'
     runs-on: ubuntu-latest
     strategy:
       # matrix: [{"package": some package that changed}, {...}, ...]
@@ -111,8 +112,6 @@ jobs:
 #        run: python functions/cli/cli.py  run-tests -r functions -s ipynb
 
   update_readmes:
-    needs: build_strategy_matrix
-    if: github.repository == 'mlrun/functions' || github.repository == 'mlrun/hub-assets'
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -6,6 +6,19 @@
 <!-- AUTOGEN:START (do not edit below) -->
 | Name | Description | Kind | Categories |
 | --- | --- | --- | --- |
-| [count_events](/home/runner/work/functions/functions/modules/src/count_events) | Count events in each time window | monitoring_application | model-serving |
-| [histogram_data_drift](/home/runner/work/functions/functions/modules/src/histogram_data_drift) | Model-monitoring application for detecting and visualizing data drift | monitoring_application | model-serving, structured-ML |
+| [count_events](https://github.com/mlrun/functions/tree/development/modules/src/count_events) | Count events in each time window | monitoring_application | model-serving |
+| [evidently_iris](https://github.com/mlrun/functions/tree/development/modules/src/evidently_iris) | Demonstrates Evidently integration in MLRun for data quality and drift monitoring using the Iris dataset | monitoring_application | model-serving, structured-ML |
+| [histogram_data_drift](https://github.com/mlrun/functions/tree/development/modules/src/histogram_data_drift) | Model-monitoring application for detecting and visualizing data drift | monitoring_application | model-serving, structured-ML |
+| [openai_proxy_app](https://github.com/mlrun/functions/tree/development/modules/src/openai_proxy_app) | OpenAI application runtime based on fastapi | generic | genai |
+
+
+## Catalog
+
+<!-- AUTOGEN:START (do not edit below) -->
+| Name | Description | Kind | Categories |
+| --- | --- | --- | --- |
+| [count_events](https://github.com/mlrun/functions/tree/development/modules/src/count_events) | Count events in each time window | monitoring_application | model-serving |
+| [evidently_iris](https://github.com/mlrun/functions/tree/development/modules/src/evidently_iris) | Demonstrates Evidently integration in MLRun for data quality and drift monitoring using the Iris dataset | monitoring_application | model-serving, structured-ML |
+| [histogram_data_drift](https://github.com/mlrun/functions/tree/development/modules/src/histogram_data_drift) | Model-monitoring application for detecting and visualizing data drift | monitoring_application | model-serving, structured-ML |
+| [openai_proxy_app](https://github.com/mlrun/functions/tree/development/modules/src/openai_proxy_app) | OpenAI application runtime based on fastapi | generic | genai |
 <!-- AUTOGEN:END -->

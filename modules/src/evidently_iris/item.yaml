@@ -1,0 +1,21 @@
+apiVersion: v1
+categories:
+- model-serving
+- structured-ML
+description: Demonstrates Evidently integration in MLRun for data quality and drift monitoring using the Iris dataset
+example: evidently_iris.ipynb
+generationDate: 2025-11-09    
+hidden: false                                       
+labels:
+  author: Iguazio
+mlrunVersion: 1.10.0-rc41
+name: evidently_iris
+spec:
+  filename: evidently_iris.py
+  image: mlrun/mlrun                                
+  kind: monitoring_application
+  requirements:
+  - scikit-learn~=1.5.2
+  - evidently~=0.7.5
+  - pandas
+version: 1.0.0                                      

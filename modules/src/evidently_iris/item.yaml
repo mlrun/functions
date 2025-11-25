@@ -4,7 +4,7 @@ categories:
 - structured-ML
 description: Demonstrates Evidently integration in MLRun for data quality and drift monitoring using the Iris dataset
 example: evidently_iris.ipynb
-generationDate: 2025-11-09    
+generationDate: 2025-11-09:12-25
 hidden: false                                       
 labels:
   author: Iguazio

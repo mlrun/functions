@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 import click
 from jinja2 import Environment, FileSystemLoader
 
@@ -37,7 +37,7 @@ overwrite: whether to overwrite existing item.yaml file
     # Render parameters
     params = {
         "example": f"{name}.ipynb",
-        "generationDate": datetime.utcnow().strftime("%Y-%m-%d"),
+        "generationDate": datetime.now(timezone.utc).strftime("%Y-%m-%d:%H-%M"),
         "name": name,
         "filename": f"{name}.py",
     }

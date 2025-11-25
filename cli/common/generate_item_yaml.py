@@ -37,7 +37,7 @@ overwrite: whether to overwrite existing item.yaml file
     # Render parameters
     params = {
         "example": f"{name}.ipynb",
-        "generationDate": datetime.utcnow().strftime("%Y-%m-%d"),
+        "generationDate": datetime.utcnow().strftime("%Y-%m-%d:%H-%M"),
         "name": name,
         "filename": f"{name}.py",
     }

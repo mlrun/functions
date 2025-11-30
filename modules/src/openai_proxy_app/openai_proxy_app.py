@@ -29,7 +29,7 @@ with open("/opt/app/openai_proxy_app.py","wb") as f:
 print("Wrote /opt/app/openai_proxy_app.py")
 PY
 
-exec gunicorn openai:app \
+exec gunicorn openai_proxy_app:app \
   --chdir /opt/app \
   --bind 0.0.0.0:8000 \
   --worker-class uvicorn.workers.UvicornWorker \

@@ -35,6 +35,7 @@ exec gunicorn openai_proxy_app:app \
   --worker-class uvicorn.workers.UvicornWorker \
   --log-level info
 '''.strip()
+
 class OpenAIModule:
     def __init__(self,project):
         self.project = project

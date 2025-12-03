@@ -28,7 +28,7 @@ Metadata about the function. Can be generated using the following CLI command:
   ```bash
     python -m cli.cli generate-item-yaml function your_function_name
   ```
-  Then, fill in all the relevant details. For example, the `categories` field (you can browse the [MLRun hub UI](https://www.mlrun.org/hub/functions/) to see existing categories).
+  Then, fill in all the relevant details. For example: `kind` (either `nuclio:serving`, `serving` or `job`) and `categories` field (you can browse the [MLRun hub UI](https://www.mlrun.org/hub/functions/) to see existing categories. You can specify more than one category per function).
   Important: Be consistent with the module name across the directory name, all relevant `item.yaml` fields, and the file names.
 
 #### function.yaml
@@ -64,7 +64,7 @@ Metadata about the module. Can be generated using the following CLI command:
 ```bash
   python -m cli.cli generate-item-yaml module your_module_name
 ```
-Then, fill in all the relevant details. For example: `kind` (either `generic` or `monitoring_application`) and `categories` (you can browse the [MLRun hub UI](https://www.mlrun.org/hub/functions/) to see existing categories).
+Then, fill in all the relevant details. For example: `kind` (either `generic` or `monitoring_application`) and `categories` (you can browse the [MLRun hub UI](https://www.mlrun.org/hub/functions/) to see existing categories. You can specify more than one category per module).
 Important: Be consistent with the module name across the directory name, all relevant `item.yaml` fields, and the file names.
 
 #### your_module_name.py

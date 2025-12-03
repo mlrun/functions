@@ -23,20 +23,30 @@ functions
 │   │   ├── test_your_function_name.py 
 │   │   └── requirements.txt
 ```
-- `item.yaml`: Metadata about the function. Can be generated using the following CLI command:
+#### item.yaml 
+Metadata about the function. Can be generated using the following CLI command:
   ```bash
     python -m cli.cli generate-item-yaml function your_function_name
   ```
-  Then, fill in all the relevant details. Important: Be consistent with the module name across the directory name, all relevant `item.yaml` fields, and the file names.
+  Then, fill in all the relevant details. For example, the `categories` field (you can browse the [MLRun hub UI](https://www.mlrun.org/hub/functions/) to see existing categories).
+  Important: Be consistent with the module name across the directory name, all relevant `item.yaml` fields, and the file names.
 
-- `function.yaml`: The MLRun function definition. Can be generated from `item.yaml` using:
-  ```bash
-    python -m cli.cli item-to-function --item-path functions/src/your_function_name
-    ```
-- `your_function_name.py`: The main code file for your function. (Notice: keep the code well-documented, the docstrings are used in the hub UI as documentation for the function.)
-- `your_function_name.ipynb`: A Jupyter notebook demonstrating the function's usage. (Notice: the notebook must be able to run end-to-end automatically without manual intervention.)
-- `test_your_function_name.py`: Unit tests for your function. (Will run upon each change to your function).
-- `requirements.txt`: Any additional Python dependencies required by your function's unit tests. (Notice: The function's own dependencies should be specified in the `item.yaml` file, not here.)
+#### function.yaml
+The MLRun function definition. Can be generated from `item.yaml` using:
+```bash
+  python -m cli.cli item-to-function --item-path functions/src/your_function_name
+  ```
+#### your_function_name.py
+The main code file for your function. (Notice: keep the code well-documented, the docstrings are used in the hub UI as documentation for the function.)
+
+#### your_function_name.ipynb
+A Jupyter notebook demonstrating the function's usage. (Notice: the notebook must be able to run end-to-end automatically without manual intervention.)
+
+#### test_your_function_name.py
+Unit tests for your function to cover the function functionality as much as possible. (Will run upon each change to your function).
+
+#### requirements.txt
+Any additional Python dependencies required by your function's unit tests. (Notice: The function's own dependencies should be specified in the `item.yaml` file, not here.)
 
 ### Modules
 ```txt
@@ -49,12 +59,23 @@ modules
 │   │   ├── test_your_module_name.py 
 │   │   └── requirements.txt
 ```
-- `item.yaml`: Metadata about the module. Can be generated using the following CLI command:
-  ```bash
-    python -m cli.cli generate-item-yaml module your_module_name
-  ```
-  Then, fill in all the relevant details. Important: Be consistent with the module name across the directory name, all relevant `item.yaml` fields, and the file names.
-- `your_module_name.py`: The main code file for your module. (Notice: keep the code well-documented, the docstrings are used in the hub UI as documentation for the module.)
-- `your_module_name.ipynb`: A Jupyter notebook demonstrating the module's usage.
-- `test_your_module_name.py`: Unit tests for your module. (Will run upon each change to your module).
-- `requirements.txt`: Any additional Python dependencies required by your module's unit tests. (Notice: The module's own dependencies should be specified in the `item.yaml` file, not
+#### item.yaml
+Metadata about the module. Can be generated using the following CLI command:
+```bash
+  python -m cli.cli generate-item-yaml module your_module_name
+```
+Then, fill in all the relevant details. For example: `kind` (either `generic` or `monitoring_application`) and `categories` (you can browse the [MLRun hub UI](https://www.mlrun.org/hub/functions/) to see existing categories).
+Important: Be consistent with the module name across the directory name, all relevant `item.yaml` fields, and the file names.
+
+#### your_module_name.py
+The main code file for your module. (Notice: keep the code well-documented, the docstrings are used in the hub UI as documentation for the module.)
+For model-monitoring modules, you can see our [guidelines for writing model monitoring applications](https://docs.mlrun.org/en/stable/model-monitoring/applications.html).
+
+#### your_module_name.ipynb
+A Jupyter notebook demonstrating the module's usage. 
+
+#### test_your_module_name.py
+Unit tests for your module to cover the module functionality as much as possible. (Will run upon each change to your module).
+
+#### requirements.txt
+Any additional Python dependencies required by your module's unit tests. (Notice: The module's own dependencies should be specified in the `item.yaml` file, not here.)

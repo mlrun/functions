@@ -18,4 +18,5 @@ spec:
   - scikit-learn~=1.5.2
   - evidently[ui]~=0.7.5
   - pandas
+  - sniffio~=1.3.0
 version: 1.0.0                                      

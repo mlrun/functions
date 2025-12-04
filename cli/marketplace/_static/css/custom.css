@@ -47,3 +47,9 @@ html:root {
     position: relative;
     box-shadow: none !important;
 }
+
+/* Remove max-width from the content */
+.bd-main .bd-content .bd-article-container {
+    max-width: none;
+    width: 100%;
+}

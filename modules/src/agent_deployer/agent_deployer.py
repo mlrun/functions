@@ -12,29 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Optional
+import os
 
 import mlrun.errors
-from mlrun import get_or_create_project, code_to_function, mlconf
+from mlrun import get_current_project, code_to_function, mlconf
 from mlrun.serving import ModelRunnerStep
-from mlrun.datastore.datastore_profile import DatastoreProfileV3io
+from mlrun.datastore.datastore_profile import DatastoreProfileV3io,DatastoreProfileKafkaStream, DatastoreProfileTDEngine
 
 
 class AgentDeployer:
     def __init__(
             self,
-            project_name: str,
             agent_name: str,
             model_class_name: str,
             function: str,
-            model_params: Optional[dict] = None,
             result_path: Optional[str] = None,
             inputs_path: Optional[str] = None,
             output_schema: Optional[list[str]] = None,
             requirements: Optional[list[str]] = None,
             image: Optional[str] = "mlrun/mlrun",
+            set_model_monitoring: Optional[bool] = False,
+            **model_params
+
     ):
         self._project = None
-        self.project_name = project_name
+        self._project_name = None
         self.agent_name = agent_name
         self.model_class_name = model_class_name
         self.function = function
@@ -44,17 +46,36 @@ class AgentDeployer:
         self.inputs_path = inputs_path
         self.output_schema = output_schema
         self.image = image
-        self.configure_model_monitoring()
+        if set_model_monitoring:
+            self.configure_model_monitoring()
 
     def configure_model_monitoring(self):
-        tsdb_profile = DatastoreProfileV3io(
-            name="v3io-tsdb-profile",
-            v3io_access_key=mlconf.get_v3io_access_key(),
-        )
-        stream_profile = DatastoreProfileV3io(
-            name="v3io-stream-profile",
-            v3io_access_key=mlconf.get_v3io_access_key(),
-        )
+        if not self.project:
+            raise mlrun.errors.MLRunInvalidArgumentError("No current project found to set model monitoring")
+        if mlrun.mlconf.is_ce_mode():
+            mlrun_namespace = os.environ.get("MLRUN_NAMESPACE", "mlrun")
+            tsdb_profile = DatastoreProfileTDEngine(
+                name="tdengine-tsdb-profile",
+                user="root",
+                password="taosdata",
+                host=f"tdengine-tsdb.{mlrun_namespace}.svc.cluster.local",
+                port="6041",
+            )
+
+            stream_profile = DatastoreProfileKafkaStream(
+                name="kafka-stream-profile",
+                brokers=f"kafka-stream.{mlrun_namespace}.svc.cluster.local:9092",
+                topics=[],
+            )
+        else:
+            tsdb_profile = DatastoreProfileV3io(
+                name="v3io-tsdb-profile",
+                v3io_access_key=mlconf.get_v3io_access_key(),
+            )
+            stream_profile = DatastoreProfileV3io(
+                name="v3io-stream-profile",
+                v3io_access_key=mlconf.get_v3io_access_key(),
+            )
 
         self.project.register_datastore_profile(tsdb_profile)
         self.project.register_datastore_profile(stream_profile)
@@ -78,10 +99,19 @@ class AgentDeployer:
     def project(self):
         if self._project:
             return self._project
-        self._project = get_or_create_project(self.project_name, context="./")
+        self._project = get_current_project(silent=True)
         return self._project
 
-    def get_function(self, enable_tracking: bool = True):
+    @property
+    def project_name(self):
+        if self._project_name:
+            return self._project_name
+        if self.project:
+            self._project_name = self.project.metadata.name
+            return self._project_name
+        raise mlrun.errors.MLRunInvalidArgumentError("No current project found to get project name")
+
+    def deploy_function(self, enable_tracking: bool = True):
         function = code_to_function(
             name=f"{self.agent_name}_serving_function",
             filename=self.function,
@@ -103,4 +133,5 @@ class AgentDeployer:
         )
         graph.to(model_runner_step).respond()
         function.set_tracking(enable_tracking=enable_tracking)
+        function.deploy()
         return function

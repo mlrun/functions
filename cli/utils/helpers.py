@@ -90,12 +90,12 @@ def install_python(directory: Union[str, Path]):
     return python_location
 
 
-def _run_subprocess(cmd: str, directory):
+def _run_subprocess(cmd: List[str], directory):
     completed_process: subprocess.CompletedProcess = subprocess.run(
         cmd,
         stdout=sys.stdout,
         stderr=subprocess.PIPE,
-        shell=True,
+        shell=False,
         cwd=directory,
     )
     exit_on_non_zero_return(completed_process)
@@ -118,9 +118,8 @@ def install_requirements(
 
     if requirements_file.exists():
         print(f"Installing requirements from {requirements_file}...")
-        _run_subprocess(
-            f"pipenv install --skip-lock -r {requirements_file}", directory
-        )
+        cmd = ["pipenv", "install", "--skip-lock", "-r", str(requirements_file)]
+        _run_subprocess(cmd, directory)
         with open(requirements_file, "r") as f:
             mlrun_version = [l.replace("\n", "") for l in f.readlines() if "mlrun" in l]
             # remove mlrun from requirements if installed with version limits:
@@ -129,9 +128,8 @@ def install_requirements(
 
     if requirements:
         print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
-        _run_subprocess(
-            f"pipenv install --skip-lock {' '.join(requirements)}", directory
-        )
+        cmd = ["pipenv", "install", "--skip-lock", *requirements]
+        _run_subprocess(cmd, directory)
 
 
 def get_item_yaml_values(

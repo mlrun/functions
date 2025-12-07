@@ -21,6 +21,7 @@ from mlrun.datastore.datastore_profile import DatastoreProfileV3io,DatastoreProf
 
 
 class AgentDeployer:
+    """Class to deploy an agent as a serving function in MLRun."""
     def __init__(
             self,
             agent_name: str,
@@ -50,9 +51,10 @@ class AgentDeployer:
             self.configure_model_monitoring()
 
     def configure_model_monitoring(self):
+        """Configure model monitoring for the current project."""
         if not self.project:
             raise mlrun.errors.MLRunInvalidArgumentError("No current project found to set model monitoring")
-        if mlrun.mlconf.is_ce_mode():
+        if mlconf.is_ce_mode():
             mlrun_namespace = os.environ.get("MLRUN_NAMESPACE", "mlrun")
             tsdb_profile = DatastoreProfileTDEngine(
                 name="tdengine-tsdb-profile",
@@ -97,6 +99,7 @@ class AgentDeployer:
 
     @property
     def project(self):
+        """Get the current MLRun project."""
         if self._project:
             return self._project
         self._project = get_current_project(silent=True)
@@ -104,6 +107,7 @@ class AgentDeployer:
 
     @property
     def project_name(self):
+        """Get the name of the current MLRun project."""
         if self._project_name:
             return self._project_name
         if self.project:
@@ -112,6 +116,10 @@ class AgentDeployer:
         raise mlrun.errors.MLRunInvalidArgumentError("No current project found to get project name")
 
     def deploy_function(self, enable_tracking: bool = True):
+        """
+        Deploy the agent as a serving function in MLRun.
+        :param enable_tracking: Whether to enable tracking for the function.
+        """
         function = code_to_function(
             name=f"{self.agent_name}_serving_function",
             filename=self.function,

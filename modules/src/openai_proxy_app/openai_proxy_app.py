@@ -29,7 +29,7 @@ with open("/opt/app/openai_proxy_app.py","wb") as f:
 print("Wrote /opt/app/openai_proxy_app.py")
 PY
 
-exec gunicorn openai:app \
+exec gunicorn openai_proxy_app:app \
   --chdir /opt/app \
   --bind 0.0.0.0:8000 \
   --worker-class uvicorn.workers.UvicornWorker \
@@ -38,17 +38,17 @@ exec gunicorn openai:app \
 class OpenAIModule:
     def __init__(self,project):
         self.project = project
-        self.fastapi_app = self.project.set_function(name="openai",kind="application",image="python:3.11")
-        self.fastapi_app.with_requirements([
+        self.openai_proxy_app = self.project.set_function(name="openai",kind="application",image="python:3.11")
+        self.openai_proxy_app.with_requirements([
                 "fastapi>=0.110,<1.0",
                 "uvicorn[standard]>=0.29,<1.0",
                 "gunicorn>=21.2,<22.0",
                 "requests>=2.31,<3.0",
             ])
-        self.fastapi_app.set_env("BASE64",BASE64)
-        self.fastapi_app.set_internal_application_port(8000)
-        self.fastapi_app.spec.command = "/bin/sh"
-        self.fastapi_app.spec.args = ["-c", CMD]
+        self.openai_proxy_app.set_env("BASE64",BASE64)
+        self.openai_proxy_app.set_internal_application_port(8000)
+        self.openai_proxy_app.spec.command = "/bin/sh"
+        self.openai_proxy_app.spec.args = ["-c", CMD]
         
 
         

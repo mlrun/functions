@@ -31,7 +31,7 @@ class AgentDeployer:
             function: str,
             result_path: Optional[str] = None,
             inputs_path: Optional[str] = None,
-            output_schema: Optional[list[str]] = None,
+            outputs: Optional[list[str]] = None,
             requirements: Optional[list[str]] = None,
             image: str = "mlrun/mlrun",
             set_model_monitoring: bool = False,
@@ -41,16 +41,24 @@ class AgentDeployer:
         """
         Class to deploy an agent as a serving function in MLRun.
 
-        :param agent_name: Name of the agent,
-        :param model_class_name: Name of the model class to be used,
-        :param function: Path to the function file,
-        :param result_path: Path where results will be stored,
-        :param inputs_path: Path to the input data of the model,
-        :param output_schema: Schema of the output data,
-        :param requirements: List of additional requirements for the function,
-        :param image: Docker image to be used for the function,
-        :param set_model_monitoring: Whether to configure model monitoring,
-        :param model_params: Additional parameters for the model
+        :param agent_name: Name of the agent
+        :param model_class_name: Model class name. If LLModel is chosen
+                                    (either by name `LLModel` or by its full path, e.g. mlrun.serving.states.LLModel),
+                                    outputs will be overridden with UsageResponseKeys fields.
+        :param function: Path to the function file.
+        :param result_path: when specified selects the key/path in the output event to use as model monitoring
+                                      outputs this require that the output event body will behave like a dict,
+                                      expects scopes to be defined by dot notation (e.g "data.d").
+        :param inputs_path: when specified selects the key/path in the event to use as model monitoring inputs
+                                      this require that the event body will behave like a dict, expects scopes to be
+                                      defined by dot notation (e.g "data.d").
+        :param outputs: list of the model outputs (e.g. labels) ,if provided will override the outputs
+                                      that been configured in the model artifact, please note that those outputs need to
+                                      be equal to the model_class predict method outputs (length, and order).
+        :param requirements: List of additional requirements for the function
+        :param image: Docker image to be used for the function
+        :param set_model_monitoring: Whether to configure model monitoring
+        :param model_params: Parameters for model instantiation
         """
 
         self._function = None
@@ -63,7 +71,7 @@ class AgentDeployer:
         self.model_params = model_params or {}
         self.result_path = result_path
         self.inputs_path = inputs_path
-        self.output_schema = output_schema
+        self.output_schema = outputs
         self.image = image
         if set_model_monitoring:
             self.configure_model_monitoring()
@@ -132,10 +140,13 @@ class AgentDeployer:
             return self._project_name
         raise mlrun.errors.MLRunInvalidArgumentError("No current project found to get project name")
 
-    @property
-    def function(self) -> ServingRuntime:
+    def get_function(self, set_tracking: bool = True) -> ServingRuntime:
+        """Get the serving function, loading it if necessary.
+        :param set_tracking: Whether to enable tracking for the function.
+        """
         if self._function is None:
             self._function = self._load_function()
+        self._function.set_tracking(enable_tracking=set_tracking)
         return self._function
 
 
@@ -144,14 +155,13 @@ class AgentDeployer:
         Deploy the agent as a serving function in MLRun.
         :param enable_tracking: Whether to enable tracking for the function.
         """
-
-        self.function.set_tracking(enable_tracking=enable_tracking)
-        self.function.deploy()
-        return self.function
+        function = self.get_function(set_tracking=enable_tracking)
+        function.deploy()
+        return function
 
     def _load_function(
             self) -> ServingRuntime:
-        self._function = code_to_function(
+        function = code_to_function(
             name=f"{self.agent_name}_serving_function",
             filename=self.function_file,
             project=self.project_name,
@@ -159,7 +169,7 @@ class AgentDeployer:
             image=self.image,
             requirements=self.requirements,
         )
-        graph = self._function.set_topology(topology="flow", engine="async")
+        graph = function.set_topology(topology="flow", engine="async")
         model_runner_step = ModelRunnerStep()
         model_runner_step.add_model(
             model_class=self.model_class_name,
@@ -171,4 +181,4 @@ class AgentDeployer:
             **self.model_params
         )
         graph.to(model_runner_step).respond()
-        return self._function
+        return function

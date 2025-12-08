@@ -3,11 +3,11 @@ categories:
 - model-serving
 description: Helper for serving function deploy of an AI agents using MLRun
 example: agent_deployer.ipynb
-generationDate: 2025-09-16:12-25
+generationDate: 2025-12-07
 hidden: false
 labels:
   author: Iguazio
-mlrunVersion: 1.10.0-rc41
+mlrunVersion: 1.10.0
 name: agent_deployer
 spec:
     filename: agent_deployer.py

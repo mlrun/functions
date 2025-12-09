@@ -13,9 +13,9 @@ spec:
     filename: openai_proxy_app.py
     image: mlrun/mlrun
     requirements:
-      - fastapi
-      - uvicorn[standard]
-      - gunicorn
-      - requests
+      - fastapi==0.124.0
+      - uvicorn[standard]==0.38.0
+      - gunicorn==23.0.0
+      - requests==2.32.5
     kind: generic
 version: 1.0.0

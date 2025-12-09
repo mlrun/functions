@@ -17,26 +17,29 @@ import os
 
 import mlrun.errors
 from mlrun import get_current_project, code_to_function, mlconf
-from mlrun.runtimes import  ServingRuntime
+from mlrun.runtimes import ServingRuntime
 from mlrun.serving import ModelRunnerStep
-from mlrun.datastore.datastore_profile import DatastoreProfileV3io,DatastoreProfileKafkaStream, DatastoreProfileTDEngine
+from mlrun.datastore.datastore_profile import (
+    DatastoreProfileV3io,
+    DatastoreProfileKafkaStream,
+    DatastoreProfileTDEngine,
+)
 from mlrun.utils import logger
 
 
 class AgentDeployer:
     def __init__(
-            self,
-            agent_name: str,
-            model_class_name: str,
-            function: str,
-            result_path: Optional[str] = None,
-            inputs_path: Optional[str] = None,
-            outputs: Optional[list[str]] = None,
-            requirements: Optional[list[str]] = None,
-            image: str = "mlrun/mlrun",
-            set_model_monitoring: bool = False,
-            **model_params
-
+        self,
+        agent_name: str,
+        model_class_name: str,
+        function: str,
+        result_path: Optional[str] = None,
+        inputs_path: Optional[str] = None,
+        outputs: Optional[list[str]] = None,
+        requirements: Optional[list[str]] = None,
+        image: str = "mlrun/mlrun",
+        set_model_monitoring: bool = False,
+        **model_params,
     ):
         """
         Class to deploy an agent as a serving function in MLRun.
@@ -79,7 +82,9 @@ class AgentDeployer:
     def configure_model_monitoring(self):
         """Configure model monitoring for the active project."""
         if not self.project:
-            raise mlrun.errors.MLRunInvalidArgumentError("No active project detected, unable to set model monitoring")
+            raise mlrun.errors.MLRunInvalidArgumentError(
+                "No active project detected, unable to set model monitoring"
+            )
         if mlconf.is_ce_mode():
             mlrun_namespace = os.environ.get("MLRUN_NAMESPACE", "mlrun")
             tsdb_profile = DatastoreProfileTDEngine(
@@ -115,12 +120,13 @@ class AgentDeployer:
         )
         try:
             self.project.enable_model_monitoring(
-                base_period=10,
-                deploy_histogram_data_drift_app=False
+                base_period=10, deploy_histogram_data_drift_app=False
             )
         except (mlrun.errors.MLRunConflictError, mlrun.errors.MLRunHTTPError) as e:
-            logger.info("While calling enable_model_monitoring, caught expected exception:", error=str(e))
-
+            logger.info(
+                "While calling enable_model_monitoring, caught expected exception:",
+                error=str(e),
+            )
 
     @property
     def project(self):
@@ -138,30 +144,33 @@ class AgentDeployer:
         if self.project:
             self._project_name = self.project.metadata.name
             return self._project_name
-        raise mlrun.errors.MLRunInvalidArgumentError("No current project found to get project name")
+        raise mlrun.errors.MLRunInvalidArgumentError(
+            "No current project found to get project name"
+        )
 
-    def get_function(self, set_tracking: bool = True) -> ServingRuntime:
-        """Get the serving function, loading it if necessary.
-        :param set_tracking: Whether to enable tracking for the function.
+    def get_function(self) -> ServingRuntime:
+        """
+        Get the serving function, loading it if necessary.
         """
         if self._function is None:
-            self._function = self._load_function()
-        self._function.set_tracking(enable_tracking=set_tracking)
+            self._load_function()
         return self._function
 
-
-    def deploy_function(self, enable_tracking: bool = True) -> ServingRuntime:
+    def deploy_function(self, enable_tracking: bool) -> ServingRuntime:
         """
         Deploy the agent as a serving function in MLRun.
         :param enable_tracking: Whether to enable tracking for the function.
         """
-        function = self.get_function(set_tracking=enable_tracking)
+
+        function = self.get_function()
+        function.set_tracking(enable_tracking=enable_tracking)
         function.deploy()
         return function
 
     def _load_function(
-            self) -> ServingRuntime:
-        function = code_to_function(
+        self,
+    ) -> ServingRuntime:
+        self._function = code_to_function(
             name=f"{self.agent_name}_serving_function",
             filename=self.function_file,
             project=self.project_name,
@@ -169,7 +178,7 @@ class AgentDeployer:
             image=self.image,
             requirements=self.requirements,
         )
-        graph = function.set_topology(topology="flow", engine="async")
+        graph = self._function.set_topology(topology="flow", engine="async")
         model_runner_step = ModelRunnerStep()
         model_runner_step.add_model(
             model_class=self.model_class_name,
@@ -178,7 +187,7 @@ class AgentDeployer:
             input_path=self.inputs_path,
             outputs=self.output_schema,
             execution_mechanism="naive",
-            **self.model_params
+            **self.model_params,
         )
         graph.to(model_runner_step).respond()
-        return function
+        return self._function

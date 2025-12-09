@@ -40,10 +40,10 @@ class OpenAIModule:
         self.project = project
         self.openai_proxy_app = self.project.set_function(name="openai",kind="application",image="python:3.11")
         self.openai_proxy_app.with_requirements([
-                "fastapi>=0.110,<1.0",
-                "uvicorn[standard]>=0.29,<1.0",
-                "gunicorn>=21.2,<22.0",
-                "requests>=2.31,<3.0",
+                "fastapi",
+                "uvicorn[standard]",
+                "gunicorn",
+                "requests",
             ])
         self.openai_proxy_app.set_env("BASE64",BASE64)
         self.openai_proxy_app.set_internal_application_port(8000)

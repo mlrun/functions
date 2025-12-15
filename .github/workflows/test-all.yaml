@@ -6,7 +6,7 @@ on:
     branches:
       - development
       - master
-      - add-step-asset
+      - add-stes-asset
   workflow_dispatch: {}
 
 jobs:

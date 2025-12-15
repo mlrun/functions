@@ -5,6 +5,7 @@ class BaseClass:
 
 
 class DummyStep(BaseClass):
+    """ this is a dummy test for testing purpose"""
     def __init__(self, name=None):
         self.name = name
 

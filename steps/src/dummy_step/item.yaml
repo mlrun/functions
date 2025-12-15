@@ -6,7 +6,7 @@ generationDate: 2025-12-15:12-06
 hidden: false                                       
 labels:
   author: Iguazio
-mlrunVersion: ''                                    
+mlrunVersion: 1.10.0-rc41
 name: dummy_step
 className: DummyStep
 spec:

@@ -6,7 +6,13 @@ on:
     branches:
       - development
       - master
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      force_update_items:
+        description: 'Force rebuild all marketplace items (updates all Sphinx documentation)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build_strategy_matrix:
@@ -180,13 +186,14 @@ jobs:
       - name: Build marketplace docs
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
+          FORCE_UPDATE: ${{ github.event.inputs.force_update_items == true && '-f' || '' }}
         run: |
           cd marketplace
           pwd
           git pull origin
           cd ..
-          python -m cli.cli build-marketplace -s ./functions/src -sn functions -m marketplace -c $CHANNEL -v -f
-          python -m cli.cli build-marketplace -s ./modules/src -sn modules -m marketplace -c $CHANNEL -v -f
+          python -m cli.cli build-marketplace -s ./functions/src -sn functions -m marketplace -c $CHANNEL -v $FORCE_UPDATE
+          python -m cli.cli build-marketplace -s ./modules/src -sn modules -m marketplace -c $CHANNEL -v $FORCE_UPDATE
       ## Uncomment the following lines if you want to upload the built marketplace as an artifact
 #      - name: Upload built marketplace as artifact
 #        uses: actions/upload-artifact@v4

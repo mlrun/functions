@@ -1,0 +1,16 @@
+apiVersion: v1
+categories:
+- genai
+description: vllm module
+example: vllm_module.ipynb
+generationDate: 2025-17-12
+hidden: false
+labels:
+  author: Iguazio
+mlrunVersion: 1.10.0
+name: vllm_module
+spec:
+    filename: vllm_module.py
+    image: mlrun/mlrun
+    kind: generic
+version: 1.0.0

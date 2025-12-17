@@ -39,18 +39,18 @@ class VLLMModule:
         self.uvicorn_log_level = uvicorn_log_level
         self.max_tokens = max_tokens
 
-        self.vllm_proxy_app = self.project.set_function(
+        self.vllm_app = self.project.set_function(
             name=self.name,
             kind="application",
             image=self.image,
         )
 
-        self.vllm_proxy_app.with_limits(gpus=self.gpus, mem=self.mem)
+        self.vllm_app.with_limits(gpus=self.gpus, mem=self.mem)
 
         if self.node_selector:
-            self.vllm_proxy_app.with_node_selection(node_selector=self.node_selector)
+            self.vllm_app.with_node_selection(node_selector=self.node_selector)
 
-        self.vllm_proxy_app.set_internal_application_port(self.port)
+        self.vllm_app.set_internal_application_port(self.port)
 
         args: List[str] = [
             "serve",
@@ -68,26 +68,24 @@ class VLLMModule:
             tps = self.tensor_parallel_size or self.gpus
             args += ["--tensor-parallel-size", str(tps)]
 
-            self.vllm_proxy_app.spec.volumes = (self.vllm_proxy_app.spec.volumes or []) + [
-                {"name": "dshm", "emptyDir": {"medium": "Memory"}}
-            ]
-            self.vllm_proxy_app.spec.volume_mounts = (self.vllm_proxy_app.spec.volume_mounts or []) + [
-                {"name": "dshm", "mountPath": "/dev/shm"}
-            ]
+            # For more than one GPU you should create a share volume for the multiple GPUs
+            self.vllm_app.spec.volumes = [{"name": "dshm", "emptyDir": {"medium": "Memory"}}]
+            self.vllm_app.spec.volume_mounts = [{"name": "dshm", "mountPath": "/dev/shm"}]
+
         if max_tokens < 0:
             self.max_tokens = 500
 
-        self.vllm_proxy_app.spec.command = "vllm"
-        self.vllm_proxy_app.spec.args = args
+        self.vllm_app.spec.command = "vllm"
+        self.vllm_app.spec.args = args
 
-        self.vllm_proxy_app.spec.min_replicas = 1
-        self.vllm_proxy_app.spec.max_replicas = 1
+        self.vllm_app.spec.min_replicas = 1
+        self.vllm_app.spec.max_replicas = 1
 
     def get_runtime(self):
-        return self.vllm_proxy_app
+        return self.vllm_app
 
     def add_args(self, extra_args: List[str]):
         if not isinstance(extra_args, list) or not all(isinstance(x, str) for x in extra_args):
             raise ValueError("extra_args must be a list of strings")
-        self.vllm_proxy_app.spec.args += extra_args
+        self.vllm_app.spec.args += extra_args
 

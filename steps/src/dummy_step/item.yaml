@@ -13,4 +13,5 @@ spec:
   filename: dummy_step.py              
   image: mlrun/mlrun                                
   requirements:
+    - numpy
 version: 1.0.0                                      

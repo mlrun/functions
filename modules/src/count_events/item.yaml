@@ -14,5 +14,4 @@ spec:
     image: mlrun/mlrun
     kind: monitoring_application
     requirements:
-      - pandas
 version: 1.0.0

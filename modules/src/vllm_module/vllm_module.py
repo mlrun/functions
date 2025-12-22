@@ -22,7 +22,7 @@ from typing import Dict, Optional, List
 class VLLMModule:
     def __init__(
             self,
-            project,
+            project: str,
             *,
             node_selector: Optional[Dict[str, str]] = None,
             name: str = "vllm",

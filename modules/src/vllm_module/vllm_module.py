@@ -1,5 +1,23 @@
-from typing import Dict, Optional, List
+# Copyright 2025 Iguazio
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#This module acts as a lightweight gateway to OpenAI-compatible APIs.
+#You can send chat prompts, create embeddings, or get model responses without worrying about authentication or endpoint differences. 
+#It simplifies access so you can test, analyze, or integrate AI features directly into your projects or notebooks with minimal setup.
 
+
+from typing import Dict, Optional, List
 
 class VLLMModule:
     def __init__(

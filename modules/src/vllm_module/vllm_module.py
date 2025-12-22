@@ -20,6 +20,26 @@
 from typing import Dict, Optional, List
 
 class VLLMModule:
+    """
+    VLLMModule
+    
+    This module provides a lightweight wrapper for deploying a vLLM
+    (OpenAI-compatible) large language model server as an MLRun application runtime.
+    
+    The VLLMModule is responsible for:
+    - Creating an MLRun application runtime based on a vLLM container image
+    - Configuring GPU resources, memory limits, and Kubernetes node selection
+    - Launching the model using `vllm serve` with configurable runtime flags
+    - Supporting multi-GPU inference via tensor parallelism
+    - Automatically configuring shared memory (/dev/shm) when using multiple GPUs
+    - Exposing an OpenAI-compatible API (e.g. /v1/chat/completions) for inference
+    - Providing a simple Python interface for deployment and invocation from Jupyter notebooks
+    
+    The module is designed to be used in Jupyter notebooks and MLRun pipelines,
+    allowing users to deploy and test large language models on Kubernetes
+    with minimal configuration.
+    """
+
     def __init__(
             self,
             project: str,

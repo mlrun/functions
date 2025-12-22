@@ -9,6 +9,7 @@ labels:
 mlrunVersion: ''                                    {# Item’s MLRun version requirement, should follow python’s versioning schema #}
 name: {{ name|default('') }}                        {# Step name #}
 className: {{ className|default('') }}              {# Step class name #}
+defaultHandler: {{ defaultHandler|default('') }}    {# Default handler name #}
 spec:
   filename: {{ filename|default('') }}              {# Implementation file #}
   image: mlrun/mlrun                                {# Base image name #}

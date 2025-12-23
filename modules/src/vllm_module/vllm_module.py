@@ -58,11 +58,25 @@ class VLLMModule:
     ):
         if gpus < 1:
             raise ValueError("gpus must be >= 1")
-        if tensor_parallel_size is not None and tensor_parallel_size < 1:
-            raise ValueError("tensor_parallel_size must be >= 1")
 
+        if tensor_parallel_size is not None:
+            if tensor_parallel_size < 1:
+                raise ValueError("tensor_parallel_size must be >= 1")
+            if tensor_parallel_size > gpus:
+                raise ValueError(
+                    f"tensor_parallel_size ({tensor_parallel_size}) cannot be greater than gpus ({gpus})"
+                )
+
+        
+        
         if node_selector is None:
             node_selector = {"alpha.eksctl.io/nodegroup-name": "added-gpu"}
+        
+        if not isinstance(max_tokens, int):
+            raise TypeError("max_tokens must be an integer")
+
+        if max_tokens < 1:
+            raise ValueError("max_tokens must be >= 1")
 
         self.project = project
         self.name = name
@@ -110,8 +124,7 @@ class VLLMModule:
             self.vllm_app.spec.volumes = [{"name": "dshm", "emptyDir": {"medium": "Memory"}}]
             self.vllm_app.spec.volume_mounts = [{"name": "dshm", "mountPath": "/dev/shm"}]
 
-        if max_tokens < 0:
-            self.max_tokens = 500
+    
 
         self.vllm_app.spec.command = "vllm"
         self.vllm_app.spec.args = args

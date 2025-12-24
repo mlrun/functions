@@ -1,0 +1,16 @@
+apiVersion: v1
+categories:
+- genai
+description: Deploys a vLLM OpenAI-compatible LLM server as an MLRun application runtime, with configurable GPU usage, node selection, tensor parallelism, and runtime flags.
+example: vllm_module.ipynb
+generationDate: 2025-12-17:12-25
+hidden: false
+labels:
+  author: Iguazio
+mlrunVersion: 1.10.0
+name: vllm_module
+spec:
+    filename: vllm_module.py
+    image: mlrun/mlrun
+    kind: generic
+version: 1.0.0

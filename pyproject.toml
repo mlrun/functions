@@ -1,0 +1,136 @@
+[project]
+name = "mlrun-functions"
+version = "0.1.0"
+description = "MLRun Functions Hub - centralized location for open source contributions of function components"
+readme = "README.md"
+requires-python = ">=3.10,<3.12"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "MLRun Team" }
+]
+keywords = ["mlrun", "machine-learning", "serverless", "ml-ops"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries",
+]
+
+dependencies = [
+    "wheel",
+    "bs4",
+    "mlrun>=1.0.0",
+    "jinja2~=3.1.2",
+    "click>=8.0",
+    "pipenv",
+    "myst_nb",
+    "black>=24.3.0",
+    "isort~=5.7",
+    "sphinx~=8.1.0",
+    "sphinx-book-theme~=1.1.3",
+    "sphinx-togglebutton==0.3.2",
+    "sphinxcontrib-applehelp==1.0.8",
+    "sphinxcontrib-devhelp==1.0.6",
+    "sphinxcontrib-htmlhelp==2.0.6",
+    "sphinxcontrib-serializinghtml==1.1.10",
+    "sphinxcontrib-qthelp==1.0.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "urllib3>=1.26.20",
+    "v3io-frames>=0.10.15",
+    "GitPython~=3.1, >=3.1.41",
+    "aiohttp~=3.11",
+    "aiohttp-retry~=2.9",
+    "click~=8.1",
+    "nest-asyncio~=1.0",
+    "ipython~=8.10",
+    "nuclio-jupyter~=0.11.2",
+    "numpy>=1.26.4, <1.27.0",
+    "pandas>=1.2, <2.2",
+    "pyarrow>=10.0, <18",
+    "pyyaml>=6.0.2, <7",
+    "requests~=2.32",
+    "tabulate~=0.8.6",
+    "v3io~=0.7.0",
+    "pydantic>=1.10.15,<2",
+    "protobuf>=3.13.0,<4",
+    "mergedeep~=1.3",
+    "semver~=3.0",
+    "dependency-injector~=4.41",
+    "fsspec>=2025.5.1, <=2025.7.0",
+    "v3iofs~=0.1.17",
+    "storey~=1.10.13",
+    "inflection~=0.5.0",
+    "python-dotenv~=1.0",
+    "setuptools>=75.2",
+    "deprecated~=1.2",
+    "jinja2~=3.1, >=3.1.6",
+    "orjson>=3.9.15, <4",
+    "mlrun-pipelines-kfp-common~=0.5.8",
+    "mlrun-pipelines-kfp-v1-8~=0.5.7",
+    "docstring_parser~=0.16",
+    "aiosmtplib~=3.0",
+    "deepdiff>=8.6.1,<9.0.0",
+]
+
+[project.scripts]
+mlrun-functions = "cli.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "urllib3>=1.26.20",
+    "v3io-frames>=0.10.15",
+    "GitPython~=3.1, >=3.1.41",
+    "aiohttp~=3.11",
+    "aiohttp-retry~=2.9",
+    "click~=8.1",
+    "nest-asyncio~=1.0",
+    "ipython~=8.10",
+    "nuclio-jupyter~=0.11.2",
+    "numpy>=1.26.4, <1.27.0",
+    "pandas>=1.2, <2.2",
+    "pyarrow>=10.0, <18",
+    "requests~=2.32",
+    "tabulate~=0.8.6",
+    "python-dotenv~=1.0",
+    "setuptools>=75.2",
+    "deprecated~=1.2",
+    "orjson>=3.9.15, <4",
+    "docstring_parser~=0.16",
+    "aiosmtplib~=3.0",
+    "deepdiff>=8.6.1,<9.0.0",
+    # The following dependencies will be pulled by mlrun with correct versions
+    # to avoid conflicts, we let mlrun manage them:
+    # pyyaml, semver, v3io, pydantic, protobuf, mergedeep,
+    # fsspec, v3iofs, storey, inflection, jinja2,
+    # mlrun-pipelines-kfp-common, mlrun-pipelines-kfp-v1-8
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["cli", "functions", "modules", "steps"]
+

@@ -18,7 +18,7 @@ import mlrun
 
 
 class TestVllmModule:
-    """Test suite for VLLMModule class."""
+    """Test suite for VLLMModule class"""
 
     def setup_method(self):
         project = mlrun.new_project("vllm", save=False)

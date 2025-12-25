@@ -173,7 +173,7 @@ We welcome contributions! Follow these steps to contribute:
 1. **Fork the repository** on GitHub
 2. **Create a new branch** for your asset:
    ```bash
-   git checkout -b feature/my-new-function
+   git checkout -b feature/my-new-item
    ```
 3. **Add your asset** under the appropriate directory:
    - Functions: `functions/src/`
@@ -209,9 +209,9 @@ functions/src/your_function_name/
    ```
 
 2. Fill in the `item.yaml` with:
-   - `kind`: `job`, `serving`, or `nuclio:serving`
+   - `kind`: `job` or `serving`
    - `categories`: Browse [MLRun hub](https://www.mlrun.org/hub/functions/) for existing categories
-   - Other metadata fields
+   - `version`, `description`, and other metadata
 
 3. Generate the function.yaml:
    ```bash
@@ -251,6 +251,7 @@ modules/src/your_module_name/
 2. Fill in the `item.yaml` with:
    - `kind`: `generic` or `monitoring_application`
    - `categories` and other metadata
+   - `version`, `description`, etc.
 
 3. Implement, document, and test your module
 

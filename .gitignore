@@ -141,3 +141,8 @@ dmypy.json
 conda-setup-cpu
 conda-setup-gpu
 .DS_Store
+
+# UV
+.uv/
+uv.lock
+

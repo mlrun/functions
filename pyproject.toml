@@ -1,7 +1,7 @@
 [project]
-name = "mlrun-functions"
+name = "mlrun-hub"
 version = "0.1.0"
-description = "MLRun Functions Hub - centralized location for open source contributions of function components"
+description = "MLRun Hub - centralized location for open source contributions of mlrun hub components"
 readme = "README.md"
 requires-python = ">=3.10,<3.12"
 license = { text = "Apache-2.0" }
@@ -14,8 +14,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Topic :: Software Development :: Libraries",
@@ -24,7 +22,7 @@ classifiers = [
 dependencies = [
     "wheel",
     "bs4",
-    "mlrun>=1.0.0",
+    "mlrun>=1.10.0",
     "jinja2~=3.1.2",
     "click>=8.0",
     "pipenv",
@@ -119,7 +117,7 @@ dev = [
 
 [tool.black]
 line-length = 88
-target-version = ["py39", "py310", "py311"]
+target-version = ["py310", "py311"]
 include = '\.pyi?$'
 
 [tool.isort]

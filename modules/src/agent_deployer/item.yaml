@@ -1,0 +1,17 @@
+apiVersion: v1
+categories:
+- model-serving
+description: Helper for serving function deploy of an AI agents using MLRun
+example: agent_deployer.ipynb
+generationDate: 2025-12-07
+hidden: false
+labels:
+  author: Iguazio
+mlrunVersion: 1.10.0
+name: agent_deployer
+spec:
+    filename: agent_deployer.py
+    image: mlrun/mlrun
+    kind: monitoring_application
+    requirements:
+version: 1.0.0

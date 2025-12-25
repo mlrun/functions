@@ -14,3 +14,4 @@ spec:
     image: mlrun/mlrun
     kind: generic
 version: 1.0.0
+

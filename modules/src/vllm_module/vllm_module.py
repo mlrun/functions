@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 # This module acts as a lightweight gateway to OpenAI-compatible APIs.
 # You can send chat prompts, create embeddings, or get model responses without worrying about authentication or endpoint differences.
 # It simplifies access so you can test, analyze, or integrate AI features directly into your projects or notebooks with minimal setup.
@@ -19,14 +20,13 @@
 
 from typing import Dict, Optional, List
 
-
 class VLLMModule:
     """
     VLLMModule
-
+    
     This module provides a lightweight wrapper for deploying a vLLM
     (OpenAI-compatible) large language model server as an MLRun application runtime.
-
+    
     The VLLMModule is responsible for:
     - Creating an MLRun application runtime based on a vLLM container image
     - Configuring GPU resources, memory limits, and Kubernetes node selection
@@ -35,7 +35,7 @@ class VLLMModule:
     - Automatically configuring shared memory (/dev/shm) when using multiple GPUs
     - Exposing an OpenAI-compatible API (e.g. /v1/chat/completions) for inference
     - Providing a simple Python interface for deployment and invocation from Jupyter notebooks
-
+    
     The module is designed to be used in Jupyter notebooks and MLRun pipelines,
     allowing users to deploy and test large language models on Kubernetes
     with minimal configuration.

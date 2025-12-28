@@ -52,20 +52,11 @@ class VLLMModule:
             mem: str = "10G",
             port: int = 8000,
             dtype: str = "auto",
-            tensor_parallel_size: Optional[int] = None,
             uvicorn_log_level: str = "info",
             max_tokens: int = 500,
     ):
         if gpus < 1:
             raise ValueError("gpus must be >= 1")
-
-        if tensor_parallel_size is not None:
-            if tensor_parallel_size < 1:
-                raise ValueError("tensor_parallel_size must be >= 1")
-            if tensor_parallel_size > gpus:
-                raise ValueError(
-                    f"tensor_parallel_size ({tensor_parallel_size}) cannot be greater than gpus ({gpus})"
-                )
 
         
         
@@ -87,7 +78,6 @@ class VLLMModule:
         self.node_selector = node_selector
         self.port = port
         self.dtype = dtype
-        self.tensor_parallel_size = tensor_parallel_size
         self.uvicorn_log_level = uvicorn_log_level
         self.max_tokens = max_tokens
 
@@ -117,8 +107,7 @@ class VLLMModule:
             args += ["--uvicorn-log-level", self.uvicorn_log_level]
 
         if self.gpus > 1:
-            tps = self.tensor_parallel_size or self.gpus
-            args += ["--tensor-parallel-size", str(tps)]
+            args += ["--tensor-parallel-size", str(gpus)]
 
             # For more than one GPU you should create a share volume for the multiple GPUs
             self.vllm_app.spec.volumes = [{"name": "dshm", "emptyDir": {"medium": "Memory"}}]

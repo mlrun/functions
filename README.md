@@ -38,8 +38,11 @@ Before you begin, ensure you have the following installed:
    ```bash
    uv sync
    ```
-
-> **Note:** UV will automatically create a virtual environment if one doesn't exist. Make sure to activate it with `source .venv/bin/activate` (macOS/Linux) or `.venv\Scripts\activate` (Windows).
+   
+> **Note:** you might need to install extra dependencies required for your asset tests. If your asset has a `requirements.txt` file, install it using:
+   ```bash
+   uv pip install -r path/to/your/asset/requirements.txt
+   ```
 
 ## Make Commands
 

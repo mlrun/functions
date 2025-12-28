@@ -13,7 +13,6 @@ A centralized repository for open-source MLRun functions, modules, and steps tha
 - [Contributing](#contributing)
 - [Testing](#testing)
 - [Code Standards](#code-standards)
-- [Troubleshooting](#troubleshooting)
 - [Resources](#resources)
 
 ## Prerequisites

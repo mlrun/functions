@@ -1,4 +1,4 @@
-# MLRun Functions Hub
+# MLRun Hub
 
 A centralized repository for open-source MLRun functions, modules, and steps that can be used as reusable components in ML pipelines.
 
@@ -20,7 +20,7 @@ A centralized repository for open-source MLRun functions, modules, and steps tha
 
 Before you begin, ensure you have the following installed:
 
-- **Python 3.10 or 3.11** - Required
+- **Python 3.10 or 3.11 (recommended) ** - Required
 - **UV** - Fast Python package manager (required)
 - **Git** - For version control
 - **Make** (optional) - For convenient command shortcuts
@@ -317,7 +317,6 @@ We follow **PEP 8** style guidelines with some modifications:
 
 - **Line length**: 88 characters (Black default)
 - **Imports**: Sorted with isort
-- **Docstrings**: Google style or NumPy style
 - **Type hints**: Encouraged for function signatures
 
 ### Formatting Tools
@@ -351,29 +350,78 @@ uv run isort --check-only .
 
 ### Documentation Standards
 
-- **Docstrings are mandatory** for all public functions, classes, and modules
+- **Docstrings are mandatory** for all public hub items
 - Use clear, concise descriptions
 - Include parameter types and return types
 - Provide usage examples when helpful
 
-**Example:**
+**Example (function `auto_trainer`):**
 ```python
-def train_model(data: pd.DataFrame, target_column: str, model_type: str = "sklearn") -> dict:
+def train(
+    context: MLClientCtx,
+    dataset: DataItem,
+    model_class: str,
+    label_columns: Optional[Union[str, List[str]]] = None,
+    drop_columns: List[str] = None,
+    model_name: str = "model",
+    tag: str = "",
+    sample_set: DataItem = None,
+    test_set: DataItem = None,
+    train_test_split_size: float = None,
+    random_state: int = None,
+    labels: dict = None,
+    **kwargs,
+):
     """
-    Train a machine learning model on the provided dataset.
-    
-    Args:
-        data: Input DataFrame containing features and target
-        target_column: Name of the target column
-        model_type: Type of model to train (default: "sklearn")
-    
-    Returns:
-        Dictionary containing the trained model and metrics
-        
-    Example:
-        >>> result = train_model(df, "label", "sklearn")
-        >>> print(result["accuracy"])
-        0.95
+    Training a model with the given dataset.
+
+    example::
+
+        import mlrun
+        project = mlrun.get_or_create_project("my-project")
+        project.set_function("hub://auto_trainer", "train")
+        trainer_run = project.run(
+            name="train",
+            handler="train",
+            inputs={"dataset": "./path/to/dataset.csv"},
+            params={
+                "model_class": "sklearn.linear_model.LogisticRegression",
+                "label_columns": "label",
+                "drop_columns": "id",
+                "model_name": "my-model",
+                "tag": "v1.0.0",
+                "sample_set": "./path/to/sample_set.csv",
+                "test_set": "./path/to/test_set.csv",
+                "CLASS_solver": "liblinear",
+            },
+        )
+
+    :param context:                 MLRun context
+    :param dataset:                 The dataset to train the model on. Can be either a URI or a FeatureVector
+    :param model_class:             The class of the model, e.g. `sklearn.linear_model.LogisticRegression`
+    :param label_columns:           The target label(s) of the column(s) in the dataset. for Regression or
+                                    Classification tasks. Mandatory when dataset is not a FeatureVector.
+    :param drop_columns:            str or a list of strings that represent the columns to drop
+    :param model_name:              The model's name to use for storing the model artifact, default to 'model'
+    :param tag:                     The model's tag to log with
+    :param sample_set:              A sample set of inputs for the model for logging its stats along the model in favour
+                                    of model monitoring. Can be either a URI or a FeatureVector
+    :param test_set:                The test set to train the model with.
+    :param train_test_split_size:   if test_set was provided then this argument is ignored.
+                                    Should be between 0.0 and 1.0 and represent the proportion of the dataset to include
+                                    in the test split. The size of the Training set is set to the complement of this
+                                    value. Default = 0.2
+    :param random_state:            Relevant only when using train_test_split_size.
+                                    A random state seed to shuffle the data. For more information, see:
+                                    https://scikit-learn.org/stable/glossary.html#term-random_state
+                                    Notice that here we only pass integer values.
+    :param labels:                  Labels to log with the model
+    :param kwargs:                  Here you can pass keyword arguments with prefixes,
+                                    that will be parsed and passed to the relevant function, by the following prefixes:
+                                    - `CLASS_` - for the model class arguments
+                                    - `FIT_` - for the `fit` function arguments
+                                    - `TRAIN_` - for the `train` function (in xgb or lgbm train function - future)
+
     """
     # Implementation here
 ```
@@ -392,10 +440,8 @@ def train_model(data: pd.DataFrame, target_column: str, model_type: str = "sklea
 pwd  # Should be the project root
 
 # Ensure dependencies are installed
-make install
+make sync
 
-# Try running with full path
-python -m cli.cli --help
 ```
 
 #### Tests Failing
@@ -404,7 +450,7 @@ python -m cli.cli --help
 
 **Solution:**
 ```bash
-# Install test dependencies if the function has a requirements.txt
+# Install test dependencies if the item has a requirements.txt
 cd functions/src/your_function
 uv pip install -r requirements.txt
 

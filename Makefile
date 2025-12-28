@@ -7,7 +7,7 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 sync: ## Sync dependencies from lockfile
-	uv sync --prerelease=allow
+	uv sync
 
 format: ## Format code with black and isort
 	uv run black .

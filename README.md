@@ -36,7 +36,7 @@ Before you begin, ensure you have the following installed:
 
 2. **Install dependencies:**
    ```bash
-   uv sync --all-groups --prerelease=allow
+   uv sync
    ```
 
 > **Note:** UV will automatically create a virtual environment if one doesn't exist. Make sure to activate it with `source .venv/bin/activate` (macOS/Linux) or `.venv\Scripts\activate` (Windows).

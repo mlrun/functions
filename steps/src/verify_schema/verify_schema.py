@@ -14,7 +14,7 @@
 #
 
 class VerifySchema:
-    def __init__(self, name, schema: list):
+    def __init__(self, name: str, schema: list):
         self.name = name
         self.schema = schema
 

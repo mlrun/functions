@@ -22,7 +22,7 @@ class TestVerifySchema:
         try:
             verifier.do(event_missing_key)
         except KeyError as e:
-            assert "key 'active' not found in event" in str(e)
+            assert "missing keys {'active'} in event" in str(e)
 
         # Test with unexpected key
         event_unexpected_key = {
@@ -34,4 +34,4 @@ class TestVerifySchema:
         try:
             verifier.do(event_unexpected_key)
         except KeyError as e:
-            assert "unexpected key 'extra' found in event" in str(e)
+            assert "unexpected keys {'extra'} in event" in str(e)

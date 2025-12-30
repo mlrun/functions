@@ -49,7 +49,7 @@ Before you begin, ensure you have the following installed:
 The project includes a Makefile for convenient command shortcuts:
 
 | Command | Description |
-|---------|-------------|
+| ------- | ----------- |
 | `make help` | Show all available commands |
 | `make sync` | Sync dependencies from lockfile |
 | `make format` | Format code with Ruff |
@@ -214,7 +214,7 @@ functions/src/your_function_name/
 
 2. Fill in the `item.yaml` with:
    - `kind`: `job` or `serving`
-   - `categories`: Browse [MLRun hub](https://www.mlrun.org/hub/functions/) for existing categories
+   - `categories`: Browse [MLRun Hub](https://www.mlrun.org/hub/functions/) for existing categories
    - `version`, `description`, and other metadata
 
 3. Generate the function.yaml:
@@ -304,7 +304,8 @@ pytest test_aggregate.py -v
 - Mock external dependencies when necessary
 - Test edge cases and error conditions
 - Ensure tests are reproducible
-- Note: Tests will be run automatically on each change in the CI pipeline
+
+> **Note:** Tests will be run automatically on each change in the CI pipeline
 
 **Example test structure:**
 ```python

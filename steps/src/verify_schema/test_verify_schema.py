@@ -3,7 +3,7 @@ from verify_schema import VerifySchema
 class TestVerifySchema:
     def test_verify_schema(self):
         schema = ["id", "name", "active"]
-        verifier = VerifySchema(name="test_verifier", schema=schema)
+        verifier = VerifySchema(schema=schema, allow_unexpected_keys=False)
 
         # Test with valid event
         event = {
@@ -35,3 +35,17 @@ class TestVerifySchema:
             verifier.do(event_unexpected_key)
         except KeyError as e:
             assert "unexpected keys {'extra'} in event" in str(e)
+
+    def test_verify_schema_allow_unexpected(self):
+        schema = ["id", "name", "active"]
+        verifier = VerifySchema(schema=schema, allow_unexpected_keys=True)
+
+        # Test with valid event and unexpected key
+        event = {
+            "id": 1,
+            "name": "Test Event",
+            "active": True,
+            "extra": "unexpected"
+        }
+        result = verifier.do(event)
+        assert result == event

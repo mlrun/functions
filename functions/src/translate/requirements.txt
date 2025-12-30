@@ -1,0 +1,4 @@
+transformers
+tqdm
+torch>=2.6
+sentencepiece

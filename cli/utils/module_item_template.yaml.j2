@@ -1,0 +1,16 @@
+apiVersion: v1
+categories: []                                      {# List of category names #}
+description: ''                                     {# Short description #}
+example: {{ example|default('') }}                  {# Path to example notebook #}
+generationDate: {{ generationDate|default('') }}    {# Automatically generated ISO8086 datetime #}
+hidden: false                                       {# Hide Module from the UI #}
+labels:
+  author: Iguazio
+mlrunVersion: ''                                    {# Module’s MLRun version requirement, should follow python’s versioning schema #}
+name: {{ name|default('') }}                        {# Module name #}
+spec:
+  filename: {{ filename|default('') }}              {# Implementation file #}
+  image: mlrun/mlrun                                {# Base image name #}
+  kind: ''                                          {# Module kind #}
+  requirements: []                                  {# List of Pythonic library requirements #}
+version: 1.0.0                                      {# Module version, should follow standard semantic versioning schema #}

@@ -1,0 +1,25 @@
+apiVersion: v1
+categories:
+- data-preparation
+- machine-learning
+description: Select features through multiple Statistical and Model filters
+doc: ''
+example: feature_selection.ipynb
+generationDate: 2022-08-28:17-25
+hidden: false
+icon: ''
+labels:
+  author: Iguazio
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.8.0-rc40
+name: feature-selection
+platformVersion: 3.6.0
+spec:
+  filename: feature_selection.py
+  handler: feature_selection
+  image: mlrun/mlrun
+  kind: job
+  requirements: []
+url: ''
+version: 1.6.0

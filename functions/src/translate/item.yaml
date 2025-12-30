@@ -1,0 +1,30 @@
+apiVersion: v1
+categories:
+- genai
+- NLP
+description: Translate text files from one language to another
+doc: ''
+example: translate.ipynb
+generationDate: 2023-12-05:17-20
+hidden: false
+icon: ''
+labels:
+  author: Iguazio
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.10.0-rc41
+name: translate
+platformVersion: 3.5.3
+spec:
+  filename: translate.py
+  handler: translate
+  image: mlrun/mlrun
+  kind: job
+  requirements:
+    - transformers
+    - sentencepiece
+    - torch>=2.6
+    - tqdm
+url: ''
+version: 0.3.0
+test_valid: True

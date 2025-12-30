@@ -1,0 +1,24 @@
+apiVersion: v1
+categories:
+- data-analysis
+description: describe and visualizes dataset stats
+doc: ''
+example: describe.ipynb
+generationDate: 2022-08-28:17-25
+hidden: false
+icon: ''
+labels:
+  author: Iguazio
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.7.0
+name: describe
+platformVersion: 3.5.3
+spec:
+  filename: describe.py
+  handler: analyze
+  image: mlrun/mlrun
+  kind: job
+  requirements: []
+url: ''
+version: 1.4.0

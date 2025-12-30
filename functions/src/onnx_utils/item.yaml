@@ -1,0 +1,42 @@
+apiVersion: v1
+categories:
+- utils
+- deep-learning
+description: ONNX intigration in MLRun, some utils functions for the ONNX framework,
+  optimizing and converting models from different framework to ONNX using MLRun.
+doc: ''
+example: onnx_utils.ipynb
+generationDate: 2022-08-28:17-25
+hidden: false
+icon: ''
+labels:
+  author: Iguazio
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.7.2
+name: onnx_utils
+platformVersion: 3.5.0
+spec:
+  extra_spec:
+    allow_empty_resources: true
+    build:
+      auto_build: true
+      with_mlrun: false
+  filename: onnx_utils.py
+  handler: to_onnx
+  image: mlrun/mlrun
+  kind: job
+  requirements:
+  - tqdm~=4.67.1
+  - tensorflow~=2.19.0
+  - tf_keras~=2.19.0
+  - torch~=2.6.0
+  - torchvision~=0.21.0
+  - onnx~=1.17.0
+  - onnxruntime~=1.19.2
+  - onnxoptimizer~=0.3.13
+  - onnxmltools~=1.13.0
+  - tf2onnx~=1.16.1
+  - plotly~=5.23
+url: ''
+version: 1.3.0

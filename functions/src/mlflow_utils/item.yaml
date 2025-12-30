@@ -1,0 +1,30 @@
+apiVersion: v1
+categories:
+- model-serving
+- utils
+description: Mlflow model server, and additional utils.
+doc: ''
+example: mlflow_utils.ipynb
+generationDate: 2024-05-23:12-00
+hidden: false
+icon: ''
+labels:
+  author: Iguazio
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.8.0
+name: mlflow_utils
+platformVersion: ''
+spec:
+  customFields:
+    default_class: MLFlowModelServer
+  filename: mlflow_utils.py
+  handler: handler
+  image: mlrun/mlrun
+  kind: serving
+  requirements:
+  - mlflow~=2.22
+  - lightgbm
+  - xgboost
+url: ''
+version: 1.1.0

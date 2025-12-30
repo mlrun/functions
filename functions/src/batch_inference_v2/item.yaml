@@ -1,0 +1,30 @@
+apiVersion: v1
+categories:
+- model-serving
+description: Batch inference (also knows as prediction) for the common ML frameworks
+  (SciKit-Learn, XGBoost and LightGBM) while performing data drift analysis.
+doc: ''
+example: batch_inference_v2.ipynb
+generationDate: 2023-08-07:12-25
+hidden: false
+icon: ''
+labels:
+  author: Iguazio
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.7.0-rc51
+name: batch_inference_v2
+platformVersion: 3.6.0
+spec:
+  extra_spec:
+    allow_empty_resources: true
+    build:
+      auto_build: false
+      with_mlrun: false
+  filename: batch_inference_v2.py
+  handler: infer
+  image: mlrun/mlrun
+  kind: job
+  requirements: null
+url: ''
+version: 2.6.0

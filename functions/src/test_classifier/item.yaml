@@ -1,0 +1,26 @@
+apiVersion: v1
+categories:
+- machine-learning
+- model-testing
+description: test a classifier using held-out or new data
+doc: README.md
+example: test_classifier.ipynb
+generationDate: 2022-08-28:17-25
+hidden: true
+icon: ''
+labels:
+  author: Iguazio
+  framework: sklearn
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.1.0
+name: test-classifier
+platformVersion: 3.5.0
+spec:
+  filename: test_classifier.py
+  handler: test_classifier
+  image: mlrun/mlrun
+  kind: job
+  requirements: []
+url: ''
+version: 1.1.0

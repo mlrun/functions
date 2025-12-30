@@ -1,0 +1,21 @@
+apiVersion: v1
+categories:
+- genai
+description: OpenAI application runtime based on fastapi
+example: openai_proxy_app.ipynb
+generationDate: 2025-11-11:12-25
+hidden: false
+labels:
+  author: Iguazio
+mlrunVersion: 1.10.0
+name: openai_proxy_app
+spec:
+    filename: openai_proxy_app.py
+    image: mlrun/mlrun
+    requirements:
+      - fastapi==0.124.0
+      - uvicorn[standard]==0.38.0
+      - gunicorn==23.0.0
+      - requests==2.32.5
+    kind: generic
+version: 1.0.0

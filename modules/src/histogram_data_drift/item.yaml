@@ -1,0 +1,20 @@
+apiVersion: v1
+categories:
+- model-serving
+- structured-ML
+description: Model-monitoring application for detecting and visualizing data drift
+example: histogram_data_drift.ipynb                  
+generationDate: 2025-11-06:12-25
+hidden: false                                       
+labels:
+  author: Iguazio
+mlrunVersion: 1.10.0-rc41
+name: histogram_data_drift                        
+spec:
+  filename: histogram_data_drift.py              
+  image: mlrun/mlrun                                
+  kind: monitoring_application
+  requirements:
+  - plotly~=5.23
+  - pandas
+version: 1.0.0                                      

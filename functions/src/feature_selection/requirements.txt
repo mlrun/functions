@@ -1,0 +1,3 @@
+scikit-learn
+scikit-plot
+plotly~=5.23

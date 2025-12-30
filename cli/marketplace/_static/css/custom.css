@@ -1,0 +1,55 @@
+html:root {
+    --sd-color-primary: #2750ff;
+    --pst-color-primary: var(--sd-color-primary);
+    --pst-color-link-hover: var(--sd-color-primary);
+    --pst-color-secondary: var(--sd-color-primary);
+    --sd-color-secondary: #6c757d;
+    --sd-color-success: #28a745;
+    --sd-color-info: #2750ff;
+    --sd-color-warning: #e3781a;
+    --sd-color-danger: #dc3545;
+    --sd-color-light: #f8f9fa;
+    --sd-color-muted: #6c757d;
+    --sd-color-dark: #212529;
+    --sd-color-primary-highlight: var(--sd-color-primary);
+    --sd-color-secondary-highlight: #5c636a;
+    --sd-color-success-highlight: #228e3b;
+    --sd-color-info-highlight: var(--sd-color-primary);
+    --sd-color-warning-highlight: #cc986b;
+    --sd-color-danger-highlight: #bb2d3b;
+    --sd-color-light-highlight: #d3d4d5;
+    --sd-color-muted-highlight: #5c636a;
+    --sd-color-dark-highlight: #1c1f23;
+    --sd-color-primary-text: #fff;
+    --sd-color-secondary-text: #fff;
+    --sd-color-success-text: #fff;
+    --sd-color-info-text: #fff;
+    --sd-color-warning-text: #fff;
+    --sd-color-danger-text: #fff;
+    --sd-color-light-text: #212529;
+    --sd-color-muted-text: #fff;
+    --sd-color-dark-text: #fff;
+    --pst-color-accent: var(--sd-color-primary);
+    --pst-color-secondary-highlight: var(--sd-color-primary);
+    --pst-color-table-row-hover-bg: #d8dfff;
+    --bs-dropdown-min-width: 8rem;
+}
+
+.bd-sidebar,
+.header-article-items__start,
+.theme-switch-button,
+.search-button,
+.footer-content{
+    display: none !important;
+}
+
+.bd-header-article {
+    position: relative;
+    box-shadow: none !important;
+}
+
+/* Remove max-width from the content */
+.bd-main .bd-content .bd-article-container {
+    max-width: none;
+    width: 100%;
+}

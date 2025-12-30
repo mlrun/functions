@@ -1,0 +1,27 @@
+apiVersion: v1
+categories:
+- data-generation
+- genai
+description: GenAI approach of generating structured data according to a given schema
+doc: ''
+example: structured_data_generator.ipynb
+generationDate: 2023-12-14:10-50
+hidden: false
+icon: ''
+labels:
+  author: Iguazio
+maintainers: []
+marketplaceType: ''
+mlrunVersion: 1.8.0
+name: structured_data_generator
+platformVersion: 3.5.5
+spec:
+  filename: structured_data_generator.py
+  handler: generate_data
+  image: mlrun/mlrun
+  kind: job
+  requirements:
+  - langchain
+  - tqdm
+url: ''
+version: 1.6.0

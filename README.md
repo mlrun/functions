@@ -19,7 +19,7 @@ A centralized repository for open-source MLRun functions, modules, and steps tha
 
 Before you begin, ensure you have the following installed:
 
-- **Python 3.10+** - Required (or let UV manage it for you)
+- **Python 3.11+** - Required (or let UV manage it for you)
 - **UV** - Fast Python package manager (required)
 - **Git** - For version control
 - **Make** (optional) - For convenient command shortcuts

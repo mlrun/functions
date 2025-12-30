@@ -19,7 +19,7 @@ A centralized repository for open-source MLRun functions, modules, and steps tha
 
 Before you begin, ensure you have the following installed:
 
-- **Python 3.10 or 3.11 (recommended) ** - Required
+- **Python 3.10+** - Required (or let UV manage it for you)
 - **UV** - Fast Python package manager (required)
 - **Git** - For version control
 - **Make** (optional) - For convenient command shortcuts
@@ -52,8 +52,8 @@ The project includes a Makefile for convenient command shortcuts:
 |---------|-------------|
 | `make help` | Show all available commands |
 | `make sync` | Sync dependencies from lockfile |
-| `make format` | Format code with black and isort |
-| `make lint` | Run code linters |
+| `make format` | Format code with Ruff |
+| `make lint` | Run code linters with Ruff |
 | `make test FUNC=<name>` | Run tests for a specific function |
 | `make cli ARGS="<args>"` | Run CLI with custom arguments |
 
@@ -183,11 +183,7 @@ We welcome contributions! Follow these steps to contribute:
    - Steps: `steps/src/`
 4. **Follow the asset structure** (see below)
 5. **Test your asset** thoroughly
-6. **Format your code**:
-   ```bash
-   make format
-   ```
-7. **Open a pull request** to the **development** branch
+6. **Open a pull request** to the **development** branch
 
 ### Asset Structure
 
@@ -266,7 +262,7 @@ For model monitoring modules, see the [MLRun model monitoring guidelines](https:
 - [ ] Code is well-documented with docstrings
 - [ ] Demo notebook runs end-to-end without errors
 - [ ] Unit tests cover the functionality
-- [ ] Code is formatted with `black` and `isort`
+- [ ] Code is formatted with Ruff (`make format`)
 - [ ] All tests pass locally
 - [ ] PR targets the **development** branch
 
@@ -315,39 +311,31 @@ def test_error_handling():
 
 ### Python Style Guide
 
-We follow **PEP 8** style guidelines with some modifications:
+We follow **PEP 8** style guidelines with the following configuration:
 
-- **Line length**: 88 characters (Black default)
-- **Imports**: Sorted with isort
+- **Line length**: 120 characters
+- **Imports**: Automatically sorted and organized
 - **Type hints**: Encouraged for function signatures
+- **Formatter**: Ruff is used for formatting and linting
 
 ### Formatting Tools
 
-**Black** - Code formatter:
+**Ruff** - Fast Python formatter and linter:
+
+**Format code automatically:**
 ```bash
 make format
 # or
-uv run black .
+uv run ruff format .
+uv run ruff check --fix .
 ```
 
-**isort** - Import sorter:
-```bash
-uv run isort .
-```
-
-**Run both:**
-```bash
-make format
-```
-
-### Linting
-
-Check code quality without modifying files:
+**Check formatting without changes:**
 ```bash
 make lint
 # or
-uv run black --check .
-uv run isort --check-only .
+uv run ruff format --check .
+uv run ruff check .
 ```
 
 ### Documentation Standards

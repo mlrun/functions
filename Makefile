@@ -9,13 +9,13 @@ help: ## Show this help message
 sync: ## Sync dependencies from lockfile
 	uv sync
 
-format: ## Format code with black and isort
-	uv run black .
-	uv run isort .
+format: ## Format code with ruff
+	uv run ruff format .
+	uv run ruff check --fix .
 
 lint: ## Run linters
-	uv run black --check .
-	uv run isort --check-only .
+	uv run ruff format --check .
+	uv run ruff check .
 
 test: ## Run tests for a specific function
 	@echo "Usage: make test FUNC=aggregate"

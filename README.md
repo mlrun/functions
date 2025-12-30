@@ -54,7 +54,7 @@ The project includes a Makefile for convenient command shortcuts:
 | `make sync` | Sync dependencies from lockfile |
 | `make format` | Format code with Ruff |
 | `make lint` | Run code linters with Ruff |
-| `make test FUNC=<name>` | Run tests for a specific function |
+| `make test NAME=<name> [TYPE=functions]` | Run tests for a specific asset (functions/modules/steps) |
 | `make cli ARGS="<args>"` | Run CLI with custom arguments |
 
 ### Examples
@@ -66,8 +66,14 @@ make sync
 # Format code
 make format
 
-# Run tests for aggregate function
-make test FUNC=aggregate
+# Run tests for a function (default type)
+make test NAME=aggregate
+
+# Run tests for a module
+make test NAME=count_events TYPE=modules
+
+# Run tests for a step
+make test NAME=mystep TYPE=steps
 
 # Run CLI command
 make cli ARGS="generate-item-yaml function my_function"
@@ -270,10 +276,18 @@ For model monitoring modules, see the [MLRun model monitoring guidelines](https:
 
 ### Running Tests
 
-**Test a specific function:**
+**Test a specific asset:**
 ```bash
-make test FUNC=aggregate
-# or
+# Test a function (default)
+make test NAME=aggregate
+
+# Test a module
+make test NAME=mymodule TYPE=modules
+
+# Test a step
+make test NAME=mystep TYPE=steps
+
+# Or use the CLI directly
 python -m cli.cli run-tests -r functions/src/aggregate -s py -fn aggregate
 ```
 

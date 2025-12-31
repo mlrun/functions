@@ -1,5 +1,8 @@
+# Modules
 
-
+Modules are reusable building blocks you can import into your MLRun project. 
+They can be generic utility code, but they can also be more specialized - such as a model-monitoring application or a wrapper around an application runtime.
+As public contributions, we ask that all contributors follow the project’s guidelines and conventions (please chip in).
 
 ## Catalog
 

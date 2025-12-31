@@ -117,7 +117,7 @@ jobs:
            ${{ runner.os }}-uv-
      - name: Install requirements
        run: |
-         uv pip install -r requirements.txt
+         uv pip install --system -r requirements.txt
      - name: Print workspace structure
        run: |
          echo "Current directory: $(pwd)"

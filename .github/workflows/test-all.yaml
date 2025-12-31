@@ -105,7 +105,7 @@ jobs:
             ${{ runner.os }}-uv-
       - name: Install requirements
         run: |
-          uv pip install -r requirements.txt
+          uv pip install --system -r requirements.txt
 
       - name: Run py tests
         run: python -m cli.cli run-tests -r ${{ matrix.package }} -s py -fn $(basename "${{ matrix.package }}")
@@ -137,7 +137,7 @@ jobs:
           python -m pip install uv
       - name: Install requirements
         run: |
-          uv pip install -r requirements.txt
+          uv pip install --system -r requirements.txt
       - name: Regenerate README tables
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
@@ -186,7 +186,7 @@ jobs:
           python -m pip install uv
       - name: Install requirements
         run: |
-          uv pip install -r requirements.txt
+          uv pip install --system -r requirements.txt
       - name: Build marketplace docs
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}

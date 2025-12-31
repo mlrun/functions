@@ -48,6 +48,7 @@ jobs:
             | awk -F'/' '
                 /^functions\/src\// {print $1"/"$2"/"$3}
                 /^modules\/src\//  {print $1"/"$2"/"$3}
+                /^steps\/src\//  {print $1"/"$2"/"$3}
               ' \
             | sort -u
           )

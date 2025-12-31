@@ -79,7 +79,12 @@ def _prepare_result_set(
 
 def _get_sample_set_statistics_parameters(
     context: mlrun.MLClientCtx,
-    model_endpoint_sample_set: mlrun.DataItem | list | dict | pd.DataFrame | pd.Series | np.ndarray,
+    model_endpoint_sample_set: mlrun.DataItem
+    | list
+    | dict
+    | pd.DataFrame
+    | pd.Series
+    | np.ndarray,
     model_artifact_feature_stats: dict,
     feature_columns: list | None,
     drop_columns: list | None,
@@ -127,7 +132,12 @@ def infer(
     # perform drift analysis is not disabled
     # a new model endpoint record is going to be generated
     model_endpoint_name: str = "batch-infer",
-    model_endpoint_sample_set: mlrun.DataItem | list | dict | pd.DataFrame | pd.Series | np.ndarray = None,
+    model_endpoint_sample_set: mlrun.DataItem
+    | list
+    | dict
+    | pd.DataFrame
+    | pd.Series
+    | np.ndarray = None,
     # the following parameters are deprecated and will be removed once the versioning mechanism is implemented
     # TODO: Remove the following parameters once FHUB-13 is resolved
     trigger_monitoring_job: bool | None = None,

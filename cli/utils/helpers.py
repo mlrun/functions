@@ -38,9 +38,7 @@ def is_function_dir(path: Path) -> bool:
     return any(f.name == "function.yaml" for f in path.iterdir())
 
 
-def render_jinja(
-    template_path: str | Path, output_path: str | Path, data: dict
-):
+def render_jinja(template_path: str | Path, output_path: str | Path, data: dict):
     with open(template_path) as t:
         template_text = t.read()
 
@@ -51,47 +49,43 @@ def render_jinja(
         out_t.write(rendered)
 
 
-def install_pipenv():
-    print("Installing pipenv...")
-    pipenv_install: subprocess.CompletedProcess = subprocess.run(
-        "export PIP_NO_INPUT=1;pip install pipenv==2023.10.24",
-        stdout=sys.stdout,
+def ensure_uv_available():
+    """Ensure `uv` is available on PATH.
+
+    We don't auto-install it here (CI should install it explicitly).
+    """
+    completed_process: subprocess.CompletedProcess = subprocess.run(
+        ["uv", "--version"],
+        stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        shell=True,
+        shell=False,
     )
-    exit_on_non_zero_return(pipenv_install)
+    exit_on_non_zero_return(completed_process)
+
+
+def _uv_python_path(directory: str | Path) -> str:
+    directory = Path(directory)
+    python_bin = directory / ".venv" / "bin" / "python"
+    return str(python_bin)
 
 
 def install_python(directory: str | Path):
-    print(f"Installing python for {directory} ...")
-    install_command = "pipenv --rm;pipenv --python 3.10.17"
-    if (os.environ.get("CONDA_DEFAULT_ENV") is not None) and (
-        os.environ.get("CONDA_PREFIX") is not None
-    ):
-        print("conda env detected using conda to get pipenv python version")
-        install_command = (
-            "pipenv --rm;pipenv --python=$(conda run which python) --site-packages"
-        )
-    python_install: subprocess.CompletedProcess = subprocess.run(
-        install_command,
-        stdout=sys.stdout,
-        stderr=subprocess.PIPE,
-        cwd=directory,
-        shell=True,
-    )
+    """Create (or reuse) an isolated uv venv under `<directory>/.venv`.
 
-    exit_on_non_zero_return(python_install)
+    Returns the venv python path.
+    """
+    directory = Path(directory)
+    print(f"Ensuring uv venv for {directory} ...")
 
-    stderr = python_install.stderr.decode("utf8")
-    stderr = stderr.split("\n")
-    python_location = [l for l in stderr if "Virtualenv location: " in l]
-    if python_location.count(python_location) > 0:
-        python_location = (
-            python_location[0].split("Virtualenv location: ")[-1] + "bin/python"
-        )
-    else:
-        python_location = None
-    return python_location
+    python_version = os.environ.get("MLRUN_HUB_PYTHON_VERSION", "3.11")
+
+    # Create venv if missing
+    venv_dir = directory / ".venv"
+    if not venv_dir.exists():
+        cmd = ["uv", "venv", str(venv_dir), "--python", python_version]
+        _run_subprocess(cmd, directory)
+
+    return _uv_python_path(directory)
 
 
 def _run_subprocess(cmd: list[str], directory):
@@ -116,13 +110,24 @@ def install_requirements(
     """
     requirements_file = Path(directory) / "requirements.txt"
 
+    # Ensure venv exists
+    venv_python = install_python(directory)
+
     if not requirements and not requirements_file.exists():
         print(f"No requirements found for {directory}...")
         return
 
     if requirements_file.exists():
         print(f"Installing requirements from {requirements_file}...")
-        cmd = ["pipenv", "install", "--skip-lock", "-r", str(requirements_file)]
+        cmd = [
+            "uv",
+            "pip",
+            "install",
+            "--python",
+            venv_python,
+            "-r",
+            str(requirements_file),
+        ]
         _run_subprocess(cmd, directory)
         with open(requirements_file) as f:
             mlrun_version = [l.replace("\n", "") for l in f.readlines() if "mlrun" in l]
@@ -132,7 +137,7 @@ def install_requirements(
 
     if requirements:
         print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
-        cmd = ["pipenv", "install", "--skip-lock", *requirements]
+        cmd = ["uv", "pip", "install", "--python", venv_python, *requirements]
         _run_subprocess(cmd, directory)
 
 

@@ -348,7 +348,9 @@ class HistogramDataDriftApplication(ModelMonitoringApplicationBase):
     def do_tracking(
         self, monitoring_context: mm_context.MonitoringApplicationContext
     ) -> list[
-        mm_results.ModelMonitoringApplicationResult | mm_results.ModelMonitoringApplicationMetric | mm_results._ModelMonitoringApplicationStats
+        mm_results.ModelMonitoringApplicationResult
+        | mm_results.ModelMonitoringApplicationMetric
+        | mm_results._ModelMonitoringApplicationStats
     ]:
         """
         Calculate and return the data drift metrics, averaged over the features.

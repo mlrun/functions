@@ -19,7 +19,6 @@ import warnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
-
 import pandas as pd
 from cloudpickle import dumps
 from mlrun.datastore import DataItem

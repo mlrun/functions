@@ -378,9 +378,7 @@ def update_or_create_item(
     target_version = marketplace_item / source_version
 
     if target_version.exists() and not force_update:
-        latest_item_yaml = yaml.full_load(
-            open(target_latest / "src" / "item.yaml")
-        )
+        latest_item_yaml = yaml.full_load(open(target_latest / "src" / "item.yaml"))
         if item_yaml["hidden"] == latest_item_yaml.get("hidden"):
             click.echo("Source version already exists in target directory!")
             return
@@ -634,9 +632,7 @@ def collect_values_from_items(
     return tags
 
 
-def sphinx_quickstart(
-    temp_root: str | Path, requirements: list[str] | None = None
-):
+def sphinx_quickstart(temp_root: str | Path, requirements: list[str] | None = None):
     """
     Generate required files for a Sphinx project. sphinx-quickstart is an
     interactive tool that asks some questions about your project and then

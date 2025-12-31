@@ -177,9 +177,7 @@ def describe(df, bins, corr_reject, config, **kwargs):
             stats_df[pretty_name(x)] = (
                 df.select(column)
                 .na.drop()
-                .selectExpr(
-                    f"percentile(`{column}`,CAST({x} AS DOUBLE))"
-                )
+                .selectExpr(f"percentile(`{column}`,CAST({x} AS DOUBLE))")
                 .toPandas()
                 .iloc[:, 0]
             )
@@ -222,9 +220,7 @@ def describe(df, bins, corr_reject, config, **kwargs):
             stats_df[pretty_name(x)] = (
                 df.select(column)
                 .na.drop()
-                .selectExpr(
-                    f"percentile_approx(`{column}`,CAST({x} AS DOUBLE))"
-                )
+                .selectExpr(f"percentile_approx(`{column}`,CAST({x} AS DOUBLE))")
                 .toPandas()
                 .iloc[:, 0]
             )
@@ -484,7 +480,6 @@ def describe(df, bins, corr_reject, config, **kwargs):
     return table_stats, variable_stats.T, freq_dict
 
 
-
 SKEWNESS_CUTOFF = 20
 DEFAULT_FLOAT_FORMATTER = "spark_df_profiling.__default_float_formatter"
 
@@ -535,9 +530,7 @@ value_formatters = {
     "p_zeros": fmt_percent,
     "memorysize": fmt_bytesize,
     "total_missing": fmt_percent,
-    DEFAULT_FLOAT_FORMATTER: lambda v: str(float(f"{v:.5g}"))
-    .rstrip("0")
-    .rstrip("."),
+    DEFAULT_FLOAT_FORMATTER: lambda v: str(float(f"{v:.5g}")).rstrip("0").rstrip("."),
     "correlation_var": lambda v: fmt_varname(v),
     "unparsed_json_types": lambda v: ", ".join([s.__name__ for s in v]),
 }

@@ -24,8 +24,8 @@ import click
 import yaml
 
 from cli.utils.helpers import (
+    ensure_uv_available,
     get_item_yaml_values,
-    install_pipenv,
     install_python,
     install_requirements,
     is_item_dir,
@@ -107,21 +107,15 @@ class TestResult:
     meta_data: dict = field(default_factory=dict)
 
     @classmethod
-    def passed(
-        cls, status_code: int | None = None, meta_data: dict | None = None
-    ):
+    def passed(cls, status_code: int | None = None, meta_data: dict | None = None):
         return cls(status="Passed", status_code=status_code, meta_data=meta_data)
 
     @classmethod
-    def failed(
-        cls, status_code: int | None = None, meta_data: dict | None = None
-    ):
+    def failed(cls, status_code: int | None = None, meta_data: dict | None = None):
         return cls(status="Failed", status_code=status_code, meta_data=meta_data)
 
     @classmethod
-    def ignored(
-        cls, status_code: int | None = None, meta_data: dict | None = None
-    ):
+    def ignored(cls, status_code: int | None = None, meta_data: dict | None = None):
         return cls(status="Ignored", status_code=status_code, meta_data=meta_data)
 
 
@@ -172,9 +166,7 @@ class TestSuite(ABC):
         for path in discovered_functions:
             if re.match(".+/test_*", path):
                 discovered_functions.remove(path)
-                print(
-                    f"a function name cannot start with test, please rename {path} "
-                )
+                print(f"a function name cannot start with test, please rename {path} ")
 
         self.before_run()
 
@@ -235,7 +227,7 @@ class TestPY(TestSuite):
         return testable
 
     def before_run(self):
-        install_pipenv()
+        ensure_uv_available()
 
     def before_each(self, path: str | Path):
         pass
@@ -254,11 +246,15 @@ class TestPY(TestSuite):
         )
         click.echo(f"Running tests for {path}...")
         completed_process: CompletedProcess = subprocess.run(
-            f"cd {path} ; pipenv run python -m pytest",
+            f"cd {path} ; python -m pytest",
             stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
             shell=True,
+            env={
+                **os.environ,
+                "PATH": f"{Path(path) / '.venv' / 'bin'}:{os.environ.get('PATH', '')}",
+            },
         )
 
         meta_data = {"completed_process": completed_process, "test_path": path}
@@ -376,7 +372,7 @@ class TestIPYNB(TestSuite):
         return testables
 
     def before_run(self):
-        install_pipenv()
+        ensure_uv_available()
 
     def before_each(self, path: str | Path):
         pass
@@ -393,13 +389,17 @@ class TestIPYNB(TestSuite):
         click.echo(f"Running tests for {path}...")
         running_ipynb = Path(path).name + ".ipynb"
         click.echo(f"Running notebook {running_ipynb}")
-        command = f"pipenv run papermill {running_ipynb} out.ipynb --log-output"
+        command = f"papermill {running_ipynb} out.ipynb --log-output"
         completed_process: CompletedProcess = subprocess.run(
             f"cd {path} ;echo {command} ; {command}",
             stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
             shell=True,
+            env={
+                **os.environ,
+                "PATH": f"{Path(path) / '.venv' / 'bin'}:{os.environ.get('PATH', '')}",
+            },
         )
 
         meta_data = {"completed_process": completed_process, "test_path": path}
@@ -600,13 +600,13 @@ class TestItemYamls(TestSuite):
 
 
 def clean_pipenv(directory: str):
-    pip_file = Path(directory) / "Pipfile"
-    pip_lock = Path(directory) / "Pipfile.lock"
+    """Legacy name: cleanup the per-asset uv environment."""
+    directory = Path(directory)
+    venv_dir = directory / ".venv"
+    if venv_dir.exists():
+        import shutil
 
-    if pip_file.exists():
-        pip_file.unlink()
-    if pip_lock.exists():
-        pip_lock.unlink()
+        shutil.rmtree(venv_dir, ignore_errors=True)
 
 
 # load item yaml

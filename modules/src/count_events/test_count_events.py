@@ -14,15 +14,15 @@
 #
 
 
-from mlrun.model_monitoring.applications import ModelMonitoringApplicationMetric
-import mlrun.model_monitoring.applications.context as mm_context
-
-from count_events import CountApp
-
-from unittest.mock import Mock
 from datetime import datetime
+from unittest.mock import Mock
+
+import mlrun.model_monitoring.applications.context as mm_context
 import pandas as pd
 import pytest
+from count_events import CountApp
+from mlrun.model_monitoring.applications import ModelMonitoringApplicationMetric
+
 
 class TestCountApp:
     """Test suite for CountApp class."""
@@ -30,6 +30,7 @@ class TestCountApp:
     def setup_method(self):
         """Set up test fixtures before each test method."""
         self.count_app = CountApp()
+
     @staticmethod
     def _create_mock_monitoring_context(sample_df, model_endpoint_name="test-model"):
         """Helper method to create a mock monitoring context."""
@@ -53,7 +54,6 @@ class TestCountApp:
 
         return mock_context
 
-
     @pytest.mark.parametrize("df_size", [0, 1, 10, 100, 1000])
     def test_do_tracking_with_various_dataframe_sizes(self, df_size):
         """Test do_tracking with various dataframe sizes using parametrized test."""
@@ -72,4 +72,3 @@ class TestCountApp:
         assert isinstance(result, ModelMonitoringApplicationMetric)
         assert result.value == df_size
         assert result.name == "count"
-

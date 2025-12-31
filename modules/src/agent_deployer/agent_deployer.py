@@ -12,18 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 import os
 
 import mlrun.errors
-from mlrun import get_current_project, code_to_function, mlconf
-from mlrun.runtimes import ServingRuntime
-from mlrun.serving import ModelRunnerStep
+from mlrun import code_to_function, get_current_project, mlconf
 from mlrun.datastore.datastore_profile import (
-    DatastoreProfileV3io,
     DatastoreProfileKafkaStream,
     DatastoreProfileTDEngine,
+    DatastoreProfileV3io,
 )
+from mlrun.runtimes import ServingRuntime
+from mlrun.serving import ModelRunnerStep
 from mlrun.utils import logger
 
 
@@ -33,10 +32,10 @@ class AgentDeployer:
         agent_name: str,
         model_class_name: str,
         function: str,
-        result_path: Optional[str] = None,
-        inputs_path: Optional[str] = None,
-        outputs: Optional[list[str]] = None,
-        requirements: Optional[list[str]] = None,
+        result_path: str | None = None,
+        inputs_path: str | None = None,
+        outputs: list[str] | None = None,
+        requirements: list[str] | None = None,
         image: str = "mlrun/mlrun",
         set_model_monitoring: bool = False,
         **model_params,

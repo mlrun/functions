@@ -15,11 +15,9 @@
 
 from abc import ABC
 from importlib import import_module
-from typing import List
-
-from transformers import pipeline
 
 import mlrun.serving
+from transformers import pipeline
 
 PACKAGE_MODULE = "transformers"
 SERIALIZABLE_TYPES = [dict, list, tuple, str, int, float]
@@ -100,7 +98,7 @@ class HuggingFaceModelServer(mlrun.serving.V2ModelServer, ABC):
             framework=self.framework,
         )
 
-    def predict(self, body: dict) -> List:
+    def predict(self, body: dict) -> list:
         """Generate model predictions from sample."""
         if self.pipe is None:
             raise ValueError("Please use `.load()`")

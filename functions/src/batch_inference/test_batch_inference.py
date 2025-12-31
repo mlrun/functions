@@ -86,7 +86,6 @@ def train(training_set: pd.DataFrame):
     reason="Project's environment variables are not set",
 )
 def test_batch_predict():
-
     project = mlrun.get_or_create_project(
         "batch-infer-v9-test", context="./", user_project=True
     )
@@ -132,7 +131,7 @@ def test_batch_predict():
 
     # Check the features drift results json:
     drift_results_file = batch_predict_run.artifact("features_drift_results").local()
-    with open(drift_results_file, "r") as json_file:
+    with open(drift_results_file) as json_file:
         drift_results = json.load(json_file)
     assert len(drift_results) == n_features + 1
 

@@ -2,7 +2,6 @@ import logging
 from abc import ABCMeta, abstractmethod
 from multiprocessing import Process, Queue
 from pathlib import Path
-from typing import List, Tuple, Type, Union
 
 import librosa
 import numpy as np
@@ -33,6 +32,7 @@ class ReduceNoiseBase(metaclass=ABCMeta):
 
     After implementing the above methods, you can use the reduce_noise method to reduce noise from audio files.
     """
+
     def __init__(
         self,
         target_directory: Path,
@@ -43,7 +43,7 @@ class ReduceNoiseBase(metaclass=ABCMeta):
         self.verbose = verbose
         self.silence_threshold = silence_threshold
 
-    def reduce_noise(self, audio_file: Path) -> Tuple[bool, Tuple[str, str]]:
+    def reduce_noise(self, audio_file: Path) -> tuple[bool, tuple[str, str]]:
         """
         Reduce noise from the given audio file.
 
@@ -89,7 +89,7 @@ class ReduceNoiseBase(metaclass=ABCMeta):
             return True, (audio_file.name, str(exception))
 
     @abstractmethod
-    def clean_audio(self, data) -> Union[np.ndarray, torch.Tensor]:
+    def clean_audio(self, data) -> np.ndarray | torch.Tensor:
         """
         Clean the audio from noise. Here you should implement the noise reduction algorithm.
 
@@ -110,7 +110,7 @@ class ReduceNoiseBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def load_audio(self, file: str) -> Tuple[Union[np.ndarray, torch.Tensor], int]:
+    def load_audio(self, file: str) -> tuple[np.ndarray | torch.Tensor, int]:
         """
         Load the audio from a file.
 
@@ -288,7 +288,7 @@ class DFN(ReduceNoiseBase):
 
 
 def _multiprocessing_complete_tasks(
-    noise_reduce_type: Type[ReduceNoiseBase],
+    noise_reduce_type: type[ReduceNoiseBase],
     noise_reduce_arguments: dict,
     tasks_queue: Queue,
     results_queue: Queue,
@@ -478,13 +478,13 @@ def _get_audio_files(audio_source: str):
 
 
 def _parallel_run(
-    noise_reduce_type: Type[ReduceNoiseBase],
+    noise_reduce_type: type[ReduceNoiseBase],
     noise_reduce_arguments: dict,
     n_workers: int,
-    audio_files: List[Path],
+    audio_files: list[Path],
     description: str,
     verbose: bool,
-) -> List[Tuple[bool, Tuple[str, str]]]:
+) -> list[tuple[bool, tuple[str, str]]]:
     """
     Run multiple noise reduce workers with multiprocessing to complete the tasks that will be created on the provided
     files using the given task creator.
@@ -547,7 +547,7 @@ def _parallel_run(
     ) as progressbar:
         while True:
             # Get a result from the queue:
-            result: Tuple[bool, Tuple[str, str]] = results_queue.get()
+            result: tuple[bool, tuple[str, str]] = results_queue.get()
             if result == _MULTIPROCESSING_STOP_MARK:
                 stop_marks_counter += 1
                 if stop_marks_counter == n_workers:
@@ -565,12 +565,12 @@ def _parallel_run(
 
 
 def _run(
-    noise_reduce_type: Type[ReduceNoiseBase],
+    noise_reduce_type: type[ReduceNoiseBase],
     noise_reduce_arguments: dict,
-    audio_files: List[Path],
+    audio_files: list[Path],
     description: str,
     verbose: bool,
-) -> List[Tuple[bool, Tuple[str, str]]]:
+) -> list[tuple[bool, tuple[str, str]]]:
     """
     Run the noise reduce algorithm on the given audio files and collect the results.
 
@@ -600,8 +600,8 @@ def _run(
 
 
 def _process_results(
-    results: List[Tuple[bool, Tuple[str, str]]], verbose: bool
-) -> Tuple[dict, dict]:
+    results: list[tuple[bool, tuple[str, str]]], verbose: bool
+) -> tuple[dict, dict]:
     """
     Process the results of the tasks.
 

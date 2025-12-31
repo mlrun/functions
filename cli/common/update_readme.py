@@ -14,8 +14,8 @@
 
 
 import sys
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, List, Tuple
 
 import click
 import yaml
@@ -28,6 +28,7 @@ ASSET_COLUMNS = {
     "steps": ("Name", "Description", "Class Name", "Categories"),
 }
 
+
 @click.command("update-readme")
 @click.option("-c", "--channel", default="master", help="Name of build channel")
 @click.option(
@@ -35,12 +36,14 @@ ASSET_COLUMNS = {
     multiple=True,
     required=True,
     help="Asset types to process (e.g: functions). "
-         "Pass multiple: --asset functions --asset modules",
+    "Pass multiple: --asset functions --asset modules",
 )
-@click.option("--check", is_flag=True,
-              help="Do not write; exit non‑zero if README(s) would change.")
-def update_readme(channel: str, asset: Iterable[str],
-                      check: bool) -> None:
+@click.option(
+    "--check",
+    is_flag=True,
+    help="Do not write; exit non‑zero if README(s) would change.",
+)
+def update_readme(channel: str, asset: Iterable[str], check: bool) -> None:
     """
     Regenerate the README tables for asset types from their item.yaml files.
     """
@@ -102,7 +105,11 @@ def _rows_for_asset_type(channel: str, asset_dir: Path, columns) -> list:
         kind = (data.get("spec", {}).get("kind", "")).strip()
         class_name = (data.get("className", "")).strip()
         cats = data.get("categories") or []
-        cats_str = ", ".join(c.strip() for c in cats) if isinstance(cats, list) else str(cats).strip()
+        cats_str = (
+            ", ".join(c.strip() for c in cats)
+            if isinstance(cats, list)
+            else str(cats).strip()
+        )
         # Link the name to its source directory
         # Construct the relative path from the repo root for the asset
         rel_path = asset_dir.relative_to(Path(".").resolve())
@@ -135,7 +142,11 @@ def _build_table_md(rows, columns) -> str:
         "| " + " | ".join("---" for _ in columns) + " |",
     ]
     for r in rows:
-        lines.append("| " + " | ".join((cell or "").replace("\n", " ").strip() for cell in r) + " |")
+        lines.append(
+            "| "
+            + " | ".join((cell or "").replace("\n", " ").strip() for cell in r)
+            + " |"
+        )
     return "\n".join(lines)
 
 

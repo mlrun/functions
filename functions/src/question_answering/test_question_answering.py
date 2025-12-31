@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import tempfile
+
 import mlrun
 import transformers
-import tempfile
 
 APPLE_COLOR = "red"
 
@@ -36,18 +37,15 @@ def test_question_answering(monkeypatch):
     input_path = "./data"
     artifact_path = tempfile.mkdtemp()
     project = mlrun.new_project("qa", context="./")
-    fn = project.set_function("question_answering.py", "answer_questions", kind="job", image="mlrun/mlrun")
+    fn = project.set_function(
+        "question_answering.py", "answer_questions", kind="job", image="mlrun/mlrun"
+    )
     qa_run = fn.run(
         handler="answer_questions",
         params={
             "model_name": "distilgpt2",
             "data_path": input_path,
-            "text_wrapper": (
-                "Given the following sentence:\n"
-                "-----\n"
-                "{}\n"
-                "-----"
-            ),
+            "text_wrapper": ("Given the following sentence:\n-----\n{}\n-----"),
             "questions": [
                 "What is the color of the apple?",
             ],
@@ -67,7 +65,7 @@ def test_question_answering(monkeypatch):
             "question_answering_errors: result",
         ],
         local=True,
-        artifact_path=artifact_path
+        artifact_path=artifact_path,
     )
     qa_df = mlrun.get_dataitem(
         qa_run.status.artifacts[0]["spec"]["target_path"]

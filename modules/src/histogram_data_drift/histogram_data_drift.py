@@ -13,16 +13,14 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Final, Optional, Protocol, Union, cast
-
-import numpy as np
-from pandas import DataFrame, Series
+from typing import Final, Protocol, cast
 
 import mlrun.artifacts
 import mlrun.common.model_monitoring.helpers
 import mlrun.model_monitoring.applications.context as mm_context
 import mlrun.model_monitoring.applications.results as mm_results
 import mlrun.model_monitoring.features_drift_table as mm_drift_table
+import numpy as np
 from mlrun.common.schemas.model_monitoring.constants import (
     ResultKindApp,
     ResultStatusApp,
@@ -37,6 +35,7 @@ from mlrun.model_monitoring.metrics.histogram_distance import (
     KullbackLeiblerDivergence,
     TotalVarianceDistance,
 )
+from pandas import DataFrame, Series
 
 
 class InvalidMetricValueError(ValueError):
@@ -134,7 +133,7 @@ class HistogramDataDriftApplication(ModelMonitoringApplicationBase):
 
     def __init__(
         self,
-        value_classifier: Optional[ValueClassifier] = None,
+        value_classifier: ValueClassifier | None = None,
         produce_json_artifact: bool = False,
         produce_plotly_artifact: bool = False,
     ) -> None:
@@ -145,9 +144,9 @@ class HistogramDataDriftApplication(ModelMonitoringApplicationBase):
         :param produce_plotly_artifact: Whether to produce the Plotly artifact or not, ``False`` by default.
         """
         self._value_classifier = value_classifier or DataDriftClassifier()
-        assert self._REQUIRED_METRICS <= set(
-            self.metrics
-        ), "TVD and Hellinger distance are required for the general data drift result"
+        assert self._REQUIRED_METRICS <= set(self.metrics), (
+            "TVD and Hellinger distance are required for the general data drift result"
+        )
 
         self._produce_json_artifact = produce_json_artifact
         self._produce_plotly_artifact = produce_plotly_artifact
@@ -349,11 +348,7 @@ class HistogramDataDriftApplication(ModelMonitoringApplicationBase):
     def do_tracking(
         self, monitoring_context: mm_context.MonitoringApplicationContext
     ) -> list[
-        Union[
-            mm_results.ModelMonitoringApplicationResult,
-            mm_results.ModelMonitoringApplicationMetric,
-            mm_results._ModelMonitoringApplicationStats,
-        ]
+        mm_results.ModelMonitoringApplicationResult | mm_results.ModelMonitoringApplicationMetric | mm_results._ModelMonitoringApplicationStats
     ]:
         """
         Calculate and return the data drift metrics, averaged over the features.

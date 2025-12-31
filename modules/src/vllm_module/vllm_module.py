@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#This module acts as a lightweight gateway to OpenAI-compatible APIs.
-#You can send chat prompts, create embeddings, or get model responses without worrying about authentication or endpoint differences. 
-#It simplifies access so you can test, analyze, or integrate AI features directly into your projects or notebooks with minimal setup.
+# This module acts as a lightweight gateway to OpenAI-compatible APIs.
+# You can send chat prompts, create embeddings, or get model responses without worrying about authentication or endpoint differences.
+# It simplifies access so you can test, analyze, or integrate AI features directly into your projects or notebooks with minimal setup.
 
 
-from typing import Dict, Optional, List
+
 
 class VLLMModule:
     """
     VLLMModule
-    
+
     This module provides a lightweight wrapper for deploying a vLLM
     (OpenAI-compatible) large language model server as an MLRun application runtime.
-    
+
     The VLLMModule is responsible for:
     - Creating an MLRun application runtime based on a vLLM container image
     - Configuring GPU resources, memory limits, and Kubernetes node selection
@@ -34,35 +34,33 @@ class VLLMModule:
     - Automatically configuring shared memory (/dev/shm) when using multiple GPUs
     - Exposing an OpenAI-compatible API (e.g. /v1/chat/completions) for inference
     - Providing a simple Python interface for deployment and invocation from Jupyter notebooks
-    
+
     The module is designed to be used in Jupyter notebooks and MLRun pipelines,
     allowing users to deploy and test large language models on Kubernetes
     with minimal configuration.
     """
 
     def __init__(
-            self,
-            project: str,
-            *,
-            node_selector: Optional[Dict[str, str]] = None,
-            name: str = "vllm",
-            image: str = "vllm/vllm-openai:latest",
-            model: str = "Qwen/Qwen2.5-Omni-3B",
-            gpus: int = 1,
-            mem: str = "10G",
-            port: int = 8000,
-            dtype: str = "auto",
-            uvicorn_log_level: str = "info",
-            max_tokens: int = 500,
+        self,
+        project: str,
+        *,
+        node_selector: dict[str, str] | None = None,
+        name: str = "vllm",
+        image: str = "vllm/vllm-openai:latest",
+        model: str = "Qwen/Qwen2.5-Omni-3B",
+        gpus: int = 1,
+        mem: str = "10G",
+        port: int = 8000,
+        dtype: str = "auto",
+        uvicorn_log_level: str = "info",
+        max_tokens: int = 500,
     ):
         if gpus < 1:
             raise ValueError("gpus must be >= 1")
 
-        
-        
         if node_selector is None:
             node_selector = {"alpha.eksctl.io/nodegroup-name": "added-gpu"}
-        
+
         if not isinstance(max_tokens, int):
             raise TypeError("max_tokens must be an integer")
 
@@ -94,7 +92,7 @@ class VLLMModule:
 
         self.vllm_app.set_internal_application_port(self.port)
 
-        args: List[str] = [
+        args: list[str] = [
             "serve",
             self.model,
             "--dtype",
@@ -110,10 +108,12 @@ class VLLMModule:
             args += ["--tensor-parallel-size", str(gpus)]
 
             # For more than one GPU you should create a share volume for the multiple GPUs
-            self.vllm_app.spec.volumes = [{"name": "dshm", "emptyDir": {"medium": "Memory"}}]
-            self.vllm_app.spec.volume_mounts = [{"name": "dshm", "mountPath": "/dev/shm"}]
-
-    
+            self.vllm_app.spec.volumes = [
+                {"name": "dshm", "emptyDir": {"medium": "Memory"}}
+            ]
+            self.vllm_app.spec.volume_mounts = [
+                {"name": "dshm", "mountPath": "/dev/shm"}
+            ]
 
         self.vllm_app.spec.command = "vllm"
         self.vllm_app.spec.args = args
@@ -124,8 +124,9 @@ class VLLMModule:
     def get_runtime(self):
         return self.vllm_app
 
-    def add_args(self, extra_args: List[str]):
-        if not isinstance(extra_args, list) or not all(isinstance(x, str) for x in extra_args):
+    def add_args(self, extra_args: list[str]):
+        if not isinstance(extra_args, list) or not all(
+            isinstance(x, str) for x in extra_args
+        ):
             raise ValueError("extra_args must be a list of strings")
         self.vllm_app.spec.args += extra_args
-

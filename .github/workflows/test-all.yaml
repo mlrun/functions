@@ -105,8 +105,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: Install requirements
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          uv pip install -r requirements.txt
 
       - name: Run py tests
         run: python -m cli.cli run-tests -r ${{ matrix.package }} -s py -fn $(basename "${{ matrix.package }}")
@@ -138,8 +137,7 @@ jobs:
           python -m pip install uv
       - name: Install requirements
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          uv pip install -r requirements.txt
       - name: Regenerate README tables
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
@@ -188,8 +186,7 @@ jobs:
           python -m pip install uv
       - name: Install requirements
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          uv pip install -r requirements.txt
       - name: Build marketplace docs
         env:
           CHANNEL: ${{ steps.branch.outputs.branch }}
@@ -262,3 +259,4 @@ jobs:
           git push -f $REMOTE $BRANCH_NAME
           echo "Submiting pull request..."
           gh pr create --title "Marketplace update from $BRANCH_NAME" --body "github-workflow" --base $BASE_BRANCH --head $BRANCH_NAME --repo $BASE_REPO/$REPO_PATH
+

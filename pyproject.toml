@@ -1,0 +1,63 @@
+[project]
+name = "mlrun-hub"
+version = "0.1.0"
+description = "MLRun Hub - centralized location for open source contributions of mlrun hub components"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [
+    { name = "MLRun Team" }
+]
+keywords = ["mlrun", "marketplace"]
+
+dependencies = [
+    "wheel",
+    "bs4",
+    "mlrun>=1.10.0",
+    "jinja2~=3.1.2",
+    "click>=8.0",
+    "myst_nb",
+    "ruff>=0.8.0",
+    "black>=24.3.0",
+    "sphinx~=8.1.0",
+    "sphinx-book-theme~=1.1.3",
+    "sphinx-togglebutton==0.3.2",
+    "sphinxcontrib-applehelp==1.0.8",
+    "sphinxcontrib-devhelp==1.0.6",
+    "sphinxcontrib-htmlhelp==2.0.6",
+    "sphinxcontrib-serializinghtml==1.1.10",
+    "sphinxcontrib-qthelp==1.0.7",
+]
+
+[project.scripts]
+mlrun-functions = "cli.cli:cli"
+
+[tool.ruff]
+target-version = "py311"
+required-version = ">=0.8.0"
+
+[tool.ruff.lint]
+extend-select = [
+    "F",   # pyflakes
+    "W",   # pycodestyle
+    "E",   # pycodestyle
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "CPY", # flake8-copyright
+    "B006", # mutable default arguments
+    "RUF013",  # forbid implicit `Optional` type hints
+]
+
+
+[tool.ruff.lint.isort]
+known-first-party = ["cli"]
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 120
+
+[tool.ruff.lint.flake8-copyright]
+author = "MLRun Team"
+
+[tool.ruff.format]
+docstring-code-format = true

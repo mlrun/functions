@@ -2,8 +2,8 @@
 
 Custom steps are individual execution units that are executed as part of a graph. 
 Each step has its own execution context and can run with different settings.
-
-To learn how to build and use custom steps, see: https://docs.mlrun.org/en/stable/serving/writing-custom-steps.html
+To learn how to build and use custom steps, see: [writing-custom-steps](https://docs.mlrun.org/en/stable/serving/writing-custom-steps.html)
+As public contributions, we ask that all contributors follow the project’s guidelines and conventions (please chip in).
 
 ## Catalog
 

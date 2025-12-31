@@ -164,6 +164,10 @@ def create_function_yaml(
         labels=item_yaml.get("labels", {}),
         with_doc=True,
     )
+
+    # Store only the file name in the function spec for portability.
+    function_object.spec.filename = Path(filename).name
+
     function_object.metadata.project = ""
     # remove build info from object
     function_object.spec.build.code_origin = ""

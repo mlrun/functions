@@ -129,11 +129,10 @@ def install_requirements(
             str(requirements_file),
         ]
         _run_subprocess(cmd, directory)
-        with open(requirements_file) as f:
-            mlrun_version = [l.replace("\n", "") for l in f.readlines() if "mlrun" in l]
-            # remove mlrun from requirements if installed with version limits:
-            if mlrun_version and any([c in mlrun_version[0] for c in "<>=~"]):
-                requirements = [r for r in requirements if "mlrun" not in r]
+
+        # NOTE: Do not modify the explicitly provided `requirements` list based on
+        # the contents of requirements.txt. The CI TestSuite injects the desired
+        # mlrun version from item.yaml (mlrunVersion), and we must always install it.
 
     if requirements:
         print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")

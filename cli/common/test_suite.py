@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import os
 import re
 import subprocess
 import sys
@@ -235,7 +234,7 @@ class TestPY(TestSuite):
 
     def run(self, path: str | Path):
         print(f"PY run path {path}")
-        install_python(path)
+        venv_python = install_python(path)
         item_requirements = list(
             get_item_yaml_values(path, "requirements")["requirements"]
         )
@@ -246,16 +245,13 @@ class TestPY(TestSuite):
             path, ["pytest", f"mlrun=={mlrun_version}"] + item_requirements
         )
         click.echo(f"Running tests for {path}...")
+
         completed_process: CompletedProcess = subprocess.run(
-            f"cd {path} ; python -m pytest",
+            [venv_python, "-m", "pytest"],
             stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
-            shell=True,
-            env={
-                **os.environ,
-                "PATH": f"{Path(path) / '.venv' / 'bin'}:{os.environ.get('PATH', '')}",
-            },
+            shell=False,
         )
 
         meta_data = {"completed_process": completed_process, "test_path": path}
@@ -381,7 +377,7 @@ class TestIPYNB(TestSuite):
     #    def run(self, path: Union[str, Path]) -> TestResult:
     def run(self, path: str | Path) -> TestResult:
         print(f"IPYNB run path {path}")
-        install_python(path)
+        venv_python = install_python(path)
         item_requirements = list(
             get_item_yaml_values(path, "requirements")["requirements"]
         )
@@ -390,17 +386,20 @@ class TestIPYNB(TestSuite):
         click.echo(f"Running tests for {path}...")
         running_ipynb = Path(path).name + ".ipynb"
         click.echo(f"Running notebook {running_ipynb}")
-        command = f"papermill {running_ipynb} out.ipynb --log-output"
+
         completed_process: CompletedProcess = subprocess.run(
-            f"cd {path} ;echo {command} ; {command}",
+            [
+                venv_python,
+                "-m",
+                "papermill",
+                running_ipynb,
+                "out.ipynb",
+                "--log-output",
+            ],
             stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
-            shell=True,
-            env={
-                **os.environ,
-                "PATH": f"{Path(path) / '.venv' / 'bin'}:{os.environ.get('PATH', '')}",
-            },
+            shell=False,
         )
 
         meta_data = {"completed_process": completed_process, "test_path": path}

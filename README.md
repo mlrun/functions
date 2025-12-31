@@ -150,22 +150,6 @@ python -m cli.cli run-tests -r PATH -s TYPE -fn NAME
 python -m cli.cli run-tests -r functions/src/aggregate -s py -fn aggregate
 ```
 
-#### 5. build-marketplace
-Build and create a PR for the marketplace directory.
-
-**Syntax:**
-```bash
-python -m cli.cli build-marketplace [OPTIONS]
-```
-
-#### 6. update-readme
-Update README files with auto-generated content.
-
-**Syntax:**
-```bash
-python -m cli.cli update-readme [OPTIONS]
-```
-
 ## Contributing
 
 We welcome contributions! Follow these steps to contribute:

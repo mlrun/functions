@@ -15,12 +15,10 @@
 import os
 import shutil
 from pathlib import Path
-from typing import Set
 
-import mlrun
 import pandas as pd
 import pytest
-from mlrun import code_to_function, import_function, new_function
+from mlrun import import_function
 from mlrun.execution import MLClientCtx
 from sklearn.datasets import make_classification, make_regression
 
@@ -29,7 +27,7 @@ PLOTS_PATH = os.path.abspath("./artifacts/task-describe/0")
 ARTIFACTS_PATH = os.path.abspath("./artifacts")
 
 
-def _validate_paths(paths: Set):
+def _validate_paths(paths: set):
     """
     Check if all the expected plot are saved
     """

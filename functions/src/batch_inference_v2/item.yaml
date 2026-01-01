@@ -12,7 +12,7 @@ labels:
   author: Iguazio
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.7.0-rc51
+mlrunVersion: 1.7.0
 name: batch_inference_v2
 platformVersion: 3.6.0
 spec:

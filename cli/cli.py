@@ -14,16 +14,18 @@
 #
 import click
 
+from cli.common.generate_item_yaml import generate_item_yaml
+from cli.common.test_suite import test_suite
+from cli.common.update_readme import update_readme
 from cli.functions.function_to_item import function_to_item_cli
 from cli.functions.item_to_function import item_to_function_cli
 from cli.marketplace.build import build_marketplace_cli
-from cli.common.test_suite import test_suite
-from cli.common.update_readme import update_readme
-from cli.common.generate_item_yaml import generate_item_yaml
+
 
 @click.group()
 def cli():
     pass
+
 
 cli.add_command(generate_item_yaml, name="generate-item-yaml")
 cli.add_command(item_to_function_cli, name="item-to-function")

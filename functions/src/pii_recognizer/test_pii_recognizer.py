@@ -13,16 +13,14 @@
 # limitations under the License.
 #
 
-import os
-import pytest
 import random
-from faker import Faker
+
 import mlrun
+import pytest
+from faker import Faker
 from pii_recognizer import (
-    _process,
     _get_analyzer_engine,
-    _anonymize,
-    _annotate,
+    _process,
     recognize_pii_parallel,
 )
 

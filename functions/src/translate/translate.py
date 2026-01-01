@@ -16,7 +16,7 @@ import logging
 import operator
 import pathlib
 from functools import reduce, wraps
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any
 
 import pandas as pd
 import transformers
@@ -26,7 +26,7 @@ from tqdm import tqdm
 _LOGGER = logging.getLogger()
 
 
-def _check_mlrun_and_open_mpi() -> Tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intracomm"]:
+def _check_mlrun_and_open_mpi() -> tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intracomm"]:
     is_mpi = False
     try:
         import mlrun
@@ -54,7 +54,7 @@ def _check_mlrun_and_open_mpi() -> Tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intrac
 
 
 def open_mpi_handler(
-    worker_inputs: List[str], root_worker_inputs: Dict[str, Any] = None
+    worker_inputs: list[str], root_worker_inputs: dict[str, Any] = None
 ):
     global _LOGGER
 
@@ -133,7 +133,7 @@ def open_mpi_handler(
 
 @open_mpi_handler(worker_inputs=["data_path"], root_worker_inputs={"verbose": True})
 def translate(
-    data_path: Union[str, List[str], pathlib.Path],
+    data_path: str | list[str] | pathlib.Path,
     output_directory: str,
     model_name: str = None,
     source_language: str = None,
@@ -143,7 +143,7 @@ def translate(
     batch_size: int = 1,
     translation_kwargs: dict = None,
     verbose: bool = False,
-) -> Tuple[str, pd.DataFrame, dict]:
+) -> tuple[str, pd.DataFrame, dict]:
     """
     Translate text files using a transformer model from Huggingface's hub according to the source and target languages
     given (or using the directly provided model name). The end result is a directory of translated text files and a
@@ -264,7 +264,7 @@ def translate(
 
 def _get_text_files(
     data_path: pathlib.Path,
-) -> List[pathlib.Path]:
+) -> list[pathlib.Path]:
     # Check if the path is of a directory or a file:
     if data_path.is_dir():
         # Get all files inside the directory:
@@ -287,7 +287,7 @@ def _get_translation_pipeline(
     device: str = None,
     model_kwargs: dict = None,
     batch_size: int = None,
-) -> Tuple[transformers.Pipeline, str]:
+) -> tuple[transformers.Pipeline, str]:
     # Construct the model name - if model name is provided (not None) then we take it, otherwise we check both source
     # and target were provided to construct the model name:
     if model_name is None and (source_language is None or target_language is None):
@@ -335,7 +335,7 @@ def _translate(
     translation_kwargs: dict,
 ) -> str:
     # Read the text from file:
-    with open(text_file, "r") as fp:
+    with open(text_file) as fp:
         text = fp.read()
 
     # Split to paragraphs and each paragraph to sentences:

@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from collections.abc import Callable
 from pathlib import Path
-from typing import Optional, Callable, Union
 
 
 class PathIterator:
@@ -27,8 +27,8 @@ class PathIterator:
 
     def __init__(
         self,
-        root: Union[str, Path],
-        rule: Optional[Callable[[Path], bool]] = None,
+        root: str | Path,
+        rule: Callable[[Path], bool] | None = None,
         recursive: bool = False,
         absolute: bool = True,
         as_path: bool = False,

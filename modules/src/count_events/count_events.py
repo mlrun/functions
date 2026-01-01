@@ -13,21 +13,22 @@
 # limitations under the License.
 #
 
-from mlrun.model_monitoring.applications import (
-    ModelMonitoringApplicationBase, ModelMonitoringApplicationMetric,
-)
 import mlrun.model_monitoring.applications.context as mm_context
+from mlrun.model_monitoring.applications import (
+    ModelMonitoringApplicationBase,
+    ModelMonitoringApplicationMetric,
+)
 
 
 class CountApp(ModelMonitoringApplicationBase):
     """
     Model Monitoring Application that counts the number of events in the given time window.
     """
+
     def do_tracking(
-        self,
-        monitoring_context: mm_context.MonitoringApplicationContext
+        self, monitoring_context: mm_context.MonitoringApplicationContext
     ) -> ModelMonitoringApplicationMetric:
-        """"
+        """ "
         he do_tracking method implementation for the CountApp class.
         It counts the number of events in the sample data-frame and logs the count.
 

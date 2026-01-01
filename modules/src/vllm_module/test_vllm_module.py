@@ -13,8 +13,8 @@
 # limitations under the License.
 #
 
-from vllm_module import VLLMModule
 import mlrun
+from vllm_module import VLLMModule
 
 
 class TestVllmModule:
@@ -30,6 +30,7 @@ class TestVllmModule:
         )
 
     def test_vllm_module(self):
-        assert (
-            type(self.TestVllmModule.vllm_app) == mlrun.runtimes.nuclio.application.application.ApplicationRuntime
+        assert isinstance(
+            self.TestVllmModule.vllm_app,
+            mlrun.runtimes.nuclio.application.application.ApplicationRuntime,
         )

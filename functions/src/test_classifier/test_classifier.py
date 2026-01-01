@@ -18,14 +18,11 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-import os
 import pandas as pd
-
-from mlrun.datastore import DataItem
-from mlrun.artifacts import get_model, update_model
-from mlrun.mlutils.models import eval_model_v2
 from cloudpickle import load
-from urllib.request import urlopen
+from mlrun.artifacts import get_model, update_model
+from mlrun.datastore import DataItem
+from mlrun.mlutils.models import eval_model_v2
 
 
 def test_classifier(
@@ -64,7 +61,7 @@ def test_classifier(
     try:
         model_file, model_obj, _ = get_model(models_path, suffix=".pkl")
         model_obj = load(open(model_file, "rb"))
-    except Exception as a:
+    except Exception:
         raise Exception("model location likely specified")
 
     extra_data = eval_model_v2(context, xtest, ytest.values, model_obj)

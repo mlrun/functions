@@ -13,12 +13,11 @@
 # limitations under the License.
 #
 from pathlib import Path
-from typing import Optional, Union
 
 import click
 import semver
 import yaml
-from black import format_str, FileMode
+from black import FileMode, format_str
 from mlrun import code_to_function
 from yaml import full_load
 
@@ -55,17 +54,21 @@ from cli.utils.path_iterator import PathIterator
     help="If -b/--bump_version is enabled, increase the minor version in the item.yaml file",
 )
 def item_to_function_cli(
-        item_path: str, output_path: Optional[str], code_output: bool, format_code: bool, bump_version: bool
+    item_path: str,
+    output_path: str | None,
+    code_output: bool,
+    format_code: bool,
+    bump_version: bool,
 ):
     item_to_function(item_path, output_path, code_output, format_code, bump_version)
 
 
 def item_to_function(
-        item_path: str,
-        output_path: Optional[str] = None,
-        code_output: bool = False,
-        format_code: bool = True,
-        bump_version: bool = False,
+    item_path: str,
+    output_path: str | None = None,
+    code_output: bool = False,
+    format_code: bool = True,
+    bump_version: bool = False,
 ):
     item_path = Path(item_path)
     if item_path.is_dir():
@@ -74,17 +77,21 @@ def item_to_function(
     # That means we are in a specific item directory
     if item_path.exists():
         _output_path = output_path or item_path.parent / "function.yaml"
-        create_function_yaml(item_path, _output_path, code_output, format_code, bump_version)
+        create_function_yaml(
+            item_path, _output_path, code_output, format_code, bump_version
+        )
     # That means we need to search for items inside this direcotry
     else:
         for inner_dir in PathIterator(
-                root=item_path.parent,
-                rule=is_item_dir,
-                as_path=True,
+            root=item_path.parent,
+            rule=is_item_dir,
+            as_path=True,
         ):
             try:
                 _output_path = output_path or (inner_dir / "function.yaml")
-                create_function_yaml(inner_dir, _output_path, code_output, format_code, bump_version)
+                create_function_yaml(
+                    inner_dir, _output_path, code_output, format_code, bump_version
+                )
             except Exception as e:
                 print(e)
                 click.echo(f"{inner_dir.name}: Failed to generate function.yaml")
@@ -114,16 +121,16 @@ def _get_item_yaml(item_path: Path) -> dict:
     elif not item_path.exists():
         raise FileNotFoundError(f"{item_path} not found")
 
-    item_yaml = full_load(open(item_path, "r"))
+    item_yaml = full_load(open(item_path))
     return item_path, item_yaml
 
 
 def create_function_yaml(
-        item_path: Union[str, Path],
-        output_path: Optional[str] = None,
-        code_output: bool = False,
-        format_code: bool = True,
-        bump_version: bool = False,
+    item_path: str | Path,
+    output_path: str | None = None,
+    code_output: bool = False,
+    format_code: bool = True,
+    bump_version: bool = False,
 ):
     item_path = Path(item_path)
     if bump_version:
@@ -157,11 +164,15 @@ def create_function_yaml(
         labels=item_yaml.get("labels", {}),
         with_doc=True,
     )
+
+    # Store only the file name in the function spec for portability.
+    function_object.spec.filename = Path(filename).name
+
     function_object.metadata.project = ""
     # remove build info from object
-    function_object.spec.build.code_origin = ''
-    function_object.spec.build.origin_filename = ''
-    if 'state_thresholds' not in spec:
+    function_object.spec.build.code_origin = ""
+    function_object.spec.build.origin_filename = ""
+    if "state_thresholds" not in spec:
         function_object.spec.state_thresholds = None
 
     custom_fields = spec.get("customFields", {})
@@ -194,7 +205,7 @@ def create_function_yaml(
     function_object.export(target=str(output_path.resolve()))
 
     if code_output and format_code:
-        with open(_code_output, "r") as file:
+        with open(_code_output) as file:
             code = file.read()
         code = format_str(code, mode=FileMode())
         with open(_code_output, "w") as file:
@@ -206,5 +217,5 @@ def bump_function_yaml_version(item_path: Path):
     item_ver = item_yaml.get("version", "0.0.0")
     new_ver = semver.Version.parse(item_ver).bump_minor()
     item_yaml["version"] = str(new_ver)
-    with open(item_path, 'w') as file:
+    with open(item_path, "w") as file:
         yaml.safe_dump(item_yaml, file, default_flow_style=False)

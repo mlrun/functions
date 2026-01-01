@@ -15,14 +15,15 @@
 import hashlib
 import json
 from datetime import datetime
-from typing import Any, Dict, List, Tuple, Union
-import semver
+from typing import Any, Union
 
 import mlrun
+import semver
+
 if semver.compare(mlrun.__version__, "1.5.0") >= 0:
     raise mlrun.errors.MLRunNotFoundError(
-        f"When using `mlrun` version >=1.5.0, please use "
-        f"batch inference `v2` function ('hub://batch_inference_v2')."
+        "When using `mlrun` version >=1.5.0, please use "
+        "batch inference `v2` function ('hub://batch_inference_v2')."
     )
 
 import mlrun.datastore
@@ -45,10 +46,10 @@ DatasetType = Union[mlrun.DataItem, list, dict, pd.DataFrame, pd.Series, np.ndar
 
 def _read_dataset_as_dataframe(
     dataset: DatasetType,
-    feature_columns: Union[str, List[str]] = None,
-    label_columns: Union[str, List[str]] = None,
-    drop_columns: Union[str, List[str], int, List[int]] = None,
-) -> Tuple[pd.DataFrame, List[str]]:
+    feature_columns: str | list[str] = None,
+    label_columns: str | list[str] = None,
+    drop_columns: str | list[str] | int | list[int] = None,
+) -> tuple[pd.DataFrame, list[str]]:
     """
     Parse the given dataset into a DataFrame and drop the columns accordingly. In addition, the label columns will be
     parsed and validated as well.
@@ -120,7 +121,7 @@ def _read_dataset_as_dataframe(
 
 
 def _prepare_result_set(
-    x: pd.DataFrame, label_columns: List[str], y_pred: np.ndarray
+    x: pd.DataFrame, label_columns: list[str], y_pred: np.ndarray
 ) -> pd.DataFrame:
     """
     Set default label column names and validate given names to prepare the result set - a concatenation of the inputs
@@ -204,7 +205,7 @@ def _get_drift_result(
     tvd: float,
     hellinger: float,
     threshold: float,
-) -> Tuple[bool, float]:
+) -> tuple[bool, float]:
     """
     Calculate the drift result by the following equation: (tvd + hellinger) / 2
 
@@ -228,7 +229,7 @@ def _perform_drift_analysis(
     drift_threshold: float,
     possible_drift_threshold: float,
     inf_capping: float,
-) -> Tuple[Artifact, Artifact, dict]:
+) -> tuple[Artifact, Artifact, dict]:
     """
     Perform drift analysis, producing the drift table artifact for logging post prediction.
 
@@ -318,9 +319,9 @@ def infer(
     context: mlrun.MLClientCtx,
     model: str,
     dataset: DatasetType,
-    drop_columns: Union[str, List[str], int, List[int]] = None,
-    label_columns: Union[str, List[str]] = None,
-    feature_columns: Union[str, List[str]] = None,
+    drop_columns: str | list[str] | int | list[int] = None,
+    label_columns: str | list[str] = None,
+    feature_columns: str | list[str] = None,
     log_result_set: bool = True,
     result_set_name: str = "prediction",
     batch_id: str = None,
@@ -330,7 +331,7 @@ def infer(
     possible_drift_threshold: float = 0.5,
     inf_capping: float = 10.0,
     artifacts_tag: str = "",
-    **predict_kwargs: Dict[str, Any],
+    **predict_kwargs: dict[str, Any],
 ):
     """
     Perform a prediction on a given dataset with the given model. Can perform drift analysis between the sample set
@@ -368,7 +369,7 @@ def infer(
     :param artifacts_tag:            Tag to use for all the artifacts resulted from the function.
     """
     # Loading the model:
-    context.logger.info(f"Loading model...")
+    context.logger.info("Loading model...")
     model_handler = AutoMLRun.load_model(model_path=model, context=context)
     if label_columns is None:
         label_columns = [
@@ -381,7 +382,7 @@ def infer(
         ]
 
     # Get dataset by object, URL or by FeatureVector:
-    context.logger.info(f"Loading data...")
+    context.logger.info("Loading data...")
     x, label_columns = _read_dataset_as_dataframe(
         dataset=dataset,
         feature_columns=feature_columns,
@@ -390,7 +391,7 @@ def infer(
     )
 
     # Predict:
-    context.logger.info(f"Calculating prediction...")
+    context.logger.info("Calculating prediction...")
     y_pred = model_handler.model.predict(x, **predict_kwargs)
 
     # Prepare the result set:
@@ -399,7 +400,7 @@ def infer(
     # Check for logging the result set:
     if log_result_set:
         # Log the result set:
-        context.logger.info(f"Logging result set (x | prediction)...")
+        context.logger.info("Logging result set (x | prediction)...")
         context.log_dataset(
             key=result_set_name,
             df=result_set,

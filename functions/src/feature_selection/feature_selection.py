@@ -23,12 +23,16 @@ import pandas as pd
 import plotly.express as px
 from mlrun.artifacts import PlotlyArtifact
 from mlrun.datastore.targets import ParquetTarget
+
 # MLRun utils
 from mlrun.utils.helpers import create_class
+
 # Feature selection strategies
 from sklearn.feature_selection import SelectFromModel, SelectKBest
+
 # Scale feature scoresgit st
 from sklearn.preprocessing import MinMaxScaler
+
 # SKLearn estimators list
 from sklearn.utils import all_estimators
 
@@ -194,7 +198,7 @@ def feature_selection(
     selected_models = {}
     for model_name, model in model_filters.items():
         if ".json" in model:
-            current_model = json.load(open(model, "r"))
+            current_model = json.load(open(model))
             classifier_class = create_class(current_model["META"]["class"])
             selected_models[model_name] = classifier_class(**current_model["CLASS"])
         elif model in all_sklearn_estimators:
@@ -211,7 +215,6 @@ def feature_selection(
     # Run model filters
     models_df = pd.DataFrame(index=X.columns)
     for model_name, model in selected_models.items():
-
         if model_name == "LogisticRegression":
             model.set_params(solver="liblinear")
 

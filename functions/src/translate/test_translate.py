@@ -19,7 +19,9 @@ import mlrun
 
 def test_translate():
     project = mlrun.new_project("test-translate")
-    translate_fn = project.set_function("translate.py", "translate", image="mlrun/mlrun")
+    translate_fn = project.set_function(
+        "translate.py", "translate", image="mlrun/mlrun"
+    )
     input_text = "Ali her gece bir kitap okur."
     expected_translation = "Ali reads a book every night."
 
@@ -48,4 +50,3 @@ def test_translate():
             assert translate_run.status.state == "completed"
             with open(os.path.join(test_dir, "test_tr.txt")) as f:
                 assert f.read() == expected_translation
-

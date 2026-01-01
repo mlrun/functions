@@ -19,17 +19,13 @@ import warnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import json
+from os import environ
+
+import mlrun
 import numpy as np
-import requests
-from tensorflow import keras
+from PIL import Image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.preprocessing.image import load_img
-from os import environ, path
-from PIL import Image
-from io import BytesIO
-from urllib.request import urlopen
-import mlrun
 
 
 class TFModel(mlrun.runtimes.MLModelServer):
@@ -40,10 +36,11 @@ class TFModel(mlrun.runtimes.MLModelServer):
         self.IMAGE_HEIGHT = int(environ.get("IMAGE_HEIGHT", "128"))
 
         try:
-            with open(environ["classes_map"], "r") as f:
+            with open(environ["classes_map"]) as f:
                 self.classes = json.load(f)
-        except:
+        except Exception as e:
             self.classes = None
+            print(f"could not load classes map: {e}")
 
     def load(self):
         model_file, extra_data = self.get_model(".h5")
@@ -81,7 +78,7 @@ class TFModel(mlrun.runtimes.MLModelServer):
                 "prediction": [
                     self.classes[str(int(cls))] for cls in predicted_classes
                 ],
-                f'{self.classes["1"]}-probability': predicted_probabilities,
+                f"{self.classes['1']}-probability": predicted_probabilities,
             }
         else:
             return predicted_probability.tolist()[0]

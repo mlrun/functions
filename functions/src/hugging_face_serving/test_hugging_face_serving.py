@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import mlrun
 import numpy as np
 import pytest
-
-import mlrun
 
 CLASS_NAME = "HuggingFaceModelServer"
 
@@ -81,7 +80,7 @@ def test_default_models(pipeline):
     )
     server = serving_function.to_mock_server()
     result = server.test(
-        f'/v2/models/{pipeline["task"]}', body={"inputs": [pipeline["example"]]}
+        f"/v2/models/{pipeline['task']}", body={"inputs": [pipeline["example"]]}
     )
     prediction = result["outputs"][0]
     assert all(
@@ -90,7 +89,6 @@ def test_default_models(pipeline):
 
 
 def test_local_model_serving():
-
     serving_function = mlrun.import_function("function.yaml")
 
     # Adding model:

@@ -1,6 +1,7 @@
 import sys
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
+
 import click
 from jinja2 import Environment, FileSystemLoader
 
@@ -14,14 +15,18 @@ TEMPLATES = {
 @click.command()
 @click.argument("type", type=click.Choice(list(TEMPLATES.keys())))
 @click.argument("name")
-@click.option("--overwrite", is_flag=True, help="Replace existing file instead of raising an error.")
+@click.option(
+    "--overwrite",
+    is_flag=True,
+    help="Replace existing file instead of raising an error.",
+)
 def generate_item_yaml(type: str, name: str, overwrite: bool = False):
     """
-    Generate an item.yaml file from a template.
+        Generate an item.yaml file from a template.
 
-type: one of the supported types (currently only `function` or `module`)
-name: the function/module name (also used as the directory name)
-overwrite: whether to overwrite existing item.yaml file
+    type: one of the supported types (currently only `function` or `module`)
+    name: the function/module name (also used as the directory name)
+    overwrite: whether to overwrite existing item.yaml file
     """
     # Construct the target path
     path = Path(f"{type}s/src/{name}").resolve()

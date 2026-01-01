@@ -14,18 +14,8 @@
 
 from typing import Optional
 
-import pandas as pd
-from sklearn.datasets import load_iris
-
 import mlrun.model_monitoring.applications.context as mm_context
-from mlrun.common.schemas.model_monitoring.constants import (
-    ResultKindApp,
-    ResultStatusApp,
-)
-from mlrun.feature_store.api import norm_column_name
-from mlrun.model_monitoring.applications import ModelMonitoringApplicationResult
-from mlrun.model_monitoring.applications.evidently import EvidentlyModelMonitoringApplicationBase
-
+import pandas as pd
 from evidently.core.report import Report, Snapshot
 from evidently.metrics import DatasetMissingValueCount, ValueDrift
 from evidently.presets import DataDriftPreset, DataSummaryPreset
@@ -33,6 +23,16 @@ from evidently.ui.workspace import (
     STR_UUID,
     OrgID,
 )
+from mlrun.common.schemas.model_monitoring.constants import (
+    ResultKindApp,
+    ResultStatusApp,
+)
+from mlrun.feature_store.api import norm_column_name
+from mlrun.model_monitoring.applications import ModelMonitoringApplicationResult
+from mlrun.model_monitoring.applications.evidently import (
+    EvidentlyModelMonitoringApplicationBase,
+)
+from sklearn.datasets import load_iris
 
 _PROJECT_NAME = "Iris Monitoring"
 _PROJECT_DESCRIPTION = "Test project using iris dataset"
@@ -43,12 +43,13 @@ class EvidentlyIrisMonitoringApp(EvidentlyModelMonitoringApplicationBase):
     This model monitoring application is a simple example of integrating MLRun with Evidently for data monitoring,
     which you can adapt to fit your own project needs or use as a reference implementation.
     """
+
     NAME = "Evidently-App-Test"
 
     def __init__(
         self,
         evidently_project_id: Optional["STR_UUID"] = None,
-        evidently_workspace_path: Optional[str] = None,
+        evidently_workspace_path: str | None = None,
         cloud_workspace: bool = False,
         evidently_organization_id: Optional["OrgID"] = None,
     ) -> None:

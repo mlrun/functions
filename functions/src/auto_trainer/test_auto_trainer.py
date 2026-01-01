@@ -14,7 +14,6 @@
 #
 import os
 import tempfile
-from typing import Tuple
 
 import mlrun
 import pandas as pd
@@ -78,7 +77,7 @@ def _assert_train_handler(train_run):
 
 
 @pytest.mark.parametrize("model", MODELS)
-def test_train(model: Tuple[str, str]):
+def test_train(model: tuple[str, str]):
     dataset, label_columns = _get_dataset(model[1])
     is_test_passed = True
 
@@ -115,7 +114,7 @@ def test_train(model: Tuple[str, str]):
     condition=not _validate_environment_variables(),
     reason="Project's environment variables are not set",
 )
-def test_train_evaluate(model: Tuple[str, str]):
+def test_train_evaluate(model: tuple[str, str]):
     dataset, label_columns = _get_dataset(model[1])
     is_test_passed = True
     # Importing function:
@@ -156,9 +155,9 @@ def test_train_evaluate(model: Tuple[str, str]):
         is_test_passed = False
 
     assert is_test_passed, "The test failed"
-    assert (
-        evaluate_run and "evaluation-test_set" in evaluate_run.outputs
-    ), "Missing fields in evaluate_run"
+    assert evaluate_run and "evaluation-test_set" in evaluate_run.outputs, (
+        "Missing fields in evaluate_run"
+    )
 
 
 @pytest.mark.parametrize("model", MODELS)
@@ -166,7 +165,7 @@ def test_train_evaluate(model: Tuple[str, str]):
     condition=not _validate_environment_variables(),
     reason="Project's environment variables are not set",
 )
-def test_train_predict(model: Tuple[str, str]):
+def test_train_predict(model: tuple[str, str]):
     is_test_passed = True
     dataset, label_columns = _get_dataset(model[1])
     df = pd.read_csv(dataset)
@@ -210,6 +209,6 @@ def test_train_predict(model: Tuple[str, str]):
         is_test_passed = False
 
     assert is_test_passed, "The test failed"
-    assert (
-        predict_run and "prediction" in predict_run.outputs
-    ), "Prediction field must be in the output"
+    assert predict_run and "prediction" in predict_run.outputs, (
+        "Prediction field must be in the output"
+    )

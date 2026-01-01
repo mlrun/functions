@@ -15,25 +15,19 @@
 
 from verify_schema import VerifySchema
 
+
 class TestVerifySchema:
     def test_verify_schema(self):
         schema = ["id", "name", "active"]
         verifier = VerifySchema(schema=schema, allow_unexpected_keys=False)
 
         # Test with valid event
-        event = {
-            "id": 1,
-            "name": "Test Event",
-            "active": True
-        }
+        event = {"id": 1, "name": "Test Event", "active": True}
         result = verifier.do(event)
         assert result == event
 
         # Test with missing key
-        event_missing_key = {
-            "id": 1,
-            "name": "Test Event"
-        }
+        event_missing_key = {"id": 1, "name": "Test Event"}
         try:
             verifier.do(event_missing_key)
         except KeyError as e:
@@ -44,7 +38,7 @@ class TestVerifySchema:
             "id": 1,
             "name": "Test Event",
             "active": True,
-            "extra": "unexpected"
+            "extra": "unexpected",
         }
         try:
             verifier.do(event_unexpected_key)
@@ -56,11 +50,6 @@ class TestVerifySchema:
         verifier = VerifySchema(schema=schema, allow_unexpected_keys=True)
 
         # Test with valid event and unexpected key
-        event = {
-            "id": 1,
-            "name": "Test Event",
-            "active": True,
-            "extra": "unexpected"
-        }
+        event = {"id": 1, "name": "Test Event", "active": True, "extra": "unexpected"}
         result = verifier.do(event)
         assert result == event

@@ -17,7 +17,7 @@ import operator
 import pathlib
 from collections import Counter
 from functools import reduce, wraps
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any
 
 import pandas as pd
 import transformers
@@ -27,7 +27,7 @@ from tqdm import tqdm
 _LOGGER = logging.getLogger()
 
 
-def _check_mlrun_and_open_mpi() -> Tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intracomm"]:
+def _check_mlrun_and_open_mpi() -> tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intracomm"]:
     global _LOGGER
 
     is_mpi = False
@@ -56,7 +56,7 @@ def _check_mlrun_and_open_mpi() -> Tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intrac
 
 
 def open_mpi_handler(
-    worker_inputs: List[str], root_worker_inputs: Dict[str, Any] = None
+    worker_inputs: list[str], root_worker_inputs: dict[str, Any] = None
 ):
     global _LOGGER
 
@@ -128,22 +128,22 @@ def open_mpi_handler(
 
 @open_mpi_handler(worker_inputs=["data_path"], root_worker_inputs={"verbose": True})
 def answer_questions(
-    data_path: Union[str, List[str]],
+    data_path: str | list[str],
     model_name: str,
-    questions: Union[List[str], List[List[str]]],
-    device_map: Union[str, dict] = None,
+    questions: list[str] | list[list[str]],
+    device_map: str | dict = None,
     model_kwargs: dict = None,
     auto_gptq_exllama_max_input_length: int = None,
     tokenizer_name: str = None,
     tokenizer_kwargs: dict = None,
-    text_wrapper: Union[str, List[str]] = "",
-    questions_wrapper: Union[str, List[str]] = "",
-    generation_config: Union[Dict, List[Dict]] = None,
-    questions_config: Union[Dict, List[Dict]] = None,
+    text_wrapper: str | list[str] = "",
+    questions_wrapper: str | list[str] = "",
+    generation_config: dict | list[dict] = None,
+    questions_config: dict | list[dict] = None,
     batch_size: int = 1,
-    questions_columns: List[str] = None,
+    questions_columns: list[str] = None,
     verbose: bool = False,
-) -> Tuple[pd.DataFrame, dict]:
+) -> tuple[pd.DataFrame, dict]:
     """
     Answer questions with a context to the given text files contents by a pretrained LLM model. Each text file will have
     the following prompt built:
@@ -396,11 +396,9 @@ def answer_questions(
 
 def _get_text_files(
     data_path: pathlib.Path,
-) -> List[pathlib.Path]:
-
+) -> list[pathlib.Path]:
     # Check if the path is of a directory or a file:
     if data_path.is_dir():
-
         # Get all files inside the directory:
         text_files = list(data_path.glob("*.*"))
     elif data_path.is_file():
@@ -417,20 +415,17 @@ def _get_text_files(
 def _get_prompt_template(
     text_wrapper: str,
     questions_wrapper: str,
-    questions: List[str],
+    questions: list[str],
 ) -> str:
-
     # Validate and build the text wrapper:
-    text_wrapper = text_wrapper or (
-        "Given the following text:\n" "-----\n" "{}\n" "-----"
-    )
+    text_wrapper = text_wrapper or ("Given the following text:\n-----\n{}\n-----")
     if text_wrapper.count("{}") != 1:
         raise ValueError(
             "The `text_wrapper` must include one placeholder '{}' for the text of the file to be asked about."
         )
 
     # Validate and build the question wrapper:
-    questions_wrapper = questions_wrapper or "Answer the questions:\n" "{}"
+    questions_wrapper = questions_wrapper or "Answer the questions:\n{}"
     if questions_wrapper.count("{}") != 1:
         raise ValueError(
             "The `questions_wrapper` must include one placeholder '{}' for the list of questions."
@@ -449,7 +444,7 @@ def _get_prompt_template(
 
 def _get_generation_pipeline(
     model_name: str,
-    device_map: Union[str, dict],
+    device_map: str | dict,
     tokenizer_name: str,
     model_kwargs: dict,
     tokenizer_kwargs: dict,
@@ -487,20 +482,19 @@ def _get_generation_pipeline(
 
 
 def _read_file_batch(
-    file_batch: List[pathlib.Path],
+    file_batch: list[pathlib.Path],
     prompt_template: str,
-) -> List[str]:
+) -> list[str]:
     batch = []
 
     # Go over all files and read in usable format
     for file in file_batch:
-        with open(file, "r", encoding="utf-8") as fp:
+        with open(file, encoding="utf-8") as fp:
             batch.append(prompt_template.format(fp.read()))
     return batch
 
 
 def _to_group_list(argument_value: list, argument_name: str, length: int):
-
     # Check if is list, turn to list if not
     argument_value = (
         argument_value if isinstance(argument_value, list) else [argument_value]
@@ -532,8 +526,7 @@ class QuestionHandler:
         pass
 
     @staticmethod
-    def _get_answers(generated_text: str, questions_amount: int) -> List[str]:
-
+    def _get_answers(generated_text: str, questions_amount: int) -> list[str]:
         # Clear answer start (part before numbers):
         # TODO find better way to verify, for list of questions this is redundant for example
         if "1." not in generated_text:
@@ -564,11 +557,10 @@ class QuestionHandler:
     def _infer_questions(
         self,
         questions_amount: int,
-        batched_input: List[str],
+        batched_input: list[str],
         generation_pipeline: transformers.Pipeline,
         generation_config: transformers.GenerationConfig,
-    ) -> List[List[str]]:
-
+    ) -> list[list[str]]:
         # Infer through the llm:
         batched_output = generation_pipeline(
             batched_input,
@@ -593,10 +585,10 @@ class QuestionHandler:
     def answer(
         self,
         questions_amount: int,
-        batched_input: List[str],
+        batched_input: list[str],
         generation_pipeline: transformers.Pipeline,
         generation_config: transformers.GenerationConfig,
-    ) -> List[List[str]]:
+    ) -> list[list[str]]:
         """
         Answer questions with a context to the given text files contents by a pretrained LLM model in given pipeline.
         """
@@ -665,8 +657,7 @@ class PollQuestionHandler(QuestionHandler):
             """
             return getattr(self, self.value)(answers)
 
-    def __init__(
-        self, poll_count: int = 5, poll_strategy: str = "most_common"):
+    def __init__(self, poll_count: int = 5, poll_strategy: str = "most_common"):
         super().__init__()
         self.poll_count = poll_count
         self.poll_strategy = self.Strategy(poll_strategy)
@@ -674,10 +665,10 @@ class PollQuestionHandler(QuestionHandler):
     def answer(
         self,
         questions_amount: int,
-        batched_input: List[str],
+        batched_input: list[str],
         generation_pipeline: transformers.Pipeline,
         generation_config: transformers.GenerationConfig,
-    ) -> List[List[str]]:
+    ) -> list[list[str]]:
         """
         Answer questions with a context to the given text files contents by a pretrained LLM model in given pipeline.
         """
@@ -691,10 +682,10 @@ class PollQuestionHandler(QuestionHandler):
     def _answer_poll_questions(
         self,
         questions_amount: int,
-        batched_input: List[str],
+        batched_input: list[str],
         generation_pipeline: transformers.Pipeline,
         generation_config: transformers.GenerationConfig,
-    ) -> List[List[str]]:
+    ) -> list[list[str]]:
         votes = []
 
         # Run the poll for each question

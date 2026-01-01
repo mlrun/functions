@@ -12,7 +12,7 @@ labels:
   author: Iguazio
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.8.0-rc40
+mlrunVersion: 1.8.0
 name: feature-selection
 platformVersion: 3.6.0
 spec:

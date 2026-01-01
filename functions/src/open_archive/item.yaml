@@ -11,7 +11,7 @@ labels:
   author: Iguazio
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.8.0-rc50
+mlrunVersion: 1.8.0
 name: open-archive
 platformVersion: 3.5.0
 spec:

@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from mlrun import code_to_function
 import os
+
+from mlrun import code_to_function
 
 
 def test_gen_class_data():
     fn = code_to_function(
-        name='test_gen_class_data',
+        name="test_gen_class_data",
         filename="gen_class_data.py",
         handler="gen_class_data",
         kind="job",
@@ -32,8 +33,11 @@ def test_gen_class_data():
             "header": None,
             "weight": [0.5, 0.5],
             "sk_params": {"n_informative": 2},
-            "file_ext": "csv"},
+            "file_ext": "csv",
+        },
         local=True,
         artifact_path="./artifacts",
-        )
-    assert os.path.isfile(run.status.artifacts[0]['spec']['target_path']), 'dataset is not available'
+    )
+    assert os.path.isfile(run.status.artifacts[0]["spec"]["target_path"]), (
+        "dataset is not available"
+    )

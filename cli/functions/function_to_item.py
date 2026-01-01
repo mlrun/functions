@@ -14,7 +14,6 @@
 #
 from datetime import datetime
 from pathlib import Path
-from typing import Union
 
 import click
 import yaml
@@ -70,8 +69,7 @@ def function_to_item(path: str):
     exit(0)
 
 
-def function_yaml_to_item(function_path: Union[str, Path]) -> dict:
-
+def function_yaml_to_item(function_path: str | Path) -> dict:
     function_path = Path(function_path)
     function_yaml = yaml.full_load(open(function_path))
 

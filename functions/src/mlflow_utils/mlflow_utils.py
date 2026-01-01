@@ -1,8 +1,9 @@
 import zipfile
-from typing import Any, Dict
+from typing import Any
+
 import mlflow
-from mlrun.serving.v2_serving import V2ModelServer
 import pandas as pd
+from mlrun.serving.v2_serving import V2ModelServer
 
 
 class MLFlowModelServer(V2ModelServer):
@@ -24,7 +25,7 @@ class MLFlowModelServer(V2ModelServer):
 
         self.model = mlflow.pyfunc.load_model(model_path_unzip)
 
-    def predict(self, request: Dict[str, Any]) -> list:
+    def predict(self, request: dict[str, Any]) -> list:
         """
         Infer the inputs through the model. The inferred data will
         be read from the "inputs" key of the request.

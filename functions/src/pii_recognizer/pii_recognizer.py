@@ -17,7 +17,7 @@ import os
 import pathlib
 import tempfile
 import warnings
-from typing import List, Set, Tuple, Union
+from typing import List
 
 import annotated_text.util as at_util
 import mlrun
@@ -162,9 +162,9 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
     def __init__(
         self,
         supported_language: str = "en",
-        supported_entities: List[str] = None,
-        check_label_groups: Tuple[Set, Set] = None,
-        context: List[str] = None,
+        supported_entities: list[str] = None,
+        check_label_groups: tuple[set, set] = None,
+        context: list[str] = None,
         ner_strength: float = 1,
     ):
         """
@@ -258,7 +258,7 @@ class CustomSpacyRecognizer(pa.LocalRecognizer):
 
     @staticmethod
     def __check_label(
-        entity: str, label: str, check_label_groups: Tuple[Set, Set]
+        entity: str, label: str, check_label_groups: tuple[set, set]
     ) -> bool:
         """
         Check if the label is in the label group.
@@ -351,8 +351,8 @@ class FlairRecognizer(pa.EntityRecognizer):
     def __init__(
         self,
         supported_language: str = "en",
-        supported_entities: List[str] = None,
-        check_label_groups: Tuple[Set, Set] = None,
+        supported_entities: list[str] = None,
+        check_label_groups: tuple[set, set] = None,
     ):
         """
         Initialize the FlairRecognizer.
@@ -381,9 +381,9 @@ class FlairRecognizer(pa.EntityRecognizer):
     def analyze(
         self,
         text: str,
-        entities: List[str],
+        entities: list[str],
         nlp_artifacts: pa.nlp_engine.NlpArtifacts = None,
-    ) -> List[pa.RecognizerResult]:
+    ) -> list[pa.RecognizerResult]:
         """
         Analyze text and return the results.
 
@@ -483,7 +483,7 @@ class FlairRecognizer(pa.EntityRecognizer):
     # sanity check of the entity and label before recognition
     @staticmethod
     def __check_label(
-        entity: str, label: str, check_label_groups: Tuple[Set, Set]
+        entity: str, label: str, check_label_groups: tuple[set, set]
     ) -> bool:
         return any(
             entity in egrp and label in lgrp for egrp, lgrp in check_label_groups
@@ -492,7 +492,7 @@ class FlairRecognizer(pa.EntityRecognizer):
 
 # get the analyzer engine based on the model
 def _get_analyzer_engine(
-    model: str = None, entities: List[str] = None
+    model: str = None, entities: list[str] = None
 ) -> pa.AnalyzerEngine:
     """
     Return pa.AnalyzerEngine.
@@ -542,7 +542,7 @@ def _get_analyzer_engine(
                 registry.add_recognizer(recognizer)
     else:
         raise ValueError(
-            f"argument of model and entities can not be None at the same time"
+            "argument of model and entities can not be None at the same time"
         )
     analyzer = pa.AnalyzerEngine(
         registry=registry,
@@ -573,7 +573,7 @@ def _get_anonymizer_engine() -> pre_anoymizer.AnonymizerEngine:
 
 def _anonymize(
     text: str,
-    analyze_results: List[pa.RecognizerResult],
+    analyze_results: list[pa.RecognizerResult],
     entity_operator_map: dict = None,
     is_full_text: bool = True,
 ) -> str:
@@ -640,8 +640,8 @@ def _anonymize(
 
 
 def _get_tokens(
-    text: str, analyze_results: List[pa.RecognizerResult], is_full: bool = True
-) -> List[str]:
+    text: str, analyze_results: list[pa.RecognizerResult], is_full: bool = True
+) -> list[str]:
     """
     Get the full tokens or only contains the entities that can form a sentence.
 
@@ -685,8 +685,8 @@ def _get_tokens(
 
 
 def _annotate(
-    text: str, st_analyze_results: List[pa.RecognizerResult], is_full_html: bool = True
-) -> List[str]:
+    text: str, st_analyze_results: list[pa.RecognizerResult], is_full_html: bool = True
+) -> list[str]:
     """
     Annotate identified input using Presidio Anonymizer.
 
@@ -704,10 +704,10 @@ def _process(
     text: str,
     model: pa.AnalyzerEngine,
     score_threshold: float,
-    entities: List[str] = None,
+    entities: list[str] = None,
     entities_operator_map: dict = None,
     is_full_text: bool = True,
-) -> Tuple[str, list]:
+) -> tuple[str, list]:
     """
     Process the text of str using the model.
 
@@ -743,7 +743,7 @@ def _process(
 
 
 def _get_single_html(
-    text: str, results: List[pa.RecognizerResult], is_full_html: bool = True
+    text: str, results: list[pa.RecognizerResult], is_full_html: bool = True
 ):
     """
     Generate the html for a single txt file.
@@ -766,7 +766,7 @@ def _get_single_html(
     return html_str
 
 
-def _get_single_json(results: List[pa.RecognizerResult], is_full_report: bool = True):
+def _get_single_json(results: list[pa.RecognizerResult], is_full_report: bool = True):
     """
     Generate the json for a single txt file.
 
@@ -844,11 +844,11 @@ def _get_all_rpt(res_dict: dict, is_full_report: bool = True):
 
 def recognize_pii(
     context: mlrun.MLClientCtx,
-    input_path: Union[str, pathlib.Path],
+    input_path: str | pathlib.Path,
     html_key: str,
     score_threshold: float,
     output_directory: str = None,
-    entities: List[
+    entities: list[
         str
     ] = None,  # List of entities to recognize, default is recognizing all
     entity_operator_map: dict = None,
@@ -858,7 +858,7 @@ def recognize_pii(
     is_full_text: bool = True,
     is_full_html: bool = True,
     is_full_report: bool = True,
-) -> Union[Tuple[str, pd.DataFrame, dict, dict], Tuple[str, pd.DataFrame, dict]]:
+) -> tuple[str, pd.DataFrame, dict, dict] | tuple[str, pd.DataFrame, dict]:
     """
     Walk through the input path, recognize PII in text and store the anonymized text in the output path.
     Generate the html with different colors for each entity, json report of the explanation.

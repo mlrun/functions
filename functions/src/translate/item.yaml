@@ -12,7 +12,7 @@ labels:
   author: Iguazio
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.10.0-rc41
+mlrunVersion: 1.10.0
 name: translate
 platformVersion: 3.5.3
 spec:

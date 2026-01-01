@@ -12,29 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import os
 import tempfile
 
 import lightgbm as lgb
 import mlflow
 import mlflow.environment_variables
 import mlflow.xgboost
+
+# os.environ["MLRUN_IGNORE_ENV_FILE"] = "True"  #TODO remove before push
+import mlrun
+import mlrun.launcher.local
 import pytest
 import xgboost as xgb
 from sklearn import datasets
 from sklearn.metrics import accuracy_score, log_loss
 from sklearn.model_selection import train_test_split
 
-import os
-# os.environ["MLRUN_IGNORE_ENV_FILE"] = "True"  #TODO remove before push
-
-import mlrun
-import mlrun.launcher.local
 #  Important:
 #  unlike mlconf which resets back to default after each test run, the mlflow configurations
 #  and env vars don't, so at the end of each test we need to redo anything we set in that test.
 #  what we cover in these tests: logging "regular" runs with, experiment name, run id and context
 #  name (last two using mlconf), failing run mid-way, and a run with no handler.
 #  we also test here importing of runs, artifacts and models from a previous run.
+
 
 # simple mlflow example of lgb logging
 def lgb_run():
@@ -170,10 +171,10 @@ def test_track_run_with_experiment_name(handler):
         server = serving_func.to_mock_server()
 
         # An example taken randomly
-        result = server.test(f"/v2/models/{model_name}/predict", {"inputs": [[5.1, 3.5, 1.4, 0.2]]})
+        result = server.test(
+            f"/v2/models/{model_name}/predict", {"inputs": [[5.1, 3.5, 1.4, 0.2]]}
+        )
     print(result)
     assert result
     # unset mlflow experiment name to default
     mlflow.environment_variables.MLFLOW_EXPERIMENT_NAME.unset()
-
-

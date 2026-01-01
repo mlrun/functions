@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Union
 
 import mlrun
 import mlrun.datastore
@@ -23,7 +23,7 @@ from mlrun import feature_store as fs
 from mlrun.datastore import DataItem
 from mlrun.execution import MLClientCtx
 from mlrun.frameworks.auto_mlrun import AutoMLRun
-from mlrun.utils.helpers import create_class, create_function
+from mlrun.utils.helpers import create_class
 from sklearn.model_selection import train_test_split
 
 PathType = Union[str, Path]
@@ -35,7 +35,7 @@ class KWArgsPrefixes:
     TRAIN = "TRAIN_"
 
 
-def _get_sub_dict_by_prefix(src: Dict, prefix_key: str) -> Dict[str, Any]:
+def _get_sub_dict_by_prefix(src: dict, prefix_key: str) -> dict[str, Any]:
     """
     Collect all the keys from the given dict that starts with the given prefix and creates a new dictionary with these
     keys.
@@ -54,9 +54,9 @@ def _get_sub_dict_by_prefix(src: Dict, prefix_key: str) -> Dict[str, Any]:
 def _get_dataframe(
     context: MLClientCtx,
     dataset: DataItem,
-    label_columns: Optional[Union[str, List[str]]] = None,
-    drop_columns: Union[str, List[str], int, List[int]] = None,
-) -> Tuple[pd.DataFrame, Optional[Union[str, List[str]]]]:
+    label_columns: str | list[str] | None = None,
+    drop_columns: str | list[str] | int | list[int] = None,
+) -> tuple[pd.DataFrame, str | list[str] | None]:
     """
     Getting the DataFrame of the dataset and drop the columns accordingly.
 
@@ -122,8 +122,8 @@ def train(
     context: MLClientCtx,
     dataset: DataItem,
     model_class: str,
-    label_columns: Optional[Union[str, List[str]]] = None,
-    drop_columns: List[str] = None,
+    label_columns: str | list[str] | None = None,
+    drop_columns: list[str] = None,
     model_name: str = "model",
     tag: str = "",
     sample_set: DataItem = None,
@@ -139,6 +139,7 @@ def train(
     example::
 
         import mlrun
+
         project = mlrun.get_or_create_project("my-project")
         project.set_function("hub://auto_trainer", "train")
         trainer_run = project.run(
@@ -210,7 +211,7 @@ def train(
     # Getting the sample set:
     if sample_set is None:
         context.logger.info(
-            f"Sample set not given, using the whole training set as the sample set"
+            "Sample set not given, using the whole training set as the sample set"
         )
         sample_set = dataset
     else:
@@ -274,8 +275,8 @@ def evaluate(
     context: MLClientCtx,
     model: str,
     dataset: mlrun.DataItem,
-    drop_columns: List[str] = None,
-    label_columns: Optional[Union[str, List[str]]] = None,
+    drop_columns: list[str] = None,
+    label_columns: str | list[str] | None = None,
     **kwargs,
 ):
     """
@@ -328,9 +329,9 @@ def predict(
     context: MLClientCtx,
     model: str,
     dataset: mlrun.DataItem,
-    drop_columns: Union[str, List[str], int, List[int]] = None,
-    label_columns: Optional[Union[str, List[str]]] = None,
-    result_set: Optional[str] = None,
+    drop_columns: str | list[str] | int | list[int] = None,
+    label_columns: str | list[str] | None = None,
+    result_set: str | None = None,
     **kwargs,
 ):
     """

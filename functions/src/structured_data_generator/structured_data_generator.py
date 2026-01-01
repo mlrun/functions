@@ -28,7 +28,7 @@ def _set_openai_secrets() -> bool:
     try:
         import mlrun
     except ModuleNotFoundError:
-        raise EnvironmentError(
+        raise OSError(
             f"One or more of the OpenAI required environment variables ('{key}', '{base}') are missing."
             f"Please set them as environment variables or install mlrun (`pip install mlrun`)"
             f"and set them as project secrets using `projecy.set_secrets`."
@@ -41,12 +41,12 @@ def _set_openai_secrets() -> bool:
 
     # If the key is not in the secrets, return False:
     if not openai_key:
-        raise EnvironmentError(
+        raise OSError(
             f"Could not find OpenAI API key in the environment variables or secrets,"
             f" please set it as: {key}."
         )
     if not openai_base:
-        raise EnvironmentError(
+        raise OSError(
             f"Could not find OpenAI API base in the environment variables or secrets,"
             f" please set it as: {base}."
         )

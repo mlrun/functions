@@ -19,13 +19,12 @@ import warnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
-from cloudpickle import dumps
 import pandas as pd
-from typing import List
-from mlrun.execution import MLClientCtx
+from cloudpickle import dumps
 from mlrun.datastore import DataItem
+from mlrun.execution import MLClientCtx
 from mlrun.mlutils.data import get_sample, get_splits
-from mlrun.mlutils.models import gen_sklearn_model, eval_model_v2
+from mlrun.mlutils.models import eval_model_v2, gen_sklearn_model
 from mlrun.utils.helpers import create_class
 
 
@@ -34,7 +33,7 @@ def train_model(
     model_pkg_class: str,
     dataset: DataItem,
     label_column: str = "labels",
-    encode_cols: List[str] = [],
+    encode_cols: list[str] = [],
     sample: int = -1,
     test_size: float = 0.30,
     train_val_split: float = 0.70,
@@ -139,5 +138,5 @@ def train_model(
         metrics=context.results,
         labels={"class": model_pkg_class},
         framework="sklearn",
-        **kwargs
+        **kwargs,
     )

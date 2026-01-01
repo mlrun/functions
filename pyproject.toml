@@ -3,7 +3,7 @@ name = "mlrun-hub"
 version = "0.1.0"
 description = "MLRun Hub - centralized location for open source contributions of mlrun hub components"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10.18"
 license = { file = "LICENSE" }
 authors = [
     { name = "MLRun Team" }
@@ -33,8 +33,12 @@ dependencies = [
 mlrun-functions = "cli.cli:cli"
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py310"
 required-version = ">=0.8.0"
+exclude = [
+    "**/*.ipynb",
+]
+
 
 [tool.ruff.lint]
 extend-select = [

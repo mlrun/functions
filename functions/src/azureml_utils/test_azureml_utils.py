@@ -13,11 +13,11 @@
 # limitations under the License.
 #
 import os
-import tempfile
 import shutil
-import pytest
+import tempfile
 
 import mlrun
+import pytest
 from mlrun import import_function
 
 EXPERIMENT_NAME = "azure-automl-test"
@@ -117,7 +117,9 @@ def test_train():
             local=True,
         )
         # Get trained models:
-        num_saved_models = len(azureml_run.status.iterations) - 1  # The first one in the list is the 'columns'
+        num_saved_models = (
+            len(azureml_run.status.iterations) - 1
+        )  # The first one in the list is the 'columns'
         test_pass = num_saved_models == save_n_models
 
     except Exception as exception:
@@ -125,4 +127,4 @@ def test_train():
 
     _cleanup_environment(artifact_path)
 
-    assert test_pass, f'Created {len(model_paths)} models instead of {save_n_models}'
+    assert test_pass, f"Created {len(model_paths)} models instead of {save_n_models}"

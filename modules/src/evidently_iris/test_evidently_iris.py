@@ -20,13 +20,11 @@ from uuid import uuid4
 
 import pytest
 import semver
-
+from evidently_iris import EvidentlyIrisMonitoringApp
 from mlrun.errors import MLRunIncompatibleVersionError
 from mlrun.model_monitoring.applications.evidently.base import (
     _check_evidently_version,
 )
-
-from evidently_iris import EvidentlyIrisMonitoringApp
 
 
 @pytest.mark.parametrize(

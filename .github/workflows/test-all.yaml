@@ -112,7 +112,7 @@ jobs:
 
   update_readmes:
     needs: build_strategy_matrix
-    if: github.repository == 'mlrun/functions' || github.repository == 'mlrun/hub-assets'
+    if: (github.repository == 'mlrun/functions' || github.repository == 'mlrun/hub-assets') && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     permissions:
       contents: write

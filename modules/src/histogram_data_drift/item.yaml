@@ -8,7 +8,7 @@ generationDate: 2025-11-06:12-25
 hidden: false                                       
 labels:
   author: Iguazio
-mlrunVersion: 1.10.0-rc41
+mlrunVersion: 1.10.0
 name: histogram_data_drift                        
 spec:
   filename: histogram_data_drift.py              

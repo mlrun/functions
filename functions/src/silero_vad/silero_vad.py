@@ -15,7 +15,6 @@ import logging
 from multiprocessing import Process, Queue
 from pathlib import Path
 from types import FunctionType
-from typing import Dict, List, Tuple, Type, Union
 
 import torch
 import torchaudio
@@ -49,7 +48,7 @@ class BaseTask:
         return self._audio_file
 
     def do_task(
-        self, speech_timestamps: Union[List[Dict[str, int]], List[List[Dict[str, int]]]]
+        self, speech_timestamps: list[dict[str, int]] | list[list[dict[str, int]]]
     ):
         """
         Do the task on the given speech timestamps. The base task will simply save the speech timestamps as the result.
@@ -58,7 +57,7 @@ class BaseTask:
         """
         self._result = speech_timestamps
 
-    def get_result(self) -> Tuple[str, list]:
+    def get_result(self) -> tuple[str, list]:
         """
         Get the result of the task. A tuple of the audio file name and the result.
 
@@ -66,7 +65,7 @@ class BaseTask:
         """
         return self._audio_file.name, self._result
 
-    def to_tuple(self) -> Tuple[str, dict]:
+    def to_tuple(self) -> tuple[str, dict]:
         """
         Convert the task to a tuple to reconstruct it later (used for multiprocessing to pass in queue).
 
@@ -80,7 +79,7 @@ class SpeechDiarizationTask(BaseTask):
     A speech diarization task. The task will diarize the VAD speech timestamps into speakers.
     """
 
-    def __init__(self, audio_file: Path, speaker_labels: List[str]):
+    def __init__(self, audio_file: Path, speaker_labels: list[str]):
         """
         Initialize the speech diarization task.
 
@@ -91,7 +90,7 @@ class SpeechDiarizationTask(BaseTask):
         super().__init__(audio_file=audio_file)
         self._speaker_labels = speaker_labels
 
-    def do_task(self, speech_timestamps: List[List[Dict[str, int]]]):
+    def do_task(self, speech_timestamps: list[list[dict[str, int]]]):
         """
         Do the task on the given speech timestamps. The task will diarize the VAD speech timestamps into speakers.
 
@@ -113,7 +112,7 @@ class SpeechDiarizationTask(BaseTask):
         speech_diarization.sort()
         self._result = speech_diarization
 
-    def to_tuple(self) -> Tuple[str, dict]:
+    def to_tuple(self) -> tuple[str, dict]:
         """
         Convert the task to a tuple to reconstruct it later (used for multiprocessing to pass in queue).
 
@@ -134,7 +133,7 @@ class TaskCreator:
         SpeechDiarizationTask.__name__: SpeechDiarizationTask,
     }
 
-    def __init__(self, task_type: Type[BaseTask], task_kwargs: dict = None):
+    def __init__(self, task_type: type[BaseTask], task_kwargs: dict = None):
         """
         Initialize the task creator.
         :param task_type: The task type - a `BaseTask` subclass.
@@ -154,7 +153,7 @@ class TaskCreator:
         return self._task_type(audio_file=audio_file, **self._task_kwargs)
 
     @classmethod
-    def from_tuple(cls, task_tuple: Tuple[str, dict]) -> BaseTask:
+    def from_tuple(cls, task_tuple: tuple[str, dict]) -> BaseTask:
         """
         Create a task from a tuple of the audio file name and the task kwargs.
 
@@ -256,7 +255,7 @@ class VoiceActivityDetector:
     def detect_voice(
         self,
         audio_file: Path,
-    ) -> Union[List[Dict[str, int]], List[List[Dict[str, int]]]]:
+    ) -> list[dict[str, int]] | list[list[dict[str, int]]]:
         """
         Infer the audio through the VAD model and return the speech timestamps.
 
@@ -359,7 +358,7 @@ def _multiprocessing_complete_tasks(
     # Start listening to the tasks queue:
     while True:
         # Get the task:
-        task: Tuple[str, dict] = tasks_queue.get()
+        task: tuple[str, dict] = tasks_queue.get()
         if task == _MULTIPROCESSING_STOP_MARK:
             break
         try:
@@ -392,7 +391,7 @@ except ModuleNotFoundError:
 
 def detect_voice(
     # Input kwargs:
-    data_path: Union[str, Path, List[Union[str, Path]]],
+    data_path: str | Path | list[str | Path],
     # Model loading kwargs:
     use_onnx: bool = True,
     force_onnx_cpu: bool = True,
@@ -516,7 +515,7 @@ def detect_voice(
 
 def diarize(
     # Input / Output kwargs:
-    data_path: Union[str, Path, List[Union[str, Path]]],
+    data_path: str | Path | list[str | Path],
     # Model loading kwargs:
     use_onnx: bool = True,
     force_onnx_cpu: bool = True,
@@ -529,7 +528,7 @@ def diarize(
     window_size_samples: int = 512,
     speech_pad_ms: int = 30,
     # Diarization kwargs:
-    speaker_labels: List[str] = None,
+    speaker_labels: list[str] = None,
     # Other kwargs:
     use_multiprocessing: int = 0,
     verbose: bool = False,
@@ -640,8 +639,8 @@ def diarize(
 
 
 def _get_audio_files(
-    data_path: Union[Path, str, list],
-) -> List[Path]:
+    data_path: Path | str | list,
+) -> list[Path]:
     """
     Get the audio files from the data path. If a path to a directory is given, all files in the directory will be
     collected.
@@ -677,12 +676,12 @@ def _get_audio_files(
 
 
 def _run(
-    audio_files: List[Path],
+    audio_files: list[Path],
     description: str,
     vad_init_kwargs: dict,
     task_creator: TaskCreator,
     verbose: bool,
-) -> List[Tuple[bool, Tuple[str, list]]]:
+) -> list[tuple[bool, tuple[str, list]]]:
     """
     Load a VAD and use it to complete the tasks that will be created on the provided files using the given task creator.
 
@@ -697,7 +696,7 @@ def _run(
     # Load the VAD:
     vad = VoiceActivityDetector(**vad_init_kwargs)
     if verbose:
-        _LOGGER.info(f"Loading the VAD model.")
+        _LOGGER.info("Loading the VAD model.")
     vad.load()
     if verbose:
         _LOGGER.info("VAD model loaded.")
@@ -729,12 +728,12 @@ def _run(
 
 def _parallel_run(
     n_workers: int,
-    audio_files: List[Path],
+    audio_files: list[Path],
     description: str,
     vad_init_kwargs: dict,
     task_creator: TaskCreator,
     verbose: bool,
-) -> List[Tuple[bool, Tuple[str, list]]]:
+) -> list[tuple[bool, tuple[str, list]]]:
     """
     Run multiple VAD workers with multiprocessing to complete the tasks that will be created on the provided files using
     the given task creator.
@@ -750,7 +749,7 @@ def _parallel_run(
     """
     # Load the VAD (download once, and it will be loaded then per process later on):
     if verbose:
-        _LOGGER.info(f"Loading the VAD model.")
+        _LOGGER.info("Loading the VAD model.")
     vad = VoiceActivityDetector(**vad_init_kwargs)
     vad.load()
     if verbose:
@@ -804,7 +803,7 @@ def _parallel_run(
     ) as progressbar:
         while True:
             # Get a result from the queue:
-            result: Tuple[bool, Tuple[str, list]] = results_queue.get()
+            result: tuple[bool, tuple[str, list]] = results_queue.get()
             if result == _MULTIPROCESSING_STOP_MARK:
                 stop_marks_counter += 1
                 if stop_marks_counter == n_workers:
@@ -822,8 +821,8 @@ def _parallel_run(
 
 
 def _process_results(
-    results: List[Tuple[bool, Tuple[str, list]]], verbose: bool
-) -> Tuple[dict, dict]:
+    results: list[tuple[bool, tuple[str, list]]], verbose: bool
+) -> tuple[dict, dict]:
     """
     Process the results of the tasks.
 

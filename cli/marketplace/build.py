@@ -18,7 +18,6 @@ import shutil
 import subprocess
 import uuid
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Union
 
 import click
 import yaml
@@ -26,9 +25,14 @@ from bs4 import BeautifulSoup
 from sphinx.cmd.build import main as sphinx_build_cmd
 from sphinx.ext.apidoc import main as sphinx_apidoc_cmd
 
-from cli.utils.helpers import (PROJECT_ROOT, get_item_yaml_values,
-                               get_mock_requirements, is_item_dir, render_jinja)
 from cli.marketplace.changelog import ChangeLog
+from cli.utils.helpers import (
+    PROJECT_ROOT,
+    get_item_yaml_values,
+    get_mock_requirements,
+    is_item_dir,
+    render_jinja,
+)
 from cli.utils.path_iterator import PathIterator
 
 _verbose = False
@@ -192,7 +196,7 @@ def build_marketplace(
     write_change_log(marketplace_root / "README.md", change_log)
 
 
-def print_file_tree(title: str, path: Union[str, Path]):
+def print_file_tree(title: str, path: str | Path):
     click.echo(f"\n\n -- {title}:")
     path = Path(path)
     lines = ["---------------------------------", f"\t{path.resolve()}"]
@@ -210,7 +214,7 @@ def print_file_tree(title: str, path: Union[str, Path]):
 
 def write_change_log(readme_path: Path, change_log: ChangeLog):
     readme_path.touch(exist_ok=True)
-    content = open(readme_path, "r").read()
+    content = open(readme_path).read()
     if change_log.changes_available:
         with open(readme_path, "w") as f:
             compiled_change_log = change_log.compile()
@@ -218,7 +222,7 @@ def write_change_log(readme_path: Path, change_log: ChangeLog):
             f.write(content)
 
 
-def write_index_html(marketplace_root: Union[str, Path]):
+def write_index_html(marketplace_root: str | Path):
     marketplace_root = Path(marketplace_root)
     index_path = marketplace_root / "index.html"
     template_path = PROJECT_ROOT / "cli" / "marketplace" / "index.html"
@@ -238,7 +242,12 @@ def copy_resources(marketplace_dir, temp_docs):
 
 
 def update_or_create_items(
-    source_dir, source_name, marketplace_dir, temp_docs, change_log, force_update: bool = False
+    source_dir,
+    source_name,
+    marketplace_dir,
+    temp_docs,
+    change_log,
+    force_update: bool = False,
 ):
     click.echo("Creating items...")
     for item_dir in PathIterator(root=source_dir, rule=is_item_dir, as_path=True):
@@ -248,9 +257,9 @@ def update_or_create_items(
 
 
 def build_catalog_json(
-    marketplace_dir: Union[str, Path],
-    source_directory: Union[str, Path],
-    catalog_path: Union[str, Path],
+    marketplace_dir: str | Path,
+    source_directory: str | Path,
+    catalog_path: str | Path,
     change_log: ChangeLog,
     in_channel_directory: bool = True,
     with_assets: bool = False,
@@ -275,7 +284,7 @@ def build_catalog_json(
     channel = marketplace_dir.name
     source = marketplace_dir.parent.name
 
-    catalog = json.load(open(catalog_path, "r")) if catalog_path.exists() else {}
+    catalog = json.load(open(catalog_path)) if catalog_path.exists() else {}
 
     funcs = catalog
     if in_channel_directory:
@@ -325,7 +334,7 @@ def update_item_in_catalog(directory: Path, with_assets: bool) -> dict:
     """
     source_yaml_path = directory / "src" / "item.yaml"
 
-    item_yaml = yaml.full_load(open(source_yaml_path, "r"))
+    item_yaml = yaml.full_load(open(source_yaml_path))
     item_yaml["generationDate"] = str(item_yaml["generationDate"])
     if with_assets:
         add_assets(item_yaml)
@@ -360,7 +369,7 @@ def update_or_create_item(
     force_update: bool = False,
 ):
     # Copy source directories to target directories, if target already has the directory, archive previous version
-    item_yaml = yaml.full_load(open(item_dir / "item.yaml", "r"))
+    item_yaml = yaml.full_load(open(item_dir / "item.yaml"))
     source_version = item_yaml["version"]
     relative_path = "../../../"
 
@@ -369,9 +378,7 @@ def update_or_create_item(
     target_version = marketplace_item / source_version
 
     if target_version.exists() and not force_update:
-        latest_item_yaml = yaml.full_load(
-            open(target_latest / "src" / "item.yaml", "r")
-        )
+        latest_item_yaml = yaml.full_load(open(target_latest / "src" / "item.yaml"))
         if item_yaml["hidden"] == latest_item_yaml.get("hidden"):
             click.echo("Source version already exists in target directory!")
             return
@@ -432,8 +439,7 @@ def update_or_create_item(
 
     source_py_name = item_yaml.get("spec", {}).get("filename", "")
     if source_py_name.endswith(".py") and (item_dir / source_py_name).exists():
-
-        with open((item_dir / source_py_name), "r") as f:
+        with open(item_dir / source_py_name) as f:
             source_code = f.read()
 
         render_jinja(
@@ -447,7 +453,7 @@ def update_or_create_item(
             {"source_code": source_code},
         )
 
-    with open((item_dir / "item.yaml"), "r") as f:
+    with open(item_dir / "item.yaml") as f:
         source_code = f.read()
 
     render_jinja(
@@ -466,7 +472,7 @@ def update_or_create_item(
     asset_yaml_path = item_dir / f"{asset_name}.yaml"
 
     if asset_yaml_path.exists():
-        with open(asset_yaml_path, "r") as f:
+        with open(asset_yaml_path) as f:
             source_code = f.read()
         render_jinja(
             templates / "yaml.html",
@@ -490,7 +496,7 @@ def update_html_resource_paths(
     item_name: str = None,
 ):
     if html_path.exists():
-        with open(html_path, "r", encoding="utf8") as html:
+        with open(html_path, encoding="utf8") as html:
             parsed = BeautifulSoup(html.read(), features="html.parser")
 
         # Update back to docs link (from source page)
@@ -516,9 +522,9 @@ def update_html_resource_paths(
             nodes = parsed.find_all(lambda node: "_sources" in node.get("href", ""))
             for node in nodes:
                 # fix path and remove example from name:
-                node[
-                    "href"
-                ] = f'../{node["href"].replace("_sources", "src").replace("_example", "")}'
+                node["href"] = (
+                    f"../{node['href'].replace('_sources', 'src').replace('_example', '')}"
+                )
         else:
             # Removing download option from documentation:
             nodes = parsed.find_all(
@@ -551,7 +557,7 @@ def patch_temp_docs(source_dir, temp_docs):
 
     for directory in PathIterator(root=source_dir, rule=is_item_dir):
         directory = Path(directory)
-        with open(directory / "item.yaml", "r") as f:
+        with open(directory / "item.yaml") as f:
             item = yaml.full_load(f)
 
         example_file = directory / item["example"]
@@ -576,7 +582,7 @@ def build_temp_project(source_dir, temp_root):
             item_count += 1
             click.echo(f"[Temporary project] Now processing: {directory / 'item.yaml'}")
 
-        with open(directory / "item.yaml", "r") as f:
+        with open(directory / "item.yaml") as f:
             item = yaml.full_load(f)
 
         filename = item.get("spec")["filename"]
@@ -594,8 +600,8 @@ def build_temp_project(source_dir, temp_root):
 
 
 def collect_values_from_items(
-    source_dir: Union[Path, str], tags_set: Set[str]
-) -> Dict[str, List[str]]:
+    source_dir: Path | str, tags_set: set[str]
+) -> dict[str, list[str]]:
     """
     Collecting all tags values from item.yaml files.
     If the `with_requirements` flag is on than also collecting requirements from ite.yaml and requirements.txt files.
@@ -626,9 +632,7 @@ def collect_values_from_items(
     return tags
 
 
-def sphinx_quickstart(
-    temp_root: Union[str, Path], requirements: Optional[List[str]] = None
-):
+def sphinx_quickstart(temp_root: str | Path, requirements: list[str] | None = None):
     """
     Generate required files for a Sphinx project. sphinx-quickstart is an
     interactive tool that asks some questions about your project and then
@@ -694,5 +698,8 @@ def build_temp_docs(temp_root, temp_docs, source_dir):
 
     sphinx_apidoc_cmd(cmd.split(" "))
 
-    shutil.copytree(PROJECT_ROOT / "cli" / "marketplace" / "_static" / "css", temp_docs / '_static/css')
+    shutil.copytree(
+        PROJECT_ROOT / "cli" / "marketplace" / "_static" / "css",
+        temp_docs / "_static/css",
+    )
     click.echo("[Sphinx] Done autodoc")

@@ -12,28 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import os
 import json
 import logging
-from typing import Tuple, List
+import os
 
-from mlrun import MLClientCtx, DataItem, get_dataitem
-import mlrun.feature_store as f_store
 import mlrun.datastore
+import mlrun.feature_store as f_store
 import mlrun.utils
-from mlrun.datastore.targets import ParquetTarget
-
 from azureml.core.authentication import ServicePrincipalAuthentication
-from azureml.core.workspace import Workspace
-from azureml.core.experiment import Experiment
-from azureml.core.dataset import Dataset
-from azureml.core.model import Model
-from azureml.core.compute import ComputeTarget, AmlCompute
+from azureml.core.compute import AmlCompute, ComputeTarget
 from azureml.core.compute_target import ComputeTargetException
+from azureml.core.dataset import Dataset
+from azureml.core.experiment import Experiment
+from azureml.core.model import Model
 from azureml.core.script_run import ScriptRun
-
+from azureml.core.workspace import Workspace
 from azureml.train.automl import AutoMLConfig
 from azureml.train.automl.run import AutoMLRun
+from mlrun import DataItem, MLClientCtx, get_dataitem
+from mlrun.datastore.targets import ParquetTarget
 
 
 def _env_or_secret(context, key):
@@ -77,7 +74,7 @@ def _load_workspace(context: MLClientCtx) -> Workspace:
 
 def _init_experiment(
     context: MLClientCtx, experiment_name: str
-) -> Tuple[Workspace, Experiment]:
+) -> tuple[Workspace, Experiment]:
     """
     Initialize workspace and experiment in Azure ML. Uses Service
     Principal authentication via environment variables.
@@ -156,9 +153,9 @@ def register_dataset(
     """
 
     # test for Azure storage connection environment variable or secret:
-    assert _env_or_secret(
-        context, "AZURE_STORAGE_CONNECTION_STRING"
-    ), "AZURE_STORAGE_CONNECTION_STRING secret not set"
+    assert _env_or_secret(context, "AZURE_STORAGE_CONNECTION_STRING"), (
+        "AZURE_STORAGE_CONNECTION_STRING secret not set"
+    )
 
     # Connect to AzureML experiment and datastore:
     context.logger.info("Connecting to AzureML experiment default datastore")
@@ -177,7 +174,9 @@ def register_dataset(
         context.logger.info(
             f"Retrieving feature vector and uploading to Azure blob storage: {blob_path}"
         )
-        f_store.get_offline_features(data.meta.uri, target=ParquetTarget(path=blob_path))
+        f_store.get_offline_features(
+            data.meta.uri, target=ParquetTarget(path=blob_path)
+        )
     else:
         blob_path += data.suffix
         # DataItem case:
@@ -195,7 +194,7 @@ def register_dataset(
         )
     else:
         context.logger.info(
-            f"OpenSSL version must be 1.1. Overriding the OpenSSL version to 1.1"
+            "OpenSSL version must be 1.1. Overriding the OpenSSL version to 1.1"
         )
         # OpenSSL version must be 1.1
         os.environ["CLR_OPENSSL_VERSION_OVERRIDE"] = "1.1"
@@ -265,7 +264,7 @@ def upload_model(
 
 def _get_top_n_runs(
     remote_run: AutoMLRun, n: int = 5, primary_metric: str = "accuracy"
-) -> List[ScriptRun]:
+) -> list[ScriptRun]:
     """
     Get top N complete runs from experiment sorted by primary metric.
 
@@ -317,9 +316,9 @@ def _get_model_hp(
         return {}
     hp_dicts = spec_dict["objects"]
     # after training there are two hyper-parameters dicts inside the run object:
-    assert (
-        len(hp_dicts) == 2
-    ), "after training there are two hyper-parameters dicts inside the run object"
+    assert len(hp_dicts) == 2, (
+        "after training there are two hyper-parameters dicts inside the run object"
+    )
     result_dict = {}
     dict_keys = [
         ["data_trans_class_name", "data_trans_module", "data_trans_spec_class"],
@@ -336,7 +335,6 @@ def _get_model_hp(
     kwargs_prefix = "param_kwargs"
     for d, name, keys in zip(hp_dicts, ["data_trans", "train"], dict_keys):
         for key in keys:
-
             if kwargs_prefix in key:
                 result_dict[key] = d[kwargs_prefix][
                     key.replace(f"{name}_{kwargs_prefix}_", "")
@@ -357,7 +355,7 @@ def submit_training_job(
     registered_dataset_name: str,
     automl_settings: dict,
     training_set: DataItem,
-    label_column_name: str = '',
+    label_column_name: str = "",
     save_n_models: int = 3,
     show_output: bool = True,
 ) -> None:
@@ -390,7 +388,7 @@ def submit_training_job(
     if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
         feature_vector = training_set.meta.uri
         label_column_name = label_column_name or training_set.meta.status.label_column
-        context.logger.info(f'label column name: {label_column_name}')
+        context.logger.info(f"label column name: {label_column_name}")
         training_set = f_store.get_offline_features(feature_vector).to_dataframe()
     else:
         training_set = training_set.as_df()
@@ -445,9 +443,7 @@ def submit_training_job(
         with context.get_child_context(**model_hp_dict) as child:
             model_key = f"model_{i + 1}_{model_hp_dict['data_trans_class_name'].lower()}_{model_hp_dict['train_class_name'].lower()}"
             # Log model:
-            context.logger.info(
-                f"Logging {model_key} model to MLRun"
-            )
+            context.logger.info(f"Logging {model_key} model to MLRun")
             child.log_results(metrics)
             child.log_model(
                 "model",

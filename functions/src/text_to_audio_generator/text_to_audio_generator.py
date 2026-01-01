@@ -19,7 +19,6 @@ import pathlib
 import random
 import tempfile
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -37,20 +36,20 @@ SAMPLE_RATE = 24000
 
 def generate_multi_speakers_audio(
     data_path: str,
-    speakers: Union[List[str], Dict[str, int]],
-    available_voices: List[str],
+    speakers: list[str] | dict[str, int],
+    available_voices: list[str],
     engine: str = "openai",
     output_directory: str = None,
-    use_gpu: Optional[bool] = None,
-    use_small_models: Optional[bool] = None,
-    offload_cpu: Optional[bool] = None,
-    model: Optional[str] = None,
-    speed: Optional[float] = None,
+    use_gpu: bool | None = None,
+    use_small_models: bool | None = None,
+    offload_cpu: bool | None = None,
+    model: str | None = None,
+    speed: float | None = None,
     sample_rate: int = 16000,
     file_format: str = "wav",
     verbose: bool = True,
-    bits_per_sample: Optional[int] = None,
-) -> Tuple[str, pd.DataFrame, dict]:
+    bits_per_sample: int | None = None,
+) -> tuple[str, pd.DataFrame, dict]:
     """
     Generate audio files from text files.
 
@@ -90,7 +89,6 @@ def generate_multi_speakers_audio(
     data_path = pathlib.Path(data_path).absolute()
     text_files = _get_text_files(data_path=data_path)
 
-
     # Prepare the speech engine:
     engine = _get_engine(
         engine=engine,
@@ -99,7 +97,7 @@ def generate_multi_speakers_audio(
         offload_cpu=offload_cpu,
         model=model,
         file_format=file_format,
-        speed=speed
+        speed=speed,
     )
 
     # Check for per channel generation:
@@ -137,7 +135,6 @@ def generate_multi_speakers_audio(
     for text_file in tqdm.tqdm(
         text_files, desc="Generating", unit="file", disable=not verbose
     ):
-
         try:
             # Randomize voices for each speaker:
             chosen_voices = {}
@@ -147,7 +144,7 @@ def generate_multi_speakers_audio(
                 chosen_voices[speaker] = voice
                 available_voices_copy.remove(voice)
             # Read text:
-            with open(text_file, "r") as fp:
+            with open(text_file) as fp:
                 text = fp.read()
             # Prepare a holder for all the generated pieces (if per channel each speaker will have its own):
             audio_pieces = (
@@ -238,7 +235,12 @@ class SpeechEngine(ABC):
 
 
 class BarkEngine(SpeechEngine):
-    def __init__(self, use_gpu: bool = True, use_small_models: bool = False, offload_cpu: bool = False):
+    def __init__(
+        self,
+        use_gpu: bool = True,
+        use_small_models: bool = False,
+        offload_cpu: bool = False,
+    ):
         try:
             self.bark = importlib.import_module("bark")
         except ImportError:
@@ -268,7 +270,9 @@ class BarkEngine(SpeechEngine):
 
 
 class OpenAIEngine(SpeechEngine):
-    def __init__(self, model: str = "tts-1", file_format: str = "wav", speed: float = 1.0):
+    def __init__(
+        self, model: str = "tts-1", file_format: str = "wav", speed: float = 1.0
+    ):
         try:
             self.openai = importlib.import_module("openai")
             self.pydub = importlib.import_module("pydub")
@@ -289,7 +293,7 @@ class OpenAIEngine(SpeechEngine):
                 api_key = context.get_secret(OPENAI_API_KEY)
                 base_url = context.get_secret(OPENAI_BASE_URL)
             except ModuleNotFoundError:
-                raise EnvironmentError(
+                raise OSError(
                     f"One or more of the OpenAI required environment variables ('{OPENAI_API_KEY}', '{OPENAI_BASE_URL}') are missing."
                     f"Please set them as environment variables or install mlrun (`pip install mlrun`)"
                     f"and set them as project secrets using `project.set_secrets`."
@@ -342,9 +346,10 @@ def _get_engine(engine: str, file_format: str, **kwargs) -> SpeechEngine:
             f"Unrecognized engine. The parameter `engine` must be either 'bark' or 'openai'. Given: {engine}"
         )
 
+
 def _get_text_files(
     data_path: pathlib.Path,
-) -> List[pathlib.Path]:
+) -> list[pathlib.Path]:
     # Check if the path is of a directory or a file:
     if data_path.is_dir():
         # Get all files inside the directory:
@@ -360,7 +365,7 @@ def _get_text_files(
     return text_files
 
 
-def _split_line(line: str, max_length: int = 250) -> List[str]:
+def _split_line(line: str, max_length: int = 250) -> list[str]:
     if len(line) < max_length:
         return [line]
 

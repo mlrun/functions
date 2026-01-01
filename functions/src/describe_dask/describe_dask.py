@@ -12,18 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import mlrun
 import warnings
+
+import mlrun
+
 warnings.simplefilter(action="ignore", category=FutureWarning)
-import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
 from mlrun.artifacts import PlotArtifact, TableArtifact
 from mlrun.mlutils.plots import gcf_clear
-import numpy as np
-
 
 pd.set_option("display.float_format", lambda x: "%.2f" % x)
+
 
 def summarize(
     context,
@@ -35,7 +37,7 @@ def summarize(
     dask_client=None,
 ) -> None:
     """Summarize a table
-    
+
     Connects to dask client through the function context, or through an optional
     user-supplied scheduler.
 
@@ -51,15 +53,17 @@ def summarize(
     elif dask_client:
         client = dask_client
     else:
-        raise ValueError('dask client was not provided')
-        
+        raise ValueError("dask client was not provided")
+
     if dask_key in client.datasets:
         table = client.get_dataset(dask_key)
     elif dataset:
-        #table = dataset.as_df(df_module=dd)
+        # table = dataset.as_df(df_module=dd)
         table = dataset.as_df()
     else:
-        context.logger.info(f"only these datasets are available {client.datasets} in client {client}")
+        context.logger.info(
+            f"only these datasets are available {client.datasets} in client {client}"
+        )
         raise Exception("dataset not found on dask cluster")
     df = table
     header = df.columns.values

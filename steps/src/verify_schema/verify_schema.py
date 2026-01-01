@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 
+
 class VerifySchema:
     """
     This step validates that an event dictionary contains exactly the keys defined in the schema,
@@ -27,7 +28,9 @@ class VerifySchema:
         # Check if all keys in the expected schema are present in the event
         missing = set(self.schema) - set(event)
         if missing:
-            raise KeyError(f"Schema verification failed: missing keys {missing} in event: {event}")
+            raise KeyError(
+                f"Schema verification failed: missing keys {missing} in event: {event}"
+            )
 
         if self.allow_unexpected_keys:
             return event
@@ -35,6 +38,8 @@ class VerifySchema:
         # Check if there are any unexpected keys in the event
         unexpected = set(event) - set(self.schema)
         if unexpected:
-            raise KeyError(f"Schema verification failed: unexpected keys {unexpected} in event: {event}")
+            raise KeyError(
+                f"Schema verification failed: unexpected keys {unexpected} in event: {event}"
+            )
 
         return event

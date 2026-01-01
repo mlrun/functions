@@ -12,28 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import pandas as pd
-import pyarrow.parquet as pq
-import pyarrow as pa
-import numpy as np
-
-
-from mlrun.execution import MLClientCtx
-from mlrun.datastore import DataItem
-
-from typing import List
 import os
 
+import numpy as np
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+from mlrun.datastore import DataItem
+from mlrun.execution import MLClientCtx
 
 
 def _chunk_readwrite(
-        archive_url,
-        dest_path,
-        chunksize,
-        header,
-        encoding,
-        dtype,
-        dataset
+    archive_url, dest_path, chunksize, header, encoding, dtype, dataset
 ):
     """stream read and write archives
 
@@ -46,9 +36,15 @@ def _chunk_readwrite(
     """
     pqwriter = None
     header = []
-    for i, df in enumerate(pd.read_csv(archive_url, chunksize=chunksize,
-                                       names=header, encoding=encoding,
-                                       dtype=dtype)):
+    for i, df in enumerate(
+        pd.read_csv(
+            archive_url,
+            chunksize=chunksize,
+            names=header,
+            encoding=encoding,
+            dtype=dtype,
+        )
+    ):
         table = pa.Table.from_pandas(df)
         if i == 0:
             if dataset:
@@ -56,7 +52,9 @@ def _chunk_readwrite(
             else:
                 pqwriter = pq.ParquetWriter(dest_path, table.schema)
         if dataset:
-            pq.write_to_dataset(table, root_path=dest_path, partition_cols=partition_cols)
+            pq.write_to_dataset(
+                table, root_path=dest_path, partition_cols=partition_cols
+            )
         else:
             pqwriter.write_table(table)
     if pqwriter:
@@ -66,19 +64,19 @@ def _chunk_readwrite(
 
 
 def arc_to_parquet(
-        context: MLClientCtx,
-        archive_url: DataItem,
-        header: List[str] = [None],
-        chunksize: int = 0,
-        dtype=None,
-        encoding: str = "latin-1",
-        key: str = "data",
-        dataset: str = "None",
-        part_cols=[],
-        file_ext: str = "parquet",
-        index: bool = False,
-        refresh_data: bool = False,
-        stats: bool = False
+    context: MLClientCtx,
+    archive_url: DataItem,
+    header: list[str] = [None],
+    chunksize: int = 0,
+    dtype=None,
+    encoding: str = "latin-1",
+    key: str = "data",
+    dataset: str = "None",
+    part_cols=[],
+    file_ext: str = "parquet",
+    index: bool = False,
+    refresh_data: bool = False,
+    stats: bool = False,
 ) -> None:
     """Open a file/object archive and save as a parquet file or dataset
 
@@ -123,10 +121,12 @@ def arc_to_parquet(
     if not exists:
         context.logger.info("destination file does not exist, downloading")
         if chunksize > 0:
-            header = _chunk_readwrite(archive_url, dest_path, chunksize,
-                                      encoding, dtype, dataset)
-            context.log_dataset(key=key, stats=stats, format='parquet',
-                                target_path=dest_path)
+            header = _chunk_readwrite(
+                archive_url, dest_path, chunksize, encoding, dtype, dataset
+            )
+            context.log_dataset(
+                key=key, stats=stats, format="parquet", target_path=dest_path
+            )
         else:
             df = pd.read_csv(archive_url)
             context.log_dataset(key, df=df, format=file_ext, index=index)

@@ -12,25 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import pandas as pd
-from typing import Optional, List
-from sklearn.datasets import make_classification
 
+import pandas as pd
 from mlrun.execution import MLClientCtx
+from sklearn.datasets import make_classification
 
 
 def gen_class_data(
-        context: MLClientCtx,
-        n_samples: int,
-        m_features: int,
-        k_classes: int,
-        header: Optional[List[str]],
-        label_column: Optional[str] = "labels",
-        weight: float = 0.5,
-        random_state: int = 1,
-        key: str = "classifier-data",
-        file_ext: str = "parquet",
-        sk_params={}
+    context: MLClientCtx,
+    n_samples: int,
+    m_features: int,
+    k_classes: int,
+    header: list[str] | None,
+    label_column: str | None = "labels",
+    weight: float = 0.5,
+    random_state: int = 1,
+    key: str = "classifier-data",
+    file_ext: str = "parquet",
+    sk_params={},
 ):
     """Create a binary classification sample dataset and save.
     If no filename is given it will default to:
@@ -56,7 +55,8 @@ def gen_class_data(
         weights=weight,
         n_classes=k_classes,
         random_state=random_state,
-        **sk_params)
+        **sk_params,
+    )
 
     # make dataframes, add column names, concatenate (X, y)
     X = pd.DataFrame(features)

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any
 
 import mlrun
 
@@ -27,7 +27,7 @@ class _ToONNXConversions:
         model_handler,
         onnx_model_name: str = None,
         optimize_model: bool = True,
-        input_signature: List[Tuple[Tuple[int], str]] = None,
+        input_signature: list[tuple[tuple[int], str]] = None,
     ):
         """
         Convert a TF.Keras model to an ONNX model and log it back to MLRun as a new model object.
@@ -82,10 +82,10 @@ class _ToONNXConversions:
         model_handler,
         onnx_model_name: str = None,
         optimize_model: bool = True,
-        input_signature: List[Tuple[Tuple[int, ...], str]] = None,
-        input_layers_names: List[str] = None,
-        output_layers_names: List[str] = None,
-        dynamic_axes: Dict[str, Dict[int, str]] = None,
+        input_signature: list[tuple[tuple[int, ...], str]] = None,
+        input_layers_names: list[str] = None,
+        output_layers_names: list[str] = None,
+        dynamic_axes: dict[str, dict[int, str]] = None,
         is_batched: bool = True,
     ):
         """
@@ -163,7 +163,7 @@ def to_onnx(
     load_model_kwargs: dict = None,
     onnx_model_name: str = None,
     optimize_model: bool = True,
-    framework_kwargs: Dict[str, Any] = None,
+    framework_kwargs: dict[str, Any] = None,
 ):
     """
     Convert the given model to an ONNX model.
@@ -225,7 +225,7 @@ def optimize(
     context: mlrun.MLClientCtx,
     model_path: str,
     handler_init_kwargs: dict = None,
-    optimizations: List[str] = None,
+    optimizations: list[str] = None,
     fixed_point: bool = False,
     optimized_model_name: str = None,
 ):

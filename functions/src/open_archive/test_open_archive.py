@@ -12,17 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from pathlib import Path
-import shutil
 import os
+import shutil
 import tarfile
-from mlrun import code_to_function, import_function
+from pathlib import Path
+
 import open_archive
 import pytest
+from mlrun import code_to_function, import_function
 
-ARTIFACTS_PATH = 'artifacts'
-CONTENT_PATH = 'content/data/images'
-ARCHIVE_URL = "https://s3.wasabisys.com/iguazio/data/cats-vs-dogs/cats-vs-dogs-labeling-demo.zip"
+ARTIFACTS_PATH = "artifacts"
+CONTENT_PATH = "content/data/images"
+ARCHIVE_URL = (
+    "https://s3.wasabisys.com/iguazio/data/cats-vs-dogs/cats-vs-dogs-labeling-demo.zip"
+)
 
 
 def _delete_outputs(paths):
@@ -32,27 +35,32 @@ def _delete_outputs(paths):
 
 
 def test_open_archive():
-    fn = code_to_function(name='test_open_archive',
-                          filename="open_archive.py",
-                          handler="open_archive",
-                          kind="local",
-                          )
+    fn = code_to_function(
+        name="test_open_archive",
+        filename="open_archive.py",
+        handler="open_archive",
+        kind="local",
+    )
     fn.spec.command = "open_archive.py"
-    fn.run(inputs={'archive_url': ARCHIVE_URL},
-           params={'key': 'test_archive', 'target_path': os.getcwd() + '/content/'},
-           local=True)
+    fn.run(
+        inputs={"archive_url": ARCHIVE_URL},
+        params={"key": "test_archive", "target_path": os.getcwd() + "/content/"},
+        local=True,
+    )
 
     assert Path(CONTENT_PATH).is_dir()
-    _delete_outputs({'artifacts', 'runs', 'schedules', 'content'})
+    _delete_outputs({"artifacts", "runs", "schedules", "content"})
 
 
 def test_open_archive_import_function():
     fn = import_function("function.yaml")
-    run = fn.run(inputs={'archive_url': ARCHIVE_URL},
-                 params={'key': 'test_archive', 'target_path': os.getcwd() + '/content/'},
-                 local=True)
-    assert (run.status.artifact_uris["test_archive"])
-    _delete_outputs({'artifacts', 'runs', 'schedules', 'content'})
+    run = fn.run(
+        inputs={"archive_url": ARCHIVE_URL},
+        params={"key": "test_archive", "target_path": os.getcwd() + "/content/"},
+        local=True,
+    )
+    assert run.status.artifact_uris["test_archive"]
+    _delete_outputs({"artifacts", "runs", "schedules", "content"})
 
 
 def test_traversal_entry():
@@ -65,6 +73,8 @@ def test_traversal_entry():
         tar.add("malicious.txt", arcname="../malicious.txt")
 
     with pytest.raises(ValueError):
-        open_archive._extract_gz_file("malicious.tar.gz", target_path=os.getcwd() + '/content/')
+        open_archive._extract_gz_file(
+            "malicious.tar.gz", target_path=os.getcwd() + "/content/"
+        )
     os.remove("malicious.txt")
     os.remove("malicious.tar.gz")

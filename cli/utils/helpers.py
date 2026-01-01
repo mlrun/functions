@@ -15,10 +15,10 @@
 import os
 import pathlib
 import subprocess
-from pathlib import Path
-from typing import Union, List, Set, Dict
 import sys
 from glob import iglob
+from pathlib import Path
+
 import yaml
 from jinja2 import Template
 
@@ -35,13 +35,11 @@ def is_function_dir(path: Path) -> bool:
     # dir_name = path.name
     # ipynb_found = any((f.name.endswith(".ipynb") for f in path.iterdir()))
     # py_found = any((f.name.endswith(".py") for f in path.iterdir()))
-    return any((f.name == "function.yaml" for f in path.iterdir()))
+    return any(f.name == "function.yaml" for f in path.iterdir())
 
 
-def render_jinja(
-    template_path: Union[str, Path], output_path: Union[str, Path], data: dict
-):
-    with open(template_path, "r") as t:
+def render_jinja(template_path: str | Path, output_path: str | Path, data: dict):
+    with open(template_path) as t:
         template_text = t.read()
 
     template = Template(template_text)
@@ -51,46 +49,46 @@ def render_jinja(
         out_t.write(rendered)
 
 
-def install_pipenv():
-    print("Installing pipenv...")
-    pipenv_install: subprocess.CompletedProcess = subprocess.run(
-        f"export PIP_NO_INPUT=1;pip install pipenv==2023.10.24",
-        stdout=sys.stdout,
+def ensure_uv_available():
+    """Ensure `uv` is available on PATH.
+
+    We don't auto-install it here (CI should install it explicitly).
+    """
+    completed_process: subprocess.CompletedProcess = subprocess.run(
+        ["uv", "--version"],
+        stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        shell=True,
+        shell=False,
     )
-    exit_on_non_zero_return(pipenv_install)
+    exit_on_non_zero_return(completed_process)
 
 
-def install_python(directory: Union[str, Path]):
-    print(f"Installing python for {directory} ...")
-    install_command = f"pipenv --rm;pipenv --python 3.10.17"
-    if (os.environ.get('CONDA_DEFAULT_ENV') is not None) and (os.environ.get('CONDA_PREFIX') is not None):
-        print("conda env detected using conda to get pipenv python version")
-        install_command = f"pipenv --rm;pipenv --python=$(conda run which python) --site-packages"
-    python_install: subprocess.CompletedProcess = subprocess.run(
-        install_command,
-        stdout=sys.stdout,
-        stderr=subprocess.PIPE,
-        cwd=directory,
-        shell=True,
-    )
-
-    exit_on_non_zero_return(python_install)
-
-    stderr = python_install.stderr.decode("utf8")
-    stderr = stderr.split("\n")
-    python_location = [l for l in stderr if "Virtualenv location: " in l]
-    if python_location.count(python_location)>0:
-        python_location = (
-            python_location[0].split("Virtualenv location: ")[-1] + "bin/python"
-        )
-    else:
-        python_location = None
-    return python_location
+def _uv_python_path(directory: str | Path) -> str:
+    directory = Path(directory)
+    python_bin = directory / ".venv" / "bin" / "python"
+    return str(python_bin)
 
 
-def _run_subprocess(cmd: List[str], directory):
+def install_python(directory: str | Path):
+    """Create (or reuse) an isolated uv venv under `<directory>/.venv`.
+
+    Returns the venv python path.
+    """
+    directory = Path(directory)
+    print(f"Ensuring uv venv for {directory} ...")
+
+    python_version = os.environ.get("MLRUN_HUB_PYTHON_VERSION", "3.11")
+
+    # Create venv if missing
+    venv_dir = directory / ".venv"
+    if not venv_dir.exists():
+        cmd = ["uv", "venv", str(venv_dir), "--python", python_version]
+        _run_subprocess(cmd, directory)
+
+    return _uv_python_path(directory)
+
+
+def _run_subprocess(cmd: list[str], directory):
     completed_process: subprocess.CompletedProcess = subprocess.run(
         cmd,
         stdout=sys.stdout,
@@ -103,14 +101,17 @@ def _run_subprocess(cmd: List[str], directory):
 
 def install_requirements(
     directory: str,
-    requirements: Union[List[str], Set[str]],
+    requirements: list[str] | set[str],
 ):
     """
     Installing requirements from a requirements list/set and from a requirements.txt file if found in directory
     :param directory:       The relevant directory were the requirements are installed and collected
     :param requirements:    Requirement list/set with or without bounds
     """
-    requirements_file = Path(directory) / 'requirements.txt'
+    requirements_file = Path(directory) / "requirements.txt"
+
+    # Ensure venv exists
+    venv_python = install_python(directory)
 
     if not requirements and not requirements_file.exists():
         print(f"No requirements found for {directory}...")
@@ -118,23 +119,30 @@ def install_requirements(
 
     if requirements_file.exists():
         print(f"Installing requirements from {requirements_file}...")
-        cmd = ["pipenv", "install", "--skip-lock", "-r", str(requirements_file)]
+        cmd = [
+            "uv",
+            "pip",
+            "install",
+            "--python",
+            venv_python,
+            "-r",
+            str(requirements_file),
+        ]
         _run_subprocess(cmd, directory)
-        with open(requirements_file, "r") as f:
-            mlrun_version = [l.replace("\n", "") for l in f.readlines() if "mlrun" in l]
-            # remove mlrun from requirements if installed with version limits:
-            if mlrun_version and any([c in mlrun_version[0] for c in "<>=~"]):
-                requirements = [r for r in requirements if "mlrun" not in r]
+
+        # NOTE: Do not modify the explicitly provided `requirements` list based on
+        # the contents of requirements.txt. The CI TestSuite injects the desired
+        # mlrun version from item.yaml (mlrunVersion), and we must always install it.
 
     if requirements:
         print(f"Installing requirements [{' '.join(requirements)}] for {directory}...")
-        cmd = ["pipenv", "install", "--skip-lock", *requirements]
+        cmd = ["uv", "pip", "install", "--python", venv_python, *requirements]
         _run_subprocess(cmd, directory)
 
 
 def get_item_yaml_values(
-    item_path: pathlib.Path, keys: Union[str, Set[str]]
-) -> Dict[str, Set[str]]:
+    item_path: pathlib.Path, keys: str | set[str]
+) -> dict[str, set[str]]:
     """
     Getting value from item.yaml requested field.
 
@@ -153,7 +161,7 @@ def get_item_yaml_values(
         item_path = Path(item_path)
         if item_path.is_dir():
             item_path = item_path / "item.yaml"
-        with open(item_path, "r") as f:
+        with open(item_path) as f:
             item = yaml.full_load(f)
         if key in item:
             values = item.get(key, "")
@@ -174,7 +182,7 @@ def get_item_yaml_values(
     return values_dict
 
 
-def get_mock_requirements(source_dir: Union[str, Path]) -> List[str]:
+def get_mock_requirements(source_dir: str | Path) -> list[str]:
     """
     Getting all requirements from .py files inside all the subdirectories of the given source dir.
     Only the files with the same name as their parent directory are taken in consideration.
@@ -197,13 +205,13 @@ def get_mock_requirements(source_dir: Union[str, Path]) -> List[str]:
             # Skipping test files
             continue
         # Getting all packages:
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             lines = list(filter(None, f.read().split("\n")))
             for line in lines:
-                words = line.split(' ')
+                words = line.split(" ")
                 words = [w for w in words if w]
-                if words and (words[0] == 'from' or words[0] == 'import'):
-                    mock_reqs.add(words[1].split('.')[0])
+                if words and (words[0] == "from" or words[0] == "import"):
+                    mock_reqs.add(words[1].split(".")[0])
 
     return sorted(mock_reqs)
 

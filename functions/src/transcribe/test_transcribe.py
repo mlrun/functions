@@ -20,7 +20,6 @@ from difflib import SequenceMatcher
 import mlrun
 import pytest
 
-
 expected_outputs = [
     "This is a speech to text test.",
     "In the heart of the stadium, "
@@ -30,7 +29,6 @@ expected_outputs = [
     "as the game writes its unpredictable story on the field of destiny.",
 ]
 models = [
-
     "openai/whisper-tiny",
 ]
 
@@ -42,7 +40,9 @@ def test_transcribe(model_name: str, audio_path: str):
     # Setting variables and importing function:
     artifact_path = tempfile.mkdtemp()
     project = mlrun.get_or_create_project("test")
-    transcribe_function = project.set_function("transcribe.py", "transcribe", kind="job", image="mlrun/mlrun")
+    transcribe_function = project.set_function(
+        "transcribe.py", "transcribe", kind="job", image="mlrun/mlrun"
+    )
     # transcribe_function = mlrun.import_function("function.yaml")
     temp_dir = tempfile.mkdtemp()
 
@@ -80,7 +80,7 @@ def test_transcribe(model_name: str, audio_path: str):
 
     # Check that the transcribed text was approximately (90%) generated from audio:
     for text_file, expected in zip(text_files, expected_outputs):
-        with open(os.path.join(temp_dir, text_file), "r") as f:
+        with open(os.path.join(temp_dir, text_file)) as f:
             output = f.readlines()[0]
             ratio = SequenceMatcher(None, expected, output).ratio()
             assert ratio >= 0.9

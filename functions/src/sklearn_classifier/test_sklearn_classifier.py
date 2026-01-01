@@ -12,22 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import mlrun
 import os
 import pickle
+
+import mlrun
 import pandas as pd
 
 
 def generate_data():
-    fn = mlrun.import_function('../gen_class_data/function.yaml')
-    run = fn.run(params={'key': 'classifier-data',
-                         'n_samples': 10_000,
-                         'm_features': 5,
-                         'k_classes': 2,
-                         'header': None,
-                         'weight': [0.5, 0.5],
-                         'sk_params': {'n_informative': 2},
-                         'file_ext': 'csv'}, local=True, artifact_path="./artifacts")
+    fn = mlrun.import_function("../gen_class_data/function.yaml")
+    run = fn.run(
+        params={
+            "key": "classifier-data",
+            "n_samples": 10_000,
+            "m_features": 5,
+            "k_classes": 2,
+            "header": None,
+            "weight": [0.5, 0.5],
+            "sk_params": {"n_informative": 2},
+            "file_ext": "csv",
+        },
+        local=True,
+        artifact_path="./artifacts",
+    )
     return run
 
 
@@ -35,23 +42,31 @@ def test_import_sklearn_classifier():
     acquire_run = generate_data()
     fn = mlrun.import_function("function.yaml")
     # define model
-    params = {"model_pkg_class": "sklearn.ensemble.RandomForestClassifier",
-              "label_column": "labels"}
+    params = {
+        "model_pkg_class": "sklearn.ensemble.RandomForestClassifier",
+        "label_column": "labels",
+    }
 
-    train_run = fn.run(params=params,
-                       inputs={"dataset": acquire_run.status.artifacts[0]['spec']['target_path']},
-                       local=True,
-                       artifact_path="./")
+    train_run = fn.run(
+        params=params,
+        inputs={"dataset": acquire_run.status.artifacts[0]["spec"]["target_path"]},
+        local=True,
+        artifact_path="./",
+    )
 
     for artifact in train_run.status.artifacts:
-        if artifact['kind'] == 'model':
-            assert os.path.exists(artifact['spec']['target_path']), 'Could not find model dir'
+        if artifact["kind"] == "model":
+            assert os.path.exists(artifact["spec"]["target_path"]), (
+                "Could not find model dir"
+            )
             break
 
-    assert os.path.exists(train_run.status.artifacts[0]['spec']['target_path'])
-    model = pickle.load(open(artifact['spec']['target_path'] + artifact['spec']['model_file'], 'rb'))
-    df = pd.read_csv(acquire_run.status.artifacts[0]['spec']['target_path'])
-    x = df.drop(['labels'], axis=1).iloc[0:1]
-    y_true = df['labels'][0]
+    assert os.path.exists(train_run.status.artifacts[0]["spec"]["target_path"])
+    model = pickle.load(
+        open(artifact["spec"]["target_path"] + artifact["spec"]["model_file"], "rb")
+    )
+    df = pd.read_csv(acquire_run.status.artifacts[0]["spec"]["target_path"])
+    x = df.drop(["labels"], axis=1).iloc[0:1]
+    y_true = df["labels"][0]
     y_pred = model.predict_proba(x).argmax()
     assert y_pred == y_true, "Failed to predict correctly"

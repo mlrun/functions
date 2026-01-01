@@ -16,24 +16,23 @@ import logging
 from pathlib import Path
 from unittest.mock import Mock
 
-import pandas as pd
-import pytest
-from hypothesis import given
-from hypothesis import strategies as st
-
 import mlrun.common.model_monitoring.helpers
 import mlrun.model_monitoring.applications
 import mlrun.model_monitoring.applications.context as mm_context
 import mlrun.utils
-from mlrun.common.schemas.model_monitoring.constants import (
-    ResultKindApp,
-    ResultStatusApp,
-)
+import pandas as pd
+import pytest
 from histogram_data_drift import (
     DataDriftClassifier,
     HistogramDataDriftApplication,
     InvalidMetricValueError,
     InvalidThresholdValueError,
+)
+from hypothesis import given
+from hypothesis import strategies as st
+from mlrun.common.schemas.model_monitoring.constants import (
+    ResultKindApp,
+    ResultStatusApp,
 )
 
 assets_folder = Path(__file__).parent / "assets"
@@ -99,9 +98,9 @@ class TestDataDriftClassifier:
     def test_status(
         classifier: DataDriftClassifier, value: float, expected_status: ResultStatusApp
     ) -> None:
-        assert (
-            classifier.value_to_status(value) == expected_status
-        ), "The status is different than expected"
+        assert classifier.value_to_status(value) == expected_status, (
+            "The status is different than expected"
+        )
 
 
 class TestApplication:
@@ -205,15 +204,15 @@ class TestApplication:
                 res,
                 mlrun.model_monitoring.applications.ModelMonitoringApplicationResult,
             ):
-                assert (
-                    res.kind == ResultKindApp.data_drift
-                ), "The kind should be data drift"
-                assert (
-                    res.name == "general_drift"
-                ), "The result name should be general_drift"
-                assert (
-                    res.status == ResultStatusApp.potential_detection
-                ), "Expected potential detection in the general drift"
+                assert res.kind == ResultKindApp.data_drift, (
+                    "The kind should be data drift"
+                )
+                assert res.name == "general_drift", (
+                    "The result name should be general_drift"
+                )
+                assert res.status == ResultStatusApp.potential_detection, (
+                    "Expected potential detection in the general drift"
+                )
             elif isinstance(
                 res,
                 mlrun.model_monitoring.applications.ModelMonitoringApplicationMetric,
@@ -274,6 +273,6 @@ class TestMetricsPerFeature:
         assert set(metrics_per_feature.columns) == {
             metric.NAME for metric in application.metrics
         }, "Different metrics than expected"
-        assert set(metrics_per_feature.index) == set(
-            feature_stats.columns
-        ), "The features are different than expected"
+        assert set(metrics_per_feature.index) == set(feature_stats.columns), (
+            "The features are different than expected"
+        )

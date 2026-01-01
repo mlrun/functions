@@ -15,10 +15,11 @@ import logging
 import operator
 import os
 import tempfile
+from collections.abc import Generator
 from functools import reduce, wraps
 from multiprocessing import Process, Queue
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Literal, NamedTuple, Tuple, Union
+from typing import Any, Literal, NamedTuple
 
 import pandas as pd
 import torch
@@ -38,7 +39,7 @@ class BaseTask:
     """
 
     def __init__(
-        self, audio_file: Path, transcription_output: Union[dict, str], text_file: Path
+        self, audio_file: Path, transcription_output: dict | str, text_file: Path
     ):
         """
         Initialize the task.
@@ -75,7 +76,7 @@ class BaseTask:
         """
         return self._error is not None
 
-    def get_result(self) -> Tuple[str, str]:
+    def get_result(self) -> tuple[str, str]:
         """
         Get the result of the task. If the task failed, the error will be returned, otherwise, the result will be the
         text file name.
@@ -86,7 +87,7 @@ class BaseTask:
             return self._audio_file.name, self._error
         return self._audio_file.name, self._text_file.name
 
-    def to_tuple(self) -> Tuple[str, dict]:
+    def to_tuple(self) -> tuple[str, dict]:
         """
         Convert the task to a tuple to reconstruct it later (used for multiprocessing to pass in queue).
 
@@ -147,7 +148,7 @@ class SpeechDiarizationTask(BaseTask):
         audio_file: Path,
         transcription_output: dict,
         text_file: Path,
-        speech_diarization: List[Tuple[float, float, str]],
+        speech_diarization: list[tuple[float, float, str]],
     ):
         """
         Initialize the task.
@@ -163,10 +164,10 @@ class SpeechDiarizationTask(BaseTask):
             text_file=text_file,
         )
         self._speech_diarization = speech_diarization
-        self._segments: List[SpeechDiarizationTask._DiarizationSegment] = None
+        self._segments: list[SpeechDiarizationTask._DiarizationSegment] = None
         self._last_chosen_index = 0
 
-    def to_tuple(self) -> Tuple[str, dict]:
+    def to_tuple(self) -> tuple[str, dict]:
         """
         Convert the task to a tuple to reconstruct it later (used for multiprocessing to pass in queue).
 
@@ -334,10 +335,10 @@ class SpeechDiarizationPerChannelTask(BaseTask):
         super().__init__(
             audio_file=audio_file, transcription_output={}, text_file=text_file
         )
-        self._transcription_output_channels: List[Tuple[str, dict]] = []
+        self._transcription_output_channels: list[tuple[str, dict]] = []
 
     @property
-    def transcription_output_channels(self) -> List[Tuple[str, dict]]:
+    def transcription_output_channels(self) -> list[tuple[str, dict]]:
         """
         Get the transcription output channels.
 
@@ -355,7 +356,7 @@ class SpeechDiarizationPerChannelTask(BaseTask):
                 return
         super().do_task()
 
-    def to_tuple(self) -> Tuple[str, dict]:
+    def to_tuple(self) -> tuple[str, dict]:
         """
         Convert the task to a tuple to reconstruct it later (used for multiprocessing to pass in queue).
 
@@ -412,7 +413,7 @@ class BatchProcessor:
     associated methods.
     """
 
-    def __init__(self, audio_files: List[Path], output_directory: Path):
+    def __init__(self, audio_files: list[Path], output_directory: Path):
         """
         Initialize the batch processor.
 
@@ -425,10 +426,10 @@ class BatchProcessor:
 
         # Prepare the batching variables:
         self._current_file_index = 0
-        self._tasks: List[BaseTask] = []
-        self._results: List[Tuple[bool, Tuple[str, str]]] = []
+        self._tasks: list[BaseTask] = []
+        self._results: list[tuple[bool, tuple[str, str]]] = []
 
-    def process_batch(self, batch: List[Union[dict, str]]):
+    def process_batch(self, batch: list[dict | str]):
         """
         Process a batch of transcriptions. Tasks related to the given batch will be created and stored in the batch
         processor.
@@ -450,7 +451,7 @@ class BatchProcessor:
             ]
         )
 
-    def get_tasks(self) -> List[BaseTask]:
+    def get_tasks(self) -> list[BaseTask]:
         """
         Get the tasks to perform.
 
@@ -468,7 +469,7 @@ class BatchProcessor:
             task.do_task()
             self._results.append((task.is_failed(), task.get_result()))
 
-    def get_results(self) -> List[Tuple[bool, Tuple[str, str]]]:
+    def get_results(self) -> list[tuple[bool, tuple[str, str]]]:
         """
         Get the results of the tasks. The stored results are then cleared.
 
@@ -478,7 +479,7 @@ class BatchProcessor:
         self._results = []
         return results
 
-    def _get_current_files(self, batch_size: int) -> List[Path]:
+    def _get_current_files(self, batch_size: int) -> list[Path]:
         """
         Get the current files to process.
 
@@ -504,7 +505,7 @@ class SpeechDiarizationBatchProcessor(BatchProcessor):
     """
 
     def __init__(
-        self, audio_files: List[Path], output_directory: Path, speech_diarization: dict
+        self, audio_files: list[Path], output_directory: Path, speech_diarization: dict
     ):
         """
         Initialize the batch processor.
@@ -517,7 +518,7 @@ class SpeechDiarizationBatchProcessor(BatchProcessor):
         self._speech_diarization = speech_diarization
         self._audio_files = audio_files
 
-    def process_batch(self, batch: List[dict]):
+    def process_batch(self, batch: list[dict]):
         """
         Process a batch of transcriptions. Tasks related to the given batch will be created and stored in the batch
         processor.
@@ -550,10 +551,10 @@ class PerChannelSpeechDiarizationBatchProcessor(BatchProcessor):
 
     def __init__(
         self,
-        audio_files: List[Path],
+        audio_files: list[Path],
         output_directory: Path,
         n_channels: int,
-        speakers: List[str],
+        speakers: list[str],
     ):
         """
         Initialize the batch processor.
@@ -572,7 +573,7 @@ class PerChannelSpeechDiarizationBatchProcessor(BatchProcessor):
         # Prepare a channel buffer to store the channels until the current task created is fully covered:
         self._task_in_process: SpeechDiarizationPerChannelTask = None
 
-    def process_batch(self, batch: List[dict]):
+    def process_batch(self, batch: list[dict]):
         """
         Process a batch of transcriptions. Tasks related to the given batch will be created and stored in the batch
         processor.
@@ -627,50 +628,50 @@ class Transcriber:
         batch_size: int = 2,
         spoken_language: str = None,
         translate_to_english: bool = False,
-        return_timestamps: Union[bool, Literal["word"]] = False,
+        return_timestamps: bool | Literal["word"] = False,
         per_channel_transcription: int = 0,
     ):
         """
-        Initialize the transcriber.
+         Initialize the transcriber.
 
-        :param model_name:                The model name to use. Should be a model from the OpenAI's Whisper models for
-                                          best results (for example "tiny", "base", "large", etc.).
-        :param device:                    The device to use for inference. If not given, will use GPU if available.
-        :param use_flash_attention_2:     Whether to use the Flash Attention 2 implementation. It can be used only with
-                                          one of the following GPUs: Nvidia H series and Nvidia A series. T4 support
-                                          will be available soon.
+         :param model_name:                The model name to use. Should be a model from the OpenAI's Whisper models for
+                                           best results (for example "tiny", "base", "large", etc.).
+         :param device:                    The device to use for inference. If not given, will use GPU if available.
+         :param use_flash_attention_2:     Whether to use the Flash Attention 2 implementation. It can be used only with
+                                           one of the following GPUs: Nvidia H series and Nvidia A series. T4 support
+                                           will be available soon.
 
-                                          Note: If both `use_flash_attention_2` and
-                                          `use_better_transformers` are `None`, the optimization will be chosen
-                                          automatically according to the available resources.
+                                           Note: If both `use_flash_attention_2` and
+                                           `use_better_transformers` are `None`, the optimization will be chosen
+                                           automatically according to the available resources.
 
-        :param use_better_transformers:   Whether to use the Better Transformers library to further optimize the model.
-                                          Should be used for all use cases that do not support flash attention 2.
+         :param use_better_transformers:   Whether to use the Better Transformers library to further optimize the model.
+                                           Should be used for all use cases that do not support flash attention 2.
 
-                                          Note: If both `use_flash_attention_2` and `use_better_transformers` are
-                                          `None`, the optimization will be chosen automatically according to the
-                                          available resources.
-       :param assistant_model:           The assistant model name to use for inference. Notice that the optimizations
-                                          (flash attention 2 and better transformers) will be applied for the assistant
-                                          as well. Should be a model from Huggingface's distil-whisper (see here for
-                                          more information: https://github.com/huggingface/distil-whisper).
-        :param max_new_tokens:            The maximum number of new tokens to generate. This is used to limit the
-                                          generation length. Default is 128 tokens.
-        :param chunk_length_s:            The audio chunk to split the audio to (in seconds). Default is 30 seconds.
-        :param batch_size:                The batch size to use for inference. Default is 2.
-        :param spoken_language:           Aim whisper to know what language is spoken. If None, it will try to detect it
-                                          for each chunk.
-        :param translate_to_english:      Whether to translate the transcriptions to English. Default is False.
-        :param return_timestamps:         Whether to return the timestamps of the words. If "word", will return the
-                                          timestamps of each word. If True will return the timestamps of each chunk.
-                                          Default is False. Aimed to be used for speech diarization.
-        :param per_channel_transcription: Whether to do per channel transcription. If needed to run per channel
-                                          transcription, pass the number of channels expected for each audio file here.
-                                          0 means regular transcription (merge channels).
+                                           Note: If both `use_flash_attention_2` and `use_better_transformers` are
+                                           `None`, the optimization will be chosen automatically according to the
+                                           available resources.
+        :param assistant_model:           The assistant model name to use for inference. Notice that the optimizations
+                                           (flash attention 2 and better transformers) will be applied for the assistant
+                                           as well. Should be a model from Huggingface's distil-whisper (see here for
+                                           more information: https://github.com/huggingface/distil-whisper).
+         :param max_new_tokens:            The maximum number of new tokens to generate. This is used to limit the
+                                           generation length. Default is 128 tokens.
+         :param chunk_length_s:            The audio chunk to split the audio to (in seconds). Default is 30 seconds.
+         :param batch_size:                The batch size to use for inference. Default is 2.
+         :param spoken_language:           Aim whisper to know what language is spoken. If None, it will try to detect it
+                                           for each chunk.
+         :param translate_to_english:      Whether to translate the transcriptions to English. Default is False.
+         :param return_timestamps:         Whether to return the timestamps of the words. If "word", will return the
+                                           timestamps of each word. If True will return the timestamps of each chunk.
+                                           Default is False. Aimed to be used for speech diarization.
+         :param per_channel_transcription: Whether to do per channel transcription. If needed to run per channel
+                                           transcription, pass the number of channels expected for each audio file here.
+                                           0 means regular transcription (merge channels).
 
-                                          Note: If `per_channel_transcription` is not 0, `batch_size` must be treated to
-                                          be the number of channels and not audio files. Aimed to be used for per
-                                          channel speech diarization.
+                                           Note: If `per_channel_transcription` is not 0, `batch_size` must be treated to
+                                           be the number of channels and not audio files. Aimed to be used for per
+                                           channel speech diarization.
         """
         # Store loading parameters:
         self._model_name = model_name
@@ -781,11 +782,11 @@ class Transcriber:
 
     def transcribe(
         self,
-        audio_files: List[Path],
+        audio_files: list[Path],
         batch_processor: BatchProcessor = None,
         batches_queue: Queue = None,
         verbose: bool = False,
-    ) -> Union[List[List[dict]], None]:
+    ) -> list[list[dict]] | None:
         """
         Transcribe the given audio files. The transcriptions will be sent to a queue or a batch processor for further
         processing like writing to text files. If no queue or batch processor is given, the transcriptions outputs from
@@ -799,9 +800,10 @@ class Transcriber:
         :returns: The transcriptions outputs from the pipeline if no queue or batch processor is given, otherwise,
                   `None`.
         """
+
         # Wrap the audio files with a function to iterate over them via a generator (save memory and runtime with
         # Huggingface's pipelines as they preload each input while inference is running):
-        def audio_iterator() -> Generator[Union[dict, str], None, None]:
+        def audio_iterator() -> Generator[dict | str, None, None]:
             if self._per_channel_transcription:
                 for audio_file in audio_files:
                     audio, sampling_rate = torchaudio.load(str(audio_file))
@@ -813,7 +815,7 @@ class Transcriber:
                     yield str(audio_file)
 
         # Create a batch iterator:
-        def batch_iterator() -> Generator[List[Union[dict, str]], None, None]:
+        def batch_iterator() -> Generator[list[dict | str], None, None]:
             batch = []
             for audio in audio_iterator():
                 batch.append(audio)
@@ -899,7 +901,7 @@ def _multiprocessing_process_batches(
     """
     while True:
         # Get the batch:
-        batch: List[dict] = batches_queue.get()
+        batch: list[dict] = batches_queue.get()
         if batch == _MULTIPROCESSING_STOP_MARK:
             break
 
@@ -955,7 +957,7 @@ _LOGGER = logging.getLogger()
 
 
 def open_mpi_handler(
-    worker_inputs: List[str], root_worker_inputs: Dict[str, Any] = None
+    worker_inputs: list[str], root_worker_inputs: dict[str, Any] = None
 ):
     global _LOGGER
 
@@ -1056,7 +1058,7 @@ def open_mpi_handler(
             if comm.recv(source=0):
                 files = []
                 for file in os.listdir(output_directory):
-                    with open(output_directory / file, "r") as f:
+                    with open(output_directory / file) as f:
                         files.append((file, f.read()))
                 comm.send(files, dest=0)
             return None
@@ -1066,7 +1068,7 @@ def open_mpi_handler(
     return decorator
 
 
-def _check_mlrun_and_open_mpi() -> Tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intracomm"]:
+def _check_mlrun_and_open_mpi() -> tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intracomm"]:
     is_mpi = False
     try:
         import mlrun
@@ -1096,7 +1098,7 @@ def _check_mlrun_and_open_mpi() -> Tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intrac
 @open_mpi_handler(worker_inputs=["data_path"], root_worker_inputs={"verbose": True})
 def transcribe(
     # Input / Output kwargs:
-    data_path: Union[str, Path, List[Union[str, Path]]],
+    data_path: str | Path | list[str | Path],
     output_directory: str = None,
     # Model loading kwargs:
     model_name: str = "openai/whisper-tiny",
@@ -1111,11 +1113,11 @@ def transcribe(
     spoken_language: str = None,
     translate_to_english: bool = False,
     # Diarization kwargs:
-    speech_diarization: Dict[str, List[Tuple[float, float, str]]] = None,
+    speech_diarization: dict[str, list[tuple[float, float, str]]] = None,
     speech_diarize_per_channel: int = None,
-    speaker_labels: List[str] = None,
+    speaker_labels: list[str] = None,
     # Other kwargs:
-    use_multiprocessing: Union[bool, int] = False,
+    use_multiprocessing: bool | int = False,
     verbose: bool = False,
 ):
     """
@@ -1314,8 +1316,8 @@ def transcribe(
 
 
 def _get_audio_files(
-    data_path: Union[Path, str, list],
-) -> List[Path]:
+    data_path: Path | str | list,
+) -> list[Path]:
     """
     Get the audio files to transcribe. If a path to a directory is given, all files in the directory will be collected.
 
@@ -1350,11 +1352,11 @@ def _get_audio_files(
 
 
 def _run(
-    audio_files: List[Path],
+    audio_files: list[Path],
     batch_processor: BatchProcessor,
     transcriber: Transcriber,
     verbose: bool,
-) -> List[Tuple[bool, Tuple[str, str]]]:
+) -> list[tuple[bool, tuple[str, str]]]:
     """
     Run the transcription without multiprocessing.
 
@@ -1367,7 +1369,7 @@ def _run(
     """
     # Load the transcription pipeline:
     if verbose:
-        _LOGGER.info(f"Loading the transcription pipeline.")
+        _LOGGER.info("Loading the transcription pipeline.")
     transcriber.load()
     if verbose:
         _LOGGER.info("Transcription pipeline loaded.")
@@ -1385,7 +1387,7 @@ def _run(
 
 def _parallel_run(
     n_workers: int,
-    audio_files: List[Path],
+    audio_files: list[Path],
     batch_processor: BatchProcessor,
     transcriber: Transcriber,
     verbose: bool,
@@ -1431,7 +1433,7 @@ def _parallel_run(
 
     # Load the transcription pipeline:
     if verbose:
-        _LOGGER.info(f"Loading the transcription pipeline.")
+        _LOGGER.info("Loading the transcription pipeline.")
     transcriber.load()
     if verbose:
         _LOGGER.info("Transcription pipeline loaded.")
@@ -1446,7 +1448,7 @@ def _parallel_run(
     stop_marks_counter = 0
     while True:
         # Get a result from the queue:
-        result: Tuple[bool, Tuple[str, str]] = results_queue.get()
+        result: tuple[bool, tuple[str, str]] = results_queue.get()
         if result == _MULTIPROCESSING_STOP_MARK:
             stop_marks_counter += 1
             if stop_marks_counter == n_workers:

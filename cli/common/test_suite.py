@@ -12,23 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import re
 import subprocess
+import sys
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from subprocess import CompletedProcess
-from typing import List, Union, Optional
-import sys
+
 import click
 import yaml
-import re
 
 from cli.utils.helpers import (
-    is_item_dir,
-    install_pipenv,
+    ensure_uv_available,
+    get_item_yaml_values,
     install_python,
     install_requirements,
-    get_item_yaml_values,
+    is_item_dir,
 )
 from cli.utils.path_iterator import PathIterator
 
@@ -45,11 +45,13 @@ from cli.utils.path_iterator import PathIterator
     default=False,
     help="When true, test suite will stop running after the first test ran",
 )
-def test_suite(root_directory: str,
-               suite: str,
-               stop_on_failure: bool,
-               multi_processing: bool = False,
-               function_name: str = None):
+def test_suite(
+    root_directory: str,
+    suite: str,
+    stop_on_failure: bool,
+    multi_processing: bool = False,
+    function_name: str = None,
+):
     if not suite:
         click.echo("-s/--suite is required")
         exit(1)
@@ -101,25 +103,19 @@ def test_example(root_dir="."):
 @dataclass
 class TestResult:
     status: str
-    status_code: Optional[int]
+    status_code: int | None
     meta_data: dict = field(default_factory=dict)
 
     @classmethod
-    def passed(
-            cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
-    ):
+    def passed(cls, status_code: int | None = None, meta_data: dict | None = None):
         return cls(status="Passed", status_code=status_code, meta_data=meta_data)
 
     @classmethod
-    def failed(
-            cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
-    ):
+    def failed(cls, status_code: int | None = None, meta_data: dict | None = None):
         return cls(status="Failed", status_code=status_code, meta_data=meta_data)
 
     @classmethod
-    def ignored(
-            cls, status_code: Optional[int] = None, meta_data: Optional[dict] = None
-    ):
+    def ignored(cls, status_code: int | None = None, meta_data: dict | None = None):
         return cls(status="Ignored", status_code=status_code, meta_data=meta_data)
 
 
@@ -129,11 +125,11 @@ class TestSuite(ABC):
         self.test_results = []
 
     @abstractmethod
-    def discover(self, path: Union[str, Path]) -> List[str]:
+    def discover(self, path: str | Path) -> list[str]:
         pass
 
     @abstractmethod
-    def run(self, path: Union[str, Path]) -> TestResult:
+    def run(self, path: str | Path) -> TestResult:
         pass
 
     @abstractmethod
@@ -145,27 +141,32 @@ class TestSuite(ABC):
         pass
 
     @abstractmethod
-    def before_each(self, path: Union[str, Path]):
+    def before_each(self, path: str | Path):
         pass
 
     @abstractmethod
-    def after_each(self, path: Union[str, Path], test_result: TestResult):
+    def after_each(self, path: str | Path, test_result: TestResult):
         pass
 
-    def _run(self, path: Union[str, Path], multiprocess, function_name):
+    def _run(self, path: str | Path, multiprocess, function_name):
         import multiprocessing as mp
+
         process_count = 1
         if multiprocess:
             process_count = mp.cpu_count() - 1
-        print("running tests with {} process".format(process_count))
+        print(f"running tests with {process_count} process")
         discovered_functions = self.discover(path)
         if function_name is not None:
-            click.echo("running test with name {}".format(function_name))
-            discovered_functions = [fn for fn in discovered_functions if Path(function_name).stem == Path(fn).stem]
+            click.echo(f"running test with name {function_name}")
+            discovered_functions = [
+                fn
+                for fn in discovered_functions
+                if Path(function_name).stem == Path(fn).stem
+            ]
         for path in discovered_functions:
             if re.match(".+/test_*", path):
                 discovered_functions.remove(path)
-                print("a function name cannot start with test, please rename {} ".format(path))
+                print(f"a function name cannot start with test, please rename {path} ")
 
         self.before_run()
 
@@ -191,7 +192,7 @@ class TestPY(TestSuite):
         self.clean_env_artifacts = clean_env_artifacts
         self.results = []
 
-    def discover(self, path: Union[str, Path]) -> List[str]:
+    def discover(self, path: str | Path) -> list[str]:
         path = Path(path)
         testable = []
         item_yaml_path = path / "item.yaml"
@@ -226,24 +227,31 @@ class TestPY(TestSuite):
         return testable
 
     def before_run(self):
-        install_pipenv()
+        ensure_uv_available()
 
-    def before_each(self, path: Union[str, Path]):
+    def before_each(self, path: str | Path):
         pass
 
-    def run(self, path: Union[str, Path]):
-        print("PY run path {}".format(path))
-        install_python(path)
-        item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
-        mlrun_version = list(get_item_yaml_values(path, "mlrunVersion")["mlrunVersion"])[0]
-        install_requirements(path, ["pytest", f"mlrun=={mlrun_version}"] + item_requirements)
+    def run(self, path: str | Path):
+        print(f"PY run path {path}")
+        venv_python = install_python(path)
+        item_requirements = list(
+            get_item_yaml_values(path, "requirements")["requirements"]
+        )
+        mlrun_version = list(
+            get_item_yaml_values(path, "mlrunVersion")["mlrunVersion"]
+        )[0]
+        install_requirements(
+            path, ["pytest", f"mlrun=={mlrun_version}"] + item_requirements
+        )
         click.echo(f"Running tests for {path}...")
+
         completed_process: CompletedProcess = subprocess.run(
-            f"cd {path} ; pipenv run python -m pytest",
+            [venv_python, "-m", "pytest"],
             stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
-            shell=True,
+            shell=False,
         )
 
         meta_data = {"completed_process": completed_process, "test_path": path}
@@ -256,7 +264,7 @@ class TestPY(TestSuite):
             meta_data=meta_data,
         )
 
-    def after_each(self, path: Union[str, Path], test_result: TestResult):
+    def after_each(self, path: str | Path, test_result: TestResult):
         if self.clean_env_artifacts:
             clean_pipenv(path)
 
@@ -314,11 +322,11 @@ class TestPY(TestSuite):
             sys.exit(1)
 
     @staticmethod
-    def is_test_py(path: Union[str, Path]) -> bool:
+    def is_test_py(path: str | Path) -> bool:
         return (
-                path.is_file()
-                and path.name.startswith("test_")
-                and path.name.endswith(".py")
+            path.is_file()
+            and path.name.startswith("test_")
+            and path.name.endswith(".py")
         )
 
 
@@ -328,7 +336,7 @@ class TestIPYNB(TestSuite):
         self.clean_env_artifacts = clean_env_artifacts
         self.results = []
 
-    def discover(self, path: Union[str, Path]) -> List[str]:
+    def discover(self, path: str | Path) -> list[str]:
         path = Path(path)
         testables = []
 
@@ -357,34 +365,41 @@ class TestIPYNB(TestSuite):
             )
             exit(0)
         testables.sort()
-        click.echo(
-            "tests list " + str(testables)
-        )
+        click.echo("tests list " + str(testables))
         return testables
 
     def before_run(self):
-        install_pipenv()
+        ensure_uv_available()
 
-    def before_each(self, path: Union[str, Path]):
+    def before_each(self, path: str | Path):
         pass
 
     #    def run(self, path: Union[str, Path]) -> TestResult:
-    def run(self, path: Union[str, Path]) -> TestResult:
-        print("IPYNB run path {}".format(path))
-        install_python(path)
-        item_requirements = list(get_item_yaml_values(path, 'requirements')['requirements'])
+    def run(self, path: str | Path) -> TestResult:
+        print(f"IPYNB run path {path}")
+        venv_python = install_python(path)
+        item_requirements = list(
+            get_item_yaml_values(path, "requirements")["requirements"]
+        )
         install_requirements(path, ["papermill"] + item_requirements)
 
         click.echo(f"Running tests for {path}...")
         running_ipynb = Path(path).name + ".ipynb"
         click.echo(f"Running notebook {running_ipynb}")
-        command = f'pipenv run papermill {running_ipynb} out.ipynb --log-output'
+
         completed_process: CompletedProcess = subprocess.run(
-            f"cd {path} ;echo {command} ; {command}",
+            [
+                venv_python,
+                "-m",
+                "papermill",
+                running_ipynb,
+                "out.ipynb",
+                "--log-output",
+            ],
             stdout=sys.stdout,
             stderr=subprocess.PIPE,
             cwd=path,
-            shell=True
+            shell=False,
         )
 
         meta_data = {"completed_process": completed_process, "test_path": path}
@@ -438,7 +453,7 @@ class TestIPYNB(TestSuite):
         if failed_tests:
             exit(1)
 
-    def after_each(self, path: Union[str, Path], test_result: TestResult):
+    def after_each(self, path: str | Path, test_result: TestResult):
         if self.clean_env_artifacts:
             clean_pipenv(path)
 
@@ -454,22 +469,19 @@ class TestIPYNB(TestSuite):
                 click.echo(complete_subprocess.stderr.decode("utf-8"))
                 exit(test_result.status_code)
 
-    def _run(self, path: Union[str, Path], multi_processing, function_name):
+    def _run(self, path: str | Path, multi_processing, function_name):
         super()._run(path, multi_processing, function_name)
 
     @staticmethod
     def is_test_ipynb(path: Path):
-        return (
-                path.is_file()
-                and path.name.endswith(".ipynb")
-        )
+        return path.is_file() and path.name.endswith(".ipynb")
 
 
 class TestItemYamls(TestSuite):
     def __init__(self, stop_on_failure: bool = True):
         super().__init__(stop_on_failure)
 
-    def discover(self, path: Union[str, Path]) -> List[str]:
+    def discover(self, path: str | Path) -> list[str]:
         path = Path(path)
         testables = []
 
@@ -493,9 +505,9 @@ class TestItemYamls(TestSuite):
 
         return testables
 
-    def run(self, path: Union[str, Path]) -> TestResult:
+    def run(self, path: str | Path) -> TestResult:
         path = Path(path)
-        item = yaml.full_load(open(path, "r"))
+        item = yaml.full_load(open(path))
         directory = path.parent
 
         if item.get("spec")["filename"]:
@@ -572,10 +584,10 @@ class TestItemYamls(TestSuite):
         if failed_tests:
             exit(1)
 
-    def before_each(self, path: Union[str, Path]):
+    def before_each(self, path: str | Path):
         pass
 
-    def after_each(self, path: Union[str, Path], test_result: TestResult):
+    def after_each(self, path: str | Path, test_result: TestResult):
         if self.stop_on_failure:
             if test_result.status == "Failed":
                 message = test_result.meta_data["message"]
@@ -583,36 +595,40 @@ class TestItemYamls(TestSuite):
                 click.echo(f"Error: {message}")
                 exit(1)
 
-    def _run(self, path: Union[str, Path]):
+    def _run(self, path: str | Path):
         super()._run(path)
 
 
 def clean_pipenv(directory: str):
-    pip_file = Path(directory) / "Pipfile"
-    pip_lock = Path(directory) / "Pipfile.lock"
+    """Legacy name: cleanup the per-asset uv environment."""
+    directory = Path(directory)
+    venv_dir = directory / ".venv"
+    if venv_dir.exists():
+        import shutil
 
-    if pip_file.exists():
-        pip_file.unlink()
-    if pip_lock.exists():
-        pip_lock.unlink()
+        shutil.rmtree(venv_dir, ignore_errors=True)
 
 
 # load item yaml
 def load_item(path):
-    with open(path, 'r') as stream:
+    with open(path) as stream:
         data = yaml.load(stream=stream, Loader=yaml.FullLoader)
     return data
 
 
 def is_test_valid_by_item(item_posix_path):
-    full_path = str(item_posix_path.absolute())+'/item.yaml'
+    full_path = str(item_posix_path.absolute()) + "/item.yaml"
     data = load_item(full_path)
     if data.get("test_valid") is not None:
         test_valid = data.get("test_valid")
         test_name = data.get("name")
         if not test_valid:
-            click.echo("==================== Test {} Not valid ====================".format(test_name))
-            click.echo("==================== enable test_valid in item.yaml ====================")
+            click.echo(
+                f"==================== Test {test_name} Not valid ===================="
+            )
+            click.echo(
+                "==================== enable test_valid in item.yaml ===================="
+            )
         return test_valid
     else:
         return True

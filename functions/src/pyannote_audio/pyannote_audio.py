@@ -18,7 +18,7 @@ import operator
 import os
 import pathlib
 from functools import reduce, wraps
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any
 
 import pandas as pd
 import pyannote.audio
@@ -31,7 +31,7 @@ from tqdm import tqdm
 _LOGGER = logging.getLogger()
 
 
-def _check_mlrun_and_open_mpi() -> Tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intracomm"]:
+def _check_mlrun_and_open_mpi() -> tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intracomm"]:
     is_mpi = False
     try:
         import mlrun
@@ -59,7 +59,7 @@ def _check_mlrun_and_open_mpi() -> Tuple["mlrun.MLClientCtx", "mpi4py.MPI.Intrac
 
 
 def open_mpi_handler(
-    worker_inputs: List[str], root_worker_inputs: Dict[str, Any] = None
+    worker_inputs: list[str], root_worker_inputs: dict[str, Any] = None
 ):
     global _LOGGER
 
@@ -137,17 +137,17 @@ def open_mpi_handler(
 
 @open_mpi_handler(worker_inputs=["data_path"], root_worker_inputs={"verbose": True})
 def diarize(
-    data_path: Union[str, List[str]],
+    data_path: str | list[str],
     model_name: str = "pyannote/speaker-diarization-3.0",
     access_token: str = None,
     device: str = None,
-    speakers_labels: List[str] = None,
+    speakers_labels: list[str] = None,
     speaker_prefix: str = "speaker_",
     separate_by_channels: bool = False,
     minimum_speakers: int = None,
     maximum_speakers: int = None,
     verbose: bool = False,
-) -> Tuple[Dict[str, List[Tuple[float, float, str]]], Dict[str, str]]:
+) -> tuple[dict[str, list[tuple[float, float, str]]], dict[str, str]]:
     """
     Perform speech diarization on given audio files using pyannote-audio (https://github.com/pyannote/pyannote-audio).
     The end result is a dictionary with the file names as keys and their diarization as value. A diarization is a list
@@ -277,7 +277,7 @@ def diarize(
 
 def _get_audio_files(
     data_path: pathlib.Path,
-) -> List[pathlib.Path]:
+) -> list[pathlib.Path]:
     # Check if the path is of a directory or a file:
     if data_path.is_dir():
         # Get all files inside the directory:
@@ -320,11 +320,11 @@ def _diarize(
     audio: torch.Tensor,
     sample_rate: int,
     pipeline: pyannote.audio.Pipeline,
-    speakers_labels: List[str],
+    speakers_labels: list[str],
     separate_by_channels: bool,
     speaker_prefix: str,
     diarize_kwargs: dict,
-) -> List[Tuple[float, float, str]]:
+) -> list[tuple[float, float, str]]:
     # If there is no need for separation by channels, we diarize and return:
     if not separate_by_channels:
         # Diarize:

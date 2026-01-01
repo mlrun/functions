@@ -13,8 +13,9 @@
 # limitations under the License.
 #
 
-from openai_proxy_app import OpenAIModule
 import mlrun
+from openai_proxy_app import OpenAIModule
+
 
 class TestOpenAIProxyApp:
     """Test suite for TestOpenAIProxyApp class."""
@@ -26,6 +27,7 @@ class TestOpenAIProxyApp:
 
     def test_openai_proxy_app(self):
         """Test do_tracking with various dataframe sizes using parametrized test."""
-        assert type(self.TestOpenAIProxyApp.openai_proxy_app) == mlrun.runtimes.nuclio.application.application.ApplicationRuntime
-
-
+        assert (
+            type(self.TestOpenAIProxyApp.openai_proxy_app)
+            == mlrun.runtimes.nuclio.application.application.ApplicationRuntime
+        )

@@ -22,8 +22,17 @@ from mlrun.serving import ModelRunnerStep
 from mlrun.datastore.datastore_profile import (
     DatastoreProfileV3io,
     DatastoreProfileKafkaStream,
-    DatastoreProfileTDEngine,
 )
+
+# TimescaleDB support (mlrun >= 1.11), fallback to TDEngine for older versions
+try:
+    from mlrun.datastore.datastore_profile import DatastoreProfilePostgreSQL
+
+    _USE_TIMESCALEDB = True
+except ImportError:
+    from mlrun.datastore.datastore_profile import DatastoreProfileTDEngine
+
+    _USE_TIMESCALEDB = False
 from mlrun.utils import logger
 
 
@@ -87,13 +96,24 @@ class AgentDeployer:
             )
         if mlconf.is_ce_mode():
             mlrun_namespace = os.environ.get("MLRUN_NAMESPACE", "mlrun")
-            tsdb_profile = DatastoreProfileTDEngine(
-                name="tdengine-tsdb-profile",
-                user="root",
-                password="taosdata",
-                host=f"tdengine-tsdb.{mlrun_namespace}.svc.cluster.local",
-                port="6041",
-            )
+            if _USE_TIMESCALEDB:
+                tsdb_profile = DatastoreProfilePostgreSQL(
+                    name="timescaledb-tsdb-profile",
+                    user="postgres",
+                    password="postgres",
+                    host=f"timescaledb.{mlrun_namespace}.svc.cluster.local",
+                    port="5432",
+                    database="postgres",
+                )
+            else:
+                # Fallback for older mlrun versions
+                tsdb_profile = DatastoreProfileTDEngine(
+                    name="tdengine-tsdb-profile",
+                    user="root",
+                    password="taosdata",
+                    host=f"tdengine-tsdb.{mlrun_namespace}.svc.cluster.local",
+                    port="6041",
+                )
 
             stream_profile = DatastoreProfileKafkaStream(
                 name="kafka-stream-profile",

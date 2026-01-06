@@ -26,7 +26,7 @@ spec:
 metadata:
   categories:
   - model-serving
-  - utils
+  - utilities
   name: mlflow-utils
   tag: ''
 kind: serving

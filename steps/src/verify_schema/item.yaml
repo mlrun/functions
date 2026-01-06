@@ -17,4 +17,5 @@ spec:
   filename: verify_schema.py              
   image: mlrun/mlrun                                
   requirements:
+  kind: generic
 version: 1.0.0                                      

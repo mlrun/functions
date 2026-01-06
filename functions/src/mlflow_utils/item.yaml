@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
 - model-serving
-- utils
+- utilities
 description: Mlflow model server, and additional utils.
 doc: ''
 example: mlflow_utils.ipynb

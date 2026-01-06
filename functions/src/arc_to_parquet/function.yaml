@@ -94,7 +94,7 @@ spec:
   disable_auto_mount: false
 metadata:
   categories:
-  - utils
+  - utilities
   name: arc-to-parquet
   tag: ''
 verbose: false

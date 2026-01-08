@@ -1,0 +1,4 @@
+pytest
+mlrun
+langchain
+pydantic-settings

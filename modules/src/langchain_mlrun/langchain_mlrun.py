@@ -601,20 +601,29 @@ class MLRunTracer(BaseTracer):
 
     def _serialize_run(self, run: Run, include_child_runs: bool) -> dict:
         """
-        Serialize a LangChain run into a dictionary. LangChain's Run is currently in Pydantic v1 where some of its
-        inner models are in Pydantic V2 which causes issues when trying to serialize the whole run object directly.
-
-        This is a workaround to properly serialize the run object.
+        Serialize a LangChain run into a dictionary.
 
         :param run: The run to serialize.
         :param include_child_runs: Whether to include child runs in the serialization.
 
         :returns: The serialized run dictionary.
         """
-        if not include_child_runs:
-            serialized_run = run.dict(exclude={"child_runs"})
-        else:
-            serialized_run = run.dict()
+        # In LangChain 1.2.3+, the Run model uses Pydantic v2 with child_runs marked as Field(exclude=True), so we
+        # must manually serialize child runs. Still excluding manually for future compatibility. In previous
+        # LangChain versions, Run was Pydantic v1, so we use dict.
+        serialized_run = (
+            run.model_dump(exclude={"child_runs"})
+            if hasattr(run, "model_dump")
+            else run.dict(exclude={"child_runs"})
+        )
+
+        # Manually serialize child runs if needed:
+        if include_child_runs and run.child_runs:
+            serialized_run["child_runs"] = [
+                self._serialize_run(child_run, include_child_runs=True)
+                for child_run in run.child_runs
+            ]
+
         return orjson.loads(orjson.dumps(serialized_run, default=self._serialize_default))
 
     def _serialize_default(self, obj: Any):
@@ -631,7 +640,7 @@ class MLRunTracer(BaseTracer):
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()
         if hasattr(obj, "model_dump"):
-            return obj.model_dump()
+            return orjson.loads(orjson.dumps(obj.model_dump(), default=self._serialize_default))
         if hasattr(obj, "dict"):
             return orjson.loads(orjson.dumps(obj.dict(), default=self._serialize_default))
         return str(obj)

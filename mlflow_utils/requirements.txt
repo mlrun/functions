@@ -1,3 +1,0 @@
-mlflow==2.20.2
-lightgbm
-xgboost

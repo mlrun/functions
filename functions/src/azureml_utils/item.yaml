@@ -1,7 +1,7 @@
 apiVersion: v1
 categories:
 - model-serving
-- utils
+- utilities
 description: Azure AutoML integration in MLRun, including utils functions for training
   models on Azure AutoML platfrom.
 doc: ''

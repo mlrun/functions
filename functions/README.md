@@ -1,8 +1,8 @@
-# Functions hub 
+# Functions 
 
-This functions hub is intended to be a centralized location for open source contributions of function components.  
-These are functions expected to be run as independent mlrun pipeline compnents, and as public contributions, 
-it is expected that contributors follow certain guidelines/protocols (please chip-in).
+This functions hub is a centralized place for open source contributions of MLRun function components.  
+These functions are meant to run as independent MLRun runtimes components. 
+As public contributions, we ask that all contributors follow the project’s guidelines and conventions (please chip in).
 
 ## Catalog
 

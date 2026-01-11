@@ -1,8 +1,9 @@
 """
-MLRun to LangChain integration - a tracer that converts LangChain Run objects into MLRun monitoring events and
-publishes them to a V3IO stream via MLRun endpoint monitoring format.
+MLRun to LangChain integration - a tracer that converts LangChain Run objects into serializable event and send them to
+MLRun monitoring.
 """
 
+from abc import ABC, abstractmethod
 import copy
 import importlib
 import orjson
@@ -15,11 +16,10 @@ from contextvars import ContextVar
 import datetime
 from typing import Any, Callable, Generator, Optional
 
-import v3io
 from langchain_core.tracers import BaseTracer, Run
 from langchain_core.tracers.context import register_configure_hook
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from uuid_utils import uuid7
 
@@ -35,15 +35,13 @@ import mlrun.common.schemas.model_monitoring.constants as mm_constants
 mlrun_monitoring_env_var = "MLRUN_MONITORING_ENABLED"
 
 
-class _MLRunEndPointClient:
+class _MLRunEndPointClient(ABC):
     """
-    An MLRun model endpoint monitoring client to connect and send events on a V3IO stream.
+    An MLRun model endpoint monitoring client base class to connect and send events on a monitoring stream.
     """
 
     def __init__(
         self,
-        monitoring_stream_path: str,
-        monitoring_container: str,
         model_endpoint_name: str,
         model_endpoint_uid: str,
         serving_function: str | RemoteRuntime,
@@ -53,8 +51,6 @@ class _MLRunEndPointClient:
         """
         Initialize an MLRun model endpoint monitoring client.
 
-        :param monitoring_stream_path: V3IO stream path.
-        :param monitoring_container: V3IO container name.
         :param model_endpoint_name: The monitoring endpoint related model name.
         :param model_endpoint_uid: Model endpoint unique identifier.
         :param serving_function: Serving function name or ``RemoteRuntime`` object.
@@ -64,8 +60,6 @@ class _MLRunEndPointClient:
         raise: MLRunInvalidArgumentError: If there is no current active project and no `project` argument was provided.
         """
         # Store the provided info:
-        self._monitoring_stream_path = monitoring_stream_path
-        self._monitoring_container = monitoring_container
         self._model_endpoint_name = model_endpoint_name
         self._model_endpoint_uid = model_endpoint_uid
 
@@ -94,9 +88,6 @@ class _MLRunEndPointClient:
                 serving_function_tag or serving_function.metadata.tag
             )
 
-        # Initialize a V3IO client:
-        self._v3io_client = v3io.Client()
-
         # Prepare the sample:
         self._event_sample = {
             "class": "CustomStream",
@@ -120,6 +111,107 @@ class _MLRunEndPointClient:
             "effective_sample_count": 1,
         }
 
+    @abstractmethod
+    def monitor(
+        self,
+        event_id: str,
+        label: str,
+        input_data: dict,
+        output_data: dict,
+        request_timestamp: str,
+        response_timestamp: str,
+    ):
+        """
+        Monitor the provided event, sending it to the model endpoint monitoring stream.
+
+        :param event_id: Unique event identifier used as the monitored record id.
+        :param label: Label for the run/event.
+        :param input_data: Serialized input data for the run.
+        :param output_data: Serialized output data for the run.
+        :param request_timestamp: Request/start timestamp in the format of '%Y-%m-%d %H:%M:%S%z'.
+        :param response_timestamp: Response/end timestamp in the format of '%Y-%m-%d %H:%M:%S%z'.
+        """
+        pass
+
+    def _create_event(
+        self,
+        event_id: str,
+        label: str,
+        input_data: dict,
+        output_data: dict,
+        request_timestamp: str,
+        response_timestamp: str,
+    ) -> dict:
+        """
+        Create a new event out of the stored event sample.
+
+        :param event_id: Unique event identifier used as the monitored record id.
+        :param label: Label for the run/event.
+        :param input_data: Serialized input data for the run.
+        :param output_data: Serialized output data for the run.
+        :param request_timestamp: Request/start timestamp in the format of '%Y-%m-%d %H:%M:%S%z'.
+        :param response_timestamp: Response/end timestamp in the format of '%Y-%m-%d %H:%M:%S%z'.
+
+        :return: The event to send to the monitoring stream.
+        """
+        # Copy the sample:
+        event = copy.deepcopy(self._event_sample)
+
+        # Edit event with given parameters:
+        event["when"] = request_timestamp
+        event["request"]["inputs"].append(orjson.dumps({"label": label, "input": input_data}).decode('utf-8'))
+        event["resp"]["timestamp"] = response_timestamp
+        event["resp"]["outputs"].append(orjson.dumps(output_data).decode('utf-8'))
+        event["resp"]["id"] = event_id
+
+        return event
+
+
+class _V3IOMLRunEndPointClient(_MLRunEndPointClient):
+    """
+    An MLRun model endpoint monitoring client to connect and send events on a V3IO stream.
+    """
+
+    def __init__(
+        self,
+        monitoring_stream_path: str,
+        monitoring_container: str,
+        model_endpoint_name: str,
+        model_endpoint_uid: str,
+        serving_function: str | RemoteRuntime,
+        serving_function_tag: str | None = None,
+        project: str | mlrun.projects.MlrunProject = None,
+    ):
+        """
+        Initialize an MLRun model endpoint monitoring client.
+
+        :param monitoring_stream_path: V3IO stream path.
+        :param monitoring_container: V3IO container name.
+        :param model_endpoint_name: The monitoring endpoint related model name.
+        :param model_endpoint_uid: Model endpoint unique identifier.
+        :param serving_function: Serving function name or ``RemoteRuntime`` object.
+        :param serving_function_tag: Optional function tag (defaults to 'latest').
+        :param project: Project name or ``MlrunProject``. If ``None``, uses the current project.
+
+        raise: MLRunInvalidArgumentError: If there is no current active project and no `project` argument was provided.
+        """
+        super().__init__(
+            model_endpoint_name=model_endpoint_name,
+            model_endpoint_uid=model_endpoint_uid,
+            serving_function=serving_function,
+            serving_function_tag=serving_function_tag,
+            project=project,
+        )
+
+        import v3io
+
+        # Store the provided info:
+        self._monitoring_stream_path = monitoring_stream_path
+        self._monitoring_container = monitoring_container
+
+        # Initialize a V3IO client:
+        self._v3io_client = v3io.Client()
+
     def monitor(
         self,
         event_id: str,
@@ -140,14 +232,14 @@ class _MLRunEndPointClient:
         :param response_timestamp: Response/end timestamp in the format of '%Y-%m-%d %H:%M:%S%z'.
         """
         # Copy the sample:
-        event = copy.deepcopy(self._event_sample)
-
-        # Edit event with given parameters:
-        event["when"] = request_timestamp
-        event["request"]["inputs"].append(orjson.dumps({"label": label, "input": input_data}).decode('utf-8'))
-        event["resp"]["timestamp"] = response_timestamp
-        event["resp"]["outputs"].append(orjson.dumps(output_data).decode('utf-8'))
-        event["resp"]["id"] = event_id
+        event = self._create_event(
+            event_id=event_id,
+            label=label,
+            input_data=input_data,
+            output_data=output_data,
+            request_timestamp=request_timestamp,
+            response_timestamp=response_timestamp,
+        )
 
         # Push to stream:
         self._v3io_client.stream.put_records(
@@ -157,21 +249,119 @@ class _MLRunEndPointClient:
         )
 
 
+class _KafkaMLRunEndPointClient(_MLRunEndPointClient):
+    """
+    An MLRun model endpoint monitoring client to connect and send events on a Kafka stream.
+    """
+
+    def __init__(
+        self,
+        monitoring_broker: str,
+        monitoring_topic: str,
+        # TODO: Add more Kafka producer options if needed...
+        model_endpoint_name: str,
+        model_endpoint_uid: str,
+        serving_function: str | RemoteRuntime,
+        serving_function_tag: str | None = None,
+        project: str | mlrun.projects.MlrunProject = None,
+    ):
+        """
+        Initialize an MLRun model endpoint monitoring client.
+
+        :param monitoring_broker: Kafka broker name.
+        :param monitoring_topic: Kafka topic name.
+        TODO: Add more Kafka producer options if needed...
+        :param model_endpoint_name: The monitoring endpoint related model name.
+        :param model_endpoint_uid: Model endpoint unique identifier.
+        :param serving_function: Serving function name or ``RemoteRuntime`` object.
+        :param serving_function_tag: Optional function tag (defaults to 'latest').
+        :param project: Project name or ``MlrunProject``. If ``None``, uses the current project.
+
+        raise: MLRunInvalidArgumentError: If there is no current active project and no `project` argument was provided.
+        """
+        super().__init__(
+            model_endpoint_name=model_endpoint_name,
+            model_endpoint_uid=model_endpoint_uid,
+            serving_function=serving_function,
+            serving_function_tag=serving_function_tag,
+            project=project,
+        )
+
+        import kafka
+
+        # Store the provided info:
+        self._monitoring_broker = monitoring_broker
+        self._monitoring_topic = monitoring_topic
+
+        # Initialize a Kafka producer:
+        self._kafka_producer = kafka.KafkaProducer(
+            ...
+        )
+
+    def monitor(
+        self,
+        event_id: str,
+        label: str,
+        input_data: dict,
+        output_data: dict,
+        request_timestamp: str,
+        response_timestamp: str,
+    ):
+        """
+        Monitor the provided event, sending it to the model endpoint monitoring stream.
+
+        :param event_id: Unique event identifier used as the monitored record id.
+        :param label: Label for the run/event.
+        :param input_data: Serialized input data for the run.
+        :param output_data: Serialized output data for the run.
+        :param request_timestamp: Request/start timestamp in the format of '%Y-%m-%d %H:%M:%S%z'.
+        :param response_timestamp: Response/end timestamp in the format of '%Y-%m-%d %H:%M:%S%z'.
+        """
+        # Copy the sample:
+        event = self._create_event(
+            event_id=event_id,
+            label=label,
+            input_data=input_data,
+            output_data=output_data,
+            request_timestamp=request_timestamp,
+            response_timestamp=response_timestamp,
+        )
+
+        # Push to stream:
+        self._kafka_producer.send(
+            topic=self._monitoring_topic,
+            value=orjson.dumps(event),
+            key=self._model_endpoint_uid,
+        )
+
+
 class MLRunTracerClientSettings(BaseSettings):
     """
     MLRun tracer monitoring client configurations. These are mandatory arguments for allowing MLRun to send monitoring
     events to a specific model endpoint stream.
     """
 
-    stream_path: str = ...
+    v3io_stream_path: str | None = None
     """
     The V3IO stream path to send the events to.
     """
 
-    container: str = ...
+    v3io_container: str | None = None
     """
     The V3IO stream container.
     """
+
+    kafka_broker: str | None = None
+    """
+    The Kafka broker address.
+    """
+
+    kafka_topic: str | None = None
+    """
+    The Kafka topic name.
+    """
+
+    # TODO: Add more Kafka producer options if needed...
 
     model_endpoint_name: str = ...
     """
@@ -201,6 +391,27 @@ class MLRunTracerClientSettings(BaseSettings):
     #: Pydantic model configuration to set the environment variable prefix.
     model_config = SettingsConfigDict(env_prefix="MLRUN_TRACER_CLIENT_")
 
+    @model_validator(mode='after')
+    def check_exclusive_sets(self) -> 'MLRunTracerClientSettings':
+        """
+        Validate that either V3IO settings or Kafka settings are provided, but not both or none.
+
+        :return: The validated settings instance.
+        """
+        # Define the sets
+        v3io_settings = all([self.v3io_container, self.v3io_stream_path])
+        kafka_settings = all([self.kafka_topic, self.kafka_broker])  # TODO: Add mandatory other kafka settings
+
+        # Make sure only one set is provided:
+        if v3io_settings and kafka_settings:
+            raise ValueError("Provide either V3IO settings OR Kafka settings, not both.")
+        if not v3io_settings and not kafka_settings:
+            raise ValueError(
+                "You must provide either a complete V3IO settings or complete Kafka settings. See docs for more "
+                "information"
+            )
+
+        return self
 
 class MLRunTracerMonitorSettings(BaseSettings):
     """
@@ -303,7 +514,7 @@ class MLRunTracerMonitorSettings(BaseSettings):
 
     debug: bool = False
     """
-    If True, disable sending events to MLRun/V3IO and instead route events to `debug_target_list`
+    If True, disable sending events to MLRun and instead route events to `debug_target_list`
     or print them as JSON to stdout. Useful for unit tests and local debugging. Default: False.
     """
 
@@ -336,7 +547,7 @@ class MLRunTracerSettings(BaseSettings):
     """
     MLRun tracer settings to configure the tracer. The settings are split into two groups:
 
-    * `client`: settings required to connect and send events to the MLRun/V3IO monitoring stream.
+    * `client`: settings required to connect and send events to the MLRun monitoring stream.
     * `monitor`: settings controlling which LangChain runs are summarized and sent and how.
     """
 
@@ -465,15 +676,7 @@ class MLRunTracer(BaseTracer):
 
         # Initialize the MLRun endpoint client:
         self._mlrun_client = (
-            _MLRunEndPointClient(
-                monitoring_stream_path=self._client_settings.stream_path,
-                monitoring_container=self._client_settings.container,
-                model_endpoint_name=self._client_settings.model_endpoint_name,
-                model_endpoint_uid=self._client_settings.model_endpoint_uid,
-                serving_function=self._client_settings.serving_function,
-                serving_function_tag=self._client_settings.serving_function_tag,
-                project=self._client_settings.project,
-            )
+            self._get_mlrun_client()
             if not self._monitor_settings.debug
             else None
         )
@@ -500,6 +703,32 @@ class MLRunTracer(BaseTracer):
         :returns: The settings used by this tracer.
         """
         return self._settings
+
+    def _get_mlrun_client(self) -> _MLRunEndPointClient:
+        """
+        Create and return an MLRun model endpoint monitoring client based on the MLRun (CE or not) and current
+        configuration.
+
+        :returns: An MLRun model endpoint monitoring client.
+        """
+        if mlrun.mlconf.is_ce_mode():
+            return _KafkaMLRunEndPointClient(
+                # TODO: Add more Kafka producer options if needed...
+                model_endpoint_name=self._client_settings.model_endpoint_name,
+                model_endpoint_uid=self._client_settings.model_endpoint_uid,
+                serving_function=self._client_settings.serving_function,
+                serving_function_tag=self._client_settings.serving_function_tag,
+                project=self._client_settings.project,
+            )
+        return _V3IOMLRunEndPointClient(
+            monitoring_stream_path=self._client_settings.v3io_stream_path,
+            monitoring_container=self._client_settings.v3io_container,
+            model_endpoint_name=self._client_settings.model_endpoint_name,
+            model_endpoint_uid=self._client_settings.model_endpoint_uid,
+            serving_function=self._client_settings.serving_function,
+            serving_function_tag=self._client_settings.serving_function_tag,
+            project=self._client_settings.project,
+        )
 
     def _import_custom_run_summarizer(self):
         """
@@ -899,8 +1128,9 @@ def setup_langchain_monitoring(
     function_name: str = "langchain_mlrun_function",
     model_name: str = "langchain_mlrun_model",
     model_endpoint_name: str = "langchain_mlrun_endpoint",
-    monitoring_container: str = "projects",
-    monitoring_stream_path: str = None,
+    v3io_container: str = "projects",
+    v3io_stream_path: str = None,
+    # TODO: Add Kafka parameters when Kafka monitoring is supported.
 ) -> dict:
     """
     Create a model endpoint in the given project to be used for LangChain monitoring with MLRun and returns the
@@ -920,9 +1150,10 @@ def setup_langchain_monitoring(
     :param function_name: The name of the serving function to create.
     :param model_name: The name of the model to create.
     :param model_endpoint_name: The name of the model endpoint to create.
-    :param monitoring_container: The V3IO container where the monitoring stream is located.
-    :param monitoring_stream_path: The V3IO stream path for monitoring. If None,
+    :param v3io_container: The V3IO container where the monitoring stream is located.
+    :param v3io_stream_path: The V3IO stream path for monitoring. If None,
         ``<project.name>/model-endpoints/stream-v1`` will be used.
+    TODO: Add Kafka parameters when Kafka monitoring is supported.
 
     :returns: A dictionary with the necessary environment variables to configure the MLRun tracer client.
 
@@ -1149,16 +1380,28 @@ def handler(context, event):
                 if model_endpoint.metadata.uid:
                     uid_exist_flag = True
 
+    # Set parameters defaults:
+    v3io_stream_path = v3io_stream_path or f"{project.name}/model-endpoints/stream-v1"
+    # TODO: Support Kafka monitoring parameters defaults when Kafka monitoring is supported.
+
+    if mlrun.mlconf.is_ce_mode():
+        client_env_vars = {
+            "MLRUN_TRACER_CLIENT_KAFKA_...": ...
+        }
+    else:
+        client_env_vars = {
+            "MLRUN_TRACER_CLIENT_V3IO_STREAM_PATH": v3io_stream_path,
+            "MLRUN_TRACER_CLIENT_V3IO_CONTAINER": v3io_container,
+        }
+
     # Prepare the environment variables:
-    monitoring_stream_path = monitoring_stream_path or f"{project.name}/model-endpoints/stream-v1"
     env_vars = {
         "MLRUN_MONITORING_ENABLED": "1",
         "MLRUN_TRACER_CLIENT_PROJECT": project.name,
-        "MLRUN_TRACER_CLIENT_STREAM_PATH": monitoring_stream_path,
-        "MLRUN_TRACER_CLIENT_CONTAINER": monitoring_container,
         "MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_NAME": model_endpoint.metadata.name,
         "MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_UID": model_endpoint.metadata.uid,
         "MLRUN_TRACER_CLIENT_SERVING_FUNCTION": function_name,
+        **client_env_vars
     }
     print("\n✨ Done! LangChain monitoring model endpoint created successfully.")
     print("You can now set the following environment variables to enable MLRun tracing in your LangChain code:\n")

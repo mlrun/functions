@@ -199,8 +199,8 @@ _run_suites: list[tuple[Callable, int]] = [
 
 #: Dummy environment variables for testing.
 _dummy_environment_variables = {
-    "MLRUN_TRACER_CLIENT_STREAM_PATH": "dummy_stream_path",
-    "MLRUN_TRACER_CLIENT_CONTAINER": "dummy_container",
+    "MLRUN_TRACER_CLIENT_V3IO_STREAM_PATH": "dummy_stream_path",
+    "MLRUN_TRACER_CLIENT_V3IO_CONTAINER": "dummy_container",
     "MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_NAME": "dummy_model_name",
     "MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_UID": "dummy_model_endpoint_uid",
     "MLRUN_TRACER_CLIENT_SERVING_FUNCTION": "dummy_serving_function",
@@ -211,24 +211,20 @@ _dummy_environment_variables = {
 
 
 @pytest.fixture()
-def auto_mode_settings():
+def auto_mode_settings(monkeypatch):
     """
     Sets the environment variables to enable mlrun monitoring in 'auto' mode.
     """
     # Set environment variables for the duration of the test:
-    os.environ[mlrun_monitoring_env_var] = "1"
-    os.environ.update(_dummy_environment_variables)
+    monkeypatch.setenv(mlrun_monitoring_env_var, "1")
+    for key, value in _dummy_environment_variables.items():
+        monkeypatch.setenv(key, value)
 
     # Reset the singleton tracer to ensure fresh initialization:
     MLRunTracer._singleton_tracer = None
     MLRunTracer._initialized = False
 
     yield
-
-    # Remove the environment variables after the test:
-    os.environ.pop(mlrun_monitoring_env_var)
-    for env_var in _dummy_environment_variables:
-        os.environ.pop(env_var)
 
     # Reset the singleton tracer after the test:
     MLRunTracer._singleton_tracer = None
@@ -242,8 +238,8 @@ def manual_mode_settings():
     """
     settings = MLRunTracerSettings(
         client=MLRunTracerClientSettings(
-            stream_path="dummy_stream_path",
-            container="dummy_container",
+            v3io_stream_path="dummy_stream_path",
+            v3io_container="dummy_container",
             model_endpoint_name="dummy_model_name",
             model_endpoint_uid="dummy_model_endpoint_uid",
             serving_function="dummy_serving_function",
@@ -258,27 +254,114 @@ def manual_mode_settings():
     yield settings
 
 
-def test_settings_init_via_env_vars():
+def test_settings_init_via_env_vars(monkeypatch):
     """
     Test that settings are correctly initialized from environment variables.
     """
     #: First, ensure that without env vars, validation fails due to missing required fields:
-    try:
-        settings = MLRunTracerSettings()
-    except ValidationError:
-        # Now, set the environment variables for the client settings and debug flag:
-        os.environ.update(_dummy_environment_variables)
+    with pytest.raises(ValidationError):
+        MLRunTracerSettings()
 
-        # Ensure that settings are now correctly initialized from env vars:
-        settings = MLRunTracerSettings()
-        assert settings.client.stream_path == "dummy_stream_path"
-        assert settings.client.container == "dummy_container"
-        assert settings.client.model_endpoint_name == "dummy_model_name"
-        assert settings.client.model_endpoint_uid == "dummy_model_endpoint_uid"
-        assert settings.client.serving_function == "dummy_serving_function"
-        assert settings.monitor.debug is True
+    # Now, set the environment variables for the client settings and debug flag:
+    for key, value in _dummy_environment_variables.items():
+        monkeypatch.setenv(key, value)
+
+    # Ensure that settings are now correctly initialized from env vars:
+    settings = MLRunTracerSettings()
+    assert settings.client.v3io_stream_path == "dummy_stream_path"
+    assert settings.client.v3io_container == "dummy_container"
+    assert settings.client.model_endpoint_name == "dummy_model_name"
+    assert settings.client.model_endpoint_uid == "dummy_model_endpoint_uid"
+    assert settings.client.serving_function == "dummy_serving_function"
+    assert settings.monitor.debug is True
+
+
+@pytest.mark.parametrize(
+    "test_suite", [
+        # Valid case: only v3io settings provided
+        (
+            {
+                "v3io_stream_path": "dummy_stream_path",
+                "v3io_container": "dummy_container",
+                "model_endpoint_name": "dummy_model_name",
+                "model_endpoint_uid": "dummy_model_endpoint_uid",
+                "serving_function": "dummy_serving_function",
+            },
+            True,
+        ),
+        # Invalid case: partial v3io settings provided
+        (
+            {
+                "v3io_stream_path": "dummy_stream_path",
+                "model_endpoint_name": "dummy_model_name",
+                "model_endpoint_uid": "dummy_model_endpoint_uid",
+                "serving_function": "dummy_serving_function",
+            },
+            False,
+        ),
+        # Valid case: only kafka settings provided
+        (
+            {
+                "kafka_broker": "dummy_bootstrap_servers",
+                "kafka_topic": "dummy_topic",
+                # TODO: Add more mandatory kafka settings
+                "model_endpoint_name": "dummy_model_name",
+                "model_endpoint_uid": "dummy_model_endpoint_uid",
+                "serving_function": "dummy_serving_function",
+            },
+            True,
+        ),
+        # Invalid case: partial kafka settings provided
+        (
+            {
+                "kafka_broker": "dummy_bootstrap_servers",
+                "model_endpoint_name": "dummy_model_name",
+                "model_endpoint_uid": "dummy_model_endpoint_uid",
+                "serving_function": "dummy_serving_function",
+            },
+            False,
+        ),
+        # Invalid case: both v3io and kafka settings provided
+        (
+            {
+                "v3io_stream_path": "dummy_stream_path",
+                "v3io_container": "dummy_container",
+                "kafka_broker": "dummy_bootstrap_servers",
+                "kafka_topic": "dummy_topic",
+                # TODO: Add more mandatory kafka settings
+                "model_endpoint_name": "dummy_model_name",
+                "model_endpoint_uid": "dummy_model_endpoint_uid",
+                "serving_function": "dummy_serving_function",
+            },
+            False,
+        ),
+        # Invalid case: both v3io and kafka settings provided (partial)
+        (
+            {
+                "v3io_container": "dummy_container",
+                "kafka_broker": "dummy_bootstrap_servers",
+                "model_endpoint_name": "dummy_model_name",
+                "model_endpoint_uid": "dummy_model_endpoint_uid",
+                "serving_function": "dummy_serving_function",
+            },
+            False,
+        ),
+    ]
+)
+def test_settings_v3io_kafka_combination(test_suite: tuple[dict[str, str], bool]):
+    """
+    Test that settings validation enforces mutual exclusivity between v3io and kafka configurations.
+
+    :param test_suite: A tuple containing environment variable overrides and a flag indicating
+        whether validation should pass.
+    """
+    settings, should_pass = test_suite
+
+    if should_pass:
+        MLRunTracerClientSettings(**settings)
     else:
-        raise AssertionError("Initializing settings without env vars should have failed.")
+        with pytest.raises(ValidationError):
+            MLRunTracerClientSettings(**settings)
 
 
 def test_auto_mode_singleton_thread_safety(auto_mode_settings):

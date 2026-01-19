@@ -21,12 +21,128 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 from cloudpickle import dumps
 import pandas as pd
-from typing import List
+import numpy as np
+from typing import List, Tuple
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from mlrun.execution import MLClientCtx
 from mlrun.datastore import DataItem
-from mlrun.mlutils.data import get_sample, get_splits
-from mlrun.mlutils.models import gen_sklearn_model, eval_model_v2
 from mlrun.utils.helpers import create_class
+
+
+def get_sample(dataset: DataItem, sample: int, label_column: str) -> Tuple[pd.DataFrame, pd.Series, list]:
+    """Get a sample of the dataset with labels separated.
+
+    :param dataset: DataItem containing the dataset
+    :param sample: Number of samples to take. If -1, use all. If < -1, take random sample.
+    :param label_column: Name of the label column
+    """
+    df = dataset.as_df()
+
+    if sample == -1:
+        sampled_df = df
+    elif sample < -1:
+        sampled_df = df.sample(n=abs(sample), random_state=1)
+    else:
+        sampled_df = df.head(sample)
+
+    labels = sampled_df[label_column]
+    features = sampled_df.drop(label_column, axis=1)
+    header = list(features.columns)
+
+    return features, labels, header
+
+
+def get_splits(
+    features: pd.DataFrame,
+    labels: pd.Series,
+    num_splits: int,
+    test_size: float,
+    val_size: float,
+    random_state: int = 1
+) -> List[Tuple[pd.DataFrame, pd.Series]]:
+    """Split data into train, validation, and test sets.
+
+    :param features: Feature DataFrame
+    :param labels: Labels Series
+    :param num_splits: Number of splits (3 for train/val/test)
+    :param test_size: Proportion for test set
+    :param val_size: Proportion of remaining data for validation
+    :param random_state: Random seed
+    """
+    # First split: separate test set
+    X_temp, X_test, y_temp, y_test = train_test_split(
+        features, labels, test_size=test_size, random_state=random_state
+    )
+
+    # Second split: separate train and validation from remaining data
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_temp, y_temp, test_size=val_size, random_state=random_state
+    )
+
+    return [(X_train, y_train), (X_val, y_val), (X_test, y_test)]
+
+
+def gen_sklearn_model(model_pkg_class: str, parameters: list) -> dict:
+    """Generate sklearn model configuration from class name and parameters.
+
+    :param model_pkg_class: Full class path (e.g., "sklearn.ensemble.RandomForestClassifier")
+    :param parameters: List of (key, value) parameter tuples
+    """
+    config = {
+        "META": {"class": model_pkg_class},
+        "CLASS": {},
+        "FIT": {}
+    }
+
+    # Parameters that should not be passed to sklearn model
+    excluded_params = {
+        'model_pkg_class', 'dataset', 'label_column', 'encode_cols',
+        'sample', 'test_size', 'train_val_split', 'test_set_key',
+        'model_evaluator', 'models_dest', 'plots_dest', 'file_ext',
+        'model_pkg_file', 'context'
+    }
+
+    # Separate parameters into model init params and fit params
+    for key, value in parameters:
+        if key in ['X', 'y', 'sample_weight']:
+            config["FIT"][key] = value
+        elif key not in excluded_params:
+            # Only add parameters that are not function-specific
+            config["CLASS"][key] = value
+
+    return config
+
+
+def eval_model_v2(
+    context: MLClientCtx,
+    xvalid: pd.DataFrame,
+    yvalid: pd.Series,
+    model,
+    plots_artifact_path: str = None
+) -> dict:
+    """Evaluate a sklearn classifier model.
+
+    :param context: MLRun context
+    :param xvalid: Validation features
+    :param yvalid: Validation labels
+    :param model: Trained sklearn model
+    :param plots_artifact_path: Path for plots (not used in this simplified version)
+    """
+    y_pred = model.predict(xvalid)
+
+    metrics = {
+        "accuracy": accuracy_score(yvalid, y_pred),
+        "precision": precision_score(yvalid, y_pred, average='weighted', zero_division=0),
+        "recall": recall_score(yvalid, y_pred, average='weighted', zero_division=0),
+        "f1_score": f1_score(yvalid, y_pred, average='weighted', zero_division=0)
+    }
+
+    # Log metrics to context
+    for key, value in metrics.items():
+        context.log_result(key, value)
+
+    return {}
 
 
 def train_model(

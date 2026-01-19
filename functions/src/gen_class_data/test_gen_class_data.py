@@ -36,4 +36,7 @@ def test_gen_class_data():
         local=True,
         artifact_path="./artifacts",
         )
-    assert os.path.isfile(run.status.artifacts[0]['spec']['target_path']), 'dataset is not available'
+    # In local mode, artifacts are in function-name/iteration subdirectory
+    # Default key is "classifier-data" (can be overridden in params)
+    dataset_path = "./artifacts/test-gen-class-data-gen-class-data/0/classifier-data.csv"
+    assert os.path.isfile(dataset_path), f'dataset is not available at {dataset_path}'

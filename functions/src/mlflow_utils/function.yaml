@@ -9,7 +9,6 @@ metadata:
 spec:
   image: mlrun/mlrun
   function_kind: serving_v2
-  filename: /Users/Omer_Mimon/PycharmProjects/functions/functions/src/mlflow_utils/mlflow_utils.py
   disable_auto_mount: false
   max_replicas: 4
   min_replicas: 1

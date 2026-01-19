@@ -84,7 +84,6 @@ spec:
       - type: None
       name: analyze
       lineno: 46
-  filename: /Users/Tomer_Weitzman/PycharmProjects/functions/functions/src/describe/describe.py
   build:
     origin_filename: ''
     code_origin: ''

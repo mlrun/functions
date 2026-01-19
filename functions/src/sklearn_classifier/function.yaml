@@ -171,7 +171,6 @@ spec:
     origin_filename: ''
     code_origin: ''
   disable_auto_mount: false
-  filename: /Users/Tomer_Weitzman/PycharmProjects/functions/functions/src/sklearn_classifier/sklearn_classifier.py
   description: train any classifier using scikit-learn's API
 metadata:
   name: sklearn-classifier

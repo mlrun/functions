@@ -8,7 +8,6 @@ spec:
   default_handler: train
   description: Automatic train, evaluate and predict functions for the ML frameworks
     - Scikit-Learn, XGBoost and LightGBM.
-  filename: /Users/Tomer_Weitzman/PycharmProjects/functions/functions/src/auto_trainer/auto_trainer.py
   command: ''
   disable_auto_mount: false
   entry_points:

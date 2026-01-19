@@ -12,7 +12,7 @@ labels:
   author: Iguazio
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.8.0
+mlrunVersion: 1.10.0
 name: mlflow_utils
 platformVersion: ''
 spec:
@@ -23,8 +23,6 @@ spec:
   image: mlrun/mlrun
   kind: serving
   requirements:
-  - mlflow~=2.22
-  - lightgbm
-  - xgboost
+  - mlflow~=3.5
 url: ''
-version: 1.1.0
+version: 1.2.0

@@ -1,0 +1,8 @@
+peft
+transformers
+torch
+datasets
+plotly
+trl
+mlrun
+bitsandbytes

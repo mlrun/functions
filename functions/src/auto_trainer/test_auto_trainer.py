@@ -82,7 +82,7 @@ def test_train(model: Tuple[str, str]):
     dataset, label_columns = _get_dataset(model[1])
     is_test_passed = True
 
-    project = mlrun.new_project("auto-trainer-test", context="./")
+    project = mlrun.get_or_create_project("auto-trainer-test", context="./")
     fn = project.set_function("function.yaml", "train", kind="job", image="mlrun/mlrun")
 
     train_run = None
@@ -119,7 +119,7 @@ def test_train_evaluate(model: Tuple[str, str]):
     dataset, label_columns = _get_dataset(model[1])
     is_test_passed = True
     # Importing function:
-    project = mlrun.new_project("auto-trainer-test", context="./")
+    project = mlrun.get_or_create_project("auto-trainer-test", context="./")
     fn = project.set_function("function.yaml", "train", kind="job", image="mlrun/mlrun")
     temp_dir = tempfile.mkdtemp()
 
@@ -172,7 +172,7 @@ def test_train_predict(model: Tuple[str, str]):
     df = pd.read_csv(dataset)
     sample = df.head().drop("labels", axis=1).values.tolist()
     # Importing function:
-    project = mlrun.new_project("auto-trainer-test", context="./")
+    project = mlrun.get_or_create_project("auto-trainer-test", context="./")
     fn = project.set_function("function.yaml", "train", kind="job", image="mlrun/mlrun")
     temp_dir = tempfile.mkdtemp()
 

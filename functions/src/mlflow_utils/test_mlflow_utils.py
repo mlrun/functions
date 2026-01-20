@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 import tempfile
-
+import shutil
 import lightgbm as lgb
 import mlflow
 import mlflow.environment_variables
@@ -132,7 +132,9 @@ def test_track_run_with_experiment_name(handler):
     # Set the mlflow experiment name
     mlflow.environment_variables.MLFLOW_EXPERIMENT_NAME.set(f"{handler}_test_track")
     with tempfile.TemporaryDirectory() as test_directory:
-        mlflow.set_tracking_uri(test_directory)  # Tell mlflow where to save logged data
+        # Use SQLite backend instead of filesystem (filesystem will be deprecated in Feb 2026)
+        db_uri = f"sqlite:///{os.path.join(test_directory, 'mlflow.db')}"
+        mlflow.set_tracking_uri(db_uri)  # Tell mlflow where to save logged data
 
         # Create a project for this tester:
         project = mlrun.get_or_create_project(name="default", context=test_directory)
@@ -149,8 +151,36 @@ def test_track_run_with_experiment_name(handler):
         trainer_run = func.run(
             local=True,
             handler=handler,
-            artifact_path=test_directory,
+            output_path=test_directory,
         )
+
+        # Find the MLflow logged model and prepare it for serving
+        # Note: In MLflow 2.24+, we must dynamically discover model paths since MLflow changed
+        # its directory structure from predictable paths (e.g., experiment_name/0/model/) to
+        # UUID-based paths (e.g., experiment_id/run_uuid/artifacts/model/).
+
+        # Create MLflow client to query the tracking server
+        mlflow_client = mlflow.tracking.MlflowClient(tracking_uri=db_uri)
+
+        # Get the experiment by name to obtain its ID
+        experiment = mlflow_client.get_experiment_by_name(f"{handler}_test_track")
+
+        # Search for runs in this experiment and get the run ID
+        # (There should only be one run from our training above)
+        run_id = mlflow_client.search_runs(experiment_ids=[experiment.experiment_id])[0].info.run_id
+
+        # Find all models logged in this run
+        logged_models = mlflow.search_logged_models(filter_string=f"source_run_id = '{run_id}'")
+
+        # Extract the artifact location and remove the "file://" prefix
+        model_artifacts_dir = logged_models["artifact_location"].tolist()[0].replace("file://", "")
+
+        # Package the model artifacts as a zip file for MLFlowModelServer
+        # Note: MLFlowModelServer requires models to be packaged as zip archives
+        # rather than loose directories for deployment
+        model_path = os.path.join(test_directory, f"{handler}-model-serving")
+        os.makedirs(model_path, exist_ok=True)
+        shutil.make_archive(os.path.join(model_path, "model"), 'zip', model_artifacts_dir)
 
         serving_func = project.set_function(
             func=os.path.abspath("function.yaml"),
@@ -158,8 +188,6 @@ def test_track_run_with_experiment_name(handler):
         )
         model_name = f"{handler}-model"
         # Add the model
-        upper_handler = handler.replace("_", "-")
-        model_path = test_directory + f"/{upper_handler}-test-{upper_handler}/0/model/"
         serving_func.add_model(
             model_name,
             class_name="MLFlowModelServer",

@@ -67,30 +67,14 @@ def _get_dataframe(
                             Classification tasks.
     :param drop_columns:    str/int or a list of strings/ints that represent the column names/indices to drop.
     """
-    store_uri_prefix, _ = mlrun.datastore.parse_store_uri(dataset.artifact_url)
-
-    # Getting the dataset:
-    if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
-        label_columns = label_columns or dataset.meta.status.label_column
-        context.logger.info(f"label columns: {label_columns}")
-        # FeatureVector case:
-        try:
-            fv = mlrun.datastore.get_store_resource(dataset.artifact_url)
-            dataset = fv.get_offline_features(drop_columns=drop_columns).to_dataframe()
-        except AttributeError:
-            # Leave here for backwards compatibility
-            dataset = fs.get_offline_features(
-                dataset.meta.uri, drop_columns=drop_columns
-            ).to_dataframe()
-
-    elif not label_columns:
-        context.logger.info(
-            "label_columns not provided, mandatory when dataset is not a FeatureVector"
-        )
-        raise ValueError
-
-    elif isinstance(dataset, (list, dict)):
+    # Check if dataset is list/dict first (before trying to access artifact_url)
+    if isinstance(dataset, (list, dict)):
         # list/dict case:
+        if not label_columns:
+            context.logger.info(
+                "label_columns not provided, mandatory when dataset is not a FeatureVector"
+            )
+            raise ValueError
         dataset = pd.DataFrame(dataset)
         # Checking if drop_columns provided by integer type:
         if drop_columns:
@@ -103,17 +87,38 @@ def _get_dataframe(
                 )
                 raise ValueError
             dataset.drop(drop_columns, axis=1, inplace=True)
-
     else:
-        # simple URL case:
-        dataset = dataset.as_df()
-        if drop_columns:
-            if all(col in dataset for col in drop_columns):
-                dataset = dataset.drop(drop_columns, axis=1)
-            else:
+        # Dataset is a DataItem with artifact_url (URI or FeatureVector)
+        store_uri_prefix, _ = mlrun.datastore.parse_store_uri(dataset.artifact_url)
+
+        # Getting the dataset:
+        if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
+            label_columns = label_columns or dataset.meta.status.label_column
+            context.logger.info(f"label columns: {label_columns}")
+            # FeatureVector case:
+            try:
+                fv = mlrun.datastore.get_store_resource(dataset.artifact_url)
+                dataset = fv.get_offline_features(drop_columns=drop_columns).to_dataframe()
+            except AttributeError:
+                # Leave here for backwards compatibility
+                dataset = fs.get_offline_features(
+                    dataset.meta.uri, drop_columns=drop_columns
+                ).to_dataframe()
+        else:
+            # simple URL case:
+            if not label_columns:
                 context.logger.info(
-                    "not all of the columns to drop in the dataset, drop columns process skipped"
+                    "label_columns not provided, mandatory when dataset is not a FeatureVector"
                 )
+                raise ValueError
+            dataset = dataset.as_df()
+            if drop_columns:
+                if all(col in dataset for col in drop_columns):
+                    dataset = dataset.drop(drop_columns, axis=1)
+                else:
+                    context.logger.info(
+                        "not all of the columns to drop in the dataset, drop columns process skipped"
+                    )
 
     return dataset, label_columns
 
@@ -360,6 +365,20 @@ def predict(
 
     # loading the model, and getting the model handler:
     model_handler = AutoMLRun.load_model(model_path=model, context=context)
+
+    # Fix feature names for models that require them (e.g., XGBoost)
+    # When dataset comes from a list, pandas assigns default integer column names
+    # but some models expect specific feature names they were trained with
+    if hasattr(model_handler.model, 'feature_names_in_'):
+        expected_features = model_handler.model.feature_names_in_
+        if len(dataset.columns) == len(expected_features):
+            # Only rename if the number of columns matches
+            # This handles the case where a list was converted to DataFrame with default column names
+            if not all(col == feat for col, feat in zip(dataset.columns, expected_features)):
+                context.logger.info(
+                    f"Renaming dataset columns to match model's expected feature names"
+                )
+                dataset.columns = expected_features
 
     # Dropping label columns if necessary:
     if not label_columns:

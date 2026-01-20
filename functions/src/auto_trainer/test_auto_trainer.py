@@ -25,37 +25,6 @@ from sklearn.datasets import (
     make_regression,
 )
 
-# Monkey-patch sklearn metrics to fix MLRun compatibility with sklearn 1.5+
-# MLRun 1.10.0 calls metrics with the deprecated 'squared' parameter
-import sklearn.metrics
-from sklearn.metrics import (
-    mean_squared_error as _original_mse,
-    mean_absolute_error as _original_mae,
-    median_absolute_error as _original_medae,
-)
-
-
-def _patched_mean_squared_error(y_true, y_pred, sample_weight=None, multioutput='uniform_average', squared=None):
-    """Wrapper for mean_squared_error that ignores the deprecated 'squared' parameter."""
-    # In sklearn 1.4+, 'squared' parameter was removed. Always return MSE (not RMSE)
-    return _original_mse(y_true, y_pred, sample_weight=sample_weight, multioutput=multioutput)
-
-
-def _patched_mean_absolute_error(y_true, y_pred, sample_weight=None, multioutput='uniform_average', squared=None):
-    """Wrapper for mean_absolute_error that ignores any 'squared' parameter."""
-    return _original_mae(y_true, y_pred, sample_weight=sample_weight, multioutput=multioutput)
-
-
-def _patched_median_absolute_error(y_true, y_pred, multioutput='uniform_average', sample_weight=None, squared=None):
-    """Wrapper for median_absolute_error that ignores any 'squared' parameter."""
-    return _original_medae(y_true, y_pred, multioutput=multioutput, sample_weight=sample_weight)
-
-
-# Apply the patches
-sklearn.metrics.mean_squared_error = _patched_mean_squared_error
-sklearn.metrics.mean_absolute_error = _patched_mean_absolute_error
-sklearn.metrics.median_absolute_error = _patched_median_absolute_error
-
 MODELS = [
     ("sklearn.linear_model.LinearRegression", "regression"),
     ("sklearn.ensemble.RandomForestClassifier", "classification"),

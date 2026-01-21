@@ -78,6 +78,10 @@ def _assert_train_handler(train_run):
 
 
 @pytest.mark.parametrize("model", MODELS)
+@pytest.mark.skipif(
+    condition=not _validate_environment_variables(),
+    reason="Project's environment variables are not set",
+)
 def test_train(model: Tuple[str, str]):
     dataset, label_columns = _get_dataset(model[1])
     is_test_passed = True

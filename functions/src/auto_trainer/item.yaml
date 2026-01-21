@@ -13,7 +13,7 @@ labels:
   author: Iguazio
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.10.0
+mlrunVersion: 1.7.0
 name: auto_trainer
 platformVersion: 3.5.0
 spec:

@@ -1,0 +1,19 @@
+apiVersion: v1
+categories:
+- model-serving
+- structured-ML
+description: OAI SPO use case for industrial optimization
+example: oai_spo.ipynb
+generationDate: 2026-01-26:12-25
+hidden: false
+labels:
+  author: Iguazio
+mlrunVersion: 1.9.2
+name: oai_spo
+spec:
+    filename: oai_spo.py
+    image: mlrun/mlrun
+    kind: monitoring_application
+    requirements:
+version: 1.0.0
+

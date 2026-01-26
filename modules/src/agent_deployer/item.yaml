@@ -12,6 +12,6 @@ name: agent_deployer
 spec:
     filename: agent_deployer.py
     image: mlrun/mlrun
-    kind: monitoring_application
+    kind: generic
     requirements:
 version: 1.0.0

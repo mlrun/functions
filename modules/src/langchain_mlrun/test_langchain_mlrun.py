@@ -213,14 +213,14 @@ _run_suites: list[tuple[Callable, int]] = [
 
 #: Dummy environment variables for testing.
 _dummy_environment_variables = {
-    "MLRUN_TRACER_CLIENT_V3IO_STREAM_PATH": "dummy_stream_path",
-    "MLRUN_TRACER_CLIENT_V3IO_CONTAINER": "dummy_container",
-    "MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_NAME": "dummy_model_name",
-    "MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_UID": "dummy_model_endpoint_uid",
-    "MLRUN_TRACER_CLIENT_SERVING_FUNCTION": "dummy_serving_function",
-    "MLRUN_TRACER_MONITOR_DEBUG": "true",
-    "MLRUN_TRACER_MONITOR_DEBUG_TARGET_LIST": "true",
-    "MLRUN_TRACER_MONITOR_SPLIT_RUNS": "true",
+    "LC_MLRUN_TRACER_CLIENT_V3IO_STREAM_PATH": "dummy_stream_path",
+    "LC_MLRUN_TRACER_CLIENT_V3IO_CONTAINER": "dummy_container",
+    "LC_MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_NAME": "dummy_model_name",
+    "LC_MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_UID": "dummy_model_endpoint_uid",
+    "LC_MLRUN_TRACER_CLIENT_SERVING_FUNCTION": "dummy_serving_function",
+    "LC_MLRUN_TRACER_MONITOR_DEBUG": "true",
+    "LC_MLRUN_TRACER_MONITOR_DEBUG_TARGET_LIST": "true",
+    "LC_MLRUN_TRACER_MONITOR_SPLIT_RUNS": "true",
 }
 
 
@@ -316,9 +316,7 @@ def test_settings_init_via_env_vars(monkeypatch):
         # Valid case: only kafka settings provided
         (
             {
-                "kafka_broker": "dummy_bootstrap_servers",
-                "kafka_topic": "dummy_topic",
-                # TODO: Add more mandatory kafka settings
+                "kafka_stream_profile_name": "dummy_stream_profile_name",
                 "model_endpoint_name": "dummy_model_name",
                 "model_endpoint_uid": "dummy_model_endpoint_uid",
                 "serving_function": "dummy_serving_function",
@@ -328,7 +326,7 @@ def test_settings_init_via_env_vars(monkeypatch):
         # Invalid case: partial kafka settings provided
         (
             {
-                "kafka_broker": "dummy_bootstrap_servers",
+                "kafka_linger_ms": "1000",
                 "model_endpoint_name": "dummy_model_name",
                 "model_endpoint_uid": "dummy_model_endpoint_uid",
                 "serving_function": "dummy_serving_function",
@@ -340,9 +338,7 @@ def test_settings_init_via_env_vars(monkeypatch):
             {
                 "v3io_stream_path": "dummy_stream_path",
                 "v3io_container": "dummy_container",
-                "kafka_broker": "dummy_bootstrap_servers",
-                "kafka_topic": "dummy_topic",
-                # TODO: Add more mandatory kafka settings
+                "kafka_stream_profile_name": "dummy_stream_profile_name",
                 "model_endpoint_name": "dummy_model_name",
                 "model_endpoint_uid": "dummy_model_endpoint_uid",
                 "serving_function": "dummy_serving_function",
@@ -353,7 +349,7 @@ def test_settings_init_via_env_vars(monkeypatch):
         (
             {
                 "v3io_container": "dummy_container",
-                "kafka_broker": "dummy_bootstrap_servers",
+                "kafka_linger_ms": "1000",
                 "model_endpoint_name": "dummy_model_name",
                 "model_endpoint_uid": "dummy_model_endpoint_uid",
                 "serving_function": "dummy_serving_function",

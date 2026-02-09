@@ -46,7 +46,7 @@ from mlrun.model_monitoring.applications import (
 import mlrun.common.schemas.model_monitoring.constants as mm_constants
 
 #: Environment variable name to use MLRun monitoring tracer via LangChain global tracing system:
-mlrun_monitoring_env_var = "MLRUN_MONITORING_ENABLED"
+mlrun_monitoring_env_var = "LC_MLRUN_MONITORING_ENABLED"
 
 
 class _MLRunEndPointClient(ABC):
@@ -84,7 +84,7 @@ class _MLRunEndPointClient(ABC):
                 raise mlrun.errors.MLRunInvalidArgumentError(
                     "There is no current active project. Either use `mlrun.get_or_create_project` prior to "
                     "initializing the monitoring tracer or pass a project name to load. You can also set the "
-                    "environment variable: 'MLRUN_MONITORING_PROJECT'."
+                    "environment variable: 'LC_MLRUN_TRACER_CLIENT_PROJECT'."
                 )
         elif isinstance(project, str):
             self._project_name = project
@@ -146,12 +146,12 @@ class _MLRunEndPointClient(ABC):
         """
         pass
 
-    @abstractmethod
     def flush(self):
         """
         Flush any buffered messages to ensure they are sent to the stream.
-        For streaming backends that buffer messages (like Kafka), this ensures delivery.
-        For backends that send immediately (like V3IO), this may be a no-op.
+
+        For streaming backends that buffer messages (like Kafka), this ensures delivery. For backends that send
+        immediately (like V3IO), this may be a no-op.
         """
         pass
 
@@ -269,12 +269,6 @@ class _V3IOMLRunEndPointClient(_MLRunEndPointClient):
             records=[{"data": orjson.dumps(event).decode('utf-8')}],
         )
 
-    def flush(self):
-        """
-        Flush is a no-op for V3IO as messages are sent immediately via put_records.
-        """
-        pass
-
 
 class _KafkaMLRunEndPointClient(_MLRunEndPointClient):
     """
@@ -322,26 +316,30 @@ class _KafkaMLRunEndPointClient(_MLRunEndPointClient):
         project_obj = mlrun.get_or_create_project(self._project_name)
 
         # Fetch the Kafka stream profile:
-        stream_profile = project_obj.get_datastore_profile(kafka_stream_profile_name)
+        stream_profile = project_obj.get_datastore_profile(profile=kafka_stream_profile_name)
 
         # Get profile attributes and convert to producer config:
         profile_attrs = stream_profile.attributes()
-        kafka_params = KafkaParameters(profile_attrs)
+        kafka_params = KafkaParameters(kwargs=profile_attrs)
         producer_config = kafka_params.producer()
 
-        # Extract broker and determine topic:
+        # Extract broker and determine topic (use profile's topic if available, otherwise use MLRun's standard naming):
         self._monitoring_broker = profile_attrs.get("brokers")
-        # Use profile's topic if available, otherwise use MLRun's standard naming:
         topics = profile_attrs.get("topics", [])
-        self._monitoring_topic = topics[0] if topics else get_kafka_topic(project_obj.name)
+        self._monitoring_topic = topics[0] if topics else get_kafka_topic(project=project_obj.name)
 
-        # Initialize a Kafka producer with full config from profile.
         # Remove bootstrap_servers from producer_config to avoid duplicate argument error:
         producer_config.pop("bootstrap_servers", None)
+
+        # Initialize a Kafka producer with full config from profile:
         self._kafka_producer = KafkaProducer(
             bootstrap_servers=self._monitoring_broker,
             key_serializer=lambda k: k.encode("utf-8") if isinstance(k, str) else k,
-            value_serializer=lambda v: v if isinstance(v, bytes) else orjson.dumps(v) if isinstance(v, dict) else str(v).encode("utf-8"),
+            value_serializer=(
+                lambda v: v if isinstance(v, bytes)
+                else orjson.dumps(v) if isinstance(v, dict)
+                else str(v).encode("utf-8")
+            ),
             linger_ms=kafka_linger_ms,
             **producer_config,
         )
@@ -385,6 +383,7 @@ class _KafkaMLRunEndPointClient(_MLRunEndPointClient):
     def flush(self):
         """
         Flush all buffered messages to ensure they are sent to Kafka.
+
         Blocks until all buffered messages are delivered and acknowledged by the broker.
         """
         self._kafka_producer.flush()
@@ -408,17 +407,18 @@ class MLRunTracerClientSettings(BaseSettings):
 
     kafka_stream_profile_name: str | None = None
     """
-    The name of the registered DatastoreProfileKafkaStream to use for Kafka configuration.
-    This profile should be registered via ``project.register_datastore_profile()`` and contains
-    all Kafka settings including broker, topic, SASL credentials, SSL config, etc.
+    The name of the registered DatastoreProfileKafkaStream to use for Kafka configuration. This profile should be
+    registered via ``project.register_datastore_profile()`` and contains all Kafka settings including broker, topic,
+    SASL credentials, SSL config, etc.
     """
 
     kafka_linger_ms: int = 500
     """
-    The Kafka producer linger.ms setting controlling message batching (in milliseconds).
-    Messages are accumulated for up to this duration before being sent as a batch, reducing network
-    overhead. The tracer always flushes at the end of each root run, guaranteeing delivery regardless
-    of this setting. Default: 500ms. Set to 0 to disable batching (each message sent immediately).
+    The Kafka producer linger.ms setting controlling message batching (in milliseconds). Messages are accumulated for 
+    up to this duration before being sent as a batch, reducing network overhead. 
+    
+    The tracer always flushes at the end of each root run, guaranteeing delivery regardless of this setting. 
+    Default: 500ms. Set to 0 to disable batching (each message sent immediately).
     """
 
     model_endpoint_name: str = ...
@@ -447,7 +447,7 @@ class MLRunTracerClientSettings(BaseSettings):
     """
 
     #: Pydantic model configuration to set the environment variable prefix.
-    model_config = SettingsConfigDict(env_prefix="MLRUN_TRACER_CLIENT_")
+    model_config = SettingsConfigDict(env_prefix="LC_MLRUN_TRACER_CLIENT_")
 
     @model_validator(mode='after')
     def validate_stream_settings(self) -> 'MLRunTracerClientSettings':
@@ -578,7 +578,7 @@ class MLRunTracerMonitorSettings(BaseSettings):
     """
 
     #: Pydantic model configuration to set the environment variable prefix.
-    model_config = SettingsConfigDict(env_prefix="MLRUN_TRACER_MONITOR_")
+    model_config = SettingsConfigDict(env_prefix="LC_MLRUN_TRACER_MONITOR_")
 
     @field_validator('debug_target_list', mode='before')
     @classmethod
@@ -609,7 +609,7 @@ class MLRunTracerSettings(BaseSettings):
 
     Contains the mandatory connection and endpoint information required to publish monitoring
     events. Values may be supplied programmatically or via environment variables prefixed with
-    `MLRUN_TRACER_CLIENT_`. See more at ``MLRunTracerClientSettings``.
+    `LC_MLRUN_TRACER_CLIENT_`. See more at ``MLRunTracerClientSettings``.
     """
 
     monitor: MLRunTracerMonitorSettings = Field(default_factory=MLRunTracerMonitorSettings)
@@ -618,12 +618,12 @@ class MLRunTracerSettings(BaseSettings):
 
     Controls what runs are captured, how they are summarized (including custom summarizer import
     options), whether child runs are split or nested, and debug behavior. Values may be supplied
-    programmatically or via environment variables prefixed with `MLRUN_TRACER_MONITOR_`. 
+    programmatically or via environment variables prefixed with `LC_MLRUN_TRACER_MONITOR_`. 
     See more at ``MLRunTracerMonitorSettings``.
     """
 
     #: Pydantic model configuration to set the environment variable prefix.
-    model_config = SettingsConfigDict(env_prefix="MLRUN_TRACER_")
+    model_config = SettingsConfigDict(env_prefix="LC_MLRUN_TRACER_")
 
 
 class MLRunTracer(BaseTracer):
@@ -640,7 +640,7 @@ class MLRunTracer(BaseTracer):
             # LangChain code here.
             pass
 
-    2. **Auto Mode** - Setting the `MLRUN_MONITORING_ENABLED="1"` environment variable::
+    2. **Auto Mode** - Setting the `LC_MLRUN_MONITORING_ENABLED="1"` environment variable::
 
         import mlrun_integration.tracer
 
@@ -668,8 +668,8 @@ class MLRunTracer(BaseTracer):
             # LangChain code here.
             pass
 
-    2. Or via environment variables following the prefix 'MLRUN_TRACER_CLIENT_' for client settings and
-       'MLRUN_TRACER_MONITOR_' for monitoring settings.
+    2. Or via environment variables following the prefix 'LC_MLRUN_TRACER_CLIENT_' for client settings and
+       'LC_MLRUN_TRACER_MONITOR_' for monitoring settings.
     """
 
     #: A singleton tracer for when using the tracer via environment variable to activate global tracing.
@@ -683,7 +683,7 @@ class MLRunTracer(BaseTracer):
         """
         Create or return an ``MLRunTracer`` instance.
 
-        When ``MLRUN_MONITORING_ENABLED`` is not set to ``"1"``, a normal instance is returned.
+        When ``LC_MLRUN_MONITORING_ENABLED`` is not set to ``"1"``, a normal instance is returned.
         When the env var is ``"1"``, a process-wide singleton is returned. Creation is thread-safe.
 
         :returns: MLRunTracer instance (singleton if 'auto' mode is active).
@@ -1099,7 +1099,7 @@ class MLRunTracer(BaseTracer):
         """
         Check whether global env-var activated tracing is requested.
 
-        :returns: True when ``MLRUN_MONITORING_ENABLED`` environment variable equals ``"1"``.
+        :returns: True when ``LC_MLRUN_MONITORING_ENABLED`` environment variable equals ``"1"``.
         """
         return os.environ.get(mlrun_monitoring_env_var, "0") == "1"
 
@@ -1443,26 +1443,26 @@ def handler(context, event):
     if mlrun.mlconf.is_ce_mode():
         if kafka_stream_profile_name is None:
             raise ValueError(
-                "kafka_stream_profile_name is required for MLRun CE mode. "
-                "Register a DatastoreProfileKafkaStream and pass its name."
+                "kafka_stream_profile_name is required for MLRun CE mode. Register a DatastoreProfileKafkaStream and "
+                "pass its name."
             )
         client_env_vars = {
-            "MLRUN_TRACER_CLIENT_KAFKA_STREAM_PROFILE_NAME": kafka_stream_profile_name,
-            "MLRUN_TRACER_CLIENT_KAFKA_LINGER_MS": str(kafka_linger_ms),
+            "LC_MLRUN_TRACER_CLIENT_KAFKA_STREAM_PROFILE_NAME": kafka_stream_profile_name,
+            "LC_MLRUN_TRACER_CLIENT_KAFKA_LINGER_MS": str(kafka_linger_ms),
         }
     else:
         client_env_vars = {
-            "MLRUN_TRACER_CLIENT_V3IO_STREAM_PATH": v3io_stream_path,
-            "MLRUN_TRACER_CLIENT_V3IO_CONTAINER": v3io_container,
+            "LC_MLRUN_TRACER_CLIENT_V3IO_STREAM_PATH": v3io_stream_path,
+            "LC_MLRUN_TRACER_CLIENT_V3IO_CONTAINER": v3io_container,
         }
 
     # Prepare the environment variables:
     env_vars = {
-        "MLRUN_MONITORING_ENABLED": "1",
-        "MLRUN_TRACER_CLIENT_PROJECT": project.name,
-        "MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_NAME": model_endpoint.metadata.name,
-        "MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_UID": model_endpoint.metadata.uid,
-        "MLRUN_TRACER_CLIENT_SERVING_FUNCTION": function_name,
+        "LC_MLRUN_MONITORING_ENABLED": "1",
+        "LC_MLRUN_TRACER_CLIENT_PROJECT": project.name,
+        "LC_MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_NAME": model_endpoint.metadata.name,
+        "LC_MLRUN_TRACER_CLIENT_MODEL_ENDPOINT_UID": model_endpoint.metadata.uid,
+        "LC_MLRUN_TRACER_CLIENT_SERVING_FUNCTION": function_name,
         **client_env_vars
     }
     print("\n✨ Done! LangChain monitoring model endpoint created successfully.")
@@ -1470,7 +1470,7 @@ def handler(context, event):
     print(json.dumps(env_vars, indent=4))
     print(
         "\nTo customize the monitoring behavior, you can also set additional environment variables prefixed with "
-        "'MLRUN_TRACER_MONITOR_'. Refer to the MLRun tracer documentation for more details.\n"
+        "'LC_MLRUN_TRACER_MONITOR_'. Refer to the MLRun tracer documentation for more details.\n"
     )
 
     return env_vars

@@ -20,4 +20,5 @@ spec:
     requirements:
       - langchain
       - pydantic-settings
+      - kafka-python
 version: 0.0.1

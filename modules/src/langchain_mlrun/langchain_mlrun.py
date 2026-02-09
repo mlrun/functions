@@ -70,7 +70,6 @@ class _MLRunEndPointClient(ABC):
         :param serving_function: Serving function name or ``RemoteRuntime`` object.
         :param serving_function_tag: Optional function tag (defaults to 'latest').
         :param project: Project name or ``MlrunProject``. If ``None``, uses the current project.
-
         raise: MLRunInvalidArgumentError: If there is no current active project and no `project` argument was provided.
         """
         # Store the provided info:
@@ -147,6 +146,15 @@ class _MLRunEndPointClient(ABC):
         """
         pass
 
+    @abstractmethod
+    def flush(self):
+        """
+        Flush any buffered messages to ensure they are sent to the stream.
+        For streaming backends that buffer messages (like Kafka), this ensures delivery.
+        For backends that send immediately (like V3IO), this may be a no-op.
+        """
+        pass
+
     def _create_event(
         self,
         event_id: str,
@@ -166,7 +174,7 @@ class _MLRunEndPointClient(ABC):
         :param request_timestamp: Request/start timestamp in the format of '%Y-%m-%d %H:%M:%S%z'.
         :param response_timestamp: Response/end timestamp in the format of '%Y-%m-%d %H:%M:%S%z'.
 
-        :return: The event to send to the monitoring stream.
+        :returns: The event to send to the monitoring stream.
         """
         # Copy the sample:
         event = copy.deepcopy(self._event_sample)
@@ -206,7 +214,6 @@ class _V3IOMLRunEndPointClient(_MLRunEndPointClient):
         :param serving_function: Serving function name or ``RemoteRuntime`` object.
         :param serving_function_tag: Optional function tag (defaults to 'latest').
         :param project: Project name or ``MlrunProject``. If ``None``, uses the current project.
-
         raise: MLRunInvalidArgumentError: If there is no current active project and no `project` argument was provided.
         """
         super().__init__(
@@ -262,6 +269,12 @@ class _V3IOMLRunEndPointClient(_MLRunEndPointClient):
             records=[{"data": orjson.dumps(event).decode('utf-8')}],
         )
 
+    def flush(self):
+        """
+        Flush is a no-op for V3IO as messages are sent immediately via put_records.
+        """
+        pass
+
 
 class _KafkaMLRunEndPointClient(_MLRunEndPointClient):
     """
@@ -270,27 +283,27 @@ class _KafkaMLRunEndPointClient(_MLRunEndPointClient):
 
     def __init__(
         self,
-        monitoring_broker: str,
-        monitoring_topic: str,
-        # TODO: Add more Kafka producer options if needed...
+        kafka_stream_profile_name: str,
         model_endpoint_name: str,
         model_endpoint_uid: str,
         serving_function: str | RemoteRuntime,
         serving_function_tag: str | None = None,
         project: str | mlrun.projects.MlrunProject = None,
+        kafka_linger_ms: int = 0,
     ):
         """
-        Initialize an MLRun model endpoint monitoring client.
+        Initialize an MLRun model endpoint monitoring client for Kafka.
 
-        :param monitoring_broker: Kafka broker name.
-        :param monitoring_topic: Kafka topic name.
-        TODO: Add more Kafka producer options if needed...
+        :param kafka_stream_profile_name: The name of the registered DatastoreProfileKafkaStream to use for Kafka
+            configuration. This profile should be registered via ``project.register_datastore_profile()`` and
+            contains all Kafka settings including broker, topic, SASL credentials, SSL config, etc.
         :param model_endpoint_name: The monitoring endpoint related model name.
         :param model_endpoint_uid: Model endpoint unique identifier.
         :param serving_function: Serving function name or ``RemoteRuntime`` object.
         :param serving_function_tag: Optional function tag (defaults to 'latest').
         :param project: Project name or ``MlrunProject``. If ``None``, uses the current project.
-
+        :param kafka_linger_ms: Kafka producer linger.ms setting controlling message batching. Messages are
+            accumulated for up to this duration before being sent as a batch. Default: 500ms.
         raise: MLRunInvalidArgumentError: If there is no current active project and no `project` argument was provided.
         """
         super().__init__(
@@ -301,15 +314,36 @@ class _KafkaMLRunEndPointClient(_MLRunEndPointClient):
             project=project,
         )
 
-        import kafka
+        from kafka import KafkaProducer
+        from mlrun.datastore.utils import KafkaParameters
+        from mlrun.common.model_monitoring.helpers import get_kafka_topic
 
-        # Store the provided info:
-        self._monitoring_broker = monitoring_broker
-        self._monitoring_topic = monitoring_topic
+        # Get project object using resolved project name from parent:
+        project_obj = mlrun.get_or_create_project(self._project_name)
 
-        # Initialize a Kafka producer:
-        self._kafka_producer = kafka.KafkaProducer(
-            ...
+        # Fetch the Kafka stream profile:
+        stream_profile = project_obj.get_datastore_profile(kafka_stream_profile_name)
+
+        # Get profile attributes and convert to producer config:
+        profile_attrs = stream_profile.attributes()
+        kafka_params = KafkaParameters(profile_attrs)
+        producer_config = kafka_params.producer()
+
+        # Extract broker and determine topic:
+        self._monitoring_broker = profile_attrs.get("brokers")
+        # Use profile's topic if available, otherwise use MLRun's standard naming:
+        topics = profile_attrs.get("topics", [])
+        self._monitoring_topic = topics[0] if topics else get_kafka_topic(project_obj.name)
+
+        # Initialize a Kafka producer with full config from profile.
+        # Remove bootstrap_servers from producer_config to avoid duplicate argument error:
+        producer_config.pop("bootstrap_servers", None)
+        self._kafka_producer = KafkaProducer(
+            bootstrap_servers=self._monitoring_broker,
+            key_serializer=lambda k: k.encode("utf-8") if isinstance(k, str) else k,
+            value_serializer=lambda v: v if isinstance(v, bytes) else orjson.dumps(v) if isinstance(v, dict) else str(v).encode("utf-8"),
+            linger_ms=kafka_linger_ms,
+            **producer_config,
         )
 
     def monitor(
@@ -341,12 +375,19 @@ class _KafkaMLRunEndPointClient(_MLRunEndPointClient):
             response_timestamp=response_timestamp,
         )
 
-        # Push to stream:
+        # Push to stream (async - message is buffered):
         self._kafka_producer.send(
             topic=self._monitoring_topic,
-            value=orjson.dumps(event),
+            value=event,  # Will be serialized by the value_serializer
             key=self._model_endpoint_uid,
         )
+
+    def flush(self):
+        """
+        Flush all buffered messages to ensure they are sent to Kafka.
+        Blocks until all buffered messages are delivered and acknowledged by the broker.
+        """
+        self._kafka_producer.flush()
 
 
 class MLRunTracerClientSettings(BaseSettings):
@@ -365,17 +406,20 @@ class MLRunTracerClientSettings(BaseSettings):
     The V3IO stream container.
     """
 
-    kafka_broker: str | None = None
+    kafka_stream_profile_name: str | None = None
     """
-    The Kafka broker address.
-    """
-
-    kafka_topic: str | None = None
-    """
-    The Kafka topic name.
+    The name of the registered DatastoreProfileKafkaStream to use for Kafka configuration.
+    This profile should be registered via ``project.register_datastore_profile()`` and contains
+    all Kafka settings including broker, topic, SASL credentials, SSL config, etc.
     """
 
-    # TODO: Add more Kafka producer options if needed...
+    kafka_linger_ms: int = 500
+    """
+    The Kafka producer linger.ms setting controlling message batching (in milliseconds).
+    Messages are accumulated for up to this duration before being sent as a batch, reducing network
+    overhead. The tracer always flushes at the end of each root run, guaranteeing delivery regardless
+    of this setting. Default: 500ms. Set to 0 to disable batching (each message sent immediately).
+    """
 
     model_endpoint_name: str = ...
     """
@@ -406,25 +450,19 @@ class MLRunTracerClientSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="MLRUN_TRACER_CLIENT_")
 
     @model_validator(mode='after')
-    def check_exclusive_sets(self) -> 'MLRunTracerClientSettings':
+    def validate_stream_settings(self) -> 'MLRunTracerClientSettings':
         """
-        Validate that either V3IO settings or Kafka settings are provided, but not both or none.
+        Validate that either V3IO settings or stream profile name is provided, but not both or none.
 
-        :return: The validated settings instance.
+        :returns: The validated settings instance.
         """
-        # Define the sets
         v3io_settings = all([self.v3io_container, self.v3io_stream_path])
-        kafka_settings = all([self.kafka_topic, self.kafka_broker])  # TODO: Add mandatory other kafka settings
+        kafka_settings = self.kafka_stream_profile_name is not None
 
-        # Make sure only one set is provided:
         if v3io_settings and kafka_settings:
             raise ValueError("Provide either V3IO settings OR Kafka settings, not both.")
         if not v3io_settings and not kafka_settings:
-            raise ValueError(
-                "You must provide either a complete V3IO settings or complete Kafka settings. See docs for more "
-                "information"
-            )
-
+            raise ValueError("You must provide either a complete V3IO settings or complete Kafka settings. See docs for more information")
         return self
 
 class MLRunTracerMonitorSettings(BaseSettings):
@@ -727,12 +765,13 @@ class MLRunTracer(BaseTracer):
         """
         if mlrun.mlconf.is_ce_mode():
             return _KafkaMLRunEndPointClient(
-                # TODO: Add more Kafka producer options if needed...
+                kafka_stream_profile_name=self._client_settings.kafka_stream_profile_name,
                 model_endpoint_name=self._client_settings.model_endpoint_name,
                 model_endpoint_uid=self._client_settings.model_endpoint_uid,
                 serving_function=self._client_settings.serving_function,
                 serving_function_tag=self._client_settings.serving_function_tag,
                 project=self._client_settings.project,
+                kafka_linger_ms=self._client_settings.kafka_linger_ms,
             )
         return _V3IOMLRunEndPointClient(
             monitoring_stream_path=self._client_settings.v3io_stream_path,
@@ -784,19 +823,38 @@ class MLRunTracer(BaseTracer):
         :param run: LangChain run object to process holding all the nested tree of runs.
         :param level: The nesting level of the run (0 for root runs, incremented for child runs).
         """
-        # Serialize the run:
-        serialized_run = self._serialize_run(
-            run=run,
-            include_child_runs=not (self._settings.monitor.root_run_only or self._settings.monitor.split_runs)
-        )
+        try:
+            # Serialize the run:
+            serialized_run = self._serialize_run(
+                run=run,
+                include_child_runs=not (self._settings.monitor.root_run_only or self._settings.monitor.split_runs)
+            )
 
-        # Check for a user custom run summarizer function:
-        if self._custom_run_summarizer_function:
-            for summarized_run in self._custom_run_summarizer_function(
-                run, self._custom_run_summarizer_settings
-            ):
+            # Check for a user custom run summarizer function:
+            if self._custom_run_summarizer_function:
+                for summarized_run in self._custom_run_summarizer_function(
+                    run, self._custom_run_summarizer_settings
+                ):
+                    if summarized_run:
+                        inputs, outputs = summarized_run
+                        self._send_run_event(
+                            event_id=serialized_run["id"],
+                            inputs=inputs,
+                            outputs=outputs,
+                            start_time=run.start_time,
+                            end_time=run.end_time,
+                        )
+                return
+
+            # Check how to deal with the child runs, monitor them in separate events or as a single event:
+            if self._monitor_settings.split_runs and not self._settings.monitor.root_run_only:
+                # Monitor as separate events:
+                for child_run in run.child_runs:
+                    self._persist_run(run=child_run, level=level + 1)
+                summarized_run = self._summarize_run(serialized_run=serialized_run, include_children=False)
                 if summarized_run:
                     inputs, outputs = summarized_run
+                    inputs["child_level"] = level
                     self._send_run_event(
                         event_id=serialized_run["id"],
                         inputs=inputs,
@@ -804,43 +862,28 @@ class MLRunTracer(BaseTracer):
                         start_time=run.start_time,
                         end_time=run.end_time,
                     )
-            return
+                return
 
-        # Check how to deal with the child runs, monitor them in separate events or as a single event:
-        if self._monitor_settings.split_runs and not self._settings.monitor.root_run_only:
-            # Monitor as separate events:
-            for child_run in run.child_runs:
-                self._persist_run(run=child_run, level=level + 1)
-            summarized_run = self._summarize_run(serialized_run=serialized_run, include_children=False)
-            if summarized_run:
-                inputs, outputs = summarized_run
-                inputs["child_level"] = level
-                self._send_run_event(
-                    event_id=serialized_run["id"],
-                    inputs=inputs,
-                    outputs=outputs,
-                    start_time=run.start_time,
-                    end_time=run.end_time,
-                )
-            return
-
-        # Monitor the root event (include child runs if `root_run_only` is False):
-        summarized_run = self._summarize_run(
-            serialized_run=serialized_run,
-            include_children=not self._monitor_settings.root_run_only
-        )
-        if not summarized_run:
-            return
-        inputs, outputs = summarized_run
-        inputs["child_level"] = level
-        self._send_run_event(
-            event_id=serialized_run["id"],
-            inputs=inputs,
-            outputs=outputs,
-            start_time=run.start_time,
-            end_time=run.end_time,
-        )
-
+            # Monitor the root event (include child runs if `root_run_only` is False):
+            summarized_run = self._summarize_run(
+                serialized_run=serialized_run,
+                include_children=not self._monitor_settings.root_run_only
+            )
+            if not summarized_run:
+                return
+            inputs, outputs = summarized_run
+            inputs["child_level"] = level
+            self._send_run_event(
+                event_id=serialized_run["id"],
+                inputs=inputs,
+                outputs=outputs,
+                start_time=run.start_time,
+                end_time=run.end_time,
+            )
+        finally:
+            # Flush buffered messages after root run completion to ensure delivery:
+            if level == 0 and self._mlrun_client:
+                self._mlrun_client.flush()
 
     def _serialize_run(self, run: Run, include_child_runs: bool) -> dict:
         """
@@ -1068,10 +1111,6 @@ class MLRunTracer(BaseTracer):
         :param module_path: Full dotted path, e.g. ``a.b.module.object``.
 
         :returns: The imported object.
-
-        raise: ValueError: If ``module_path`` is not a valid Python module path.
-        raise: ImportError: If module cannot be imported.
-        raise: AttributeError: If the object name is not found in the module.
         """
         try:
             module_name, object_name = module_path.rsplit(".", 1)
@@ -1135,7 +1174,6 @@ register_configure_hook(
     handle_class=MLRunTracer,
 )
 
-
 # Temporary convenient function to set up the monitoring infrastructure required for the tracer.
 def setup_langchain_monitoring(
     project: str | mlrun.MlrunProject = None,
@@ -1144,7 +1182,8 @@ def setup_langchain_monitoring(
     model_endpoint_name: str = "langchain_mlrun_endpoint",
     v3io_container: str = "projects",
     v3io_stream_path: str = None,
-    # TODO: Add Kafka parameters when Kafka monitoring is supported.
+    kafka_stream_profile_name: str = None,
+    kafka_linger_ms: int = 500,
 ) -> dict:
     """
     Create a model endpoint in the given project to be used for LangChain monitoring with MLRun and returns the
@@ -1164,13 +1203,18 @@ def setup_langchain_monitoring(
     :param function_name: The name of the serving function to create.
     :param model_name: The name of the model to create.
     :param model_endpoint_name: The name of the model endpoint to create.
-    :param v3io_container: The V3IO container where the monitoring stream is located.
-    :param v3io_stream_path: The V3IO stream path for monitoring. If None,
+    :param v3io_container: The V3IO container where the monitoring stream is located (for MLRun Enterprise).
+    :param v3io_stream_path: The V3IO stream path for monitoring (for MLRun Enterprise). If None,
         ``<project.name>/model-endpoints/stream-v1`` will be used.
-    TODO: Add Kafka parameters when Kafka monitoring is supported.
+    :param kafka_stream_profile_name: The name of the registered ``DatastoreProfileKafkaStream`` to use for Kafka
+        configuration (required for MLRun CE). This profile should be registered via
+        ``project.register_datastore_profile()`` and contains all Kafka settings including broker, topic,
+        SASL credentials, SSL config, etc.
+    :param kafka_linger_ms: Kafka producer linger.ms setting controlling message batching (default: 500ms).
+        Messages are accumulated for up to this duration before being sent as a batch, reducing network overhead.
+        The tracer always flushes at the end of each root run, guaranteeing delivery. Set to 0 to disable batching.
 
     :returns: A dictionary with the necessary environment variables to configure the MLRun tracer client.
-
     raise: MLRunInvalidArgumentError: If no project is provided and there is no current active project.
     """
     import io
@@ -1181,7 +1225,6 @@ def setup_langchain_monitoring(
     import pickle
     import json
 
-    from mlrun.common.helpers import parse_versioned_object_uri
     from mlrun.features import Feature
 
     class ProgressStep:
@@ -1396,11 +1439,16 @@ def handler(context, event):
 
     # Set parameters defaults:
     v3io_stream_path = v3io_stream_path or f"{project.name}/model-endpoints/stream-v1"
-    # TODO: Support Kafka monitoring parameters defaults when Kafka monitoring is supported.
 
     if mlrun.mlconf.is_ce_mode():
+        if kafka_stream_profile_name is None:
+            raise ValueError(
+                "kafka_stream_profile_name is required for MLRun CE mode. "
+                "Register a DatastoreProfileKafkaStream and pass its name."
+            )
         client_env_vars = {
-            "MLRUN_TRACER_CLIENT_KAFKA_...": ...
+            "MLRUN_TRACER_CLIENT_KAFKA_STREAM_PROFILE_NAME": kafka_stream_profile_name,
+            "MLRUN_TRACER_CLIENT_KAFKA_LINGER_MS": str(kafka_linger_ms),
         }
     else:
         client_env_vars = {

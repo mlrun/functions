@@ -13,8 +13,6 @@
 # limitations under the License.
 #
 import os
-import shutil
-import tempfile
 
 import mlrun
 import pytest
@@ -34,6 +32,8 @@ OPTIMIZED_ONNX_MODEL_NAME = f"optimized_{ONNX_MODEL_NAME}"
 REQUIRED_ENV_VARS = [
     "MLRUN_DBPATH",
     "MLRUN_ARTIFACT_PATH",
+    "V3IO_USERNAME",
+    "V3IO_ACCESS_KEY",
 ]
 
 
@@ -54,47 +54,6 @@ def _is_tf2onnx_available() -> bool:
         return True
     except ImportError:
         return False
-
-
-def _setup_environment() -> str:
-    """
-    Setup the test environment, creating the artifacts path of the test.
-
-    :returns: The temporary directory created for the test artifacts path.
-    """
-    artifact_path = tempfile.TemporaryDirectory().name
-    os.makedirs(artifact_path)
-    return artifact_path
-
-
-def _cleanup_environment(artifact_path: str):
-    """
-    Cleanup the test environment, deleting files and artifacts created during the test.
-
-    :param artifact_path: The artifact path to delete.
-    """
-    # Clean the local directory:
-    for test_output in [
-        *os.listdir(artifact_path),
-        "schedules",
-        "runs",
-        "artifacts",
-        "functions",
-        "model.pt",
-        "model.zip",
-        "model_modules_map.json",
-        "onnx_model.onnx",
-        "optimized_onnx_model.onnx",
-    ]:
-        test_output_path = os.path.abspath(f"./{test_output}")
-        if os.path.exists(test_output_path):
-            if os.path.isdir(test_output_path):
-                shutil.rmtree(test_output_path)
-            else:
-                os.remove(test_output_path)
-
-    # Clean the artifacts directory:
-    shutil.rmtree(artifact_path)
 
 
 def _log_tf_keras_model(context: mlrun.MLClientCtx, model_name: str):
@@ -151,16 +110,11 @@ def _log_pytorch_model(context: mlrun.MLClientCtx, model_name: str):
     condition=not _validate_environment_variables(),
     reason="Project's environment variables are not set",
 )
-@pytest.mark.skipif(
-    condition=not _is_tf2onnx_available(),
-    reason="tf2onnx is not installed",
-)
-def test_to_onnx_help():
+def test_to_onnx_help(test_environment):
     """
     Test the 'to_onnx' handler, passing "help" in the 'framework_kwargs'.
     """
-    # Setup the tests environment:
-    artifact_path = _setup_environment()
+    artifact_path = test_environment
 
     # Create the function:
     log_model_function = mlrun.code_to_function(
@@ -172,12 +126,17 @@ def test_to_onnx_help():
     )
 
     # Run the function to log the model:
-    log_model_run = log_model_function.run(
-        handler="_log_tf_keras_model",
+    log_model_function.run(
+        handler="_log_pytorch_model",
         output_path=artifact_path,
         params={"model_name": MODEL_NAME},
         local=True,
     )
+
+    # Get artifact paths - construct from artifact_path and run structure
+    run_artifact_dir = os.path.join(artifact_path, "log-model--log-pytorch-model", "0")
+    model_path = os.path.join(run_artifact_dir, "model")
+    modules_map_path = os.path.join(run_artifact_dir, "model_modules_map.json.json")
 
     # Import the ONNX Utils function:
     onnx_function = mlrun.import_function("function.yaml", project=PROJECT_NAME)
@@ -190,8 +149,12 @@ def test_to_onnx_help():
             output_path=artifact_path,
             params={
                 # Take the logged model from the previous function.
-                "model_path": log_model_run.status.artifacts[0]["spec"]["target_path"],
-                "load_model_kwargs": {"model_name": MODEL_NAME},
+                "model_path": model_path,
+                "load_model_kwargs": {
+                    "model_name": MODEL_NAME,
+                    "model_class": "mobilenet_v2",
+                    "modules_map": modules_map_path,
+                },
                 "framework_kwargs": "help",
             },
             local=True,
@@ -201,9 +164,6 @@ def test_to_onnx_help():
             f"The test failed, the help was not handled properly and raised the following error: {exception}"
         )
         is_test_passed = False
-
-    # Cleanup the tests environment:
-    _cleanup_environment(artifact_path=artifact_path)
 
     assert is_test_passed
 
@@ -216,12 +176,11 @@ def test_to_onnx_help():
     condition=not _is_tf2onnx_available(),
     reason="tf2onnx is not installed",
 )
-def test_tf_keras_to_onnx():
+def test_tf_keras_to_onnx(test_environment):
     """
     Test the 'to_onnx' handler, giving it a tf.keras model.
     """
-    # Setup the tests environment:
-    artifact_path = _setup_environment()
+    artifact_path = test_environment
 
     # Create the function:
     log_model_function = mlrun.code_to_function(
@@ -256,9 +215,6 @@ def test_tf_keras_to_onnx():
         local=True,
     )
 
-    # Cleanup the tests environment:
-    _cleanup_environment(artifact_path=artifact_path)
-
     # Print the outputs list:
     print(f"Produced outputs: {onnx_function_run.outputs}")
 
@@ -270,12 +226,11 @@ def test_tf_keras_to_onnx():
     condition=not _validate_environment_variables(),
     reason="Project's environment variables are not set",
 )
-def test_pytorch_to_onnx():
+def test_pytorch_to_onnx(test_environment):
     """
     Test the 'to_onnx' handler, giving it a pytorch model.
     """
-    # Setup the tests environment:
-    artifact_path = _setup_environment()
+    artifact_path = test_environment
 
     # Create the function:
     log_model_function = mlrun.code_to_function(
@@ -320,9 +275,6 @@ def test_pytorch_to_onnx():
         local=True,
     )
 
-    # Cleanup the tests environment:
-    _cleanup_environment(artifact_path=artifact_path)
-
     # Print the outputs list:
     print(f"Produced outputs: {onnx_function_run.outputs}")
 
@@ -334,12 +286,11 @@ def test_pytorch_to_onnx():
     condition=not _validate_environment_variables(),
     reason="Project's environment variables are not set",
 )
-def test_optimize_help():
+def test_optimize_help(test_environment):
     """
     Test the 'optimize' handler, passing "help" in the 'optimizations'.
     """
-    # Setup the tests environment:
-    artifact_path = _setup_environment()
+    artifact_path = test_environment
 
     # Import the ONNX Utils function:
     onnx_function = mlrun.import_function("function.yaml", project=PROJECT_NAME)
@@ -362,9 +313,6 @@ def test_optimize_help():
         )
         is_test_passed = False
 
-    # Cleanup the tests environment:
-    _cleanup_environment(artifact_path=artifact_path)
-
     assert is_test_passed
 
 
@@ -372,16 +320,11 @@ def test_optimize_help():
     condition=not _validate_environment_variables(),
     reason="Project's environment variables are not set",
 )
-@pytest.mark.skipif(
-    condition=not _is_tf2onnx_available(),
-    reason="tf2onnx is not installed",
-)
-def test_optimize():
+def test_optimize(test_environment):
     """
-    Test the 'optimize' handler, giving it a model from the ONNX zoo git repository.
+    Test the 'optimize' handler, giving it a pytorch model converted to ONNX.
     """
-    # Setup the tests environment:
-    artifact_path = _setup_environment()
+    artifact_path = test_environment
 
     # Create the function:
     log_model_function = mlrun.code_to_function(
@@ -393,28 +336,44 @@ def test_optimize():
     )
 
     # Run the function to log the model:
-    log_model_run = log_model_function.run(
-        handler="_log_tf_keras_model",
+    log_model_function.run(
+        handler="_log_pytorch_model",
         output_path=artifact_path,
         params={"model_name": MODEL_NAME},
         local=True,
     )
 
+    # Get artifact paths - construct from artifact_path and run structure
+    run_artifact_dir = os.path.join(artifact_path, "log-model--log-pytorch-model", "0")
+    model_path = os.path.join(run_artifact_dir, "model")
+    modules_map_path = os.path.join(run_artifact_dir, "model_modules_map.json.json")
+
     # Import the ONNX Utils function:
     onnx_function = mlrun.import_function("function.yaml", project=PROJECT_NAME)
 
     # Run the function to convert our model to ONNX:
-    to_onnx_function_run = onnx_function.run(
+    onnx_function.run(
         handler="to_onnx",
         output_path=artifact_path,
         params={
             # Take the logged model from the previous function.
-            "model_path": log_model_run.status.artifacts[0]["spec"]["target_path"],
-            "load_model_kwargs": {"model_name": MODEL_NAME},
+            "model_path": model_path,
+            "load_model_kwargs": {
+                "model_name": MODEL_NAME,
+                "model_class": "mobilenet_v2",
+                "modules_map": modules_map_path,
+            },
             "onnx_model_name": ONNX_MODEL_NAME,
+            "framework_kwargs": {"input_signature": [((32, 3, 224, 224), "float32")]},
         },
         local=True,
     )
+
+    # Get the ONNX model path from the to_onnx run output
+    onnx_run_artifact_dir = os.path.join(
+        artifact_path, "onnx-utils-to-onnx", "0"
+    )
+    onnx_model_path = os.path.join(onnx_run_artifact_dir, "model")
 
     # Run the function to optimize our model:
     optimize_function_run = onnx_function.run(
@@ -422,17 +381,12 @@ def test_optimize():
         output_path=artifact_path,
         params={
             # Take the logged model from the previous function.
-            "model_path": to_onnx_function_run.status.artifacts[0]["spec"][
-                "target_path"
-            ],
+            "model_path": onnx_model_path,
             "handler_init_kwargs": {"model_name": ONNX_MODEL_NAME},
             "optimized_model_name": OPTIMIZED_ONNX_MODEL_NAME,
         },
         local=True,
     )
-
-    # Cleanup the tests environment:
-    _cleanup_environment(artifact_path=artifact_path)
 
     # Print the outputs list:
     print(f"Produced outputs: {optimize_function_run.outputs}")

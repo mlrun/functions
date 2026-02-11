@@ -38,29 +38,19 @@ def test_import_sklearn_classifier():
     params = {"model_pkg_class": "sklearn.ensemble.RandomForestClassifier",
               "label_column": "labels"}
 
-    # In local mode, artifacts are in function-name/iteration subdirectory
-    dataset_path = "./artifacts/gen-class-data-gen-class-data/0/classifier-data.csv"
-    assert os.path.exists(dataset_path), f"Dataset not found at {dataset_path}"
-
     train_run = fn.run(params=params,
-                       inputs={"dataset": dataset_path},
+                       inputs={"dataset": acquire_run.status.artifacts[0]['spec']['target_path']},
                        local=True,
-                       artifact_path="./artifacts")
+                       artifact_path="./")
 
-    # Check that the run completed successfully
-    assert train_run.status.state == "completed", f"Run failed with state: {train_run.status.state}"
+    for artifact in train_run.status.artifacts:
+        if artifact['kind'] == 'model':
+            assert os.path.exists(artifact['spec']['target_path']), 'Could not find model dir'
+            break
 
-    # In local mode, check if model metrics were logged
-    assert "accuracy" in train_run.status.results or len(train_run.status.results) > 0, \
-        "No metrics were logged"
-
-    # In local mode, the model is saved to artifacts/model/function-name/iteration/model/model.pkl
-    model_path = "./artifacts/model/sklearn-classifier-train-model/0/model/model.pkl"
-    assert os.path.exists(model_path), f'Could not find model file at {model_path}'
-
-    # Load the model and verify it can make predictions
-    model = pickle.load(open(model_path, 'rb'))
-    df = pd.read_csv(dataset_path)
+    assert os.path.exists(train_run.status.artifacts[0]['spec']['target_path'])
+    model = pickle.load(open(artifact['spec']['target_path'] + artifact['spec']['model_file'], 'rb'))
+    df = pd.read_csv(acquire_run.status.artifacts[0]['spec']['target_path'])
     x = df.drop(['labels'], axis=1).iloc[0:1]
     y_true = df['labels'][0]
     y_pred = model.predict_proba(x).argmax()

@@ -366,20 +366,6 @@ def predict(
     # loading the model, and getting the model handler:
     model_handler = AutoMLRun.load_model(model_path=model, context=context)
 
-    # Fix feature names for models that require them (e.g., XGBoost)
-    # When dataset comes from a list, pandas assigns default integer column names
-    # but some models expect specific feature names they were trained with
-    if hasattr(model_handler.model, 'feature_names_in_'):
-        expected_features = model_handler.model.feature_names_in_
-        if len(dataset.columns) == len(expected_features):
-            # Only rename if the number of columns matches
-            # This handles the case where a list was converted to DataFrame with default column names
-            if not all(col == feat for col, feat in zip(dataset.columns, expected_features)):
-                context.logger.info(
-                    f"Renaming dataset columns to match model's expected feature names"
-                )
-                dataset.columns = expected_features
-
     # Dropping label columns if necessary:
     if not label_columns:
         label_columns = []

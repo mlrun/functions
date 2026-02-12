@@ -1,4 +1,5 @@
 pandas
 scikit-learn~=1.5.2
 lightgbm
+xgboost<2.0.0
 plotly

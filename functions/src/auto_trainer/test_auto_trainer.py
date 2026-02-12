@@ -28,7 +28,10 @@ from sklearn.datasets import (
 MODELS = [
     ("sklearn.linear_model.LinearRegression", "regression"),
     ("sklearn.ensemble.RandomForestClassifier", "classification"),
+    ("xgboost.XGBRegressor", "regression"),
+    ("xgboost.XGBClassifier", "classification"),
     ("lightgbm.LGBMRegressor", "regression"),
+    ("lightgbm.LGBMClassifier", "classification")
 ]
 
 REQUIRED_ENV_VARS = [

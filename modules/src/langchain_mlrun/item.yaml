@@ -18,7 +18,7 @@ spec:
     image: mlrun/mlrun
     kind: generic
     requirements:
-      - langchain
-      - pydantic-settings
-      - kafka-python
+    - langchain~=1.2
+    - pydantic-settings~=2.12
+    - kafka-python~=2.3
 version: 0.0.1

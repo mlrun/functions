@@ -13,6 +13,7 @@ As public contributions, we ask that all contributors follow the project’s gui
 | [count_events](https://github.com/mlrun/functions/tree/master/modules/src/count_events) | Count events in each time window | monitoring_application | model-serving |
 | [evidently_iris](https://github.com/mlrun/functions/tree/master/modules/src/evidently_iris) | Demonstrates Evidently integration in MLRun for data quality and drift monitoring using the Iris dataset | monitoring_application | model-serving, structured-ML |
 | [histogram_data_drift](https://github.com/mlrun/functions/tree/master/modules/src/histogram_data_drift) | Model-monitoring application for detecting and visualizing data drift | monitoring_application | model-serving, structured-ML |
+| [langchain_mlrun](https://github.com/mlrun/functions/tree/master/modules/src/langchain_mlrun) | LangChain x MLRun integration - Orchestrate your LangChain code with MLRun. | generic | langchain, langgraph, tracing, monitoring, llm |
 | [openai_proxy_app](https://github.com/mlrun/functions/tree/master/modules/src/openai_proxy_app) | OpenAI application runtime based on fastapi | generic | genai |
 | [vllm_module](https://github.com/mlrun/functions/tree/master/modules/src/vllm_module) | Deploys a vLLM OpenAI-compatible LLM server as an MLRun application runtime, with configurable GPU usage, node selection, tensor parallelism, and runtime flags. | generic | genai |
 <!-- AUTOGEN:END -->

@@ -45,6 +45,7 @@ class AgentDeployer:
         result_path: Optional[str] = None,
         inputs_path: Optional[str] = None,
         outputs: Optional[list[str]] = None,
+        inputs: Optional[list[str]] = None,
         requirements: Optional[list[str]] = None,
         image: str = "mlrun/mlrun",
         set_model_monitoring: bool = False,
@@ -67,6 +68,9 @@ class AgentDeployer:
         :param outputs: list of the model outputs (e.g. labels) ,if provided will override the outputs
                                       that been configured in the model artifact, please note that those outputs need to
                                       be equal to the model_class predict method outputs (length, and order).
+        :param inputs: list of the model inputs (e.g. features) ,if provided will override the inputs
+                                      that been configured in the model artifact, please note that those outputs need to
+                                      be equal to the model_class predict method outputs (length, and order).
         :param requirements: List of additional requirements for the function
         :param image: Docker image to be used for the function
         :param set_model_monitoring: Whether to configure model monitoring
@@ -84,6 +88,7 @@ class AgentDeployer:
         self.result_path = result_path
         self.inputs_path = inputs_path
         self.output_schema = outputs
+        self.input_schema = inputs
         self.image = image
         if set_model_monitoring:
             self.configure_model_monitoring()
@@ -206,6 +211,7 @@ class AgentDeployer:
             result_path=self.result_path,
             input_path=self.inputs_path,
             outputs=self.output_schema,
+            inputs=self.input_schema,
             execution_mechanism="naive",
             **self.model_params,
         )

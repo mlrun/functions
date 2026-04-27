@@ -1,0 +1,4 @@
+pytest
+langchain~=1.2
+pydantic-settings~=2.12
+kafka-python~=2.3

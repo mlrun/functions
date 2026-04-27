@@ -1,0 +1,24 @@
+apiVersion: v1
+categories:
+- langchain
+- langgraph
+- tracing
+- monitoring
+- llm
+description: LangChain x MLRun integration - Orchestrate your LangChain code with MLRun.
+example: langchain_mlrun.ipynb
+generationDate: 2026-01-08:12-25
+hidden: false
+labels:
+  author: Iguazio
+mlrunVersion: 1.10.0
+name: langchain_mlrun
+spec:
+    filename: langchain_mlrun.py
+    image: mlrun/mlrun
+    kind: generic
+    requirements:
+    - langchain~=1.2
+    - pydantic-settings~=2.12
+    - kafka-python~=2.3
+version: 0.0.1

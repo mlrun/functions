@@ -1,2 +1,2 @@
-mlrun==1.10.0-rc41
+mlrun==1.10.0
 pytest~=8.2

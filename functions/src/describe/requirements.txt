@@ -1,4 +1,4 @@
-scikit-learn~=1.0.2
+scikit-learn~=1.5.2
 plotly~=5.23
 pytest~=7.0.1
 matplotlib~=3.5.1

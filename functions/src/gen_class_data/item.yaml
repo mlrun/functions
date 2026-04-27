@@ -11,7 +11,7 @@ labels:
   author: Iguazio
 maintainers: []
 marketplaceType: ''
-mlrunVersion: 1.7.0
+mlrunVersion: 1.10.0
 name: gen_class_data
 platformVersion: 3.5.3
 spec:
@@ -21,4 +21,4 @@ spec:
   kind: job
   requirements: []
 url: ''
-version: 1.3.0
+version: 1.4.0

@@ -67,30 +67,14 @@ def _get_dataframe(
                             Classification tasks.
     :param drop_columns:    str/int or a list of strings/ints that represent the column names/indices to drop.
     """
-    store_uri_prefix, _ = mlrun.datastore.parse_store_uri(dataset.artifact_url)
-
-    # Getting the dataset:
-    if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
-        label_columns = label_columns or dataset.meta.status.label_column
-        context.logger.info(f"label columns: {label_columns}")
-        # FeatureVector case:
-        try:
-            fv = mlrun.datastore.get_store_resource(dataset.artifact_url)
-            dataset = fv.get_offline_features(drop_columns=drop_columns).to_dataframe()
-        except AttributeError:
-            # Leave here for backwards compatibility
-            dataset = fs.get_offline_features(
-                dataset.meta.uri, drop_columns=drop_columns
-            ).to_dataframe()
-
-    elif not label_columns:
-        context.logger.info(
-            "label_columns not provided, mandatory when dataset is not a FeatureVector"
-        )
-        raise ValueError
-
-    elif isinstance(dataset, (list, dict)):
+    # Check if dataset is list/dict first (before trying to access artifact_url)
+    if isinstance(dataset, (list, dict)):
         # list/dict case:
+        if not label_columns:
+            context.logger.info(
+                "label_columns not provided, mandatory when dataset is not a FeatureVector"
+            )
+            raise ValueError
         dataset = pd.DataFrame(dataset)
         # Checking if drop_columns provided by integer type:
         if drop_columns:
@@ -103,17 +87,38 @@ def _get_dataframe(
                 )
                 raise ValueError
             dataset.drop(drop_columns, axis=1, inplace=True)
-
     else:
-        # simple URL case:
-        dataset = dataset.as_df()
-        if drop_columns:
-            if all(col in dataset for col in drop_columns):
-                dataset = dataset.drop(drop_columns, axis=1)
-            else:
+        # Dataset is a DataItem with artifact_url (URI or FeatureVector)
+        store_uri_prefix, _ = mlrun.datastore.parse_store_uri(dataset.artifact_url)
+
+        # Getting the dataset:
+        if mlrun.utils.StorePrefix.FeatureVector == store_uri_prefix:
+            label_columns = label_columns or dataset.meta.status.label_column
+            context.logger.info(f"label columns: {label_columns}")
+            # FeatureVector case:
+            try:
+                fv = mlrun.datastore.get_store_resource(dataset.artifact_url)
+                dataset = fv.get_offline_features(drop_columns=drop_columns).to_dataframe()
+            except AttributeError:
+                # Leave here for backwards compatibility
+                dataset = fs.get_offline_features(
+                    dataset.meta.uri, drop_columns=drop_columns
+                ).to_dataframe()
+        else:
+            # simple URL case:
+            if not label_columns:
                 context.logger.info(
-                    "not all of the columns to drop in the dataset, drop columns process skipped"
+                    "label_columns not provided, mandatory when dataset is not a FeatureVector"
                 )
+                raise ValueError
+            dataset = dataset.as_df()
+            if drop_columns:
+                if all(col in dataset for col in drop_columns):
+                    dataset = dataset.drop(drop_columns, axis=1)
+                else:
+                    context.logger.info(
+                        "not all of the columns to drop in the dataset, drop columns process skipped"
+                    )
 
     return dataset, label_columns
 

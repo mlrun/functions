@@ -7,6 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 TEMPLATES = {
     "function": "cli/utils/function_item_template.yaml.j2",
     "module": "cli/utils/module_item_template.yaml.j2",
+    "step": "cli/utils/step_item_template.yaml.j2",
 }
 
 

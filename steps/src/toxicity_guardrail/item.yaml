@@ -9,7 +9,7 @@ generationDate: 2026-04-27:12-00
 hidden: false
 labels:
   author: Iguazio
-mlrunVersion: 1.10.0
+mlrunVersion: 1.11.0-rc48
 name: toxicity_guardrail
 className: ToxicityGuardrailStep
 defaultHandler:

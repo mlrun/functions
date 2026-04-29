@@ -10,5 +10,6 @@ As public contributions, we ask that all contributors follow the project’s gui
 <!-- AUTOGEN:START (do not edit below) -->
 | Name | Description | Class Name | Categories |
 | --- | --- | --- | --- |
+| [toxicity_guardrail](https://github.com/mlrun/functions/tree/development/steps/src/toxicity_guardrail) | Filters toxic requests using a pre-trained text classifier before they reach the LLM | ToxicityGuardrailStep | data-preparation, model-serving, genai |
 | [verify_schema](https://github.com/mlrun/functions/tree/development/steps/src/verify_schema) | Verifies the event is aligned with the provided schema | VerifySchema | data-preparation, model-serving, utilities |
 <!-- AUTOGEN:END -->

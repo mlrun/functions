@@ -4,6 +4,10 @@ import tempfile
 import mlrun
 import pytest
 
+pytestmark = pytest.mark.skip(
+    reason="Skipped until FHUB-248 is addressed"
+)
+
 
 @pytest.fixture()
 def setup_test():

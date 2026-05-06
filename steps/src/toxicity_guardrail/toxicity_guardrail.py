@@ -16,7 +16,6 @@
 from typing import Any, Dict
 from transformers import pipeline
 
-
 class ToxicityGuardrailStep:
     def __init__(
         self,

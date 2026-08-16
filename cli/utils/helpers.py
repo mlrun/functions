@@ -20,7 +20,7 @@ from typing import Union, List, Set, Dict
 import sys
 from glob import iglob
 import yaml
-from jinja2 import Template
+from jinja2 import Template, select_autoescape
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.absolute()
 
@@ -44,7 +44,10 @@ def render_jinja(
     with open(template_path, "r") as t:
         template_text = t.read()
 
-    template = Template(template_text)
+    autoescape = select_autoescape(enabled_extensions=("html", "htm", "xml"))(
+        str(template_path)
+    )
+    template = Template(template_text, autoescape=autoescape)
     rendered = template.render(**data)
 
     with open(output_path, "w+") as out_t:

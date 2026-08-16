@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 from datetime import datetime, timezone
 import click
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 TEMPLATES = {
     "function": "cli/utils/function_item_template.yaml.j2",
@@ -44,7 +44,7 @@ overwrite: whether to overwrite existing item.yaml file
     }
 
     # Load and render template
-    env = Environment(loader=FileSystemLoader("."))
+    env = Environment(loader=FileSystemLoader("."), autoescape=select_autoescape())
     template = env.get_template(TEMPLATES[type])
     rendered = template.render(params)
 

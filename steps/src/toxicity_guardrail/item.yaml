@@ -17,7 +17,7 @@ spec:
   filename: toxicity_guardrail.py
   image: mlrun/mlrun
   requirements:
-    - transformers==4.46.3
+    - transformers==5.5.0
     - torch==2.11.0
   kind: generic
 version: 1.0.0

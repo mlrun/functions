@@ -411,8 +411,12 @@ def update_or_create_item(
     latest_static = target_latest / "static"
     version_static = target_version / "static"
 
-    shutil.copytree(item_dir, latest_src)
-    shutil.copytree(item_dir, version_src)
+    # requirements.txt is only used for local testing and is not consumed by the
+    # marketplace or by mlrun (deps live in function.yaml/item.yaml). Excluding it
+    # keeps unfixable dependency-scan manifests out of the published artifact.
+    ignore_published = shutil.ignore_patterns("requirements.txt")
+    shutil.copytree(item_dir, latest_src, ignore=ignore_published)
+    shutil.copytree(item_dir, version_src, ignore=ignore_published)
 
     latest_static.mkdir(parents=True, exist_ok=True)
     version_static.mkdir(parents=True, exist_ok=True)
